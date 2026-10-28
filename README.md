@@ -13,7 +13,7 @@ npm run build      # statikus build a dist/ mappába (Netlify / Vercel / GitHub 
 ## Állapot
 
 - [x] 1. fázis – Alap: projekt, területek, SVG vászon cm-ben, nagyítás/mozgatás, IndexedDB mentés, PWA
-- [ ] 2. fázis – Növények
+- [x] 2. fázis – Növények: adatbázis (30 faj), paletta, elhelyezés, mozgatás, lasszó, visszavonás
 - [ ] 3. fázis – Gyors ültetés
 - [ ] 4. fázis – Szabálymotor, rögzített elemek
 - [ ] 5. fázis – Növénylista
