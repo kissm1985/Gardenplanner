@@ -1,12 +1,13 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from 'react';
-import { pointInPolygon, snap } from '../model/geometry';
+import { fillPath, fillPolygon } from '../engine/fill';
+import { bbox, centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
 import { plantMap } from '../model/plants';
 import type { Area, Plant, Pt, Settings } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import { FixturesLayer, FixtureZonesLayer } from './layers/Fixtures';
 import { GridLayer } from './layers/Grid';
-import { PlantsLayer, type DragOffset } from './layers/Plants';
+import { CountLabel, GroupLabels, PlantsLayer, plantRadius, VertexHandles, type DragOffset, type ShapeOverride } from './layers/Plants';
 import { Rulers, RULER } from './layers/Rulers';
 import { fitView, niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
 
@@ -22,6 +23,8 @@ type Gesture =
   | { mode: 'pan'; view: View; start: P2; moved: boolean; onEmpty: boolean; additive: boolean }
   | { mode: 'move'; start: P2; ids: string[]; anchor: Pt; moved: boolean; tappedId: string; additive: boolean; wasSelected: boolean }
   | { mode: 'lasso'; points: Pt[] }
+  | { mode: 'draw'; kind: 'drift' | 'curve' | 'line'; points: Pt[]; startPx: P2; moved: boolean }
+  | { mode: 'vertex'; id: string; index: number; points: Pt[]; start: P2; moved: boolean }
   | { mode: 'pinch'; view: View; start: Map<number, P2> };
 
 const DOUBLE_TAP_MS = 300;
@@ -48,6 +51,12 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
   const lastTap = useRef<{ t: number; x: number; y: number } | null>(null);
   const [drag, setDrag] = useState<DragOffset | null>(null);
   const [lassoPts, setLassoPts] = useState<Pt[] | null>(null);
+  const [draft, setDraft] = useState<{ kind: 'drift' | 'curve' | 'line'; points: Pt[] } | null>(null);
+  const [shape, setShape] = useState<ShapeOverride | null>(null);
+  const pendingLineStart = useRef<Pt | null>(null);
+  const [pendingStart, setPendingStart] = useState<Pt | null>(null);
+  const driftPattern = useUi((s) => s.driftPattern);
+  const rowMode = useUi((s) => s.rowMode);
 
   // Drop selections that no longer exist (after undo, delete, area switch).
   useEffect(() => {
@@ -121,7 +130,9 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
 
   const itemPos = (id: string): Pt => {
     const it = items.find((i) => i.id === id);
-    return it?.kind === 'plant' ? [it.x, it.y] : [0, 0];
+    if (!it) return [0, 0];
+    if (it.kind === 'plant') return [it.x, it.y];
+    return it.kind === 'drift' ? it.polygon[0] : it.path[0];
   };
 
   const onPointerDown = (e: PointerEvent) => {
@@ -134,13 +145,24 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
       // Second finger: abandon move / lasso and pinch instead.
       setDrag(null);
       setLassoPts(null);
+      setDraft(null);
+      setShape(null);
       gesture.current = { mode: 'pinch', view, start: new Map(pointers.current) };
       return;
     }
 
     const additive = e.shiftKey || e.ctrlKey || e.metaKey;
-    const hitId = (e.target as Element).closest?.('[data-id]')?.getAttribute('data-id') ?? null;
-    if (tool === 'select' && hitId) {
+    const target = e.target as Element;
+    const hitId = target.closest?.('[data-id]')?.getAttribute('data-id') ?? null;
+    const handle = target.getAttribute?.('data-handle');
+    const editing = editable();
+    if (tool === 'select' && handle != null && editing) {
+      gesture.current = { mode: 'vertex', id: editing.id, index: +handle, points: editing.points, start: p, moved: false };
+    } else if ((tool === 'drift' || tool === 'row') && activePlant) {
+      const kind = tool === 'drift' ? 'drift' : rowMode === 'curve' ? 'curve' : 'line';
+      const w = kind === 'line' ? snapPt(toWorld(p)) : toWorld(p);
+      gesture.current = { mode: 'draw', kind, points: [w], startPx: p, moved: false };
+    } else if (tool === 'select' && hitId) {
       const ui = useUi.getState();
       const wasSelected = ui.selected.includes(hitId);
       let ids = ui.selected;
@@ -185,6 +207,19 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
     } else if (g.mode === 'lasso') {
       g.points.push(toWorld(p));
       setLassoPts([...g.points]);
+    } else if (g.mode === 'draw') {
+      if (!g.moved && Math.hypot(p.x - g.startPx.x, p.y - g.startPx.y) < TAP_SLOP_PX) return;
+      g.moved = true;
+      const w = toWorld(p);
+      if (g.kind === 'line') g.points = [g.points[0], snapPt(w)];
+      else if (dist(g.points[g.points.length - 1], w) * viewRef.current!.s > 3) g.points.push(w);
+      setDraft({ kind: g.kind, points: [...g.points] });
+    } else if (g.mode === 'vertex') {
+      if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
+      g.moved = true;
+      const pts = g.points.slice();
+      pts[g.index] = snapPt(toWorld(p));
+      setShape({ id: g.id, points: pts });
     }
   };
 
@@ -224,10 +259,25 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
       }
       return;
     }
+    if (g.mode === 'vertex') {
+      setShape(null);
+      if (g.moved) {
+        const pts = g.points.slice();
+        pts[g.index] = snapPt(toWorld(p));
+        useProject.getState().updateShape(g.id, pts);
+      }
+      return;
+    }
+    if (g.mode === 'draw') {
+      setDraft(null);
+      finishDraw(g, p);
+      return;
+    }
     if (g.mode === 'lasso') {
       setLassoPts(null);
       if (g.points.length > 2) {
-        const hit = items.filter((i) => i.kind === 'plant' && pointInPolygon([i.x, i.y], g.points)).map((i) => i.id);
+        const anchor = (i: (typeof items)[number]): Pt => (i.kind === 'plant' ? [i.x, i.y] : centroid(i.kind === 'drift' ? i.polygon : i.path));
+        const hit = items.filter((i) => pointInPolygon(anchor(i), g.points)).map((i) => i.id);
         const cur = useUi.getState().selected;
         useUi.getState().select(e.shiftKey ? [...new Set([...cur, ...hit])] : hit);
       }
@@ -236,9 +286,73 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
     if (g.mode === 'pan' && !g.moved) onTap(p, g);
   };
 
+  /** The single selected drift/row whose vertices can be dragged. */
+  const editable = (): { id: string; points: Pt[] } | null => {
+    const sel = useUi.getState().selected;
+    if (sel.length !== 1) return null;
+    const it = items.find((i) => i.id === sel[0]);
+    if (it?.kind === 'drift') return { id: it.id, points: it.polygon };
+    if (it?.kind === 'row') return { id: it.id, points: it.path };
+    return null;
+  };
+
+  const finishDraw = (g: Extract<Gesture, { mode: 'draw' }>, p: P2) => {
+    const st = useProject.getState();
+    const plantId = activePlant!;
+    const tol = 4 / viewRef.current!.s; // ~4 px simplification tolerance
+    if (g.kind === 'line') {
+      // Drag A→B, or tap A then tap B.
+      if (!g.moved) {
+        const here = snapPt(toWorld(p));
+        const start = pendingLineStart.current;
+        if (start && dist(start, here) > 1) {
+          pendingLineStart.current = null;
+          setPendingStart(null);
+          const id = st.addRow(plantId, [start, here]);
+          if (id) useUi.getState().select([id]);
+        } else {
+          pendingLineStart.current = here;
+          setPendingStart(here);
+        }
+        return;
+      }
+      const id = st.addRow(plantId, g.points);
+      if (id) useUi.getState().select([id]);
+      return;
+    }
+    if (!g.moved) {
+      if (g.kind === 'drift') hint('Húzd körbe ujjal a folt területét.');
+      else hint('Húzz egy vonalat ujjal az ív mentén.');
+      return;
+    }
+    const pts = simplify(g.points, tol);
+    if (g.kind === 'drift') {
+      if (pts.length < 3 || polygonArea(pts) < 100) return hint('Ez a folt túl kicsi. Rajzolj nagyobbat.');
+      const id = st.addDrift(plantId, pts, useUi.getState().driftPattern);
+      if (id) useUi.getState().select([id]);
+    } else {
+      if (pts.length < 2) return;
+      const id = st.addRow(plantId, pts);
+      if (id) useUi.getState().select([id]);
+    }
+  };
+
+  const [toast, setToast] = useState('');
+  const hint = (t: string) => {
+    setToast(t);
+    window.setTimeout(() => setToast((x) => (x === t ? '' : x)), 2500);
+  };
+
+  // Forget a half-made straight row when the tool or plant changes.
+  useEffect(() => {
+    pendingLineStart.current = null;
+    setPendingStart(null);
+  }, [tool, activePlant, rowMode]);
+
   const onTap = (p: P2, g: Extract<Gesture, { mode: 'pan' }>) => {
-    if (tool === 'plant') {
-      if (activePlant) place(activePlant, toWorld(p));
+    if (tool === 'plant' || tool === 'drift' || tool === 'row') {
+      if (!activePlant) hint('Előbb válassz növényt a palettán.');
+      else if (tool === 'plant') place(activePlant, toWorld(p));
       return;
     }
     const now = performance.now();
@@ -286,6 +400,13 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
     e.preventDefault();
   };
 
+  const Handles = () => {
+    const e = editable();
+    if (!e || drag) return null;
+    const pts = shape?.id === e.id ? shape.points : e.points;
+    return <VertexHandles points={pts} s={view!.s} />;
+  };
+
   const zoomBtn = (f: number) => view && setView(zoomAt(view, f, size.w / 2, size.h / 2));
 
   return (
@@ -318,15 +439,32 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
                 plants={plants}
                 selected={selectedSet}
                 drag={drag}
+                shape={shape}
                 showMature={settings.showMatureSize}
                 showSpacing={layers.spacing}
               />
             )}
+            {layers.plants && <GroupLabels items={items} plants={plants} drag={drag} shape={shape} s={view.s} />}
+            {tool === 'select' && <Handles />}
+            {draft && activePlant && plants.get(activePlant) && (
+              <Draft draft={draft} plant={plants.get(activePlant)!} pattern={driftPattern} s={view.s} mature={settings.showMatureSize} />
+            )}
+            {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
             {layers.dimensions && <Dimensions area={area} s={view.s} />}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>
           <Rulers view={view} w={size.w} h={size.h} />
         </svg>
+      )}
+      {toast && (
+        <p className="canvas-toast" role="status">
+          {toast}
+        </p>
+      )}
+      {pendingStart && !toast && (
+        <p className="canvas-toast" role="status">
+          Koppints a sor végpontjára.
+        </p>
       )}
       <div className="zoom-ctl" aria-label="Nagyítás">
         <button type="button" onClick={() => zoomBtn(1.25)} aria-label="Nagyítás">+</button>
@@ -352,6 +490,35 @@ function Dimensions({ area, s }: { area: Area; s: number }) {
       <text transform={`translate(${right + off} ${area.lengthCm / 2}) rotate(90)`} textAnchor="middle" dominantBaseline="middle">
         {area.lengthCm} cm
       </text>
+    </g>
+  );
+}
+
+/** Live preview while drawing a drift / row: outline, planting positions and count. */
+function Draft({ draft, plant, pattern, s, mature }: {
+  draft: { kind: 'drift' | 'curve' | 'line'; points: Pt[] };
+  plant: Plant;
+  pattern: 'grid' | 'staggered';
+  s: number;
+  mature: boolean;
+}) {
+  const pts = draft.points;
+  const isDrift = draft.kind === 'drift';
+  const positions = isDrift ? (pts.length >= 3 ? fillPolygon(pts, plant.spacingCm, pattern) : []) : fillPath(pts, plant.spacingCm);
+  const r = plantRadius(plant, mature);
+  const b = bbox(pts);
+  const line = pts.map((q) => q.join(',')).join(' ');
+  return (
+    <g className="draft" pointerEvents="none">
+      {isDrift ? (
+        <polygon className="draft-shape" points={line} vectorEffect="non-scaling-stroke" />
+      ) : (
+        <polyline className="draft-shape" points={line} vectorEffect="non-scaling-stroke" />
+      )}
+      {positions.map(([x, y], i) => (
+        <circle key={i} cx={x} cy={y} r={r} fill={plant.color} fillOpacity={0.55} />
+      ))}
+      <CountLabel x={(b.minX + b.maxX) / 2} y={b.minY - 6 / s} fs={12 / s} text={`${plant.code} × ${positions.length}`} />
     </g>
   );
 }

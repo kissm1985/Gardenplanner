@@ -6,6 +6,13 @@ import { PlantChip } from './PlantChip';
 
 const DRAG_START_PX = 12;
 
+const TOOL_HINT: Record<string, string> = {
+  plant: 'koppints a rajzra',
+  drift: 'húzd körbe ujjal a foltot',
+  row: 'húzz egyenest, vagy koppints a két végére',
+  curve: 'húzd végig ujjal az ív mentén',
+};
+
 export const matchesQuery = (p: Plant, q: string) => {
   const s = q.trim().toLowerCase();
   return !s || p.code.toLowerCase().includes(s) || p.nameHu.toLowerCase().includes(s) || p.nameLat.toLowerCase().includes(s);
@@ -18,6 +25,8 @@ export const matchesQuery = (p: Plant, q: string) => {
 export function PlantPalette({ onOpenDb }: { onOpenDb: () => void }) {
   const plantDb = useProject((s) => s.project!.plantDb);
   const active = useUi((s) => s.activePlant);
+  const tool = useUi((s) => s.tool);
+  const rowMode = useUi((s) => s.rowMode);
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(true);
   const list = useMemo(
@@ -65,10 +74,12 @@ export function PlantPalette({ onOpenDb }: { onOpenDb: () => void }) {
         <p className="palette-hint" role="status">
           {activePlant ? (
             <>
-              <b>{activePlant.nameHu}</b> · koppints a rajzra
+              <b>{activePlant.nameHu}</b> · {TOOL_HINT[tool === 'row' ? (rowMode === 'curve' ? 'curve' : 'row') : tool] ?? ''}
             </>
-          ) : (
+          ) : tool === 'plant' ? (
             'Válassz növényt, majd koppints a rajzra, vagy húzd fel a rajzra.'
+          ) : (
+            'Válassz növényt, aztán rajzolj a tervre.'
           )}
         </p>
         <button type="button" className="btn btn-small" onClick={onOpenDb}>

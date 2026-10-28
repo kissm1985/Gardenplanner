@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { PlanCanvas, SNAP_CM } from './canvas/PlanCanvas';
 import { ORIENTATION_LABEL } from './model/types';
-import { selectCurrentArea, useProject } from './store/projectStore';
+import { selectCurrentArea, selectItems, useProject } from './store/projectStore';
 import { useUi, type Layers, type Tool } from './store/uiStore';
 import { AreasPanel } from './ui/AreasPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
@@ -14,8 +14,8 @@ import { Welcome } from './ui/Welcome';
 const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
   { id: 'select', label: 'Kijelölés', icon: '↖', ready: true },
   { id: 'plant', label: 'Növény', icon: '✿', ready: true },
-  { id: 'drift', label: 'Folt', icon: '⬭', ready: false },
-  { id: 'row', label: 'Sor', icon: '⋯', ready: false },
+  { id: 'drift', label: 'Folt', icon: '⬭', ready: true },
+  { id: 'row', label: 'Sor', icon: '⋯', ready: true },
   { id: 'season', label: 'Évszak', icon: '◐', ready: false },
   { id: 'list', label: 'Lista', icon: '☰', ready: false },
 ];
@@ -40,6 +40,9 @@ export function App({ loading }: { loading: boolean }) {
   const lasso = useUi((s) => s.lasso);
   const snapOn = useUi((s) => s.snap);
   const layers = useUi((s) => s.layers);
+  const driftPattern = useUi((s) => s.driftPattern);
+  const rowMode = useUi((s) => s.rowMode);
+  const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
 
   // Desktop keyboard shortcuts for undo/redo.
@@ -68,7 +71,7 @@ export function App({ loading }: { loading: boolean }) {
           <span className="area-name">{area ? area.name : 'Nincs terület'}</span>
           {area && (
             <span className="area-meta mono">
-              {area.widthCm} × {area.lengthCm} cm · {ORIENTATION_LABEL[area.orientation]}
+              {area.widthCm} × {area.lengthCm} cm · <b className="meta-count">{total} tő</b> · {ORIENTATION_LABEL[area.orientation]}
               {area.sunUntil && ` · ${area.sunUntil}`}
             </span>
           )}
@@ -110,6 +113,29 @@ export function App({ loading }: { loading: boolean }) {
                 </button>
               </div>
             )}
+            {tool === 'drift' && (
+              <div className="stage-tools" role="toolbar" aria-label="Folt kiosztása">
+                <button type="button" className="chip-btn" aria-pressed={driftPattern === 'staggered'} onClick={() => ui.setDriftPattern('staggered')}>
+                  Eltolt rács
+                </button>
+                <button type="button" className="chip-btn" aria-pressed={driftPattern === 'grid'} onClick={() => ui.setDriftPattern('grid')}>
+                  Négyzetes
+                </button>
+              </div>
+            )}
+            {tool === 'row' && (
+              <div className="stage-tools" role="toolbar" aria-label="Sor fajtája">
+                <button type="button" className="chip-btn" aria-pressed={rowMode === 'line'} onClick={() => ui.setRowMode('line')}>
+                  Egyenes
+                </button>
+                <button type="button" className="chip-btn" aria-pressed={rowMode === 'curve'} onClick={() => ui.setRowMode('curve')}>
+                  Ív
+                </button>
+                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
+                  Mágnes
+                </button>
+              </div>
+            )}
             {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} />}
           </>
         ) : (
@@ -122,7 +148,7 @@ export function App({ loading }: { loading: boolean }) {
         )}
       </main>
 
-      {tool === 'plant' && area && <PlantPalette onOpenDb={() => setSheet('plantdb')} />}
+      {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && <PlantPalette onOpenDb={() => setSheet('plantdb')} />}
 
       <nav className="toolbar" aria-label="Eszközök">
         {TOOLS.map((t) => (

@@ -19,6 +19,10 @@ export interface UiState {
   lasso: boolean;
   snap: boolean;
   layers: Layers;
+  driftPattern: 'grid' | 'staggered';
+  rowMode: 'line' | 'curve';
+  setDriftPattern: (p: 'grid' | 'staggered') => void;
+  setRowMode: (m: 'line' | 'curve') => void;
   setTool: (t: Tool) => void;
   setActivePlant: (code: string | null) => void;
   select: (ids: string[]) => void;
@@ -34,6 +38,10 @@ export const useUi = create<UiState>()((set) => ({
   selected: [],
   lasso: false,
   snap: false,
+  driftPattern: 'staggered',
+  rowMode: 'line',
+  setDriftPattern: (driftPattern) => set({ driftPattern }),
+  setRowMode: (rowMode) => set({ rowMode }),
   layers: { plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
   setTool: (tool) => set((s) => ({ tool, lasso: tool === 'select' ? s.lasso : false })),
   setActivePlant: (activePlant) => set({ activePlant }),

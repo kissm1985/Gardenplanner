@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { fillPath, fillPolygon, spacingForCount } from '../engine/fill';
 import { JUGLONE_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { ItemStatus, PlacedItem, Plant } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
@@ -36,6 +37,7 @@ export function SelectionBar({ onProps }: { onProps: () => void }) {
 /** Properties of the selected item(s): species, status, note, position. */
 export function ItemProps({ plantDb, onDone }: { plantDb: Plant[]; onDone: () => void }) {
   const selected = useUi((s) => s.selected);
+  const [note, setNote] = useState('');
   const all = useProject(selectItems);
   const items = useMemo(() => all.filter((i) => selected.includes(i.id)), [all, selected]);
   const byCode = useMemo(() => new Map(plantDb.map((p) => [p.code, p])), [plantDb]);
@@ -75,6 +77,14 @@ export function ItemProps({ plantDb, onDone }: { plantDb: Plant[]; onDone: () =>
           ))}
         </div>
       </fieldset>
+      {single && single.kind !== 'plant' && (
+        <GroupFields key={`${single.id}:${single.spacingCm}:${single.count}`} item={single} onNote={setNote} />
+      )}
+      {note && (
+        <p className="mono warn-text" role="status">
+          {note}
+        </p>
+      )}
       {single && <SingleFields key={single.id} item={single} />}
       <div className="form-actions">
         <button type="button" className="btn btn-primary" onClick={onDone}>
@@ -102,6 +112,67 @@ function SingleFields({ item }: { item: PlacedItem }) {
         <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} onBlur={() => note !== (item.note ?? '') && upd([item.id], { note })} />
       </label>
     </>
+  );
+}
+
+type Group = Extract<PlacedItem, { kind: 'drift' | 'row' }>;
+
+/** Count, spacing and pattern of a drift or row. Setting a count solves for the spacing. */
+function GroupFields({ item, onNote }: { item: Group; onNote: (s: string) => void }) {
+  const upd = useProject.getState().updateItems;
+  const setCount = (n: number) => {
+    const target = Math.round(n);
+    const sp = spacingForCount(countFor, target);
+    const got = countFor(sp);
+    upd([item.id], { spacingCm: sp });
+    onNote(got === target ? '' : `Ennél az alaknál ${target} db nem jön ki egyenletes tőtávval; a legközelebbi: ${got} db (${sp} cm).`);
+  };
+  const countFor = (sp: number) =>
+    item.kind === 'drift' ? fillPolygon(item.polygon, sp, item.pattern).length : fillPath(item.path, sp).length;
+  return (
+    <>
+      <div className="field-row">
+        <NumField
+          label="Darabszám"
+          v={item.count}
+          on={(n) => n >= 1 && setCount(n)}
+        />
+        <NumField label="Tőtáv (cm)" v={item.spacingCm} on={(sp) => sp >= 3 && (onNote(''), upd([item.id], { spacingCm: sp }))} />
+      </div>
+      {item.kind === 'drift' && (
+        <fieldset className="field-group">
+          <legend>Kiosztás</legend>
+          <div className="seg">
+            <label className="seg-item">
+              <input type="radio" name="pattern" checked={item.pattern === 'staggered'} onChange={() => upd([item.id], { pattern: 'staggered' })} />
+              <span>eltolt (háromszög)</span>
+            </label>
+            <label className="seg-item">
+              <input type="radio" name="pattern" checked={item.pattern === 'grid'} onChange={() => upd([item.id], { pattern: 'grid' })} />
+              <span>négyzetes</span>
+            </label>
+          </div>
+        </fieldset>
+      )}
+      <p className="mono muted">
+        {item.kind === 'drift' ? 'Folt' : 'Sor'}: a csúcspontokat Kijelölés módban húzva alakíthatod.
+      </p>
+    </>
+  );
+}
+
+function NumField({ label, v, on }: { label: string; v: number; on: (v: number) => void }) {
+  const [s, setS] = useState(String(v));
+  const commit = () => {
+    const n = parseFloat(s.replace(',', '.'));
+    if (Number.isFinite(n) && n !== v) on(n);
+    else setS(String(v));
+  };
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <input inputMode="decimal" value={s} onChange={(e) => setS(e.target.value)} onBlur={commit} onKeyDown={(e) => e.key === 'Enter' && commit()} />
+    </label>
   );
 }
 

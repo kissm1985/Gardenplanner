@@ -125,3 +125,38 @@ describe('placed plants', () => {
     expect(performance.now() - t).toBeLessThan(1000);
   });
 });
+
+describe('drifts and rows', () => {
+  beforeEach(() => {
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+  });
+  const items = () => selectItems(st());
+  const sq: [number, number][] = [[0, 0], [100, 0], [100, 100], [0, 100]];
+
+  it('a drift stores its count, using the plant spacing by default', () => {
+    const id = st().addDrift('FE', sq, 'grid')!; // Festuca, 25 cm
+    expect(items()[0]).toMatchObject({ id, kind: 'drift', spacingCm: 25, count: 16 });
+  });
+
+  it('count follows spacing, pattern, shape and species changes', () => {
+    const id = st().addDrift('FE', sq, 'grid')!;
+    st().updateItems([id], { spacingCm: 50 });
+    expect(items()[0]).toMatchObject({ count: 4 });
+    st().updateItems([id], { pattern: 'staggered' });
+    expect((items()[0] as { count: number }).count).toBeGreaterThan(0);
+    st().updateShape(id, [[0, 0], [200, 0], [200, 100], [0, 100]]);
+    expect(items()[0]).toMatchObject({ kind: 'drift' });
+    st().updateItems([id], { plantId: 'LA', pattern: 'grid' }); // lavender 40 cm: 5 × 2
+    expect(items()[0]).toMatchObject({ plantId: 'LA', spacingCm: 40, count: 10 });
+  });
+
+  it('a row along 1200 cm of lavender at 40 cm has 31 plants; moving keeps the count', () => {
+    const id = st().addRow('LA', [[60, 0], [60, 1200]])!;
+    expect(items()[0]).toMatchObject({ count: 31 });
+    st().moveItems([id], 5, 5);
+    expect(items()[0]).toMatchObject({ count: 31, path: [[65, 5], [65, 1205]] });
+    st().undo();
+    expect(items()[0]).toMatchObject({ path: [[60, 0], [60, 1200]] });
+  });
+});

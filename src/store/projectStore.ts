@@ -1,12 +1,13 @@
 import { create } from 'zustand';
+import { itemCount, type Pattern } from '../engine/fill';
 import { SEED_PLANTS } from '../data/plants.seed';
 import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
-import { DEFAULT_SETTINGS, type Area, type ItemStatus, type PlacedItem, type Plant, type Project, type Settings, type Variant } from '../model/types';
+import { DEFAULT_SETTINGS, type Area, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Settings, type Variant } from '../model/types';
 
 export const HISTORY_LIMIT = 100;
 
-export type ItemPatch = Partial<{ plantId: string; status: ItemStatus; note: string; x: number; y: number }>;
+export type ItemPatch = Partial<{ plantId: string; status: ItemStatus; note: string; x: number; y: number; pattern: Pattern; spacingCm: number }>;
 
 export interface ProjectState {
   project: Project | null;
@@ -29,6 +30,9 @@ export interface ProjectState {
   importPlants: (plants: Plant[], mode: 'merge' | 'replace') => void;
 
   placePlant: (plantId: string, x: number, y: number) => string | null;
+  addDrift: (plantId: string, polygon: Pt[], pattern: Pattern, spacingCm?: number) => string | null;
+  addRow: (plantId: string, path: Pt[], spacingCm?: number) => string | null;
+  updateShape: (id: string, points: Pt[]) => void;
   moveItems: (ids: string[], dx: number, dy: number) => void;
   updateItems: (ids: string[], patch: ItemPatch) => void;
   deleteItems: (ids: string[]) => void;
@@ -178,10 +182,38 @@ export const useProject = create<ProjectState>()((set, get) => {
       return id;
     },
 
+    addDrift: (plantId, polygon, pattern, spacingCm) => {
+      const sp = spacingCm ?? plantSpacing(plantId);
+      if (!get().currentAreaId || polygon.length < 3 || !sp) return null;
+      const id = uid('i');
+      const it = withCount({ kind: 'drift', id, plantId, polygon: roundPts(polygon), pattern, spacingCm: sp, count: 0, status: 'needed' });
+      mapItems((items) => [...items, it]);
+      return id;
+    },
+
+    addRow: (plantId, path, spacingCm) => {
+      const sp = spacingCm ?? plantSpacing(plantId);
+      if (!get().currentAreaId || path.length < 2 || !sp) return null;
+      const id = uid('i');
+      const it = withCount({ kind: 'row', id, plantId, path: roundPts(path), spacingCm: sp, count: 0, status: 'needed' });
+      mapItems((items) => [...items, it]);
+      return id;
+    },
+
+    updateShape: (id, points) =>
+      mapItems((items) =>
+        items.map((it) => {
+          if (it.id !== id) return it;
+          if (it.kind === 'drift') return withCount({ ...it, polygon: roundPts(points) });
+          if (it.kind === 'row') return withCount({ ...it, path: roundPts(points) });
+          return it;
+        }),
+      ),
+
     moveItems: (ids, dx, dy) => {
       if (!ids.length || (dx === 0 && dy === 0)) return;
       const set_ = new Set(ids);
-      mapItems((items) => items.map((it) => (set_.has(it.id) ? roundItem(translateItem(it, dx, dy)) : it)));
+      mapItems((items) => items.map((it) => (set_.has(it.id) ? withCount(roundItem(translateItem(it, dx, dy))) : it)));
     },
 
     updateItems: (ids, patch) => {
@@ -189,11 +221,17 @@ export const useProject = create<ProjectState>()((set, get) => {
       mapItems((items) =>
         items.map((it) => {
           if (!set_.has(it.id)) return it;
-          const { x, y, ...rest } = patch;
+          const { x, y, pattern, spacingCm, ...rest } = patch;
           let next = { ...it, ...rest } as PlacedItem;
-          if (next.kind === 'plant' && (x !== undefined || y !== undefined))
-            next = { ...next, x: round1(x ?? next.x), y: round1(y ?? next.y) };
-          return next;
+          if (next.kind === 'plant') {
+            if (x !== undefined || y !== undefined) next = { ...next, x: round1(x ?? next.x), y: round1(y ?? next.y) };
+            return next;
+          }
+          // A species change on a drift/row adopts the new plant's spacing unless one is given.
+          const sp = spacingCm ?? (rest.plantId && rest.plantId !== it.plantId ? plantSpacing(rest.plantId) : undefined);
+          if (sp && sp > 0) next = { ...next, spacingCm: Math.round(sp * 10) / 10 };
+          if (pattern && next.kind === 'drift') next = { ...next, pattern };
+          return withCount(next);
         }),
       );
     },
@@ -211,7 +249,7 @@ export const useProject = create<ProjectState>()((set, get) => {
         const copies = items
           .filter((i) => set_.has(i.id))
           .map((i) => {
-            const c = { ...roundItem(translateItem(i, dx, dy)), id: uid('i') };
+            const c = { ...withCount(roundItem(translateItem(i, dx, dy))), id: uid('i') };
             created.push(c.id);
             return c;
           });
@@ -237,6 +275,10 @@ export const useProject = create<ProjectState>()((set, get) => {
     },
   };
 
+  function plantSpacing(code: string): number {
+    return get().project?.plantDb.find((p) => p.code === code)?.spacingCm ?? 0;
+  }
+
   function insertArea(area: Area) {
     commit((p) => ({ ...p, areas: [...p.areas, area] }));
     set({ currentAreaId: area.id });
@@ -248,6 +290,13 @@ export const useProject = create<ProjectState>()((set, get) => {
     if (project && !project.areas.some((a) => a.id === currentAreaId)) set({ currentAreaId: project.areas[0]?.id ?? null });
   }
 });
+
+const roundPts = (pts: Pt[]): Pt[] => pts.map(([x, y]) => [round1(x), round1(y)]);
+
+/** Drifts and rows keep their plant count in sync with their shape and spacing. */
+function withCount(it: PlacedItem): PlacedItem {
+  return it.kind === 'plant' ? it : { ...it, count: itemCount(it) };
+}
 
 function roundItem(it: PlacedItem): PlacedItem {
   if (it.kind === 'plant') return { ...it, x: round1(it.x), y: round1(it.y) };

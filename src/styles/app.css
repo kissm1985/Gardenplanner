@@ -994,3 +994,79 @@ html[data-save-error] .topbar {
   color: var(--accent);
   margin: 0;
 }
+
+/* ---------- phase 3: drifts and rows ---------- */
+.drift-area {
+  fill-opacity: 0.16;
+  stroke-width: 1.5;
+  stroke-dasharray: 6 4;
+}
+.row-line {
+  fill: none;
+  stroke-opacity: 0.22;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.group-select {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+.plan-svg.tool-select .group {
+  cursor: move;
+}
+.plan-svg.tool-drift,
+.plan-svg.tool-row {
+  cursor: crosshair;
+}
+.count-bg {
+  fill: var(--bg);
+  stroke: var(--line);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  opacity: 0.94;
+}
+.count-text {
+  font-family: var(--mono);
+  font-weight: 500;
+  fill: var(--fg);
+}
+.handle {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 2;
+  cursor: grab;
+}
+.draft-shape {
+  fill: color-mix(in srgb, var(--accent) 10%, transparent);
+  stroke: var(--accent);
+  stroke-width: 2;
+  stroke-dasharray: 6 4;
+}
+polyline.draft-shape {
+  fill: none;
+}
+.pending-start {
+  fill: var(--accent);
+  stroke: var(--bg);
+  stroke-width: 2;
+}
+.canvas-toast {
+  position: absolute;
+  left: 50%;
+  top: 76px;
+  transform: translateX(-50%);
+  margin: 0;
+  max-width: calc(100% - 48px);
+  padding: 8px 12px;
+  background: var(--fg);
+  color: var(--bg);
+  font-size: 14px;
+  border-radius: 4px;
+  pointer-events: none;
+  text-align: center;
+}
+.meta-count {
+  color: var(--fg);
+  font-weight: 500;
+}
