@@ -1,11 +1,30 @@
 // Seasonal appearance (SPEC §4.4): colour, opacity and size of a plant in a given month.
 import type { Plant } from '../model/types';
+import { labelList } from '../i18n';
 
 export type Season = 0 | 1 | 2 | 3; // spring, summer, autumn, winter
-export const SEASON_LABEL = ['Tavasz', 'Nyár', 'Ősz', 'Tél'] as const;
+export const SEASON_LABEL = labelList([
+  ['Tavasz', 'Spring'],
+  ['Nyár', 'Summer'],
+  ['Ősz', 'Autumn'],
+  ['Tél', 'Winter'],
+]);
 /** Month shown when a season button is pressed. */
 export const SEASON_MONTH: Record<Season, number> = { 0: 4, 1: 7, 2: 10, 3: 1 };
-export const MONTH_LABEL = ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'];
+export const MONTH_LABEL = labelList([
+  ['január', 'January'],
+  ['február', 'February'],
+  ['március', 'March'],
+  ['április', 'April'],
+  ['május', 'May'],
+  ['június', 'June'],
+  ['július', 'July'],
+  ['augusztus', 'August'],
+  ['szeptember', 'September'],
+  ['október', 'October'],
+  ['november', 'November'],
+  ['december', 'December'],
+]);
 
 export const seasonOf = (month: number): Season => (month >= 3 && month <= 5 ? 0 : month >= 6 && month <= 8 ? 1 : month >= 9 && month <= 11 ? 2 : 3);
 

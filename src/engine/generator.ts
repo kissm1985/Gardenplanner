@@ -3,29 +3,37 @@
 import { areaPoints } from '../model/area';
 import { bbox, dist, pointInPolygon } from '../model/geometry';
 import { uid } from '../model/ids';
+import { plantName } from '../model/plants';
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings } from '../model/types';
 import { fillPath, fillPolygon } from './fill';
 import { areaSunLevel } from './rules';
+import { labels, t } from '../i18n';
 
 export type PaletteKey = 'purple-silver' | 'warm' | 'white-blue' | 'pink-purple';
 
-export const PALETTES: Record<PaletteKey, { label: string; families: string[] }> = {
-  'purple-silver': { label: 'Lila–ezüst', families: ['purple', 'blue', 'silver'] },
-  warm: { label: 'Meleg sárga–bordó', families: ['yellow', 'orange', 'red', 'bronze'] },
-  'white-blue': { label: 'Fehér–kék–zöld', families: ['white', 'blue', 'green'] },
-  'pink-purple': { label: 'Rózsaszín–lila', families: ['pink', 'purple', 'silver'] },
+const PALETTE_LABEL = labels<PaletteKey>({
+  'purple-silver': ['Lila–ezüst', 'Purple–silver'],
+  warm: ['Meleg sárga–bordó', 'Warm yellow–burgundy'],
+  'white-blue': ['Fehér–kék–zöld', 'White–blue–green'],
+  'pink-purple': ['Rózsaszín–lila', 'Pink–purple'],
+});
+export const PALETTES: Record<PaletteKey, { readonly label: string; families: string[] }> = {
+  'purple-silver': { get label() { return PALETTE_LABEL['purple-silver']; }, families: ['purple', 'blue', 'silver'] },
+  warm: { get label() { return PALETTE_LABEL.warm; }, families: ['yellow', 'orange', 'red', 'bronze'] },
+  'white-blue': { get label() { return PALETTE_LABEL['white-blue']; }, families: ['white', 'blue', 'green'] },
+  'pink-purple': { get label() { return PALETTE_LABEL['pink-purple']; }, families: ['pink', 'purple', 'silver'] },
 };
 
 // Hungarian colour words → colour family.
 const WORDS: [RegExp, string][] = [
-  [/lila|ibolya|levendula|bíbor(?!rózsa)/, 'purple'],
-  [/kék/, 'blue'],
-  [/ezüst|szürk|kékesszürk/, 'silver'],
-  [/sárga|arany/, 'yellow'],
-  [/narancs|réz|rozsda/, 'orange'],
-  [/piros|vörös|bordó|bíborrózsa/, 'red'],
+  [/lila|ibolya|levendula|bíbor(?!rózsa)|purple|violet|lavender|mauve/, 'purple'],
+  [/kék|blue/, 'blue'],
+  [/ezüst|szürk|kékesszürk|silver|grey|gray/, 'silver'],
+  [/sárga|arany|yellow|gold/, 'yellow'],
+  [/narancs|réz|rozsda|orange|copper|rust/, 'orange'],
+  [/piros|vörös|bordó|bíborrózsa|red|burgundy|crimson|scarlet/, 'red'],
   [/bronz|barna/, 'bronze'],
-  [/fehér|krém/, 'white'],
+  [/fehér|krém|white|cream/, 'white'],
   [/rózsaszín|magenta|pink/, 'pink'],
 ];
 
@@ -33,7 +41,7 @@ export function colourFamilies(p: Plant): Set<string> {
   const out = new Set<string>();
   const text = `${p.bloomColor} ${p.foliageColor}`.toLowerCase();
   for (const [re, fam] of WORDS) if (re.test(text)) out.add(fam);
-  if (/zöld/.test(p.foliageColor.toLowerCase())) out.add('green');
+  if (/zöld|green/.test(p.foliageColor.toLowerCase())) out.add('green');
   return out;
 }
 
@@ -53,14 +61,14 @@ const seasonsOf = (p: Plant) => new Set<number>(p.bloomMonths.map((m) => (m >= 3
 
 /** Plant types the generator can be asked for. */
 export type PlantKind = 'perennial' | 'grass' | 'groundcover' | 'shrub' | 'hedge' | 'tree';
-export const KIND_LABEL: Record<PlantKind, string> = {
-  perennial: 'Évelők',
-  grass: 'Díszfüvek',
-  groundcover: 'Talajtakarók, elterülők',
-  shrub: 'Cserjék (magasabbak)',
-  hedge: 'Sövény (hátsó sor)',
-  tree: 'Fák',
-};
+export const KIND_LABEL: Record<PlantKind, string> = labels({
+  perennial: ['Évelők', 'Perennials'],
+  grass: ['Díszfüvek', 'Grasses'],
+  groundcover: ['Talajtakarók, elterülők', 'Ground covers, spreading'],
+  shrub: ['Cserjék (magasabbak)', 'Shrubs (taller)'],
+  hedge: ['Sövény (hátsó sor)', 'Hedge (back row)'],
+  tree: ['Fák', 'Trees'],
+});
 export const DEFAULT_KINDS: PlantKind[] = ['perennial', 'grass', 'groundcover'];
 const DRIFT_KINDS: PlantKind[] = ['perennial', 'grass', 'groundcover'];
 
@@ -263,7 +271,8 @@ export function generateIdea(
       }
   const underWalnut = total > 0 && inZone / total > 0.4 && all.filter((p) => p.juglone === 'tolerant').length >= 3;
   const tol = (xs: Plant[]) => (underWalnut ? xs.filter((p) => p.juglone === 'tolerant') : xs);
-  if (underWalnut) notes.push('A terület nagy része a diófa zónájában van, ezért csak juglone-tűrő fajokból válogattam.');
+  if (underWalnut)
+    notes.push(t('A terület nagy része a diófa zónájában van, ezért csak juglone-tűrő fajokból válogattam.', 'Most of the area is in the walnut zone, so only juglone-tolerant species were used.'));
 
   // One water band for everything (low+medium or medium+high), so neighbours don't clash.
   const lowSide = all.filter((p) => p.water !== 'high').length >= all.filter((p) => p.water !== 'low').length;
@@ -284,9 +293,15 @@ export function generateIdea(
   );
   for (const k of kinds) {
     const empty = k === 'hedge' ? !hedge : k === 'tree' ? !trees.length : k === 'shrub' ? !shrubs.length : !species.some((p) => plantKinds(p).has(k));
-    if (empty) notes.push(`${KIND_LABEL[k]}: ehhez a területhez (fény, magasság, mérgező, talaj, korlátok) nincs megfelelő faj.`);
+    if (empty)
+      notes.push(
+        t(
+          `${KIND_LABEL[k]}: ehhez a területhez (fény, magasság, mérgező, talaj, korlátok) nincs megfelelő faj.`,
+          `${KIND_LABEL[k]}: no species fits this area (light, height, toxicity, soil, limits).`,
+        ),
+      );
   }
-  if (!species.length && !woody) return { seed, palette, species: [], items: [], notes: [...notes, 'Nincs a terület feltételeinek megfelelő faj az adatbázisban.'] };
+  if (!species.length && !woody) return { seed, palette, species: [], items: [], notes: [...notes, t('Nincs a terület feltételeinek megfelelő faj az adatbázisban.', 'No species in the database fits the area.')] };
 
   // Long axis u, short axis v.
   const alongY = bb.maxY - bb.minY >= bb.maxX - bb.minX;
@@ -435,19 +450,30 @@ export function generateIdea(
 
   const ordered = [...(hedge ? [hedge] : []), ...trees, ...shrubs, ...species];
   const used = ordered.filter((p) => usedCodes.has(p.code));
-  notes.push(`Színvilág: ${PALETTES[palette].label}.`);
+  notes.push(t(`Színvilág: ${PALETTES[palette].label}.`, `Colour scheme: ${PALETTES[palette].label}.`));
   const parts: string[] = [];
-  if (hedge && usedCodes.has(hedge.code)) parts.push(`hátul ${hedge.nameHu.toLowerCase()} sövény`);
-  if (tree && usedCodes.has(tree.code)) parts.push(`${treesPlaced > 1 ? 'fák' : 'egy fa'} (${tree.nameHu.toLowerCase()}) körülöttük szabad hellyel`);
+  if (hedge && usedCodes.has(hedge.code)) parts.push(t(`hátul ${plantName(hedge).toLowerCase()} sövény`, `a ${plantName(hedge).toLowerCase()} hedge at the back`));
+  if (tree && usedCodes.has(tree.code))
+    parts.push(
+      t(
+        `${treesPlaced > 1 ? 'fák' : 'egy fa'} (${plantName(tree).toLowerCase()}) körülöttük szabad hellyel`,
+        `${treesPlaced > 1 ? 'trees' : 'a tree'} (${plantName(tree).toLowerCase()}) with free space around`,
+      ),
+    );
   const sh = shrubs.filter((p) => usedCodes.has(p.code));
-  if (sh.length) parts.push(`előtte cserjék ritmusban (${sh.map((p) => p.nameHu.toLowerCase()).join(', ')})`);
+  if (sh.length)
+    parts.push(t(`előtte cserjék ritmusban (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`, `shrubs in rhythm in front (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`));
   const dr = species.filter((p) => usedCodes.has(p.code));
-  if (dr.length) parts.push(`${dr.length} faj ismétlődő foltokban, elöl az alacsonyabbak`);
+  if (dr.length) parts.push(t(`${dr.length} faj ismétlődő foltokban, elöl az alacsonyabbak`, `${dr.length} species in repeated drifts, lower ones in front`));
   if (parts.length) notes.push(`${parts.join('; ')}.`.replace(/^./, (c) => c.toUpperCase()));
   const seasons = new Set(used.flatMap((p) => [...seasonsOf(p)]));
-  const sName = ['tavasz', 'nyár', 'ősz'].filter((_, i) => seasons.has(i as 0 | 1 | 2));
-  if (sName.length) notes.push(`Virágzás: ${sName.join(', ')}.`);
+  const sName = [t('tavasz', 'spring'), t('nyár', 'summer'), t('ősz', 'autumn')].filter((_, i) => seasons.has(i as 0 | 1 | 2));
+  if (sName.length) notes.push(t(`Virágzás: ${sName.join(', ')}.`, `Flowering: ${sName.join(', ')}.`));
   const winter = used.filter((p) => p.winterInterest);
-  notes.push(winter.length ? `Télen is díszít: ${winter.map((p) => p.nameHu.toLowerCase()).join(', ')}.` : 'Télen kevés a díszítő elem.');
+  notes.push(
+    winter.length
+      ? t(`Télen is díszít: ${winter.map((p) => plantName(p).toLowerCase()).join(', ')}.`, `Winter interest: ${winter.map((p) => plantName(p).toLowerCase()).join(', ')}.`)
+      : t('Télen kevés a díszítő elem.', 'Little winter interest.'),
+  );
   return { seed, palette, species: used, items, notes };
 }

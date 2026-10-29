@@ -1,4 +1,5 @@
 import type { Plant, Soil } from '../model/types';
+import { PLANTS_EN } from './plants.en';
 
 // Starting plant list. The first 19 species, heights, spreads, pots, juglone notes and
 // seasonal colours come from the K-07 sheet; unit prices and pot sizes from K-08
@@ -49,8 +50,10 @@ const mk = (s: Seed): Plant => {
   const verify = new Set<keyof Plant>(['toxic', ...(s.verify ?? [])]);
   if (s.juglone === 'unknown') verify.add('juglone');
   if (s.priceSource === 'estimate') verify.add('unitPriceHuf');
+  const en = PLANTS_EN[s.code];
   return {
     ...s,
+    ...(en ? { nameEn: en[0], en: { bloomColor: en[1], foliageColor: en[2], ...(en[3] ? { notes: en[3] } : {}) } } : {}),
     soil: s.soil ?? SOIL[s.code] ?? [],
     spacingCm: s.spacingCm ?? s.spreadCm,
     color: s.color ?? s.seasonColors?.[1] ?? '#6f9a5a',

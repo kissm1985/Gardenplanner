@@ -2,8 +2,9 @@ import { useState } from 'react';
 import { RULE_LABEL, type Severity, type Warning } from '../engine/rules';
 import { useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
+import { labels, t } from '../i18n';
 
-export const SEVERITY_LABEL: Record<Severity, string> = { error: 'hiba', warn: 'figyelmeztetés', info: 'megjegyzés' };
+export const SEVERITY_LABEL: Record<Severity, string> = labels({ error: ['hiba', 'error'], warn: ['figyelmeztetés', 'warning'], info: ['megjegyzés', 'note'] });
 
 /** Active and muted warnings; tap jumps to the element, the switch mutes it as a deliberate exception. */
 export function WarningsPanel({ active, muted, onJump }: { active: Warning[]; muted: Warning[]; onJump: () => void }) {
@@ -18,7 +19,7 @@ export function WarningsPanel({ active, muted, onJump }: { active: Warning[]; mu
   return (
     <div className="warnings">
       {active.length === 0 ? (
-        <p className="empty ok-text">Nincs figyelmeztetés. A terv megfelel a terület korlátainak.</p>
+        <p className="empty ok-text">{t('Nincs figyelmeztetés. A terv megfelel a terület korlátainak.', 'No warnings. The plan meets the limits of the area.')}</p>
       ) : (
         <ul className="warn-list">
           {active.map((w) => (
@@ -29,7 +30,7 @@ export function WarningsPanel({ active, muted, onJump }: { active: Warning[]; mu
       {muted.length > 0 && (
         <>
           <button type="button" className="btn btn-small" onClick={() => setShowMuted((v) => !v)} aria-expanded={showMuted}>
-            Elnémítva: {muted.length} {showMuted ? '▴' : '▾'}
+            {t('Elnémítva', 'Muted')}: {muted.length} {showMuted ? '▴' : '▾'}
           </button>
           {showMuted && (
             <ul className="warn-list is-muted">
@@ -55,7 +56,7 @@ function WarningRow({ w, muted, onJump }: { w: Warning; muted?: boolean; onJump:
         {w.hint && <span className="warn-hint">{w.hint}</span>}
       </button>
       <button type="button" className="btn btn-small" onClick={() => useProject.getState().setMuted(w.id, !muted)}>
-        {muted ? 'Visszakapcsolás' : 'Elnémítás'}
+        {muted ? t('Visszakapcsolás', 'Unmute') : t('Elnémítás', 'Mute')}
       </button>
     </li>
   );

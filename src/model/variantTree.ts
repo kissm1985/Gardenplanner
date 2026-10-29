@@ -1,5 +1,6 @@
 // Variants and folders of one area as a tree (parentId links). Unknown parents fall back to the top level.
 import type { Area, Variant, VariantFolder } from './types';
+import { t } from '../i18n';
 
 export type TreeNode =
   | { kind: 'folder'; id: string; name: string; folder: VariantFolder; children: TreeNode[] }
@@ -43,7 +44,7 @@ export function variantCount(n: TreeNode): number {
 
 /** Possible new parents for a node: everything except itself and its descendants. */
 export function moveTargets(area: Area, id: string): { id: string | null; label: string }[] {
-  const out: { id: string | null; label: string }[] = [{ id: null, label: '— legfelső szint —' }];
+  const out: { id: string | null; label: string }[] = [{ id: null, label: t('— legfelső szint —', '— top level —') }];
   const walk = (ns: TreeNode[], depth: number) => {
     for (const n of ns) {
       if (n.id === id) continue;

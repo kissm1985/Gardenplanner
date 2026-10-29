@@ -2,6 +2,7 @@
 import type { Area, Plant, Project, Variant } from '../model/types';
 import { bomFromEntries, type Bom } from './bom';
 import { evaluate, partition, type Warning } from './rules';
+import { byPlantName } from '../model/plants';
 
 export interface VariantStats {
   variant: Variant;
@@ -35,6 +36,6 @@ export function compareVariants(project: Project, area: Area, a: Variant, b: Var
   return {
     a: sa,
     b: sb,
-    rows: [...rows.values()].sort((x, y) => x.plant.nameHu.localeCompare(y.plant.nameHu, 'hu')),
+    rows: [...rows.values()].sort((x, y) => byPlantName(x.plant, y.plant)),
   };
 }

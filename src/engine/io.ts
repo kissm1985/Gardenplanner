@@ -3,22 +3,25 @@
 import { deflateSync, inflateSync, strFromU8, strToU8 } from 'fflate';
 import type { Project } from '../model/types';
 import { chosenItems } from './bom';
+import { t } from '../i18n';
 
 export const exportJson = (p: Project) => JSON.stringify(p, null, 2);
 
-/** Parse and sanity-check a project backup; throws a Hungarian message on failure. */
+const NOT_A_BACKUP = () => t('Ez nem Kerttervező projektmentés (hiányzó vagy ismeretlen verzió).', 'This is not a Garden planner backup (missing or unknown version).');
+
+/** Parse and sanity-check a project backup; throws a readable message on failure. */
 export function parseProject(text: string): Project {
   let data: unknown;
   try {
     data = JSON.parse(text);
   } catch {
-    throw new Error('A fájl nem érvényes JSON.');
+    throw new Error(t('A fájl nem érvényes JSON.', 'The file is not valid JSON.'));
   }
   const p = data as Project;
-  if (!p || typeof p !== 'object' || p.schemaVersion !== 1) throw new Error('Ez nem Kerttervező projektmentés (hiányzó vagy ismeretlen verzió).');
-  if (!Array.isArray(p.areas) || !Array.isArray(p.plantDb)) throw new Error('A mentésből hiányoznak a területek vagy a növénylista.');
+  if (!p || typeof p !== 'object' || p.schemaVersion !== 1) throw new Error(NOT_A_BACKUP());
+  if (!Array.isArray(p.areas) || !Array.isArray(p.plantDb)) throw new Error(t('A mentésből hiányoznak a területek vagy a növénylista.', 'The backup has no areas or no plant list.'));
   for (const a of p.areas) {
-    if (!a.id || !Array.isArray(a.variants) || !a.variants.length || !Array.isArray(a.fixtures)) throw new Error(`Hibás terület a mentésben: ${a.name ?? a.id}.`);
+    if (!a.id || !Array.isArray(a.variants) || !a.variants.length || !Array.isArray(a.fixtures)) throw new Error(t(`Hibás terület a mentésben: ${a.name ?? a.id}.`, `Broken area in the backup: ${a.name ?? a.id}.`));
   }
   return p;
 }
@@ -54,7 +57,7 @@ export function decodeShare(code: string): Project {
   try {
     return parseProject(strFromU8(inflateSync(unb64url(code))));
   } catch (e) {
-    throw new Error(e instanceof Error && e.message.startsWith('Ez nem') ? e.message : 'A megosztott link sérült vagy hiányos.');
+    throw new Error(e instanceof Error && e.message === NOT_A_BACKUP() ? e.message : t('A megosztott link sérült vagy hiányos.', 'The shared link is damaged or incomplete.'));
   }
 }
 

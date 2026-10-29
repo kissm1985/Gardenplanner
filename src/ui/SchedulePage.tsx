@@ -7,11 +7,13 @@ import { useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
 import { PlantChip } from './PlantChip';
+import { locale, t } from '../i18n';
+import { plantName } from '../model/plants';
 
 type Tab = 'plant' | 'care' | 'mulch';
 
 const dayLabel = (iso: string) =>
-  fromIso(iso).toLocaleDateString('hu-HU', { month: 'short', day: 'numeric', weekday: 'long' });
+  fromIso(iso).toLocaleDateString(locale(), { month: 'short', day: 'numeric', weekday: 'long' });
 
 /** Planting schedule, monthly care calendar and mulch advice (SPEC §4.7). */
 export function SchedulePage() {
@@ -19,13 +21,13 @@ export function SchedulePage() {
   return (
     <div className="schedule">
       <header className="cmp-head">
-        <div className="eyebrow">Menetrend és gondozás · a választott változatokból</div>
-        <div className="seg" role="tablist" aria-label="Nézet">
+        <div className="eyebrow">{t('Menetrend és gondozás · a választott változatokból', 'Schedule and care · from the chosen variants')}</div>
+        <div className="seg" role="tablist" aria-label={t('Nézet', 'View')}>
           {(
             [
-              ['plant', 'Ültetési menetrend'],
-              ['care', 'Gondozási naptár'],
-              ['mulch', 'Mulcs'],
+              ['plant', t('Ültetési menetrend', 'Planting schedule')],
+              ['care', t('Gondozási naptár', 'Care calendar')],
+              ['mulch', t('Mulcs', 'Mulch')],
             ] as const
           ).map(([k, l]) => (
             <button key={k} type="button" role="tab" className="chip-btn" aria-selected={tab === k} aria-pressed={tab === k} onClick={() => setTab(k)}>
@@ -34,7 +36,7 @@ export function SchedulePage() {
           ))}
         </div>
         <button type="button" className="btn btn-small" onClick={() => useUi.getState().setPage(null)}>
-          ← Vissza a tervhez
+          {t('← Vissza a tervhez', '← Back to the plan')}
         </button>
       </header>
       {tab === 'plant' && <PlantingTab />}
@@ -52,13 +54,13 @@ function PlantingTab() {
   const plan = useMemo(() => buildSchedule(project, win.start, win.end), [project, win.start, win.end]);
   const done = new Set(project.schedule?.done ?? []);
   const all = plan.days.flatMap((d) => d.tasks);
-  const doneCount = all.filter((t) => done.has(t.id)).length;
+  const doneCount = all.filter((tk) => done.has(tk.id)).length;
   const [toast, setToast] = useState('');
   const taRef = useRef<HTMLTextAreaElement>(null);
   const st = useProject.getState();
 
   const apply = () => {
-    if (!start || !end || end < start) return setToast('A záró dátum ne legyen a kezdő előtt.');
+    if (!start || !end || end < start) return setToast(t('A záró dátum ne legyen a kezdő előtt.', 'The end date must not be before the start date.'));
     setToast('');
     st.setScheduleWindow(start, end);
   };
@@ -73,15 +75,15 @@ function PlantingTab() {
     <section className="sched-tab">
       <div className="sched-window">
         <label className="field">
-          <span>Kezdés</span>
+          <span>{t('Kezdés', 'Start')}</span>
           <input type="date" value={start} onChange={(e) => setStart(e.target.value)} />
         </label>
         <label className="field">
-          <span>Befejezés</span>
+          <span>{t('Befejezés', 'End')}</span>
           <input type="date" value={end} onChange={(e) => setEnd(e.target.value)} />
         </label>
         <button type="button" className="btn btn-primary" onClick={apply} disabled={start === win.start && end === win.end}>
-          Menetrend készítése
+          {t('Menetrend készítése', 'Make the schedule')}
         </button>
       </div>
       {toast && (
@@ -89,12 +91,15 @@ function PlantingTab() {
           {toast}
         </p>
       )}
-      <div className="sched-progress" aria-label={`${doneCount} / ${all.length} kész`}>
+      <div className="sched-progress" aria-label={t(`${doneCount} / ${all.length} kész`, `${doneCount} / ${all.length} done`)}>
         <div className="bar">
           <i style={{ width: all.length ? `${(doneCount / all.length) * 100}%` : 0 }} />
         </div>
         <span className="mono">
-          {doneCount} / {all.length} kész · kb. {plan.hours.toLocaleString('hu-HU')} munkaóra
+          {t(
+            `${doneCount} / ${all.length} kész · kb. ${plan.hours.toLocaleString(locale())} munkaóra`,
+            `${doneCount} / ${all.length} done · about ${plan.hours.toLocaleString(locale())} working hours`,
+          )}
         </span>
       </div>
       {plan.notes.map((n) => (
@@ -107,17 +112,17 @@ function PlantingTab() {
           <li key={d.date} className={`day${d.tasks.length ? '' : ' is-spare'}`}>
             <h3>{dayLabel(d.date)}</h3>
             {d.tasks.length === 0 ? (
-              <p className="mono muted">Tartaléknap (eső, késő szállítás).</p>
+              <p className="mono muted">{t('Tartaléknap (eső, késő szállítás).', 'Spare day (rain, late delivery).')}</p>
             ) : (
               <ul className="tasks">
-                {d.tasks.map((t) => (
-                  <li key={t.id}>
-                    <label className={`task${done.has(t.id) ? ' is-done' : ''}`}>
-                      <input type="checkbox" checked={done.has(t.id)} onChange={() => toggle(t.id)} />
+                {d.tasks.map((tk) => (
+                  <li key={tk.id}>
+                    <label className={`task${done.has(tk.id) ? ' is-done' : ''}`}>
+                      <input type="checkbox" checked={done.has(tk.id)} onChange={() => toggle(tk.id)} />
                       <span>
-                        <b>{t.title}</b>
-                        {t.detail && <small>{t.detail}</small>}
-                        <small className="mono">~{t.hours.toLocaleString('hu-HU')} óra</small>
+                        <b>{tk.title}</b>
+                        {tk.detail && <small>{tk.detail}</small>}
+                        <small className="mono">~{t(`${tk.hours.toLocaleString(locale())} óra`, `${tk.hours.toLocaleString(locale())} h`)}</small>
                       </span>
                     </label>
                   </li>
@@ -133,13 +138,13 @@ function PlantingTab() {
           className="btn btn-small"
           onClick={async () => {
             const ok = await copy(text, taRef.current);
-            setToast(ok ? '' : 'A másolás itt nem működik: jelöld ki a lenti mezőt.');
+            setToast(ok ? '' : t('A másolás itt nem működik: jelöld ki a lenti mezőt.', 'Copying does not work here: select the box below.'));
           }}
         >
-          Menetrend másolása szövegként
+          {t('Menetrend másolása szövegként', 'Copy the schedule as text')}
         </button>
       </div>
-      <textarea ref={taRef} className="sched-text" readOnly rows={4} value={text} aria-label="Menetrend szövegként" onFocus={(e) => e.currentTarget.select()} />
+      <textarea ref={taRef} className="sched-text" readOnly rows={4} value={text} aria-label={t('Menetrend szövegként', 'Schedule as text')} onFocus={(e) => e.currentTarget.select()} />
     </section>
   );
 }
@@ -147,7 +152,7 @@ function PlantingTab() {
 export function scheduleText(days: Day[], done: Set<string>): string {
   return days
     .filter((d) => d.tasks.length)
-    .map((d) => [dayLabel(d.date), ...d.tasks.map((t) => `  [${done.has(t.id) ? 'x' : ' '}] ${t.title}`)].join('\n'))
+    .map((d) => [dayLabel(d.date), ...d.tasks.map((tk) => `  [${done.has(tk.id) ? 'x' : ' '}] ${tk.title}`)].join('\n'))
     .join('\n\n');
 }
 
@@ -160,23 +165,28 @@ function CareTab() {
   const order = Array.from({ length: 12 }, (_, i) => (now + i) % 12);
   return (
     <section className="sched-tab">
-      <p className="mono muted">Győri éghajlat: utolsó fagy április közepe, első fagy október vége. Csak a tervben szereplő fajok jelennek meg.</p>
+      <p className="mono muted">
+        {t(
+          'Győri éghajlat: utolsó fagy április közepe, első fagy október vége. Csak a tervben szereplő fajok jelennek meg.',
+          'Győr climate: last frost mid-April, first frost end of October. Only species in the plan are shown.',
+        )}
+      </p>
       <ol className="months-cal">
         {order.map((m) => (
           <li key={m} className={`month-card${m === now ? ' is-now' : ''}`}>
             <h3>
               <span className="month-name">{MONTH_LABEL[m]}</span>
-              {m === now && <span className="badge badge-chosen">most</span>}
+              {m === now && <span className="badge badge-chosen">{t('most', 'now')}</span>}
             </h3>
             <ul>
-              {cal[m].map((t) => (
-                <li key={t.text}>
-                  {t.codes.length > 0 && (
+              {cal[m].map((tk) => (
+                <li key={tk.text}>
+                  {tk.codes.length > 0 && (
                     <span className="care-chips">
-                      {t.codes.slice(0, 6).map((c) => byCode.get(c) && <PlantChip key={c} p={byCode.get(c)!} size={22} />)}
+                      {tk.codes.slice(0, 6).map((c) => byCode.get(c) && <PlantChip key={c} p={byCode.get(c)!} size={22} />)}
                     </span>
                   )}
-                  <span>{t.text}</span>
+                  <span>{tk.text}</span>
                 </li>
               ))}
             </ul>
@@ -194,32 +204,42 @@ function MulchTab() {
     <ul className="mulch-list">
       {ps.map((p) => (
         <li key={p.code}>
-          <PlantChip p={p} size={26} /> {p.nameHu}
+          <PlantChip p={p} size={26} /> {plantName(p)}
         </li>
       ))}
     </ul>
   );
-  if (!m.gravel.length && !m.bark.length && !m.trees.length) return <p className="empty">Még nincs növény a választott változatokban.</p>;
+  if (!m.gravel.length && !m.bark.length && !m.trees.length) return <p className="empty">{t('Még nincs növény a választott változatokban.', 'No plants in the chosen variants yet.')}</p>;
   return (
     <section className="sched-tab mulch">
       {m.gravel.length > 0 && (
         <article className="mulch-card">
-          <h3>Világos apró kavics, 4–8 mm</h3>
-          <p>A szárazságtűrő, napimádó fajok mellé kéreg helyett: nem tart nedvességet a tő körül, a levendula és a kakukkfű nem rothad, és visszaveri a fényt. 4–5 cm vastagon, agrotextilen.</p>
+          <h3>{t('Világos apró kavics, 4–8 mm', 'Light fine gravel, 4–8 mm')}</h3>
+          <p>
+            {t(
+              'A szárazságtűrő, napimádó fajok mellé kéreg helyett: nem tart nedvességet a tő körül, a levendula és a kakukkfű nem rothad, és visszaveri a fényt. 4–5 cm vastagon, agrotextilen.',
+              'Instead of bark next to drought-tolerant, sun-loving species: it keeps no moisture around the crown, lavender and thyme do not rot, and it reflects light. 4–5 cm deep, on fabric.',
+            )}
+          </p>
           {list(m.gravel)}
         </article>
       )}
       {m.bark.length > 0 && (
         <article className="mulch-card">
-          <h3>Kéreg vagy komposztált kéreg</h3>
-          <p>A többi évelő mellé ~5 cm vastagon, a tövektől 3–5 cm-re. Ha az ágyás többi része kérget kap, a kavicsos fajok foltjai körül akkor is kavics maradjon.</p>
+          <h3>{t('Kéreg vagy komposztált kéreg', 'Bark or composted bark')}</h3>
+          <p>
+            {t(
+              'A többi évelő mellé ~5 cm vastagon, a tövektől 3–5 cm-re. Ha az ágyás többi része kérget kap, a kavicsos fajok foltjai körül akkor is kavics maradjon.',
+              'For the other perennials, ~5 cm deep, 3–5 cm from the stems. If the rest of the bed gets bark, keep gravel around the drifts of the gravel-loving species.',
+            )}
+          </p>
           {list(m.bark)}
         </article>
       )}
       {m.trees.length > 0 && (
         <article className="mulch-card">
-          <h3>Fák</h3>
-          <p>A törzs körül 60 cm átmérőben agrotextil nélkül; kéreggyűrű, ami nem ér a törzshöz.</p>
+          <h3>{t('Fák', 'Trees')}</h3>
+          <p>{t('A törzs körül 60 cm átmérőben agrotextil nélkül; kéreggyűrű, ami nem ér a törzshöz.', 'No fabric within 60 cm around the trunk; a ring of bark that does not touch the trunk.')}</p>
           {list(m.trees)}
         </article>
       )}

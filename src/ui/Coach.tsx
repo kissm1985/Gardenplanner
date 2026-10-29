@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { t } from '../i18n';
 
 const KEY = 'kerttervezo:intro-done';
 
@@ -17,21 +18,39 @@ function markDone() {
   }
 }
 
-const STEPS: { target: string; title: string; text: string }[] = [
+const STEPS: { target: string; readonly title: string; readonly text: string }[] = [
   {
     target: '.area-switch',
-    title: 'Terület kiválasztása',
-    text: 'Koppints a terület nevére: itt váltasz a Házoldali sáv és a Gyepsávos kert között, és itt hozol létre újat.',
+    get title() {
+      return t('Terület kiválasztása', 'Choose the area');
+    },
+    get text() {
+      return t(
+        'Koppints a terület nevére: itt váltasz a Házoldali sáv és a Gyepsávos kert között, és itt hozol létre újat.',
+        'Tap the area name: this is where you switch between areas and create new ones.',
+      );
+    },
   },
   {
-    target: '.tool[title="Növény"]',
-    title: 'Növény elhelyezése',
-    text: 'Válaszd a Növény eszközt, koppints egy növényre a palettán, aztán a rajzra. Sok tőhöz a Folt és a Sor eszköz gyorsabb.',
+    target: '.toolbar .tool:nth-child(2)',
+    get title() {
+      return t('Növény elhelyezése', 'Place a plant');
+    },
+    get text() {
+      return t(
+        'Válaszd a Növény eszközt, koppints egy növényre a palettán, aztán a rajzra. Sok tőhöz a Folt és a Sor eszköz gyorsabb.',
+        'Choose the Plant tool, tap a plant in the palette, then tap the plan. For many plants the Drift and Row tools are faster.',
+      );
+    },
   },
   {
-    target: '.tool[title="Lista"]',
-    title: 'Lista megtekintése',
-    text: 'A Lista mutatja a darabszámot, a rendelendő mennyiséget és a költséget; innen másolhatod Excelbe is.',
+    target: '.toolbar .tool:last-child',
+    get title() {
+      return t('Lista megtekintése', 'See the list');
+    },
+    get text() {
+      return t('A Lista mutatja a darabszámot, a rendelendő mennyiséget és a költséget; innen másolhatod Excelbe is.', 'The List shows the counts, what to order and the cost; you can copy it to Excel from there.');
+    },
   },
 ];
 
@@ -49,7 +68,7 @@ export function Coach({ onClose }: { onClose: () => void }) {
     onClose();
   };
   return (
-    <div className={`coach coach-${i === 0 ? 'top' : 'bottom'}`} role="dialog" aria-label="Bevezető" aria-live="polite">
+    <div className={`coach coach-${i === 0 ? 'top' : 'bottom'}`} role="dialog" aria-label={t('Bevezető', 'Introduction')} aria-live="polite">
       <div className="mono muted">
         {i + 1} / {STEPS.length}
       </div>
@@ -57,10 +76,10 @@ export function Coach({ onClose }: { onClose: () => void }) {
       <p>{step.text}</p>
       <div className="form-actions">
         <button type="button" className="btn btn-small" onClick={close}>
-          Kihagyás
+          {t('Kihagyás', 'Skip')}
         </button>
         <button type="button" className="btn btn-small btn-primary" onClick={() => (i < STEPS.length - 1 ? setI(i + 1) : close())}>
-          {i < STEPS.length - 1 ? 'Tovább' : 'Kezdjük'}
+          {i < STEPS.length - 1 ? t('Tovább', 'Next') : t('Kezdjük', "Let's start")}
         </button>
       </div>
     </div>

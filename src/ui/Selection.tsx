@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { fillPath, fillPolygon, spacingForCount } from '../engine/fill';
-import { JUGLONE_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
+import { byPlantName, JUGLONE_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { ItemStatus, PlacedItem, Plant } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
@@ -64,7 +64,7 @@ export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; on
   const all = useProject(selectItems);
   const items = useMemo(() => all.filter((i) => selected.includes(i.id)), [all, selected]);
   const byCode = useMemo(() => new Map(plantDb.map((p) => [p.code, p])), [plantDb]);
-  const sorted = useMemo(() => [...plantDb].sort((a, b) => a.nameHu.localeCompare(b.nameHu, 'hu')), [plantDb]);
+  const sorted = useMemo(() => [...plantDb].sort(byPlantName), [plantDb]);
   if (!items.length) return <p className="empty">Nincs kijelölt elem.</p>;
 
   const ids = items.map((i) => i.id);

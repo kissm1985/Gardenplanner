@@ -1,5 +1,6 @@
 import { uid } from '../model/ids';
 import { DEFAULT_CONSTRAINTS, type Area, type Fixture, type Orientation, type AreaKind, type Pt, type Soil, type SunNeed } from '../model/types';
+import { t } from '../i18n';
 
 export interface AreaInput {
   name: string;
@@ -31,7 +32,7 @@ export function makeArea(input: AreaInput): Area {
     shape: { kind: 'rect' },
     constraints: { ...DEFAULT_CONSTRAINTS, ...input.constraints, speciesLimits: { ...input.constraints?.speciesLimits } },
     fixtures: input.fixtures ?? [],
-    variants: [{ id: variantId, name: 'A terv', items: [], notes: '' }],
+    variants: [{ id: variantId, name: t('A terv', 'Plan A'), items: [], notes: '' }],
     chosenVariantId: variantId,
   };
 }
@@ -64,45 +65,53 @@ export interface AreaTemplate {
 export const AREA_TEMPLATES: AreaTemplate[] = [
   {
     key: 'house-strip',
-    title: 'Házoldali sáv',
-    summary: '120 × 1200 cm · déli fekvés · 13:00-ig napos · max. 50 cm',
+    get title() {
+      return t('Házoldali sáv', 'House-side strip');
+    },
+    get summary() {
+      return t('120 × 1200 cm · déli fekvés · 13:00-ig napos · max. 50 cm', '120 × 1200 cm · facing south · sun until 13:00 · max. 50 cm');
+    },
     build: () =>
       makeArea({
-        name: 'Házoldali sáv',
+        name: t('Házoldali sáv', 'House-side strip'),
         widthCm: 120,
         lengthCm: 1200,
         orientation: 'S',
-        sunUntil: '13:00-ig',
+        sunUntil: t('13:00-ig', 'until 13:00'),
         kind: 'gravel',
-        notes: 'Kőkert a ház mellett (K-06 / K-07). Felül a hátsó kerítés, alul a járda.',
+        notes: t('Kőkert a ház mellett (K-06 / K-07). Felül a hátsó kerítés, alul a járda.', 'Rock garden along the house (K-06 / K-07). Back fence at the top, pavement at the bottom.'),
         constraints: { maxHeightCm: 50, noThorns: true, nonToxic: true, drip: true, mulchCover: true },
         fixtures: [
-          { id: uid('f'), type: 'wall', label: 'Ház', x: -16, y: 0, w: 16, h: 1200 },
-          { id: uid('f'), type: 'paving', label: 'Járda', x: 120, y: 0, w: 30, h: 1200 },
+          { id: uid('f'), type: 'wall', label: t('Ház', 'House'), x: -16, y: 0, w: 16, h: 1200 },
+          { id: uid('f'), type: 'paving', label: t('Járda', 'Pavement'), x: 120, y: 0, w: 30, h: 1200 },
         ],
       }),
   },
   {
     key: 'lawn-garden',
-    title: 'Gyepsávos kert',
-    summary: '500 × 1200 cm · keleti fekvés · 12:00-ig napos · ívelt gyepsáv, max. 2 fa',
+    get title() {
+      return t('Gyepsávos kert', 'Garden with lawn strip');
+    },
+    get summary() {
+      return t('500 × 1200 cm · keleti fekvés · 12:00-ig napos · ívelt gyepsáv, max. 2 fa', '500 × 1200 cm · facing east · sun until 12:00 · curved lawn strip, max. 2 trees');
+    },
     build: () =>
       makeArea({
-        name: 'Gyepsávos kert',
+        name: t('Gyepsávos kert', 'Garden with lawn strip'),
         widthCm: 500,
         lengthCm: 1200,
         orientation: 'E',
-        sunUntil: '12:00-ig',
+        sunUntil: t('12:00-ig', 'until 12:00'),
         kind: 'bed',
-        notes: 'Előkert (K-05 / K-07): középen ívelt gyepsáv, két oldalán ágyás. Legfeljebb 2 fa, 150–200 cm.',
+        notes: t('Előkert (K-05 / K-07): középen ívelt gyepsáv, két oldalán ágyás. Legfeljebb 2 fa, 150–200 cm.', 'Front garden (K-05 / K-07): curved lawn strip in the middle, beds on both sides. At most 2 trees, 150–200 cm.'),
         constraints: { noThorns: true, nonToxic: true, drip: true, mulchCover: true, maxTrees: 2 },
         fixtures: [
-          { id: uid('f'), type: 'wall', label: 'Ház', x: -16, y: 0, w: 16, h: 1200 },
-          { id: uid('f'), type: 'fence', label: 'Kerítés', x: 500, y: 0, w: 6, h: 1200 },
-          { id: uid('f'), type: 'lawn', label: 'Gyepsáv', x: 0, y: 0, polygon: curvedLawn(500, 1200) },
-          { id: uid('f'), type: 'tap', label: 'Csap / akna', x: 385, y: 4, w: 90, h: 80 },
+          { id: uid('f'), type: 'wall', label: t('Ház', 'House'), x: -16, y: 0, w: 16, h: 1200 },
+          { id: uid('f'), type: 'fence', label: t('Kerítés', 'Fence'), x: 500, y: 0, w: 6, h: 1200 },
+          { id: uid('f'), type: 'lawn', label: t('Gyepsáv', 'Lawn strip'), x: 0, y: 0, polygon: curvedLawn(500, 1200) },
+          { id: uid('f'), type: 'tap', label: t('Csap / akna', 'Tap / manhole'), x: 385, y: 4, w: 90, h: 80 },
           // The walnut stands beyond the fence; exact position is not in K-05…K-08, adjust on site.
-          { id: uid('f'), type: 'walnut', label: 'Diófa (szomszéd, helye ellenőrizendő)', x: 760, y: 600, radius: 450 },
+          { id: uid('f'), type: 'walnut', label: t('Diófa (szomszéd, helye ellenőrizendő)', 'Walnut (neighbour, position to be checked)'), x: 760, y: 600, radius: 450 },
         ],
       }),
   },

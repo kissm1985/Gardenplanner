@@ -5,12 +5,14 @@ import { mixCounts, type MixPart } from '../engine/mix';
 import type { PlacedItem } from '../model/types';
 import { activeVariant, selectCurrentArea, useProject, type ReplaceScope } from '../store/projectStore';
 import { PlantMultiPicker } from './PlantMultiPicker';
+import { labels, t } from '../i18n';
+import { plantName } from '../model/plants';
 
-const SCOPE_LABEL: Record<ReplaceScope, string> = {
-  variant: 'csak a szerkesztett változatban',
-  area: 'a terület összes változatában',
-  project: 'az egész projektben (minden terület)',
-};
+const SCOPE_LABEL: Record<ReplaceScope, string> = labels({
+  variant: ['csak a szerkesztett változatban', 'only in the edited variant'],
+  area: ['a terület összes változatában', 'in every variant of the area'],
+  project: ['az egész projektben (minden terület)', 'in the whole project (all areas)'],
+});
 
 const plants = (it: PlacedItem) => (it.kind === 'plant' ? 1 : it.count);
 
@@ -33,7 +35,7 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
   const [msg, setMsg] = useState('');
   if (!area) return null;
   const src = project.plantDb.find((p) => p.code === from);
-  if (!src) return <p className="empty">A szerkesztett változatban még nincs növény.</p>;
+  if (!src) return <p className="empty">{t('A szerkesztett változatban még nincs növény.', 'There are no plants in the edited variant yet.')}</p>;
 
   // Suggestions: same type first (hedge for a hedge…), then similar height.
   const kinds = plantKinds(src);
@@ -41,7 +43,7 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
     .filter((p) => p.code !== from)
     .map((p) => {
       const same = [...plantKinds(p)].some((k) => kinds.has(k));
-      return { p, tag: same ? 'hasonló típus' : undefined, score: (same ? 0 : 2) + Math.abs(p.maxHeightCm - src.maxHeightCm) / 1000 };
+      return { p, tag: same ? t('hasonló típus', 'similar type') : undefined, score: (same ? 0 : 2) + Math.abs(p.maxHeightCm - src.maxHeightCm) / 1000 };
     });
   const targets = to.map((x) => ({ ...x, p: project.plantDb.find((p) => p.code === x.code)! })).filter((x) => x.p);
   const mixed = targets.length > 1;
@@ -52,21 +54,30 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
   const preview = (() => {
     if (!targets.length) return '';
     if (!mixed) {
-      const t = targets[0].p;
-      const after = mine.reduce((s, it) => s + (it.kind === 'plant' ? 1 : itemCount({ ...it, spacingCm: keepSpacing ? it.spacingCm : t.spacingCm })), 0);
-      return `${mine.length} elem, ${before} tő ${src.nameHu.toLowerCase()} → ${after} tő ${t.nameHu.toLowerCase()}.`;
+      const to1 = targets[0].p;
+      const after = mine.reduce((s, it) => s + (it.kind === 'plant' ? 1 : itemCount({ ...it, spacingCm: keepSpacing ? it.spacingCm : to1.spacingCm })), 0);
+      return t(
+        `${mine.length} elem, ${before} tő ${plantName(src).toLowerCase()} → ${after} tő ${plantName(to1).toLowerCase()}.`,
+        `${mine.length} items, ${before} ${plantName(src).toLowerCase()} → ${after} ${plantName(to1).toLowerCase()}.`,
+      );
     }
     const n = mode === 'plant' ? before : mine.length;
     const counts = mixCounts(n, targets);
-    const unit = mode === 'plant' ? 'tő' : 'elem';
-    return `${before} tő ${src.nameHu.toLowerCase()} → véletlenszerűen ${targets.map((t, i) => `${counts[i]} ${unit} ${t.p.nameHu.toLowerCase()}`).join(', ')}.`;
+    const unit = mode === 'plant' ? t('tő', 'plants') : t('elem', 'items');
+    const parts = targets.map((tg, i) => `${counts[i]} ${unit} ${plantName(tg.p).toLowerCase()}`).join(', ');
+    return t(`${before} tő ${plantName(src).toLowerCase()} → véletlenszerűen ${parts}.`, `${before} ${plantName(src).toLowerCase()} → at random ${parts}.`);
   })();
 
   const run = () => {
     if (!targets.length) return;
     const n = useProject.getState().replaceSpecies(from, to, scope, keepSpacing, mode);
-    const names = targets.map((t) => t.p.nameHu).join(' + ');
-    setMsg(n ? `${n} ${mixed && mode === 'plant' ? 'tő' : 'elem'} cserélve: ${src.nameHu} → ${names}. Visszavonással visszaállítható.` : 'Nem volt mit cserélni.');
+    const names = targets.map((tg) => plantName(tg.p)).join(' + ');
+    const unit = mixed && mode === 'plant' ? t('tő', 'plants') : t('elem', 'items');
+    setMsg(
+      n
+        ? t(`${n} ${unit} cserélve: ${plantName(src)} → ${names}. Visszavonással visszaállítható.`, `${n} ${unit} replaced: ${plantName(src)} → ${names}. Undo brings them back.`)
+        : t('Nem volt mit cserélni.', 'Nothing to replace.'),
+    );
     setFrom(targets[0].code);
     setTo([]);
   };
@@ -74,7 +85,7 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
   return (
     <div className="form">
       <label className="field">
-        <span className="lbl">Ezt cserélem</span>
+        <span className="lbl">{t('Ezt cserélem', 'Replace this')}</span>
         <select
           value={from}
           onChange={(e) => {
@@ -84,36 +95,44 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
         >
           {used.map(({ plant, n }) => (
             <option key={plant.code} value={plant.code}>
-              {plant.code} – {plant.nameHu} ({n} tő)
+              {plant.code} – {plantName(plant)} ({t(`${n} tő`, `${n} plants`)})
             </option>
           ))}
         </select>
       </label>
       <p className="mono muted">
-        Típus: {[...kinds].map((k) => KIND_LABEL[k].toLowerCase()).join(', ') || '–'} · {src.maxHeightCm} cm magas · tőtáv {src.spacingCm} cm
+        {t('Típus', 'Type')}: {[...kinds].map((k) => KIND_LABEL[k].toLowerCase()).join(', ') || '–'} ·{' '}
+        {t(`${src.maxHeightCm} cm magas · tőtáv ${src.spacingCm} cm`, `${src.maxHeightCm} cm tall · spacing ${src.spacingCm} cm`)}
       </p>
 
-      <PlantMultiPicker area={area} options={options} picked={to} onChange={setTo} label="Erre cserélem (egy vagy több növény)" />
+      <PlantMultiPicker area={area} options={options} picked={to} onChange={setTo} label={t('Erre cserélem (egy vagy több növény)', 'Replace with (one or more plants)')} />
       {mixed && (
         <fieldset className="field-group">
-          <legend>Véletlenszerű keverés</legend>
+          <legend>{t('Véletlenszerű keverés', 'Random mix')}</legend>
           <label className="check">
             <input type="radio" name="mix-mode" checked={mode === 'plant'} onChange={() => setMode('plant')} />
-            <span>tövenként – a foltok és sorok egyedi tövekre bomlanak, minden tő helyére véletlenszerűen kerül valamelyik</span>
+            <span>
+              {t(
+                'tövenként – a foltok és sorok egyedi tövekre bomlanak, minden tő helyére véletlenszerűen kerül valamelyik',
+                'per plant – drifts and rows are split into single plants, each spot gets one of them at random',
+              )}
+            </span>
           </label>
           <label className="check">
             <input type="radio" name="mix-mode" checked={mode === 'item'} onChange={() => setMode('item')} />
-            <span>elemenként – egy folt vagy sor egészében egy fajt kap</span>
+            <span>{t('elemenként – egy folt vagy sor egészében egy fajt kap', 'per item – a whole drift or row gets one species')}</span>
           </label>
           <p className="mono muted">
-            A darabszámok az arányokat követik (pl. 1 : 1 → fele-fele), a sorrend véletlenszerű. Tövenkénti keverésnél a tövek a régi helyükön maradnak; ha az új növények
-            nagyobbak, a figyelmeztetések jelzik a túl sűrű helyeket.
+            {t(
+              'A darabszámok az arányokat követik (pl. 1 : 1 → fele-fele), a sorrend véletlenszerű. Tövenkénti keverésnél a tövek a régi helyükön maradnak; ha az új növények nagyobbak, a figyelmeztetések jelzik a túl sűrű helyeket.',
+              'Counts follow the shares (e.g. 1 : 1 → half and half), the order is random. Per plant, the plants keep their old spots; if the new plants are bigger, warnings show where it gets too dense.',
+            )}
           </p>
         </fieldset>
       )}
 
       <fieldset className="field-group">
-        <legend>Hol cseréljem?</legend>
+        <legend>{t('Hol cseréljem?', 'Where?')}</legend>
         {(Object.keys(SCOPE_LABEL) as ReplaceScope[]).map((k) => (
           <label key={k} className="check">
             <input type="radio" name="replace-scope" checked={scope === k} onChange={() => setScope(k)} />
@@ -122,13 +141,13 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
         ))}
         <label className="check">
           <input type="checkbox" checked={!keepSpacing} onChange={(e) => setKeepSpacing(!e.target.checked)} />
-          <span>A megmaradó foltok és sorok az új növény tőtávját kapják (a darabszám újraszámolódik)</span>
+          <span>{t('A megmaradó foltok és sorok az új növény tőtávját kapják (a darabszám újraszámolódik)', 'Remaining drifts and rows take the new plant’s spacing (the count is recalculated)')}</span>
         </label>
       </fieldset>
 
       {preview && (
         <p className="mono" role="status">
-          A szerkesztett változatban: {preview}
+          {t('A szerkesztett változatban', 'In the edited variant')}: {preview}
         </p>
       )}
       {msg && (
@@ -139,10 +158,10 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
       <div className="form-actions">
         <span className="spacer" />
         <button type="button" className="btn" onClick={onDone}>
-          Kész
+          {t('Kész', 'Done')}
         </button>
         <button type="button" className="btn btn-primary" disabled={!targets.length} onClick={run}>
-          Csere
+          {t('Csere', 'Replace')}
         </button>
       </div>
     </div>

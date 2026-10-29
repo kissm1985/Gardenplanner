@@ -1,5 +1,6 @@
 // Data model (SPEC §6). All coordinates are in cm, origin = top-left corner of the area,
 // x along the width, y along the length. Derived values (counts, cost, warnings) are never stored.
+import { labels } from '../i18n';
 
 export type Pt = [number, number];
 
@@ -15,6 +16,10 @@ export type ItemStatus = 'needed' | 'ordered' | 'owned' | 'planted';
 export interface Plant {
   code: string; // 2 letters, unique within the project
   nameHu: string;
+  /** English common name (shown when the app is in English). */
+  nameEn?: string;
+  /** English bloom colour, foliage colour and notes (shown when the app is in English). */
+  en?: { bloomColor?: string; foliageColor?: string; notes?: string };
   nameLat: string;
   maxHeightCm: number;
   spreadCm: number;
@@ -193,26 +198,26 @@ export interface Project {
   schedule?: Schedule;
 }
 
-export const ORIENTATION_LABEL: Record<Orientation, string> = {
-  N: 'észak',
-  NE: 'északkelet',
-  E: 'kelet',
-  SE: 'délkelet',
-  S: 'dél',
-  SW: 'délnyugat',
-  W: 'nyugat',
-  NW: 'északnyugat',
-};
+export const ORIENTATION_LABEL: Record<Orientation, string> = labels({
+  N: ['észak', 'north'],
+  NE: ['északkelet', 'north-east'],
+  E: ['kelet', 'east'],
+  SE: ['délkelet', 'south-east'],
+  S: ['dél', 'south'],
+  SW: ['délnyugat', 'south-west'],
+  W: ['nyugat', 'west'],
+  NW: ['északnyugat', 'north-west'],
+});
 
-export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 4 };
+export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 5 };
 
-export const AREA_KIND_LABEL: Record<AreaKind, string> = {
-  bed: 'évelőágyás',
-  gravel: 'kavicsos / kőkert',
-  shade: 'árnyékágyás',
-  border: 'szegély, alacsony sövény',
-  pots: 'dézsás terasz',
-};
+export const AREA_KIND_LABEL: Record<AreaKind, string> = labels({
+  bed: ['évelőágyás', 'perennial bed'],
+  gravel: ['kavicsos / kőkert', 'gravel / rock garden'],
+  shade: ['árnyékágyás', 'shade bed'],
+  border: ['szegély, alacsony sövény', 'edging, low hedge'],
+  pots: ['dézsás terasz', 'patio with pots'],
+});
 
 export const DEFAULT_CONSTRAINTS: Constraints = {
   maxHeightCm: null,

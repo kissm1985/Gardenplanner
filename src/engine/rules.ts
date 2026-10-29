@@ -1,9 +1,10 @@
 // Rule engine (SPEC §4.5). Pure function of the area, its active items, the plant list and the
 // settings; runs after every change. Warnings carry a stable id so the user can mute them.
 import { centroid, dist, pointInPolygon } from '../model/geometry';
-import { effectivePlant, JUGLONE_LABEL, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
+import { effectivePlant, JUGLONE_LABEL, plantName, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings, SunNeed, WaterNeed } from '../model/types';
 import { itemPositions } from './fill';
+import { labels, t } from '../i18n';
 
 export type Severity = 'error' | 'warn' | 'info';
 export type RuleId =
@@ -33,22 +34,22 @@ export interface Warning {
   hint?: string;
 }
 
-export const RULE_LABEL: Record<RuleId, string> = {
-  height: 'Magasság',
-  thorny: 'Tüske',
-  toxic: 'Mérgező',
-  juglone: 'Juglone',
-  spacing: 'Tőtáv',
-  outside: 'Határon kívül',
-  'species-limit': 'Fajkorlát',
-  trees: 'Fák száma',
-  'water-mix': 'Vízigény',
-  sun: 'Napigény',
-  soil: 'Talaj',
-  fixture: 'Rögzített elem',
-  window: 'Ablak',
-  lawn: 'Gyep',
-};
+export const RULE_LABEL: Record<RuleId, string> = labels({
+  height: ['Magasság', 'Height'],
+  thorny: ['Tüske', 'Thorns'],
+  toxic: ['Mérgező', 'Toxic'],
+  juglone: ['Juglone', 'Juglone'],
+  spacing: ['Tőtáv', 'Spacing'],
+  outside: ['Határon kívül', 'Outside the area'],
+  'species-limit': ['Fajkorlát', 'Species limit'],
+  trees: ['Fák száma', 'Number of trees'],
+  'water-mix': ['Vízigény', 'Water needs'],
+  sun: ['Napigény', 'Light'],
+  soil: ['Talaj', 'Soil'],
+  fixture: ['Rögzített elem', 'Fixed element'],
+  window: ['Ablak', 'Window'],
+  lawn: ['Gyep', 'Lawn'],
+});
 
 const SEVERITY_ORDER: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
 const WATER_RANK: Record<WaterNeed, number> = { low: 0, medium: 1, high: 2 };
@@ -59,18 +60,22 @@ const WINDOW_MAX_HEIGHT_CM = 100;
 
 // ---------- area sun level ----------
 
-/** Hours of direct sun from a free-text note such as "13:00-ig", "délig", "14:00-tól". */
+/**
+ * Hours of direct sun from a free-text note: "13:00-ig", "délig", "14:00-tól", "egész nap",
+ * or in English "until 13:00", "until noon", "from 14:00", "all day", "afternoon".
+ */
 export function sunHours(sunUntil: string): number | null {
-  const t = sunUntil.toLowerCase().trim();
-  if (!t) return null;
-  if (/egész nap/.test(t)) return 10;
-  if (/délig/.test(t)) return 12 - 7;
-  if (/délután/.test(t)) return 19 - 13;
-  const m = t.match(/(\d{1,2})(?:[:.](\d{2}))?\s*(?:óra)?\s*-?\s*(ig|tól|től)?/);
+  const s = sunUntil.toLowerCase().trim();
+  if (!s) return null;
+  if (/egész nap|all day|full sun/.test(s)) return 10;
+  if (/délig|until noon|till noon|morning/.test(s)) return 12 - 7;
+  if (/délután|afternoon/.test(s)) return 19 - 13;
+  const m = s.match(/(until|till|to|from|after)?\s*(\d{1,2})(?:[:.](\d{2}))?\s*(?:óra|h)?\s*-?\s*(ig|tól|től)?/);
   if (!m) return null;
-  const h = +m[1] + (m[2] ? +m[2] / 60 : 0);
+  const h = +m[2] + (m[3] ? +m[3] / 60 : 0);
+  const from = m[4] === 'tól' || m[4] === 'től' || m[1] === 'from' || m[1] === 'after';
   // Assume direct sun from ~7:00 to ~19:00 in the growing season (Győr).
-  return m[3] === 'tól' || m[3] === 'től' ? Math.max(0, 19 - h) : Math.max(0, h - 7);
+  return from ? Math.max(0, 19 - h) : Math.max(0, h - 7);
 }
 
 export function areaSunLevel(area: Area): SunNeed {
@@ -99,7 +104,8 @@ const inRect = (f: Fixture, [x, y]: Pt, pad = 0) =>
 
 const anchorOf = (it: PlacedItem): Pt => (it.kind === 'plant' ? [it.x, it.y] : centroid(it.kind === 'drift' ? it.polygon : it.path));
 
-const plural = (items: PlacedItem[], tő: number) => (items.length > 1 ? ` (${items.length} elem, ${tő} tő)` : tő > 1 ? ` (${tő} tő)` : '');
+const plural = (items: PlacedItem[], n: number) =>
+  items.length > 1 ? t(` (${items.length} elem, ${n} tő)`, ` (${items.length} items, ${n} plants)`) : n > 1 ? t(` (${n} tő)`, ` (${n} plants)`) : '';
 
 /** Uniform grid for neighbour queries, so 1000+ positions stay fast. */
 function neighbours(pos: Pos[], cell: number, fn: (a: Pos, b: Pos) => void) {
@@ -154,35 +160,55 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
     const n = its.reduce((s, it) => s + (posByItem.get(it.id)?.length ?? 0), 0);
     const ids = its.map((i) => i.id);
     const at = anchorOf(its[0]);
-    const name = `${p.nameHu}${plural(its, n)}`;
+    const name = `${plantName(p)}${plural(its, n)}`;
     const add = (rule: RuleId, severity: Severity, message: string, hint?: string, itemIds = ids, where = at) =>
       out.push({ id: `${rule}:${code}`, rule, severity, itemIds, at: where, message, hint });
 
     if (c.maxHeightCm != null && p.maxHeightCm > c.maxHeightCm)
-      add('height', 'error', `${name}: ${p.maxHeightCm} cm magasra nő, a terület korlátja ${c.maxHeightCm} cm.`, 'Válassz alacsonyabb fajt vagy fajtát.');
+      add(
+        'height',
+        'error',
+        t(`${name}: ${p.maxHeightCm} cm magasra nő, a terület korlátja ${c.maxHeightCm} cm.`, `${name}: grows to ${p.maxHeightCm} cm, the area allows ${c.maxHeightCm} cm.`),
+        t('Válassz alacsonyabb fajt vagy fajtát.', 'Choose a lower species or cultivar.'),
+      );
 
-    if (c.noThorns && p.thorny) add('thorny', 'error', `${name} tüskés, ezen a területen nem lehet tüskés növény.`);
+    if (c.noThorns && p.thorny) add('thorny', 'error', t(`${name} tüskés, ezen a területen nem lehet tüskés növény.`, `${name} is thorny; this area allows no thorny plants.`));
 
     if (c.nonToxic && p.toxic !== 'no') {
       if (p.toxic === 'unknown')
-        add('toxic', 'warn', `${name}: a mérgező hatás nem ismert, a terület nem mérgező növényt kér.`, 'Nézz utána, vagy jelöld tudatos kivételnek.');
-      else add('toxic', 'error', `${name} mérgező (${TOXIC_LABEL[p.toxic]}), a terület nem mérgező növényt kér.`);
+        add(
+          'toxic',
+          'warn',
+          t(`${name}: a mérgező hatás nem ismert, a terület nem mérgező növényt kér.`, `${name}: toxicity unknown; the area asks for non-toxic plants.`),
+          t('Nézz utána, vagy jelöld tudatos kivételnek.', 'Look it up, or mute it as a deliberate exception.'),
+        );
+      else add('toxic', 'error', t(`${name} mérgező (${TOXIC_LABEL[p.toxic]}), a terület nem mérgező növényt kér.`, `${name} is toxic (${TOXIC_LABEL[p.toxic]}); the area asks for non-toxic plants.`));
     }
 
     if (!p.sun.includes(sunLevel))
       add(
         'sun',
         'warn',
-        `${name} napigénye: ${p.sun.map((s) => SUN_LABEL[s]).join('/')}, a terület ${SUN_LABEL[sunLevel]}${area.sunUntil ? ` (napos ${area.sunUntil})` : ''}.`,
-        sunLevel === 'sun' ? 'Tűző napon öntözd az első évben.' : 'Az első évben figyeld, elég napot kap-e.',
+        t(
+          `${name} napigénye: ${p.sun.map((s) => SUN_LABEL[s]).join('/')}, a terület ${SUN_LABEL[sunLevel]}${area.sunUntil ? ` (napos ${area.sunUntil})` : ''}.`,
+          `${name} wants ${p.sun.map((s) => SUN_LABEL[s]).join('/')}; the area is ${SUN_LABEL[sunLevel]}${area.sunUntil ? ` (sun ${area.sunUntil})` : ''}.`,
+        ),
+        sunLevel === 'sun'
+          ? t('Tűző napon öntözd az első évben.', 'Water it in full sun during the first year.')
+          : t('Az első évben figyeld, elég napot kap-e.', 'In the first year, check that it gets enough light.'),
       );
 
     if (area.soil && p.soil?.length && !p.soil.includes(area.soil))
       add(
         'soil',
         'info',
-        `${name}: ${SOIL_LABEL[area.soil]} talajba kevésbé való (kedveli: ${p.soil.map((x) => SOIL_LABEL[x]).join(', ')}).`,
-        area.soil === 'clay' ? 'Agyagos talajba homokot, apró kavicsot keverj az ültetőgödörbe, vagy válassz más fajt.' : 'Javítsd a talajt az ültetőgödörben, vagy válassz más fajt.',
+        t(
+          `${name}: ${SOIL_LABEL[area.soil]} talajba kevésbé való (kedveli: ${p.soil.map((x) => SOIL_LABEL[x]).join(', ')}).`,
+          `${name}: less suited to ${SOIL_LABEL[area.soil]} soil (prefers ${p.soil.map((x) => SOIL_LABEL[x]).join(', ')}).`,
+        ),
+        area.soil === 'clay'
+          ? t('Agyagos talajba homokot, apró kavicsot keverj az ültetőgödörbe, vagy válassz más fajt.', 'Mix sand and fine gravel into the planting hole in clay, or choose another species.')
+          : t('Javítsd a talajt az ültetőgödörben, vagy válassz más fajt.', 'Improve the soil in the planting hole, or choose another species.'),
       );
 
     // Juglone: any position within the walnut radius.
@@ -191,15 +217,25 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
       const inZone = its.filter((it) => (posByItem.get(it.id) ?? []).some((q) => walnuts.some((w) => dist(q, [w.x, w.y]) <= r)));
       if (inZone.length) {
         const zoneIds = inZone.map((i) => i.id);
-        const label = `${p.nameHu}${plural(inZone, inZone.reduce((s, it) => s + (posByItem.get(it.id)?.length ?? 0), 0))}`;
+        const label = `${plantName(p)}${plural(inZone, inZone.reduce((s, it) => s + (posByItem.get(it.id)?.length ?? 0), 0))}`;
         if (p.juglone === 'sensitive')
-          add('juglone', 'error', `${label} juglone-érzékeny, és a diófa ${r / 100} m-es zónájában van.`, 'Tedd a zónán kívülre, vagy válassz juglone-tűrő fajt.', zoneIds, anchorOf(inZone[0]));
+          add(
+            'juglone',
+            'error',
+            t(`${label} juglone-érzékeny, és a diófa ${r / 100} m-es zónájában van.`, `${label} is sensitive to juglone and stands in the walnut's ${r / 100} m zone.`),
+            t('Tedd a zónán kívülre, vagy válassz juglone-tűrő fajt.', 'Move it out of the zone, or choose a juglone-tolerant species.'),
+            zoneIds,
+            anchorOf(inZone[0]),
+          );
         else
           add(
             'juglone',
             'warn',
-            `${label}: juglone-tűrése ${JUGLONE_LABEL[p.juglone]}, a diófa ${r / 100} m-es zónájában van.`,
-            'Javaslat: jól dokumentált tűrő fajt tegyél a dió felőli oldalra (pl. ligeti zsálya, macskamenta, bergénia, kék gólyaorr), ezt pedig kezeld próbaültetésként.',
+            t(`${label}: juglone-tűrése ${JUGLONE_LABEL[p.juglone]}, a diófa ${r / 100} m-es zónájában van.`, `${label}: juglone tolerance ${JUGLONE_LABEL[p.juglone]}, in the walnut's ${r / 100} m zone.`),
+            t(
+              'Javaslat: jól dokumentált tűrő fajt tegyél a dió felőli oldalra (pl. ligeti zsálya, macskamenta, bergénia, kék gólyaorr), ezt pedig kezeld próbaültetésként.',
+              'Tip: put well-documented tolerant species on the walnut side (e.g. woodland sage, catmint, bergenia, Rozanne cranesbill) and treat this one as a trial.',
+            ),
             zoneIds,
             anchorOf(inZone[0]),
           );
@@ -208,7 +244,12 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
 
     const limit = c.speciesLimits[code];
     if (limit != null && n > limit)
-      add('species-limit', 'warn', `${p.nameHu}: ${n} tő van a területen, a beállított korlát ${limit}.`, 'Csökkentsd a darabszámot, vagy emeld a korlátot a terület beállításainál.');
+      add(
+        'species-limit',
+        'warn',
+        t(`${plantName(p)}: ${n} tő van a területen, a beállított korlát ${limit}.`, `${plantName(p)}: ${n} plants in the area, the limit is ${limit}.`),
+        t('Csökkentsd a darabszámot, vagy emeld a korlátot a terület beállításainál.', 'Reduce the number, or raise the limit in the area settings.'),
+      );
   }
 
   // Trees.
@@ -222,7 +263,7 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
         severity: 'error',
         itemIds: trees.map((t) => t.id),
         at: anchorOf(trees[0]),
-        message: `${n} fa van a területen, legfeljebb ${c.maxTrees} lehet.`,
+        message: t(`${n} fa van a területen, legfeljebb ${c.maxTrees} lehet.`, `${n} trees in the area; at most ${c.maxTrees} allowed.`),
       });
   }
 
@@ -239,8 +280,11 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
         severity: 'error',
         itemIds: [it.id],
         at: outside[0],
-        message: `${p.nameHu}: ${ps.length > 1 ? `${outside.length} tő ` : ''}a terület határán kívül van.`,
-        hint: 'Húzd vissza a területre.',
+        message: t(
+          `${plantName(p)}: ${ps.length > 1 ? `${outside.length} tő ` : ''}a terület határán kívül van.`,
+          `${plantName(p)}: ${ps.length > 1 ? `${outside.length} plants are` : 'it is'} outside the area.`,
+        ),
+        hint: t('Húzd vissza a területre.', 'Drag it back into the area.'),
       });
 
     if (it.kind !== 'plant' && it.spacingCm < p.spacingCm * SPACING_TOLERANCE)
@@ -250,8 +294,11 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
         severity: 'warn',
         itemIds: [it.id],
         at: anchorOf(it),
-        message: `${p.nameHu} ${it.kind === 'drift' ? 'foltjában' : 'sorában'} a tőtáv ${it.spacingCm} cm, a javasolt ${p.spacingCm} cm.`,
-        hint: 'A tövek túl sűrűn lesznek; növeld a tőtávot.',
+        message: t(
+          `${plantName(p)} ${it.kind === 'drift' ? 'foltjában' : 'sorában'} a tőtáv ${it.spacingCm} cm, a javasolt ${p.spacingCm} cm.`,
+          `${plantName(p)} ${it.kind === 'drift' ? 'drift' : 'row'}: spacing ${it.spacingCm} cm, recommended ${p.spacingCm} cm.`,
+        ),
+        hint: t('A tövek túl sűrűn lesznek; növeld a tőtávot.', 'The plants will be too dense; increase the spacing.'),
       });
 
     for (const f of area.fixtures) {
@@ -264,8 +311,11 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
             severity: 'warn',
             itemIds: [it.id],
             at: hit[0],
-            message: `${p.nameHu}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label || 'gyep'}” területére esik.`,
-            hint: 'A gyepre nem kerül növény; húzd az ágyásba, vagy igazítsd a gyep alakját.',
+            message: t(
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label || 'gyep'}” területére esik.`,
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${f.label || 'lawn'}”.`,
+            ),
+            hint: t('A gyepre nem kerül növény; húzd az ágyásba, vagy igazítsd a gyep alakját.', 'No plants go on the lawn; drag it into the bed, or reshape the lawn.'),
           });
       }
       if (f.type === 'tap' || f.type === 'manhole' || f.type === 'paving') {
@@ -277,8 +327,11 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
             severity: 'warn',
             itemIds: [it.id],
             at: hit[0],
-            message: `${p.nameHu}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label ?? 'elem'}” helyére esik.`,
-            hint: 'A csapot, aknát és burkolatot hagyd szabadon.',
+            message: t(
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label ?? 'elem'}” helyére esik.`,
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${f.label ?? 'element'}”.`,
+            ),
+            hint: t('A csapot, aknát és burkolatot hagyd szabadon.', 'Keep taps, manholes and paving clear.'),
           });
       }
       if (f.type === 'window' && p.maxHeightCm > WINDOW_MAX_HEIGHT_CM) {
@@ -290,7 +343,7 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
             severity: 'info',
             itemIds: [it.id],
             at: hit[0],
-            message: `${p.nameHu} (${p.maxHeightCm} cm) eltakarhatja az ablakot.`,
+            message: t(`${plantName(p)} (${p.maxHeightCm} cm) eltakarhatja az ablakot.`, `${plantName(p)} (${p.maxHeightCm} cm) may cover the window.`),
           });
       }
     }
@@ -317,9 +370,15 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
       at: [(a.p[0] + b.p[0]) / 2, (a.p[1] + b.p[1]) / 2],
       message:
         a.plant.code === b.plant.code
-          ? `Két ${a.plant.nameHu} túl közel (${Math.round(dist(a.p, b.p))} cm, javasolt ${a.plant.spacingCm} cm).`
-          : `${a.plant.nameHu} és ${b.plant.nameHu} túl közel (${Math.round(dist(a.p, b.p))} cm, javasolt ${Math.round((a.plant.spacingCm + b.plant.spacingCm) / 2)} cm).`,
-      hint: 'A kifejlett tövek erősen fedni fogják egymást.',
+          ? t(
+              `Két ${plantName(a.plant)} túl közel (${Math.round(dist(a.p, b.p))} cm, javasolt ${a.plant.spacingCm} cm).`,
+              `Two ${plantName(a.plant)} too close (${Math.round(dist(a.p, b.p))} cm, recommended ${a.plant.spacingCm} cm).`,
+            )
+          : t(
+              `${plantName(a.plant)} és ${plantName(b.plant)} túl közel (${Math.round(dist(a.p, b.p))} cm, javasolt ${Math.round((a.plant.spacingCm + b.plant.spacingCm) / 2)} cm).`,
+              `${plantName(a.plant)} and ${plantName(b.plant)} too close (${Math.round(dist(a.p, b.p))} cm, recommended ${Math.round((a.plant.spacingCm + b.plant.spacingCm) / 2)} cm).`,
+            ),
+      hint: t('A kifejlett tövek erősen fedni fogják egymást.', 'Grown plants will overlap a lot.'),
     });
   for (const [key, { a, b }] of waterMix)
     out.push({
@@ -328,8 +387,11 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
       severity: 'warn',
       itemIds: [a.item.id, b.item.id],
       at: [(a.p[0] + b.p[0]) / 2, (a.p[1] + b.p[1]) / 2],
-      message: `Eltérő vízigény egymás mellett: ${a.plant.nameHu} (${WATER_LABEL[a.plant.water]}) és ${b.plant.nameHu} (${WATER_LABEL[b.plant.water]}).`,
-      hint: 'Csepegtetőnél a két csoport ugyanannyi vizet kap; tedd őket külön öntözési zónába.',
+      message: t(
+        `Eltérő vízigény egymás mellett: ${plantName(a.plant)} (${WATER_LABEL[a.plant.water]}) és ${plantName(b.plant)} (${WATER_LABEL[b.plant.water]}).`,
+        `Different water needs side by side: ${plantName(a.plant)} (${WATER_LABEL[a.plant.water]}) and ${plantName(b.plant)} (${WATER_LABEL[b.plant.water]}).`,
+      ),
+      hint: t('Csepegtetőnél a két csoport ugyanannyi vizet kap; tedd őket külön öntözési zónába.', 'With drip irrigation both groups get the same water; put them in separate zones.'),
     });
 
   return out.sort((x, y) => SEVERITY_ORDER[x.severity] - SEVERITY_ORDER[y.severity]);

@@ -5,6 +5,7 @@ import type { Area, Fixture, FixtureType } from '../model/types';
 import { startLawnEdit } from './ShapeEditBar';
 import { selectCurrentArea, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
+import { locale, t } from '../i18n';
 
 export { FIXTURE_LABEL };
 
@@ -44,7 +45,7 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="form">
-      <p className="mono muted">A diófa, fa, ablak, csap és akna a rajzon Kijelölés módban húzható.</p>
+      <p className="mono muted">{t('A diófa, fa, ablak, csap és akna a rajzon Kijelölés módban húzható.', 'Walnut, tree, window, tap and manhole can be dragged on the plan with the Select tool.')}</p>
       <ul className="fx-list">
         {area.fixtures.map((x) => (
           <li key={x.id}>
@@ -54,7 +55,7 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
                 <b>{x.label || FIXTURE_LABEL[x.type]}</b>
                 <span className="mono muted">
                   {FIXTURE_LABEL[x.type]} · x {x.x} · y {x.y}
-                  {x.polygon ? ` · ${m2(x.polygon)} m²` : x.radius ? ` · sugár ${x.radius} cm` : x.w ? ` · ${x.w} × ${x.h} cm` : ''}
+                  {x.polygon ? ` · ${m2(x.polygon)} m²` : x.radius ? t(` · sugár ${x.radius} cm`, ` · radius ${x.radius} cm`) : x.w ? ` · ${x.w} × ${x.h} cm` : ''}
                 </span>
               </span>
             </button>
@@ -70,11 +71,16 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
             onDone();
           }}
         >
-          + Gyepsáv rajzolása
+          {t('+ Gyepsáv rajzolása', '+ Draw a lawn strip')}
         </button>
       </div>
-      <p className="mono muted">A gyepre nem kerül növény: ha mégis oda tennél, figyelmeztet. A gyep nem számít bele az ágyás területébe (mulcs, talajtakarás).</p>
-      <h3 className="sub-h">Új elem a nézet közepére</h3>
+      <p className="mono muted">
+        {t(
+          'A gyepre nem kerül növény: ha mégis oda tennél, figyelmeztet. A gyep nem számít bele az ágyás területébe (mulcs, talajtakarás).',
+          'No plants go on the lawn: you get a warning if one does. The lawn does not count as bed area (mulch, cover).',
+        )}
+      </p>
+      <h3 className="sub-h">{t('Új elem a nézet közepére', 'New element in the middle of the view')}</h3>
       <div className="seg">
         {ADDABLE.map((t) => (
           <button key={t} type="button" className="btn btn-small" onClick={() => add(t)}>
@@ -84,9 +90,11 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
       </div>
       <BackgroundSection area={area} onCalibrate={onDone} />
       <fieldset className="field-group">
-        <legend>Juglone-zóna (diófa körül)</legend>
+        <legend>{t('Juglone-zóna (diófa körül)', 'Juglone zone (around walnuts)')}</legend>
         <label className="field">
-          <span>Sugár: {(settings.walnutRadiusCm / 100).toLocaleString('hu-HU')} m</span>
+          <span>
+            {t('Sugár', 'Radius')}: {(settings.walnutRadiusCm / 100).toLocaleString(locale())} m
+          </span>
           <input
             type="range"
             min={100}
@@ -96,13 +104,13 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
             onChange={(e) => useProject.getState().updateSettings({ walnutRadiusCm: +e.target.value })}
           />
         </label>
-        <p className="mono muted">Alapérték 15 m: a dió gyökérzete a lombkoronánál jóval messzebbre ér.</p>
+        <p className="mono muted">{t('Alapérték 15 m: a dió gyökérzete a lombkoronánál jóval messzebbre ér.', 'Default 15 m: walnut roots reach well beyond the crown.')}</p>
       </fieldset>
     </div>
   );
 }
 
-const m2 = (pts: [number, number][]) => (polygonArea(pts) / 10000).toLocaleString('hu-HU', { maximumFractionDigits: 1 });
+const m2 = (pts: [number, number][]) => (polygonArea(pts) / 10000).toLocaleString(locale(), { maximumFractionDigits: 1 });
 
 function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void; onReshape: () => void }) {
   const upd = (patch: Partial<Fixture>) => useProject.getState().updateFixture(f.id, patch);
@@ -123,7 +131,7 @@ function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void;
   return (
     <div className="form">
       <label className="field">
-        <span>Felirat</span>
+        <span>{t('Felirat', 'Label')}</span>
         <input defaultValue={f.label ?? ''} onBlur={(e) => e.target.value !== (f.label ?? '') && upd({ label: e.target.value })} />
       </label>
       {!f.polygon && (
@@ -133,20 +141,20 @@ function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void;
         </div>
       )}
       {f.radius != null ? (
-        num('radius', f.type === 'walnut' ? 'Lombkorona sugara (cm)' : 'Sugár (cm)')
+        num('radius', f.type === 'walnut' ? t('Lombkorona sugara (cm)', 'Crown radius (cm)') : t('Sugár (cm)', 'Radius (cm)'))
       ) : !f.polygon ? (
         <div className="field-row">
-          {num('w', 'Szélesség (cm)')}
-          {num('h', 'Hossz (cm)')}
+          {num('w', t('Szélesség (cm)', 'Width (cm)'))}
+          {num('h', t('Hossz (cm)', 'Length (cm)'))}
         </div>
       ) : (
         <>
           <p className="mono muted">
-            Szabad alakú elem, {f.polygon.length} sarokpont, {m2(f.polygon)} m².
+            {t(`Szabad alakú elem, ${f.polygon.length} sarokpont, ${m2(f.polygon)} m².`, `Free-shape element, ${f.polygon.length} corners, ${m2(f.polygon)} m².`)}
           </p>
           <div className="form-actions form-actions-start">
             <button type="button" className="btn btn-small" onClick={onReshape}>
-              Alak szerkesztése a rajzon
+              {t('Alak szerkesztése a rajzon', 'Edit the shape on the plan')}
             </button>
           </div>
         </>
@@ -161,11 +169,11 @@ function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void;
             onBack();
           }}
         >
-          Törlés
+          {t('Törlés', 'Delete')}
         </button>
         <span className="spacer" />
         <button type="button" className="btn btn-primary" onClick={onBack}>
-          Kész
+          {t('Kész', 'Done')}
         </button>
       </div>
     </div>
@@ -179,7 +187,7 @@ async function loadImage(file: File, maxPx = 1600): Promise<{ dataUrl: string; a
     const img = new Image();
     await new Promise<void>((res, rej) => {
       img.onload = () => res();
-      img.onerror = () => rej(new Error('Ezt a képet nem lehet megnyitni.'));
+      img.onerror = () => rej(new Error(t('Ezt a képet nem lehet megnyitni.', 'This image cannot be opened.')));
       img.src = url;
     });
     const k = Math.min(1, maxPx / Math.max(img.width, img.height));
@@ -200,10 +208,10 @@ function BackgroundSection({ area, onCalibrate }: { area: Area; onCalibrate: () 
   const set = useProject.getState().setBackground;
   return (
     <fieldset className="field-group">
-      <legend>Háttérkép (fotó vagy tervrajz)</legend>
+      <legend>{t('Háttérkép (fotó vagy tervrajz)', 'Background image (photo or drawing)')}</legend>
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-small" onClick={() => ref.current?.click()}>
-          {bg ? 'Csere' : 'Kép feltöltése'}
+          {bg ? t('Csere', 'Replace') : t('Kép feltöltése', 'Upload image')}
         </button>
         {bg && (
           <>
@@ -216,10 +224,10 @@ function BackgroundSection({ area, onCalibrate }: { area: Area; onCalibrate: () 
                 onCalibrate();
               }}
             >
-              Méretarány két ponttal
+              {t('Méretarány két ponttal', 'Scale with two points')}
             </button>
             <button type="button" className="btn btn-small btn-danger" onClick={() => set(null)}>
-              Törlés
+              {t('Törlés', 'Delete')}
             </button>
           </>
         )}
@@ -245,17 +253,24 @@ function BackgroundSection({ area, onCalibrate }: { area: Area; onCalibrate: () 
       {bg && (
         <>
           <label className="field">
-            <span>Átlátszatlanság: {Math.round(bg.opacity * 100)}%</span>
+            <span>
+              {t('Átlátszatlanság', 'Opacity')}: {Math.round(bg.opacity * 100)}%
+            </span>
             <input type="range" min={0.1} max={1} step={0.05} value={bg.opacity} onChange={(e) => set({ ...bg, opacity: +e.target.value })} />
           </label>
           <div className="field-row field-row-3">
             <BgNum label="x (cm)" v={bg.x} on={(x) => set({ ...bg, x })} />
             <BgNum label="y (cm)" v={bg.y} on={(y) => set({ ...bg, y })} />
-            <BgNum label="Szélesség (cm)" v={bg.widthCm} on={(w) => w > 0 && set({ ...bg, widthCm: w })} />
+            <BgNum label={t('Szélesség (cm)', 'Width (cm)')} v={bg.widthCm} on={(w) => w > 0 && set({ ...bg, widthCm: w })} />
           </div>
         </>
       )}
-      <p className="mono muted">A kép a rajz alá kerül. Két ismert pont megjelölésével igazítod a méretarányt; a Nézet → Rétegek alatt ki is kapcsolható.</p>
+      <p className="mono muted">
+        {t(
+          'A kép a rajz alá kerül. Két ismert pont megjelölésével igazítod a méretarányt; a Nézet → Rétegek alatt ki is kapcsolható.',
+          'The image goes under the plan. Mark two known points to set the scale; it can be hidden under View → Layers.',
+        )}
+      </p>
       {err && <p className="form-error">{err}</p>}
     </fieldset>
   );

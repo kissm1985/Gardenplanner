@@ -1,27 +1,52 @@
 import type { JugloneTolerance, PlacedItem, Plant, Soil, SunNeed, Toxicity, WaterNeed } from './types';
+import { getLang, labelList, labels, t } from '../i18n';
 
-export const SUN_LABEL: Record<SunNeed, string> = { sun: 'nap', part: 'félárnyék', shade: 'árnyék' };
+export const SUN_LABEL: Record<SunNeed, string> = labels({ sun: ['nap', 'sun'], part: ['félárnyék', 'part shade'], shade: ['árnyék', 'shade'] });
 export const SOILS: Soil[] = ['sandy', 'loam', 'clay', 'chalky', 'acidic', 'poor'];
-export const SOIL_LABEL: Record<Soil, string> = {
-  sandy: 'homokos',
-  loam: 'vályog',
-  clay: 'agyagos',
-  chalky: 'meszes',
-  acidic: 'savanyú',
-  poor: 'tápanyagszegény',
-};
-export const WATER_LABEL: Record<WaterNeed, string> = { low: 'alacsony', medium: 'közepes', high: 'magas' };
-export const TOXIC_LABEL: Record<Toxicity, string> = {
-  no: 'nem',
-  human: 'emberre',
-  pet: 'háziállatra',
-  both: 'emberre és háziállatra',
-  unknown: 'nem ismert',
-};
-export const JUGLONE_LABEL: Record<JugloneTolerance, string> = { tolerant: 'tűri', sensitive: 'érzékeny', unknown: 'nem dokumentált' };
-export const MONTHS = ['jan', 'feb', 'márc', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szept', 'okt', 'nov', 'dec'];
+export const SOIL_LABEL: Record<Soil, string> = labels({
+  sandy: ['homokos', 'sandy'],
+  loam: ['vályog', 'loam'],
+  clay: ['agyagos', 'clay'],
+  chalky: ['meszes', 'chalky'],
+  acidic: ['savanyú', 'acidic'],
+  poor: ['tápanyagszegény', 'poor'],
+});
+export const WATER_LABEL: Record<WaterNeed, string> = labels({ low: ['alacsony', 'low'], medium: ['közepes', 'medium'], high: ['magas', 'high'] });
+export const TOXIC_LABEL: Record<Toxicity, string> = labels({
+  no: ['nem', 'no'],
+  human: ['emberre', 'to people'],
+  pet: ['háziállatra', 'to pets'],
+  both: ['emberre és háziállatra', 'to people and pets'],
+  unknown: ['nem ismert', 'unknown'],
+});
+export const JUGLONE_LABEL: Record<JugloneTolerance, string> = labels({ tolerant: ['tűri', 'tolerant'], sensitive: ['érzékeny', 'sensitive'], unknown: ['nem dokumentált', 'not documented'] });
+export const MONTHS = labelList([
+  ['jan', 'Jan'],
+  ['feb', 'Feb'],
+  ['márc', 'Mar'],
+  ['ápr', 'Apr'],
+  ['máj', 'May'],
+  ['jún', 'Jun'],
+  ['júl', 'Jul'],
+  ['aug', 'Aug'],
+  ['szept', 'Sep'],
+  ['okt', 'Oct'],
+  ['nov', 'Nov'],
+  ['dec', 'Dec'],
+]);
 
 export const plantMap = (db: Plant[]) => new Map(db.map((p) => [p.code, p]));
+
+/** Alphabetical order by the name in the current language. */
+export const byPlantName = (a: Plant, b: Plant) => plantName(a).localeCompare(plantName(b), getLang() === 'en' ? 'en' : 'hu');
+
+/** Bloom colour, foliage colour and notes in the current language (Hungarian when no English text). */
+export const plantBloom = (p: Plant) => (getLang() === 'en' && p.en?.bloomColor) || p.bloomColor;
+export const plantFoliage = (p: Plant) => (getLang() === 'en' && p.en?.foliageColor) || p.foliageColor;
+export const plantNotes = (p: Plant) => (getLang() === 'en' && p.en?.notes) || p.notes;
+
+/** The plant's common name in the current language (falls back to the other one). */
+export const plantName = (p: Pick<Plant, 'nameHu' | 'nameEn'>) => (getLang() === 'en' ? p.nameEn || p.nameHu : p.nameHu || p.nameEn || '');
 
 /** The plant as placed: a single plant may have its own spread; the spacing scales with it. */
 export function effectivePlant(p: Plant, it: PlacedItem): Plant {
@@ -85,13 +110,13 @@ export function suggestCode(name: string, taken: Set<string>): string {
 /** Returns a list of Hungarian error messages; empty when valid. */
 export function validatePlant(p: Plant, others: Plant[]): string[] {
   const e: string[] = [];
-  if (!/^[A-Z0-9]{2}$/.test(p.code)) e.push('A kód pontosan 2 nagybetű vagy szám legyen (pl. LA).');
-  else if (others.some((o) => o.code === p.code)) e.push(`A(z) ${p.code} kód már foglalt.`);
-  if (!p.nameHu.trim()) e.push('Add meg a magyar nevet.');
-  if (!(p.maxHeightCm > 0)) e.push('A magasság legyen nagyobb 0-nál.');
-  if (!(p.spreadCm > 0)) e.push('A szélesség legyen nagyobb 0-nál.');
-  if (!(p.spacingCm > 0)) e.push('A tőtáv legyen nagyobb 0-nál.');
-  if (!p.sun.length) e.push('Válassz legalább egy napigényt.');
+  if (!/^[A-Z0-9]{2}$/.test(p.code)) e.push(t('A kód pontosan 2 nagybetű vagy szám legyen (pl. LA).', 'The code must be exactly 2 capital letters or digits (e.g. LA).'));
+  else if (others.some((o) => o.code === p.code)) e.push(t(`A(z) ${p.code} kód már foglalt.`, `The code ${p.code} is already taken.`));
+  if (!p.nameHu.trim() && !p.nameEn?.trim()) e.push(t('Add meg a növény nevét.', 'Enter the plant’s name.'));
+  if (!(p.maxHeightCm > 0)) e.push(t('A magasság legyen nagyobb 0-nál.', 'The height must be greater than 0.'));
+  if (!(p.spreadCm > 0)) e.push(t('A szélesség legyen nagyobb 0-nál.', 'The spread must be greater than 0.'));
+  if (!(p.spacingCm > 0)) e.push(t('A tőtáv legyen nagyobb 0-nál.', 'The spacing must be greater than 0.'));
+  if (!p.sun.length) e.push(t('Válassz legalább egy napigényt.', 'Choose at least one light requirement.'));
   return e;
 }
 
@@ -100,6 +125,7 @@ export function validatePlant(p: Plant, others: Plant[]): string[] {
 const CSV_COLS: { key: keyof Plant; head: string }[] = [
   { key: 'code', head: 'kod' },
   { key: 'nameHu', head: 'magyar_nev' },
+  { key: 'nameEn', head: 'angol_nev' },
   { key: 'nameLat', head: 'latin_nev' },
   { key: 'maxHeightCm', head: 'max_magassag_cm' },
   { key: 'spreadCm', head: 'szelesseg_cm' },
@@ -129,16 +155,26 @@ const CSV_COLS: { key: keyof Plant; head: string }[] = [
 
 const esc = (s: string) => (/[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
 
+/** English texts, nested under `en` in the model, as flat columns. */
+const EN_COLS: { key: 'bloomColor' | 'foliageColor' | 'notes'; head: string }[] = [
+  { key: 'bloomColor', head: 'angol_viragszin' },
+  { key: 'foliageColor', head: 'angol_lombszin' },
+  { key: 'notes', head: 'angol_megjegyzes' },
+];
+
 export function plantsToCsv(db: Plant[]): string {
-  const rows = [CSV_COLS.map((c) => c.head).join(';')];
+  const rows = [[...CSV_COLS, ...EN_COLS].map((c) => c.head).join(';')];
   for (const p of db) {
     rows.push(
-      CSV_COLS.map(({ key }) => {
-        const v = p[key];
-        if (Array.isArray(v)) return esc(v.join(','));
-        if (typeof v === 'boolean') return v ? 'igen' : 'nem';
-        return esc(v == null ? '' : String(v));
-      }).join(';'),
+      [
+        ...CSV_COLS.map(({ key }) => {
+          const v = p[key];
+          if (Array.isArray(v)) return esc(v.join(','));
+          if (typeof v === 'boolean') return v ? 'igen' : 'nem';
+          return esc(v == null ? '' : String(v));
+        }),
+        ...EN_COLS.map(({ key }) => esc(p.en?.[key] ?? '')),
+      ].join(';'),
     );
   }
   return rows.join('\r\n');
@@ -183,10 +219,10 @@ const enumOf = <T extends string>(v: string, allowed: readonly T[], fallback: T)
 export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[] } {
   const rows = parseCsv(text);
   const errors: string[] = [];
-  if (!rows.length) return { plants: [], errors: ['Üres fájl.'] };
+  if (!rows.length) return { plants: [], errors: [t('Üres fájl.', 'Empty file.')] };
   const head = rows[0].map((h) => h.trim());
   const idx = (h: string) => head.indexOf(h);
-  if (idx('kod') < 0 || idx('magyar_nev') < 0) return { plants: [], errors: ['Hiányzik a „kod” vagy a „magyar_nev” oszlop.'] };
+  if (idx('kod') < 0 || (idx('magyar_nev') < 0 && idx('angol_nev') < 0)) return { plants: [], errors: [t('Hiányzik a „kod” vagy a „magyar_nev” oszlop.', 'The “kod” or “angol_nev” (English name) column is missing.')] };
   const plants: Plant[] = [];
   rows.slice(1).forEach((r, n) => {
     const get = (h: string) => (idx(h) >= 0 ? (r[idx(h)] ?? '').trim() : '');
@@ -201,6 +237,7 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
     const p: Plant = {
       ...base,
       nameHu: get('magyar_nev'),
+      nameEn: get('angol_nev') || undefined,
       nameLat: get('latin_nev'),
       maxHeightCm: num('max_magassag_cm', base.maxHeightCm),
       spreadCm: num('szelesseg_cm', base.spreadCm),
@@ -230,10 +267,13 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
     if (!p.sun.length) p.sun = ['sun'];
     if (p.seasonColors === undefined) delete p.seasonColors;
     if (p.isTree === undefined) delete p.isTree;
+    if (p.nameEn === undefined) delete p.nameEn;
+    const en = Object.fromEntries(EN_COLS.map(({ key, head }) => [key, get(head)]).filter(([, v]) => v));
+    if (Object.keys(en).length) p.en = en;
     if (p.photoUrl === undefined) delete p.photoUrl;
     if (p.photoCredit === undefined) delete p.photoCredit;
     const errs = validatePlant(p, plants);
-    if (errs.length) errors.push(`${n + 2}. sor: ${errs.join(' ')}`);
+    if (errs.length) errors.push(t(`${n + 2}. sor: ${errs.join(' ')}`, `Row ${n + 2}: ${errs.join(' ')}`));
     else plants.push(p);
   });
   return { plants, errors };
@@ -243,17 +283,17 @@ export function plantsFromJson(text: string): { plants: Plant[]; errors: string[
   try {
     const data = JSON.parse(text);
     const arr: unknown = Array.isArray(data) ? data : data?.plantDb;
-    if (!Array.isArray(arr)) return { plants: [], errors: ['A JSON nem növénylista.'] };
+    if (!Array.isArray(arr)) return { plants: [], errors: [t('A JSON nem növénylista.', 'This JSON is not a plant list.')] };
     const plants: Plant[] = [];
     const errors: string[] = [];
     arr.forEach((raw, i) => {
       const p = { ...blankPlant(String(raw?.code ?? '')), ...raw } as Plant;
       const errs = validatePlant(p, plants);
-      if (errs.length) errors.push(`${i + 1}. elem: ${errs.join(' ')}`);
+      if (errs.length) errors.push(t(`${i + 1}. elem: ${errs.join(' ')}`, `Item ${i + 1}: ${errs.join(' ')}`));
       else plants.push(p);
     });
     return { plants, errors };
   } catch {
-    return { plants: [], errors: ['Hibás JSON fájl.'] };
+    return { plants: [], errors: [t('Hibás JSON fájl.', 'Invalid JSON file.')] };
   }
 }

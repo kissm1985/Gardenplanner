@@ -1,7 +1,8 @@
 // Bill of materials (SPEC §4.6): planted and order quantities, prices, per area and overall.
-import { JUGLONE_LABEL, WATER_LABEL } from '../model/plants';
+import { byPlantName, JUGLONE_LABEL, plantName, WATER_LABEL } from '../model/plants';
 import type { Area, ItemStatus, PlacedItem, Plant, Project } from '../model/types';
 import { itemCount } from './fill';
+import { locale, t } from '../i18n';
 
 export const STATUSES: ItemStatus[] = ['needed', 'ordered', 'owned', 'planted'];
 
@@ -76,7 +77,7 @@ export function bomFromEntries(entries: { area: Area; items: PlacedItem[] }[], p
       return { ...r, order, subtotal: order * (r.plant.unitPriceHuf || 0) };
     })
     // Trees last, then by Hungarian name.
-    .sort((x, y) => Number(!!x.plant.isTree) - Number(!!y.plant.isTree) || x.plant.nameHu.localeCompare(y.plant.nameHu, 'hu'));
+    .sort((x, y) => Number(!!x.plant.isTree) - Number(!!y.plant.isTree) || byPlantName(x.plant, y.plant));
   return {
     areas,
     rows: list,
@@ -91,7 +92,7 @@ export function bomFromEntries(entries: { area: Area; items: PlacedItem[] }[], p
 
 // ---------- tabular exports ----------
 
-export const fmtInt = (n: number) => Math.round(n).toLocaleString('hu-HU');
+export const fmtInt = (n: number) => Math.round(n).toLocaleString(locale());
 export const fmtFt = (n: number) => `${fmtInt(n)} Ft`;
 
 type Cell = string | number;
@@ -100,24 +101,24 @@ type Cell = string | number;
 export function bomTable(b: Bom): Cell[][] {
   const perArea = b.areas.length > 1;
   const head: Cell[] = [
-    'Kód',
-    'Magyar név',
-    'Latin név',
-    ...(perArea ? b.areas.map((a) => `${a.name} (db)`) : []),
-    'Ültetett (db)',
-    `Rendelendő (db, +${b.reservePct}%)`,
-    'Kiszerelés',
-    'Max. magasság (cm)',
-    'Tőtáv (cm)',
-    'Vízigény',
+    t('Kód', 'Code'),
+    t('Magyar név', 'Name'),
+    t('Latin név', 'Latin name'),
+    ...(perArea ? b.areas.map((a) => t(`${a.name} (db)`, `${a.name} (pcs)`)) : []),
+    t('Ültetett (db)', 'Planted (pcs)'),
+    t(`Rendelendő (db, +${b.reservePct}%)`, `To order (pcs, +${b.reservePct}%)`),
+    t('Kiszerelés', 'Pot size'),
+    t('Max. magasság (cm)', 'Max. height (cm)'),
+    t('Tőtáv (cm)', 'Spacing (cm)'),
+    t('Vízigény', 'Water'),
     'Juglone',
-    'Egységár (Ft)',
-    'Ár forrása',
-    'Részösszeg (Ft)',
+    t('Egységár (Ft)', 'Unit price (HUF)'),
+    t('Ár forrása', 'Price source'),
+    t('Részösszeg (Ft)', 'Subtotal (HUF)'),
   ];
   const rows: Cell[][] = b.rows.map((r) => [
     r.plant.code,
-    r.plant.nameHu + (r.plant.isTree ? ' (fa)' : ''),
+    plantName(r.plant) + (r.plant.isTree ? t(' (fa)', ' (tree)') : ''),
     r.plant.nameLat,
     ...(perArea ? b.areas.map((a) => r.byArea[a.id] ?? 0) : []),
     r.planted,
@@ -128,10 +129,10 @@ export function bomTable(b: Bom): Cell[][] {
     WATER_LABEL[r.plant.water],
     JUGLONE_LABEL[r.plant.juglone],
     r.plant.unitPriceHuf || '',
-    r.plant.priceSource === 'shop' ? 'boltlista' : 'becslés',
+    r.plant.priceSource === 'shop' ? t('boltlista', 'shop list') : t('becslés', 'estimate'),
     r.subtotal,
   ]);
-  const total: Cell[] = ['', 'Összesen', '', ...(perArea ? b.areas.map((a) => b.rows.reduce((s, r) => s + (r.byArea[a.id] ?? 0), 0)) : []), b.planted, b.order, '', '', '', '', '', '', '', b.total];
+  const total: Cell[] = ['', t('Összesen', 'Total'), '', ...(perArea ? b.areas.map((a) => b.rows.reduce((s, r) => s + (r.byArea[a.id] ?? 0), 0)) : []), b.planted, b.order, '', '', '', '', '', '', '', b.total];
   return [head, ...rows, total];
 }
 
@@ -148,12 +149,20 @@ export const toHtmlTable = (t: Cell[][]) =>
 
 /** Readable shopping list for messages / notes. */
 export function toText(b: Bom, title: string): string {
-  const lines = [`${title} – növénylista (rendelés +${b.reservePct}% tartalékkal, fák tartalék nélkül)`, ''];
+  const lines = [
+    t(`${title} – növénylista (rendelés +${b.reservePct}% tartalékkal, fák tartalék nélkül)`, `${title} – plant list (order +${b.reservePct}% spare, trees without spare)`),
+    '',
+  ];
   for (const r of b.rows) {
-    const price = r.plant.unitPriceHuf ? ` – ${fmtFt(r.plant.unitPriceHuf)}/db – ${fmtFt(r.subtotal)}` : '';
-    lines.push(`${r.plant.code} ${r.plant.nameHu} (${r.plant.nameLat}) – ültetés ${r.planted} db – rendelés ${r.order} db – ${r.plant.pot}${price}`);
+    const price = r.plant.unitPriceHuf ? t(` – ${fmtFt(r.plant.unitPriceHuf)}/db – ${fmtFt(r.subtotal)}`, ` – ${fmtFt(r.plant.unitPriceHuf)} each – ${fmtFt(r.subtotal)}`) : '';
+    lines.push(
+      t(
+        `${r.plant.code} ${plantName(r.plant)} (${r.plant.nameLat}) – ültetés ${r.planted} db – rendelés ${r.order} db – ${r.plant.pot}${price}`,
+        `${r.plant.code} ${plantName(r.plant)} (${r.plant.nameLat}) – plant ${r.planted} – order ${r.order} – ${r.plant.pot}${price}`,
+      ),
+    );
   }
-  lines.push('', `Összesen: ${b.planted} tő, rendelés ${b.order} db, kb. ${fmtFt(b.total)}`);
-  if (b.estimated) lines.push(`${b.estimated} tétel ára becslés – vásárlás előtt kérj pontos árat.`);
+  lines.push('', t(`Összesen: ${b.planted} tő, rendelés ${b.order} db, kb. ${fmtFt(b.total)}`, `Total: ${b.planted} plants, order ${b.order}, about ${fmtFt(b.total)}`));
+  if (b.estimated) lines.push(t(`${b.estimated} tétel ára becslés – vásárlás előtt kérj pontos árat.`, `${b.estimated} prices are estimates – ask for exact prices before buying.`));
   return lines.join('\n');
 }

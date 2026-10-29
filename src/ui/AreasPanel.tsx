@@ -6,6 +6,7 @@ import { useProject } from '../store/projectStore';
 import { AreaForm } from './AreaForm';
 import { startLawnEdit, startShapeEdit } from './ShapeEditBar';
 import { useUi } from '../store/uiStore';
+import { t } from '../i18n';
 
 type Mode = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; id: string };
 
@@ -19,7 +20,7 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
   if (mode.kind === 'new') {
     return (
       <AreaForm
-        submitLabel="Terület létrehozása"
+        submitLabel={t('Terület létrehozása', 'Create area')}
         onCancel={() => setMode({ kind: 'list' })}
         onSubmit={({ freeShape, ...d }) => {
           const id = addArea(d);
@@ -38,7 +39,7 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
       return (
         <AreaForm
           initial={area}
-          submitLabel="Mentés"
+          submitLabel={t('Mentés', 'Save')}
           onCancel={() => setMode({ kind: 'list' })}
           onSubmit={(d) => {
             updateArea(area.id, d);
@@ -55,7 +56,7 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="areas">
-      {project.areas.length === 0 && <p className="empty">Még nincs területed. Hozz létre egyet, vagy indulj egy sablonból.</p>}
+      {project.areas.length === 0 && <p className="empty">{t('Még nincs területed. Hozz létre egyet, vagy indulj egy sablonból.', 'You have no area yet. Create one, or start from a template.')}</p>}
       <ul className="area-list">
         {project.areas.map((a) => (
           <AreaCard
@@ -78,22 +79,22 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
               onDone();
             }}
             onDelete={() => {
-              if (confirm(`Biztosan törlöd a(z) „${a.name}” területet? Visszavonással visszahozható.`)) deleteArea(a.id);
+              if (confirm(t(`Biztosan törlöd a(z) „${a.name}” területet? Visszavonással visszahozható.`, `Delete the area “${a.name}”? Undo brings it back.`))) deleteArea(a.id);
             }}
           />
         ))}
       </ul>
       <div className="form-actions">
         <button type="button" className="btn btn-primary" onClick={() => setMode({ kind: 'new' })}>
-          + Új terület
+          {t('+ Új terület', '+ New area')}
         </button>
       </div>
-      <h3 className="sub-h">Sablonból</h3>
+      <h3 className="sub-h">{t('Sablonból', 'From a template')}</h3>
       <div className="tpl-list">
-        {AREA_TEMPLATES.map((t) => (
-          <button key={t.key} type="button" className="tpl" onClick={() => addTemplate(t.key)}>
-            <b>{t.title}</b>
-            <small>{t.summary}</small>
+        {AREA_TEMPLATES.map((tp) => (
+          <button key={tp.key} type="button" className="tpl" onClick={() => addTemplate(tp.key)}>
+            <b>{tp.title}</b>
+            <small>{tp.summary}</small>
           </button>
         ))}
       </div>
@@ -113,14 +114,14 @@ function AreaCard({ a, current, onOpen, onEdit, onShape, onLawn, onDelete }: {
   const c = a.constraints;
   const tags = [
     c.maxHeightCm != null && `max. ${c.maxHeightCm} cm`,
-    c.maxTrees != null && `max. ${c.maxTrees} fa`,
-    a.soil && `talaj: ${SOIL_LABEL[a.soil]}`,
+    c.maxTrees != null && t(`max. ${c.maxTrees} fa`, `max. ${c.maxTrees} trees`),
+    a.soil && t(`talaj: ${SOIL_LABEL[a.soil]}`, `soil: ${SOIL_LABEL[a.soil]}`),
     a.kind && AREA_KIND_LABEL[a.kind],
-    a.shape.kind === 'polygon' && 'szabad alak',
-    c.noThorns && 'tüskementes',
-    c.nonToxic && 'nem mérgező',
-    c.drip && 'csepegtető',
-    c.mulchCover && 'agrotextil + mulcs',
+    a.shape.kind === 'polygon' && t('szabad alak', 'free shape'),
+    c.noThorns && t('tüskementes', 'no thorns'),
+    c.nonToxic && t('nem mérgező', 'non-toxic'),
+    c.drip && t('csepegtető', 'drip irrigation'),
+    c.mulchCover && t('agrotextil + mulcs', 'fabric + mulch'),
   ].filter(Boolean) as string[];
   return (
     <li className={`area-card${current ? ' is-current' : ''}`}>
@@ -128,28 +129,28 @@ function AreaCard({ a, current, onOpen, onEdit, onShape, onLawn, onDelete }: {
         <b>{a.name}</b>
         <span className="mono">
           {a.widthCm} × {a.lengthCm} cm · {ORIENTATION_LABEL[a.orientation]}
-          {a.sunUntil && ` · napos ${a.sunUntil}`}
+          {a.sunUntil && t(` · napos ${a.sunUntil}`, ` · sun ${a.sunUntil}`)}
         </span>
       </button>
       {tags.length > 0 && (
         <ul className="chips">
-          {tags.map((t) => (
-            <li key={t}>{t}</li>
+          {tags.map((tag) => (
+            <li key={tag}>{tag}</li>
           ))}
         </ul>
       )}
       <div className="card-actions">
         <button type="button" className="btn btn-small" onClick={onEdit}>
-          Szerkesztés
+          {t('Szerkesztés', 'Edit')}
         </button>
         <button type="button" className="btn btn-small" onClick={onShape}>
-          Alak szerkesztése
+          {t('Alak szerkesztése', 'Edit shape')}
         </button>
         <button type="button" className="btn btn-small" onClick={onLawn}>
-          + Gyepsáv
+          {t('+ Gyepsáv', '+ Lawn strip')}
         </button>
         <button type="button" className="btn btn-small btn-danger" onClick={onDelete}>
-          Törlés
+          {t('Törlés', 'Delete')}
         </button>
       </div>
     </li>

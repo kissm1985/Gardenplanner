@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
+import { t } from '../i18n';
 
 const SWIPE_CLOSE_PX = 80;
 
@@ -59,11 +60,11 @@ export function Sheet({ open, title, onClose, children, wide, onHelp }: {
         <span className="sheet-grip" aria-hidden="true" />
         <h2>{title}</h2>
         {onHelp && (
-          <button type="button" className="icon-btn sheet-help" onClick={onHelp} aria-label={`Súgó: ${title}`}>
+          <button type="button" className="icon-btn sheet-help" onClick={onHelp} aria-label={t(`Súgó: ${title}`, `Help: ${title}`)}>
             ?
           </button>
         )}
-        <button type="button" className="icon-btn" onClick={onClose} aria-label="Bezárás">
+        <button type="button" className="icon-btn" onClick={onClose} aria-label={t('Bezárás', 'Close')}>
           ×
         </button>
       </div>

@@ -23,7 +23,13 @@ const num = (s: string) => {
 
 export const matchesQuery = (p: Plant, q: string) => {
   const s = q.trim().toLowerCase();
-  return !s || p.code.toLowerCase().includes(s) || p.nameHu.toLowerCase().includes(s) || p.nameLat.toLowerCase().includes(s);
+  return (
+    !s ||
+    p.code.toLowerCase().includes(s) ||
+    p.nameHu.toLowerCase().includes(s) ||
+    !!p.nameEn?.toLowerCase().includes(s) ||
+    p.nameLat.toLowerCase().includes(s)
+  );
 };
 
 /** Number of active criteria (search text excluded). */
@@ -47,6 +53,7 @@ export function filterPlants(db: Plant[], f: PlantFilter): Plant[] {
       (!f.soil || !!p.soil?.includes(f.soil)) &&
       (!f.thorny || p.thorny === (f.thorny === 'yes')) &&
       (!f.juglone || p.juglone === f.juglone) &&
-      (!color || p.bloomColor.toLowerCase().includes(color) || p.foliageColor.toLowerCase().includes(color)),
+      (!color ||
+        [p.bloomColor, p.foliageColor, p.en?.bloomColor ?? '', p.en?.foliageColor ?? ''].some((c) => c.toLowerCase().includes(color))),
   );
 }

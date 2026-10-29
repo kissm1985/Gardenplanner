@@ -2,6 +2,7 @@ import { JUGLONE_LABEL, SOIL_LABEL, SOILS } from '../model/plants';
 import { activeFilterCount, NO_FILTER, type PlantFilter } from '../model/plantFilter';
 import type { JugloneTolerance, SunNeed } from '../model/types';
 import { useUi } from '../store/uiStore';
+import { t } from '../i18n';
 
 /** Shared plant filters (database list and palette). */
 export function PlantFilterForm() {
@@ -11,29 +12,29 @@ export function PlantFilterForm() {
   return (
     <div className="filter-grid">
       <label className="field">
-        <span>Mérgező</span>
+        <span>{t('Mérgező', 'Toxic')}</span>
         <select value={f.toxic} onChange={(e) => set('toxic', e.target.value as PlantFilter['toxic'])}>
-          <option value="">mind</option>
-          <option value="no">nem mérgező</option>
-          <option value="yes">mérgező</option>
-          <option value="unknown">nem ismert</option>
+          <option value="">{t('mind', 'all')}</option>
+          <option value="no">{t('nem mérgező', 'non-toxic')}</option>
+          <option value="yes">{t('mérgező', 'toxic')}</option>
+          <option value="unknown">{t('nem ismert', 'unknown')}</option>
         </select>
       </label>
       <label className="field">
-        <span>Fény</span>
+        <span>{t('Fény', 'Light')}</span>
         <select value={f.sun} onChange={(e) => set('sun', e.target.value as PlantFilter['sun'])}>
-          <option value="">mind</option>
+          <option value="">{t('mind', 'all')}</option>
           {(['sun', 'part', 'shade'] as SunNeed[]).map((s) => (
             <option key={s} value={s}>
-              {s === 'sun' ? 'napos' : s === 'part' ? 'félárnyékos' : 'árnyékos'}
+              {s === 'sun' ? t('napos', 'sunny') : s === 'part' ? t('félárnyékos', 'part shade') : t('árnyékos', 'shade')}
             </option>
           ))}
         </select>
       </label>
       <label className="field">
-        <span>Talaj</span>
+        <span>{t('Talaj', 'Soil')}</span>
         <select value={f.soil} onChange={(e) => set('soil', e.target.value as PlantFilter['soil'])}>
-          <option value="">mind</option>
+          <option value="">{t('mind', 'all')}</option>
           {SOILS.map((s) => (
             <option key={s} value={s}>
               {SOIL_LABEL[s]}
@@ -42,29 +43,29 @@ export function PlantFilterForm() {
         </select>
       </label>
       <fieldset className="range">
-        <legend>Magasság (cm)</legend>
-        <input type="number" inputMode="numeric" placeholder="tól" value={f.hMin} onChange={(e) => set('hMin', e.target.value)} aria-label="Magasság legalább (cm)" />
+        <legend>{t('Magasság (cm)', 'Height (cm)')}</legend>
+        <input type="number" inputMode="numeric" placeholder={t('tól', 'from')} value={f.hMin} onChange={(e) => set('hMin', e.target.value)} aria-label={t('Magasság legalább (cm)', 'Height at least (cm)')} />
         <span>–</span>
-        <input type="number" inputMode="numeric" placeholder="ig" value={f.hMax} onChange={(e) => set('hMax', e.target.value)} aria-label="Magasság legfeljebb (cm)" />
+        <input type="number" inputMode="numeric" placeholder={t('ig', 'to')} value={f.hMax} onChange={(e) => set('hMax', e.target.value)} aria-label={t('Magasság legfeljebb (cm)', 'Height at most (cm)')} />
       </fieldset>
       <fieldset className="range">
-        <legend>Terjedelem (cm)</legend>
-        <input type="number" inputMode="numeric" placeholder="tól" value={f.sMin} onChange={(e) => set('sMin', e.target.value)} aria-label="Terjedelem legalább (cm)" />
+        <legend>{t('Terjedelem (cm)', 'Spread (cm)')}</legend>
+        <input type="number" inputMode="numeric" placeholder={t('tól', 'from')} value={f.sMin} onChange={(e) => set('sMin', e.target.value)} aria-label={t('Terjedelem legalább (cm)', 'Spread at least (cm)')} />
         <span>–</span>
-        <input type="number" inputMode="numeric" placeholder="ig" value={f.sMax} onChange={(e) => set('sMax', e.target.value)} aria-label="Terjedelem legfeljebb (cm)" />
+        <input type="number" inputMode="numeric" placeholder={t('ig', 'to')} value={f.sMax} onChange={(e) => set('sMax', e.target.value)} aria-label={t('Terjedelem legfeljebb (cm)', 'Spread at most (cm)')} />
       </fieldset>
       <label className="field">
-        <span>Tüske</span>
+        <span>{t('Tüske', 'Thorns')}</span>
         <select value={f.thorny} onChange={(e) => set('thorny', e.target.value as PlantFilter['thorny'])}>
-          <option value="">mind</option>
-          <option value="no">tüskementes</option>
-          <option value="yes">tüskés</option>
+          <option value="">{t('mind', 'all')}</option>
+          <option value="no">{t('tüskementes', 'no thorns')}</option>
+          <option value="yes">{t('tüskés', 'thorny')}</option>
         </select>
       </label>
       <label className="field">
         <span>Juglone</span>
         <select value={f.juglone} onChange={(e) => set('juglone', e.target.value as PlantFilter['juglone'])}>
-          <option value="">mind</option>
+          <option value="">{t('mind', 'all')}</option>
           {(Object.keys(JUGLONE_LABEL) as JugloneTolerance[]).map((j) => (
             <option key={j} value={j}>
               {JUGLONE_LABEL[j]}
@@ -73,11 +74,12 @@ export function PlantFilterForm() {
         </select>
       </label>
       <label className="field">
-        <span>Szín</span>
-        <input value={f.color} onChange={(e) => set('color', e.target.value)} placeholder="pl. lila, ezüst" />
+        <span>{t('Szín', 'Colour')}</span>
+        <input value={f.color} onChange={(e) => set('color', e.target.value)} placeholder={t('pl. lila, ezüst', 'e.g. purple, silver')} />
       </label>
       <button type="button" className="btn btn-small" onClick={() => useUi.getState().setPlantFilter({ ...NO_FILTER, q: f.q })} disabled={!n}>
-        Szűrők törlése{n ? ` (${n})` : ''}
+        {t('Szűrők törlése', 'Clear filters')}
+        {n ? ` (${n})` : ''}
       </button>
     </div>
   );

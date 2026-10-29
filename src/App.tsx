@@ -24,41 +24,52 @@ import { VariantsPanel } from './ui/VariantsPanel';
 import { IdeaPanel } from './ui/IdeaPanel';
 import { ReplacePanel } from './ui/ReplacePanel';
 import { HelpPanel } from './ui/HelpPanel';
+import { helpId, type HelpKey } from './ui/helpSections';
+import { getLang, labels, setLang, t, type Lang } from './i18n';
 import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
 
 // Tools arrive phase by phase (SPEC §7); unavailable ones are shown but disabled.
-const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
-  { id: 'select', label: 'Kijelölés', icon: '↖', ready: true },
-  { id: 'plant', label: 'Növény', icon: '✿', ready: true },
-  { id: 'drift', label: 'Folt', icon: '⬭', ready: true },
-  { id: 'row', label: 'Sor', icon: '⋯', ready: true },
-  { id: 'fixtures', label: 'Elemek', icon: '▦', ready: true },
-  { id: 'season', label: 'Évszak', icon: '◐', ready: true },
-  { id: 'list', label: 'Lista', icon: '☰', ready: true },
+const TOOL_LABEL = labels<Tool>({
+  select: ['Kijelölés', 'Select'],
+  plant: ['Növény', 'Plant'],
+  drift: ['Folt', 'Drift'],
+  row: ['Sor', 'Row'],
+  fixtures: ['Elemek', 'Elements'],
+  season: ['Évszak', 'Season'],
+  list: ['Lista', 'List'],
+});
+const TOOLS: { id: Tool; icon: string; ready: boolean }[] = [
+  { id: 'select', icon: '↖', ready: true },
+  { id: 'plant', icon: '✿', ready: true },
+  { id: 'drift', icon: '⬭', ready: true },
+  { id: 'row', icon: '⋯', ready: true },
+  { id: 'fixtures', icon: '▦', ready: true },
+  { id: 'season', icon: '◐', ready: true },
+  { id: 'list', icon: '☰', ready: true },
 ];
 
 /** Which chapter of the guide the help opens at, by the active tool. */
-const HELP_SECTION: Partial<Record<Tool, string>> = {
-  plant: '5-növények-elhelyezése',
-  drift: '5-növények-elhelyezése',
-  row: '5-növények-elhelyezése',
-  fixtures: '4-rögzített-elemek-gyep-burkolat-fal-fa',
-  season: '12-évszaknézet',
-  list: '13-növénylista-rendelés-költség',
+const HELP_SECTION: Partial<Record<Tool, HelpKey>> = {
+  plant: 'placing',
+  drift: 'placing',
+  row: 'placing',
+  fixtures: 'fixtures',
+  season: 'season',
+  list: 'list',
 };
 
-const LAYER_LABELS: Record<keyof Layers, string> = {
-  background: 'Háttérkép',
-  warnings: 'Figyelmeztetések',
-  plants: 'Növények',
-  spacing: 'Tőtáv-körök',
-  grid: 'Rácsháló',
-  fixtures: 'Rögzített elemek',
-  zones: 'Juglone-zóna',
-  dimensions: 'Méretvonalak',
-};
+const LAYER_LABELS: Record<keyof Layers, string> = labels({
+  background: ['Háttérkép', 'Background image'],
+  warnings: ['Figyelmeztetések', 'Warnings'],
+  plants: ['Növények', 'Plants'],
+  spacing: ['Tőtáv-körök', 'Spacing circles'],
+  grid: ['Rácsháló', 'Grid'],
+  fixtures: ['Rögzített elemek', 'Fixed elements'],
+  zones: ['Juglone-zóna', 'Juglone zone'],
+  dimensions: ['Méretvonalak', 'Dimensions'],
+});
 
 type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
 
@@ -95,8 +106,8 @@ export function App({ loading }: { loading: boolean }) {
     if (zoneDraft) setSheet('ideas');
   }, [zoneDraft]);
   const [helpAt, setHelpAt] = useState<string | undefined>(undefined);
-  const openHelp = (section?: string) => {
-    setHelpAt(section);
+  const openHelp = (key?: HelpKey) => {
+    setHelpAt(key && helpId(key));
     setSheet('help');
   };
   const openReplace = (code?: string) => {
@@ -147,7 +158,7 @@ export function App({ loading }: { loading: boolean }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
-  if (loading) return <div className="splash">Betöltés…</div>;
+  if (loading) return <div className="splash">{t('Betöltés…', 'Loading…')}</div>;
   if (!project) return <Welcome />;
 
   const ui = useUi.getState();
@@ -156,35 +167,35 @@ export function App({ loading }: { loading: boolean }) {
     <div className="app">
       <header className="topbar">
         <button type="button" className="area-switch" onClick={() => setSheet('areas')} aria-haspopup="dialog">
-          <span className="area-name">{area ? area.name : 'Nincs terület'}</span>
+          <span className="area-name">{area ? area.name : t('Nincs terület', 'No area')}</span>
           {area && (
             <span className="area-meta mono">
-              {area.widthCm} × {area.lengthCm} cm · <b className="meta-count">{total} tő</b> · {ORIENTATION_LABEL[area.orientation]}
+              {area.widthCm} × {area.lengthCm} cm · <b className="meta-count">{t(`${total} tő`, `${total} plants`)}</b> · {ORIENTATION_LABEL[area.orientation]}
               {area.sunUntil && ` · ${area.sunUntil}`}
             </span>
           )}
         </button>
         <div className="top-actions">
-          <button type="button" className="icon-btn" onClick={() => useProject.getState().undo()} disabled={!canUndo} aria-label="Visszavonás">
+          <button type="button" className="icon-btn" onClick={() => useProject.getState().undo()} disabled={!canUndo} aria-label={t('Visszavonás', 'Undo')}>
             ↶
           </button>
-          <button type="button" className="icon-btn" onClick={() => useProject.getState().redo()} disabled={!canRedo} aria-label="Újra">
+          <button type="button" className="icon-btn" onClick={() => useProject.getState().redo()} disabled={!canRedo} aria-label={t('Újra', 'Redo')}>
             ↷
           </button>
-          <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label="Nézet és rétegek">
+          <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label={t('Nézet és rétegek', 'View and layers')}>
             ◫
           </button>
-          <button type="button" className="icon-btn help-btn" onClick={() => openHelp(HELP_SECTION[tool])} aria-label="Súgó: felhasználói útmutató">
+          <button type="button" className="icon-btn help-btn" onClick={() => openHelp(HELP_SECTION[tool])} aria-label={t('Súgó: felhasználói útmutató', 'Help: user guide')}>
             ?
           </button>
-          <button type="button" className="icon-btn" onClick={() => setSheet('project')} aria-label="Projekt: mentés, megosztás, nyomtatás">
+          <button type="button" className="icon-btn" onClick={() => setSheet('project')} aria-label={t('Projekt: mentés, megosztás, nyomtatás', 'Project: save, share, print')}>
             ⋯
           </button>
           <button
             type="button"
             className={`warn-badge${warnings.length === 0 ? ' is-ok' : errors ? ' is-error' : ''}`}
             onClick={() => setSheet('warnings')}
-            aria-label={`${warnings.length} figyelmeztetés`}
+            aria-label={t(`${warnings.length} figyelmeztetés`, `${warnings.length} warnings`)}
           >
             {warnings.length}
           </button>
@@ -203,49 +214,49 @@ export function App({ loading }: { loading: boolean }) {
         ) : area ? (
           <>
             <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
-            <button type="button" className="variant-pill" onClick={() => setSheet('variants')} aria-label={`Változat: ${activeVariant(area).name}. Változatok kezelése`}>
+            <button type="button" className="variant-pill" onClick={() => setSheet('variants')} aria-label={t(`Változat: ${activeVariant(area).name}. Változatok kezelése`, `Variant: ${activeVariant(area).name}. Manage variants`)}>
               {activeVariant(area).name}
               {activeVariant(area).id === area.chosenVariantId ? ' ★' : ''}
               {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
             </button>
             {shapeEditing && <ShapeEditBar />}
             {tool === 'select' && !shapeEditing && (
-              <div className="stage-tools" role="toolbar" aria-label="Kijelölés módja">
+              <div className="stage-tools" role="toolbar" aria-label={t('Kijelölés módja', 'Selection mode')}>
                 <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
-                  Lasszó
+                  {t('Lasszó', 'Lasso')}
                 </button>
-                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)} title={`Igazítás ${SNAP_CM} cm-es rácsra`}>
-                  Mágnes
+                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)} title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}>
+                  {t('Mágnes', 'Snap')}
                 </button>
               </div>
             )}
             {tool === 'plant' && (
-              <div className="stage-tools" role="toolbar" aria-label="Elhelyezés">
-                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)} title={`Igazítás ${SNAP_CM} cm-es rácsra`}>
-                  Mágnes
+              <div className="stage-tools" role="toolbar" aria-label={t('Elhelyezés', 'Placing')}>
+                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)} title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}>
+                  {t('Mágnes', 'Snap')}
                 </button>
               </div>
             )}
             {tool === 'drift' && (
-              <div className="stage-tools" role="toolbar" aria-label="Folt kiosztása">
+              <div className="stage-tools" role="toolbar" aria-label={t('Folt kiosztása', 'Drift layout')}>
                 <button type="button" className="chip-btn" aria-pressed={driftPattern === 'staggered'} onClick={() => ui.setDriftPattern('staggered')}>
-                  Eltolt rács
+                  {t('Eltolt rács', 'Staggered')}
                 </button>
                 <button type="button" className="chip-btn" aria-pressed={driftPattern === 'grid'} onClick={() => ui.setDriftPattern('grid')}>
-                  Négyzetes
+                  {t('Négyzetes', 'Grid')}
                 </button>
               </div>
             )}
             {tool === 'row' && (
-              <div className="stage-tools" role="toolbar" aria-label="Sor fajtája">
+              <div className="stage-tools" role="toolbar" aria-label={t('Sor fajtája', 'Row type')}>
                 <button type="button" className="chip-btn" aria-pressed={rowMode === 'line'} onClick={() => ui.setRowMode('line')}>
-                  Egyenes
+                  {t('Egyenes', 'Straight')}
                 </button>
                 <button type="button" className="chip-btn" aria-pressed={rowMode === 'curve'} onClick={() => ui.setRowMode('curve')}>
-                  Ív
+                  {t('Ív', 'Curve')}
                 </button>
                 <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
-                  Mágnes
+                  {t('Mágnes', 'Snap')}
                 </button>
               </div>
             )}
@@ -259,9 +270,9 @@ export function App({ loading }: { loading: boolean }) {
           </>
         ) : (
           <div className="empty-stage">
-            <p>Még nincs területed. Hozz létre egyet, és kezdjük a rajzolást.</p>
+            <p>{t('Még nincs területed. Hozz létre egyet, és kezdjük a rajzolást.', 'You have no area yet. Create one and start drawing.')}</p>
             <button type="button" className="btn btn-primary" onClick={() => setSheet('areas')}>
-              Terület hozzáadása
+              {t('Terület hozzáadása', 'Add an area')}
             </button>
           </div>
         )}
@@ -271,35 +282,35 @@ export function App({ loading }: { loading: boolean }) {
       {tool === 'fixtures' && area && !page && !compare && !shapeEditing && <FixtureTools onList={() => setSheet('fixtures')} />}
       {tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}
 
-      <nav className="toolbar" aria-label="Eszközök">
-        {TOOLS.map((t) => (
+      <nav className="toolbar" aria-label={t('Eszközök', 'Tools')}>
+        {TOOLS.map((tb) => (
           <button
-            key={t.id}
+            key={tb.id}
             type="button"
             className="tool"
-            aria-pressed={tool === t.id}
-            disabled={!t.ready}
-            title={t.ready ? t.label : `${t.label} – hamarosan`}
-            onClick={() => ui.setTool(t.id)}
+            aria-pressed={tool === tb.id}
+            disabled={!tb.ready}
+            title={TOOL_LABEL[tb.id]}
+            onClick={() => ui.setTool(tb.id)}
           >
             <span className="tool-icon" aria-hidden="true">
-              {t.icon}
+              {tb.icon}
             </span>
-            <span className="tool-label">{t.label}</span>
+            <span className="tool-label">{TOOL_LABEL[tb.id]}</span>
           </button>
         ))}
       </nav>
 
-      <Sheet open={sheet === 'areas'} onHelp={() => openHelp('3-területek')} title="Területek" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'areas'} onHelp={() => openHelp('areas')} title={t('Területek', 'Areas')} onClose={() => setSheet(null)}>
         <AreasPanel onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('9-növényadatbázis-és-szűrők')} title="Növényadatbázis" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('db')} title={t('Növényadatbázis', 'Plant database')} onClose={() => setSheet(null)}>
         <PlantDbPanel />
       </Sheet>
-      <Sheet open={sheet === 'props'} onHelp={() => openHelp('6-kijelölés-szerkesztés-csere')} title="Tulajdonságok" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'props'} onHelp={() => openHelp('select')} title={t('Tulajdonságok', 'Properties')} onClose={() => setSheet(null)}>
         <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
       </Sheet>
-      <Sheet open={sheet === 'project'} onHelp={() => openHelp('15-mentés-megosztás-nyomtatás-képek')} title="Projekt" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'project'} onHelp={() => openHelp('project')} title={t('Projekt', 'Project')} onClose={() => setSheet(null)}>
         <ProjectPanel
           onPrint={startPrint}
           onIntro={() => {
@@ -311,38 +322,38 @@ export function App({ loading }: { loading: boolean }) {
       </Sheet>
       {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
       {print && <PrintView project={project} orientation={print} />}
-      <Sheet open={sheet === 'filters'} onHelp={() => openHelp('9-növényadatbázis-és-szűrők')} title="Növényszűrők" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'filters'} onHelp={() => openHelp('db')} title={t('Növényszűrők', 'Plant filters')} onClose={() => setSheet(null)}>
         <div className="form">
           <PlantFilterForm />
           <div className="form-actions">
             <button type="button" className="btn btn-primary" onClick={() => setSheet(null)}>
-              Kész
+              {t('Kész', 'Done')}
             </button>
           </div>
         </div>
       </Sheet>
-      <Sheet open={sheet === 'variants'} onHelp={() => openHelp('10-változatok')} title="Változatok" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'variants'} onHelp={() => openHelp('variants')} title={t('Változatok', 'Variants')} onClose={() => setSheet(null)}>
         <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} />
       </Sheet>
-      <Sheet open={sheet === 'help'} title="Súgó" onClose={() => setSheet(null)} wide>
+      <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
         <HelpPanel section={helpAt} />
       </Sheet>
-      <Sheet open={sheet === 'replace'} onHelp={() => openHelp('növény-cseréje-mindenhol')} title="Növény cseréje" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'replace'} onHelp={() => openHelp('replace')} title={t('Növény cseréje', 'Replace plants')} onClose={() => setSheet(null)}>
         <ReplacePanel key={replaceFrom ?? ''} from={replaceFrom} onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'ideas'} onHelp={() => openHelp('11-ötletgenerátor')} title="Ötletgenerátor" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'ideas'} onHelp={() => openHelp('ideas')} title={t('Ötletgenerátor', 'Idea generator')} onClose={() => setSheet(null)}>
         <IdeaPanel onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'warnings'} onHelp={() => openHelp('8-figyelmeztetések')} title={`Figyelmeztetések (${warnings.length})`} onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'warnings'} onHelp={() => openHelp('warnings')} title={t(`Figyelmeztetések (${warnings.length})`, `Warnings (${warnings.length})`)} onClose={() => setSheet(null)}>
         <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'fixtures'} onHelp={() => openHelp('4-rögzített-elemek-gyep-burkolat-fal-fa')} title="Rögzített elemek" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'fixtures'} onHelp={() => openHelp('fixtures')} title={t('Rögzített elemek', 'Fixed elements')} onClose={() => setSheet(null)}>
         <FixturesPanel onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'view'} onHelp={() => openHelp('2-a-képernyő-részei')} title="Nézet" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'view'} onHelp={() => openHelp('screen')} title={t('Nézet', 'View')} onClose={() => setSheet(null)}>
         <div className="form">
           <fieldset className="field-group">
-            <legend>Rétegek</legend>
+            <legend>{t('Rétegek', 'Layers')}</legend>
             {(Object.keys(LAYER_LABELS) as (keyof Layers)[]).map((k) => (
               <label key={k} className="check">
                 <input type="checkbox" checked={layers[k]} onChange={(e) => ui.setLayer(k, e.target.checked)} />
@@ -351,7 +362,7 @@ export function App({ loading }: { loading: boolean }) {
             ))}
           </fieldset>
           <fieldset className="field-group">
-            <legend>Növények mérete</legend>
+            <legend>{t('Növények mérete', 'Plant size')}</legend>
             <div className="seg">
               <label className="seg-item">
                 <input
@@ -360,7 +371,7 @@ export function App({ loading }: { loading: boolean }) {
                   checked={project.settings.showMatureSize}
                   onChange={() => useProject.getState().updateSettings({ showMatureSize: true })}
                 />
-                <span>kifejlett</span>
+                <span>{t('kifejlett', 'mature')}</span>
               </label>
               <label className="seg-item">
                 <input
@@ -369,7 +380,7 @@ export function App({ loading }: { loading: boolean }) {
                   checked={!project.settings.showMatureSize}
                   onChange={() => useProject.getState().updateSettings({ showMatureSize: false })}
                 />
-                <span>ültetéskori</span>
+                <span>{t('ültetéskori', 'at planting')}</span>
               </label>
             </div>
           </fieldset>
@@ -379,21 +390,21 @@ export function App({ loading }: { loading: boolean }) {
               checked={project.settings.wikiPhotos !== false}
               onChange={(e) => useProject.getState().updateSettings({ wikiPhotos: e.target.checked })}
             />
-            <span>Növényfotók a Wikipédiáról (első alkalommal internet kell)</span>
+            <span>{t('Növényfotók a Wikipédiáról (első alkalommal internet kell)', 'Plant photos from Wikipedia (needs internet the first time)')}</span>
           </label>
           <label className="check">
             <input type="checkbox" checked={snapOn} onChange={(e) => ui.setSnap(e.target.checked)} />
-            <span>Mágnesezés {SNAP_CM} cm-es rácsra</span>
+            <span>{t(`Mágnesezés ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}</span>
           </label>
           <div className="form-actions form-actions-start">
             <button type="button" className="btn" onClick={() => setSheet('plantdb')}>
-              Növényadatbázis
+              {t('Növényadatbázis', 'Plant database')}
             </button>
             <button type="button" className="btn" onClick={() => setSheet('fixtures')}>
-              Rögzített elemek
+              {t('Rögzített elemek', 'Fixed elements')}
             </button>
             <button type="button" className="btn" onClick={() => setSheet('ideas')}>
-              ✦ Ötletgenerátor
+              {t('✦ Ötletgenerátor', '✦ Idea generator')}
             </button>
             <button
               type="button"
@@ -403,9 +414,20 @@ export function App({ loading }: { loading: boolean }) {
                 setSheet(null);
               }}
             >
-              Menetrend és gondozás
+              {t('Menetrend és gondozás', 'Schedule and care')}
             </button>
           </div>
+          <fieldset className="field-group">
+            <legend>{t('Nyelv', 'Language')}</legend>
+            <div className="seg">
+              {(['hu', 'en'] as Lang[]).map((l) => (
+                <label key={l} className="seg-item">
+                  <input type="radio" name="lang" checked={getLang() === l} onChange={() => setLang(l)} />
+                  <span>{l === 'hu' ? 'Magyar' : 'English'}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
         </div>
       </Sheet>
     </div>
@@ -414,10 +436,10 @@ export function App({ loading }: { loading: boolean }) {
 
 function FixtureBar({ id, label, onProps }: { id: string; label: string; onProps: () => void }) {
   return (
-    <div className="selbar" role="toolbar" aria-label="Kijelölt elem">
+    <div className="selbar" role="toolbar" aria-label={t('Kijelölt elem', 'Selected element')}>
       <span className="selbar-count mono">{label}</span>
       <button type="button" className="btn btn-small" onClick={onProps}>
-        Adatok
+        {t('Adatok', 'Details')}
       </button>
       <button
         type="button"
@@ -427,9 +449,9 @@ function FixtureBar({ id, label, onProps }: { id: string; label: string; onProps
           useUi.getState().selectFixture(null);
         }}
       >
-        Törlés
+        {t('Törlés', 'Delete')}
       </button>
-      <button type="button" className="icon-btn" onClick={() => useUi.getState().selectFixture(null)} aria-label="Kijelölés megszüntetése">
+      <button type="button" className="icon-btn" onClick={() => useUi.getState().selectFixture(null)} aria-label={t('Kijelölés megszüntetése', 'Clear selection')}>
         ×
       </button>
     </div>

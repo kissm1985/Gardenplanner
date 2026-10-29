@@ -6,6 +6,7 @@ import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
 import { isAncestor } from '../model/variantTree';
 import { DEFAULT_SETTINGS, type Area, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Settings, type Variant } from '../model/types';
+import { t } from '../i18n';
 
 export const HISTORY_LIMIT = 100;
 
@@ -93,7 +94,7 @@ export interface ProjectState {
 
 export function newProject(templateKeys: string[]): Project {
   const areas = AREA_TEMPLATES.filter((t) => templateKeys.includes(t.key)).map((t) => t.build());
-  return { schemaVersion: 1, id: uid('p'), name: 'Kertem', areas, plantDb: seedPlants(), settings: { ...DEFAULT_SETTINGS } };
+  return { schemaVersion: 1, id: uid('p'), name: t('Kertem', 'My garden'), areas, plantDb: seedPlants(), settings: { ...DEFAULT_SETTINGS } };
 }
 
 const seedPlants = () => SEED_PLANTS.map((p) => ({ ...p }));
@@ -111,7 +112,13 @@ export function migrate(p: Project): Project {
     const byCode = new Map(seeds.map((x) => [x.code, x]));
     const updated = out.plantDb.map((x) => {
       const seed = byCode.get(x.code);
-      return seed && !x.soil?.length && seed.nameLat === x.nameLat ? { ...x, soil: seed.soil } : x;
+      if (!seed || seed.nameLat !== x.nameLat) return x;
+      // Fill what older builds lacked (soil, English texts); never overwrite the user's values.
+      let y = x;
+      if (!y.soil?.length) y = { ...y, soil: seed.soil };
+      if (!y.nameEn && seed.nameEn) y = { ...y, nameEn: seed.nameEn };
+      if (!y.en && seed.en) y = { ...y, en: seed.en };
+      return y;
     });
     // Only species newer than the project's list are added, so earlier deletions stick.
     const added = seeds.filter((x) => !have.has(x.code) && (SEED_SINCE[x.code] ?? 2) > seedVersion);
@@ -122,7 +129,7 @@ export function migrate(p: Project): Project {
 }
 
 /** Bump when the built-in plant list grows. */
-export const SEED_VERSION = 4;
+export const SEED_VERSION = 5;
 
 /** Copy with a new parent; a missing parent removes the field (top level). */
 function withParent<T extends { parentId?: string }>(x: T, parentId: string | undefined): T {
@@ -134,11 +141,12 @@ function withParent<T extends { parentId?: string }>(x: T, parentId: string | un
 export const activeVariant = (a: Area): Variant =>
   a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0];
 
-/** Next free plan name: "A terv", "B terv", … */
+/** Next free plan name: "A terv", "B terv", … ("Plan A", "Plan B" in English). */
 export function nextVariantName(vs: Variant[]): string {
   const used = new Set(vs.map((v) => v.name));
-  for (const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') if (!used.has(`${c} terv`)) return `${c} terv`;
-  return `${vs.length + 1}. terv`;
+  const name = (c: string) => t(`${c} terv`, `Plan ${c}`);
+  for (const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') if (!used.has(name(c))) return name(c);
+  return t(`${vs.length + 1}. terv`, `Plan ${vs.length + 1}`);
 }
 
 function translateItem(it: PlacedItem, dx: number, dy: number): PlacedItem {

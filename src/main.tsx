@@ -9,6 +9,7 @@ import { StrictMode, useEffect, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './App';
+import { useLang } from './i18n';
 import { SHARE_PREFIX } from './engine/io';
 import { ReadOnlyView } from './ui/ReadOnlyView';
 import { createAutosaver, loadProject } from './store/persist';
@@ -22,6 +23,8 @@ autosave.onError(() => {
 
 function Root() {
   const [loading, setLoading] = useState(true);
+  // Switching the language re-mounts the app, so every text is rebuilt in the new language.
+  const lang = useLang();
   useEffect(() => {
     let unsub = () => {};
     let cancelled = false;
@@ -53,7 +56,7 @@ function Root() {
       window.removeEventListener('pagehide', onHide);
     };
   }, []);
-  return <App loading={loading} />;
+  return <App key={lang} loading={loading} />;
 }
 
 const LAST_AREA = 'kerttervezo:last-area';
@@ -72,6 +75,11 @@ function writeLastArea(id: string | null) {
   }
 }
 
+function ReadOnlyRoot({ code }: { code: string }) {
+  const lang = useLang();
+  return <ReadOnlyView key={lang} code={code} />;
+}
+
 registerSW({ immediate: true });
 
 // A share link (#view=…) opens the read-only page and never touches the local plan.
@@ -83,4 +91,4 @@ setVisibleH();
 window.visualViewport?.addEventListener('resize', setVisibleH);
 window.addEventListener('resize', setVisibleH);
 
-createRoot(document.getElementById('root')!).render(<StrictMode>{share ? <ReadOnlyView code={share} /> : <Root />}</StrictMode>);
+createRoot(document.getElementById('root')!).render(<StrictMode>{share ? <ReadOnlyRoot code={share} /> : <Root />}</StrictMode>);

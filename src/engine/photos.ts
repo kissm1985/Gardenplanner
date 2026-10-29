@@ -1,5 +1,6 @@
 // Plant photos from Wikipedia / Wikimedia Commons, looked up by Latin name.
 // Only freely licensed images (Wikipedia "page images" are free by default); author and licence are kept for the credit line.
+import { t } from '../i18n';
 
 export interface PhotoInfo {
   /** Thumbnail URL (about 480 px wide). */
@@ -60,7 +61,7 @@ async function commonsInfo(fetchFn: Fetch, file: string): Promise<{ src: string;
   const src = info?.thumburl ?? info?.url;
   if (!src) return null;
   const meta = info?.extmetadata ?? {};
-  const artist = stripHtml(meta.Artist?.value ?? '') || 'ismeretlen szerző';
+  const artist = stripHtml(meta.Artist?.value ?? '') || t('ismeretlen szerző', 'unknown author');
   const lic = stripHtml(meta.LicenseShortName?.value ?? '');
   return { src, credit: `${artist}${lic ? `, ${lic}` : ''}` };
 }

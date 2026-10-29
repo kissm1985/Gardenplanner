@@ -1,18 +1,19 @@
 // Fixed (non-plant) elements: labels and default sizes for new ones.
 import type { Fixture, FixtureType } from './types';
+import { labels } from '../i18n';
 
-export const FIXTURE_LABEL: Record<FixtureType, string> = {
-  walnut: 'Diófa',
-  tree: 'Fa',
-  window: 'Ablak',
-  tap: 'Csap',
-  manhole: 'Akna',
-  paving: 'Burkolat',
-  fence: 'Kerítés',
-  lawn: 'Gyep',
-  wall: 'Fal',
-  other: 'Egyéb',
-};
+export const FIXTURE_LABEL: Record<FixtureType, string> = labels({
+  walnut: ['Diófa', 'Walnut'],
+  tree: ['Fa', 'Tree'],
+  window: ['Ablak', 'Window'],
+  tap: ['Csap', 'Tap'],
+  manhole: ['Akna', 'Manhole'],
+  paving: ['Burkolat', 'Paving'],
+  fence: ['Kerítés', 'Fence'],
+  lawn: ['Gyep', 'Lawn'],
+  wall: ['Fal', 'Wall'],
+  other: ['Egyéb', 'Other'],
+});
 
 /** Strip-like elements drawn by dragging on the plan; thickness for the walls/fences. */
 export const STRIP_THICKNESS: Partial<Record<FixtureType, number>> = { wall: 16, fence: 6 };

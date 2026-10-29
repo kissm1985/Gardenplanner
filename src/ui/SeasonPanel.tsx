@@ -4,6 +4,8 @@ import { MONTH_LABEL, SEASON_LABEL, SEASON_MONTH, seasonOf, seasonSummary, type 
 import type { Area, Plant } from '../model/types';
 import { StaticPlan } from '../canvas/StaticPlan';
 import { useUi } from '../store/uiStore';
+import { t } from '../i18n';
+import { plantName } from '../model/plants';
 
 /** Species of the area, for the hint line. */
 function usedPlants(area: Area, plantDb: Plant[]) {
@@ -11,14 +13,15 @@ function usedPlants(area: Area, plantDb: Plant[]) {
   return plantDb.filter((p) => codes.has(p.code));
 }
 
-const names = (ps: Plant[]) => ps.map((p) => p.nameHu.toLowerCase()).join(', ');
+const names = (ps: Plant[]) => ps.map((p) => plantName(p).toLowerCase()).join(', ');
 
 function hint(ps: Plant[], month: number): string {
   const { blooming, winter } = seasonSummary(ps, month);
   const parts: string[] = [];
-  if (blooming.length) parts.push(`Virágzik: ${names(blooming)}.`);
-  if (winter.length) parts.push(`Télen is díszít: ${names(winter)}.`);
-  if (!parts.length) parts.push(ps.length ? 'Ebben a hónapban nincs virágzó faj a területen.' : 'Még nincs növény a területen.');
+  if (blooming.length) parts.push(t(`Virágzik: ${names(blooming)}.`, `In bloom: ${names(blooming)}.`));
+  if (winter.length) parts.push(t(`Télen is díszít: ${names(winter)}.`, `Winter interest: ${names(winter)}.`));
+  if (!parts.length)
+    parts.push(ps.length ? t('Ebben a hónapban nincs virágzó faj a területen.', 'Nothing in the area flowers this month.') : t('Még nincs növény a területen.', 'No plants in the area yet.'));
   return parts.join(' ');
 }
 
@@ -30,22 +33,22 @@ export function SeasonPanel({ area, plantDb }: { area: Area; plantDb: Plant[] })
   const ps = useMemo(() => usedPlants(area, plantDb), [area, plantDb]);
   const season = seasonOf(month);
   return (
-    <section className="season-panel" aria-label="Évszaknézet">
-      <div className="season-btns" role="group" aria-label="Évszak">
+    <section className="season-panel" aria-label={t('Évszaknézet', 'Season view')}>
+      <div className="season-btns" role="group" aria-label={t('Évszak', 'Season')}>
         {([0, 1, 2, 3] as Season[]).map((s) => (
           <button key={s} type="button" className="chip-btn" aria-pressed={!fourUp && season === s} onClick={() => (ui.setMonth(SEASON_MONTH[s]), ui.setFourUp(false))}>
             {SEASON_LABEL[s]}
           </button>
         ))}
         <button type="button" className="chip-btn" aria-pressed={fourUp} onClick={() => ui.setFourUp(!fourUp)}>
-          4 egymás mellett
+          {t('4 egymás mellett', '4 side by side')}
         </button>
       </div>
       {!fourUp && (
         <>
           <label className="month-slider">
             <span className="mono">{MONTH_LABEL[month - 1]}</span>
-            <input type="range" min={1} max={12} step={1} value={month} onChange={(e) => ui.setMonth(+e.target.value)} aria-label="Hónap" />
+            <input type="range" min={1} max={12} step={1} value={month} onChange={(e) => ui.setMonth(+e.target.value)} aria-label={t('Hónap', 'Month')} />
           </label>
           <p className="season-hint" role="status">
             {hint(ps, month)}

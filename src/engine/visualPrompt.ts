@@ -154,14 +154,14 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
           ? 'téli állapot: visszavágva / lombtalan, alig látszik'
           : `most nem virágzik; lomb: ${p.foliageColor}`
       : look.blooming
-        ? `in bloom now: ${p.bloomColor}`
+        ? `in bloom now: ${p.en?.bloomColor ?? p.bloomColor}`
         : opt.season === 3 && !p.winterInterest
           ? 'winter state: cut back / leafless, barely visible'
-          : `not in bloom; foliage: ${p.foliageColor}`;
+          : `not in bloom; foliage: ${p.en?.foliageColor ?? p.foliageColor}`;
     L.push(
       hu
         ? `- **${p.code} – ${p.nameHu}** (*${p.nameLat}*), ${n} tő. ${form}, kb. ${h} cm magas és ${w} cm széles; ${state}.`
-        : `- **${p.code} – ${p.nameHu}** (*${p.nameLat}*), ${n} plants. ${form}, about ${h} cm tall and ${w} cm wide; ${state}.`,
+        : `- **${p.code} – ${p.nameEn || p.nameHu}** (*${p.nameLat}*), ${n} plants. ${form}, about ${h} cm tall and ${w} cm wide; ${state}.`,
     );
     for (const it of its) L.push(`  - ${placement(it, opt.lang)}${it.kind === 'plant' ? '' : hu ? ` (${count(it)} tő)` : ` (${count(it)} plants)`}`);
   }

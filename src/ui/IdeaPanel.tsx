@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { DEFAULT_KINDS, generateIdea, KIND_LABEL, PALETTES, poolsFor, type Idea, type PaletteKey, type PlantKind } from '../engine/generator';
 import { areaSunLevel, evaluate } from '../engine/rules';
-import { SUN_LABEL, SOIL_LABEL } from '../model/plants';
+import { byPlantName, SOIL_LABEL, SUN_LABEL } from '../model/plants';
 import { AREA_KIND_LABEL } from '../model/types';
 import { fillZone, type ZoneMode } from '../engine/zoneFill';
 import { activeVariant, selectCurrentArea, useProject } from '../store/projectStore';
@@ -63,7 +63,7 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
   }, []);
 
   if (!area) return null;
-  const options = [...project.plantDb].sort((a, b) => a.nameHu.localeCompare(b.nameHu, 'hu')).map((p, i) => ({ p, score: i / 10000 }));
+  const options = [...project.plantDb].sort(byPlantName).map((p, i) => ({ p, score: i / 10000 }));
   const mine = last && last.areaId === area.id ? last : null;
   const alive = mine ? activeVariant(area).items.some((it) => mine.ids.includes(it.id)) : false;
   const byCode = new Map(project.plantDb.map((p) => [p.code, p]));

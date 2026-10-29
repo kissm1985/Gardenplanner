@@ -15,6 +15,7 @@ import { Rulers, RULER } from './layers/Rulers';
 import { WarningsLayer } from './layers/Warnings';
 import { PlantTooltip } from '../ui/PlantTooltip';
 import { fitView, niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
+import { locale, t } from '../i18n';
 
 interface Props {
   area: Area;
@@ -465,13 +466,13 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       return;
     }
     if (!g.moved) {
-      if (g.kind === 'drift') hint('Húzd körbe ujjal a folt területét.');
-      else hint('Húzz egy vonalat ujjal az ív mentén.');
+      if (g.kind === 'drift') hint(t('Húzd körbe ujjal a folt területét.', 'Draw around the drift with your finger.'));
+      else hint(t('Húzz egy vonalat ujjal az ív mentén.', 'Trace a line along the curve with your finger.'));
       return;
     }
     const pts = simplify(g.points, tol);
     if (g.kind === 'drift') {
-      if (pts.length < 3 || polygonArea(pts) < 100) return hint('Ez a folt túl kicsi. Rajzolj nagyobbat.');
+      if (pts.length < 3 || polygonArea(pts) < 100) return hint(t('Ez a folt túl kicsi. Rajzolj nagyobbat.', 'This drift is too small. Draw a bigger one.'));
       const id = st.addDrift(plantId, pts, useUi.getState().driftPattern);
       if (id) useUi.getState().select([id]);
     } else {
@@ -502,14 +503,17 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const bg = area.background;
     const measured = dist(pts[0], pts[1]);
     if (!bg || measured < 1) return;
-    const input = prompt(`Mekkora a valódi távolság a két pont között (cm)? A kép szerint most ${Math.round(measured)} cm.`);
+    const input = prompt(
+      t(`Mekkora a valódi távolság a két pont között (cm)? A kép szerint most ${Math.round(measured)} cm.`, `What is the real distance between the two points (cm)? The image now says ${Math.round(measured)} cm.`),
+    );
     const real = input ? parseFloat(input.replace(',', '.')) : NaN;
-    if (!(real > 0)) return hint('A méretarány nem változott.');
+    if (!(real > 0)) return hint(t('A méretarány nem változott.', 'The scale did not change.'));
     // Scale the image about the first point so that point stays put.
     const k = real / measured;
     const [ax, ay] = pts[0];
     useProject.getState().setBackground({ ...bg, widthCm: bg.widthCm * k, x: ax - (ax - bg.x) * k, y: ay - (ay - bg.y) * k });
-    hint(`Méretarány beállítva (×${k.toLocaleString('hu-HU', { maximumFractionDigits: 2 })}).`);
+    const kk = k.toLocaleString(locale(), { maximumFractionDigits: 2 });
+    hint(t(`Méretarány beállítva (×${kk}).`, `Scale set (×${kk}).`));
   };
 
   /** Add a fixture from the Elemek tool and select it, so it can be moved or edited at once. */
@@ -517,7 +521,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const id = useProject.getState().addFixture(f);
     if (id) {
       useUi.getState().selectFixture(id);
-      hint(`${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod; a Tulajdonságoknál pontos méret.`);
+      hint(t(`${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod; a Tulajdonságoknál pontos méret.`, `${FIXTURE_LABEL[f.type]} added. Drag to move it; exact size in its details.`));
     }
   };
 
@@ -539,7 +543,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       return addFixtureAt(newFixture(ft, Math.round(w[0]), Math.round(w[1])));
     }
     if (tool === 'plant' || tool === 'drift' || tool === 'row') {
-      if (!activePlant) hint('Előbb válassz növényt a palettán.');
+      if (!activePlant) hint(t('Előbb válassz növényt a palettán.', 'Pick a plant in the palette first.'));
       else if (tool === 'plant') place(activePlant, toWorld(p));
       return;
     }
@@ -630,7 +634,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
           width={size.w}
           height={size.h}
           role="application"
-          aria-label={`${area.name} felülnézet, ${area.widthCm} × ${area.lengthCm} cm. Nagyítás: plusz és mínusz, illesztés: 0, mozgatás: nyilak, törlés: Delete.`}
+          aria-label={t(
+            `${area.name} felülnézet, ${area.widthCm} × ${area.lengthCm} cm. Nagyítás: plusz és mínusz, illesztés: 0, mozgatás: nyilak, törlés: Delete.`,
+            `${area.name} plan view, ${area.widthCm} × ${area.lengthCm} cm. Zoom: plus and minus, fit: 0, move: arrows, delete: Delete.`,
+          )}
           tabIndex={0}
           onPointerDown={onPointerDown}
           onPointerMove={onPointerMove}
@@ -711,18 +718,20 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       )}
       {calibrate && !toast && (
         <p className="canvas-toast" role="status">
-          Méretarány: koppints a kép {calibrate.length ? 'második' : 'első'} pontjára (pl. egy ismert hosszúságú fal két végére).
+          {calibrate.length
+            ? t('Méretarány: koppints a kép második pontjára (pl. egy ismert hosszúságú fal két végére).', 'Scale: tap the second point on the image (e.g. both ends of a wall of known length).')
+            : t('Méretarány: koppints a kép első pontjára (pl. egy ismert hosszúságú fal két végére).', 'Scale: tap the first point on the image (e.g. both ends of a wall of known length).')}
         </p>
       )}
       {pendingStart && !toast && (
         <p className="canvas-toast" role="status">
-          Koppints a sor végpontjára.
+          {t('Koppints a sor végpontjára.', 'Tap the end of the row.')}
         </p>
       )}
-      <div className="zoom-ctl" aria-label="Nagyítás">
-        <button type="button" onClick={() => zoomBtn(1.25)} aria-label="Nagyítás">+</button>
-        <button type="button" onClick={() => zoomBtn(0.8)} aria-label="Kicsinyítés">−</button>
-        <button type="button" onClick={() => fit()} aria-label="Illesztés a képernyőhöz">⤢</button>
+      <div className="zoom-ctl" aria-label={t('Nagyítás', 'Zoom')}>
+        <button type="button" onClick={() => zoomBtn(1.25)} aria-label={t('Nagyítás', 'Zoom in')}>+</button>
+        <button type="button" onClick={() => zoomBtn(0.8)} aria-label={t('Kicsinyítés', 'Zoom out')}>−</button>
+        <button type="button" onClick={() => fit()} aria-label={t('Illesztés a képernyőhöz', 'Fit to screen')}>⤢</button>
       </div>
     </div>
   );
