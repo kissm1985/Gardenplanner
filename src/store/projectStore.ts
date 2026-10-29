@@ -10,6 +10,9 @@ export const HISTORY_LIMIT = 100;
 
 export type ItemPatch = Partial<{ plantId: string; status: ItemStatus; note: string; x: number; y: number; pattern: Pattern; spacingCm: number }>;
 
+/** Where a species replacement applies: the edited variant, every variant of the area, or the whole project. */
+export type ReplaceScope = 'variant' | 'area' | 'project';
+
 export interface ProjectState {
   project: Project | null;
   currentAreaId: string | null;
@@ -37,6 +40,11 @@ export interface ProjectState {
   moveItems: (ids: string[], dx: number, dy: number) => void;
   updateItems: (ids: string[], patch: ItemPatch) => void;
   deleteItems: (ids: string[]) => void;
+  /**
+   * Replace every plant of one species with another in the chosen scope. Drifts and rows take the
+   * new plant's spacing (their count is recomputed) unless keepSpacing. Returns the number of items changed.
+   */
+  replaceSpecies: (from: string, to: string, scope: ReplaceScope, keepSpacing?: boolean) => number;
   duplicateItems: (ids: string[], dx: number, dy: number) => string[];
 
   setMuted: (warningId: string, muted: boolean) => void;
@@ -305,6 +313,37 @@ export const useProject = create<ProjectState>()((set, get) => {
           return withCount(next);
         }),
       );
+    },
+
+    replaceSpecies: (from, to, scope, keepSpacing = false) => {
+      const p0 = get().project;
+      const areaId = get().currentAreaId;
+      const target = p0?.plantDb.find((x) => x.code === to);
+      if (!p0 || !target || from === to) return 0;
+      let n = 0;
+      const swap = (items: PlacedItem[]) =>
+        items.some((it) => it.plantId === from)
+          ? items.map((it) => {
+              if (it.plantId !== from) return it;
+              n++;
+              if (it.kind === 'plant') return { ...it, plantId: to };
+              return withCount({ ...it, plantId: to, spacingCm: keepSpacing ? it.spacingCm : target.spacingCm });
+            })
+          : items;
+      commit((p) => {
+        const areas = p.areas.map((a) => {
+          if (scope !== 'project' && a.id !== areaId) return a;
+          const editing = activeVariant(a).id;
+          const variants = a.variants.map((v) => {
+            if (scope === 'variant' && v.id !== editing) return v;
+            const items = swap(v.items);
+            return items === v.items ? v : { ...v, items };
+          });
+          return variants.some((v, i) => v !== a.variants[i]) ? { ...a, variants } : a;
+        });
+        return n ? { ...p, areas } : p; // nothing to replace: no history entry
+      });
+      return n;
     },
 
     deleteItems: (ids) => {

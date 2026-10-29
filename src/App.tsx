@@ -22,6 +22,7 @@ import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
 import { VariantsPanel } from './ui/VariantsPanel';
 import { IdeaPanel } from './ui/IdeaPanel';
+import { ReplacePanel } from './ui/ReplacePanel';
 import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
@@ -48,7 +49,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -63,6 +64,11 @@ export function App({ loading }: { loading: boolean }) {
   const rowMode = useUi((s) => s.rowMode);
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
+  const [replaceFrom, setReplaceFrom] = useState<string | undefined>(undefined);
+  const openReplace = (code?: string) => {
+    setReplaceFrom(code);
+    setSheet('replace');
+  };
   const items = useProject(selectItems);
   const selectedFixture = useUi((s) => s.selectedFixture);
   const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
@@ -206,7 +212,7 @@ export function App({ loading }: { loading: boolean }) {
                 </button>
               </div>
             )}
-            {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} />}
+            {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} onReplace={openReplace} />}
             {(tool === 'select' || tool === 'fixtures') && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
               <FixtureBar id={selectedFixture} label={(() => {
                 const f = area.fixtures.find((x) => x.id === selectedFixture);
@@ -254,7 +260,7 @@ export function App({ loading }: { loading: boolean }) {
         <PlantDbPanel />
       </Sheet>
       <Sheet open={sheet === 'props'} title="Tulajdonságok" onClose={() => setSheet(null)}>
-        <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} />
+        <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
       </Sheet>
       <Sheet open={sheet === 'project'} title="Projekt" onClose={() => setSheet(null)}>
         <ProjectPanel
@@ -279,7 +285,10 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </Sheet>
       <Sheet open={sheet === 'variants'} title="Változatok" onClose={() => setSheet(null)}>
-        <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} />
+        <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} />
+      </Sheet>
+      <Sheet open={sheet === 'replace'} title="Növény cseréje" onClose={() => setSheet(null)}>
+        <ReplacePanel key={replaceFrom ?? ''} from={replaceFrom} onDone={() => setSheet(null)} />
       </Sheet>
       <Sheet open={sheet === 'ideas'} title="Ötletgenerátor" onClose={() => setSheet(null)}>
         <IdeaPanel onDone={() => setSheet(null)} />

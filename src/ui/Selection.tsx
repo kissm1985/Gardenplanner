@@ -9,7 +9,7 @@ import { PlantChip } from './PlantChip';
 export const STATUS_LABEL: Record<ItemStatus, string> = { needed: 'kell', ordered: 'megrendelve', owned: 'megvan', planted: 'beültetve' };
 
 /** Floating action bar for the current selection. */
-export function SelectionBar({ onProps }: { onProps: () => void }) {
+export function SelectionBar({ onProps, onReplace }: { onProps: () => void; onReplace: (code: string) => void }) {
   const selected = useUi((s) => s.selected);
   if (!selected.length) return null;
   const dup = () => useUi.getState().select(useProject.getState().duplicateItems(selected, 20, 20));
@@ -24,6 +24,17 @@ export function SelectionBar({ onProps }: { onProps: () => void }) {
       <button type="button" className="btn btn-small" onClick={dup}>
         Másolás
       </button>
+      <button
+        type="button"
+        className="btn btn-small"
+        title="Az összes ilyen növény cseréje egy másikra"
+        onClick={() => {
+          const it = selectItems(useProject.getState()).find((i) => i.id === selected[0]);
+          if (it) onReplace(it.plantId);
+        }}
+      >
+        Csere
+      </button>
       <button type="button" className="btn btn-small btn-danger" onClick={() => useProject.getState().deleteItems(selected)}>
         Törlés
       </button>
@@ -35,7 +46,7 @@ export function SelectionBar({ onProps }: { onProps: () => void }) {
 }
 
 /** Properties of the selected item(s): species, status, note, position. */
-export function ItemProps({ plantDb, onDone }: { plantDb: Plant[]; onDone: () => void }) {
+export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; onDone: () => void; onReplace: (code: string) => void }) {
   const selected = useUi((s) => s.selected);
   const [note, setNote] = useState('');
   const all = useProject(selectItems);
@@ -66,6 +77,11 @@ export function ItemProps({ plantDb, onDone }: { plantDb: Plant[]; onDone: () =>
           ))}
         </select>
       </label>
+      {plant && (
+        <button type="button" className="btn btn-small" onClick={() => onReplace(plant.code)}>
+          Az összes {plant.nameHu.toLowerCase()} cseréje a tervben…
+        </button>
+      )}
       <fieldset className="field-group">
         <legend>Státusz</legend>
         <div className="seg">

@@ -21,9 +21,11 @@ type Stats = ReturnType<typeof variantStats>;
 export function VariantsPanel({
   onDone,
   onIdeas,
+  onReplace,
 }: {
   onDone: () => void;
   onIdeas: () => void;
+  onReplace: () => void;
 }) {
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
@@ -74,6 +76,9 @@ export function VariantsPanel({
         </button>
         <button type="button" className="btn" onClick={onIdeas}>
           ✦ Ötlet generálása
+        </button>
+        <button type="button" className="btn" onClick={onReplace}>
+          ⇄ Növény cseréje
         </button>
         <button
           type="button"

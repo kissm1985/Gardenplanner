@@ -195,3 +195,35 @@ describe('plant list migration', () => {
     expect(db.length).toBe(p.plantDb.length - 1);
   });
 });
+
+describe('replace species', () => {
+  it('swaps every plant of a species; drifts take the new spacing; scope and undo', () => {
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+    st().addDrift('LA', [[0, 0], [120, 0], [120, 200], [0, 200]], 'staggered');
+    st().placePlant('LA', 60, 500);
+    st().placePlant('SA', 60, 700);
+    const a = st().project!.areas[0];
+    const other = st().duplicateVariant(a.variants[0].id)!; // B, now edited
+    st().setActiveVariant(a.variants[0].id);
+    const items = () => st().project!.areas[0].variants.find((v) => v.id === a.variants[0].id)!.items;
+    const bItems = () => st().project!.areas[0].variants.find((v) => v.id === other)!.items;
+
+    expect(st().replaceSpecies('LA', 'NE', 'variant')).toBe(2);
+    const drift = items().find((i) => i.kind === 'drift')!;
+    expect(drift.plantId).toBe('NE');
+    expect(drift.kind === 'drift' && drift.spacingCm).toBe(st().project!.plantDb.find((p) => p.code === 'NE')!.spacingCm);
+    expect(items().filter((i) => i.plantId === 'SA')).toHaveLength(1);
+    expect(bItems().filter((i) => i.plantId === 'LA')).toHaveLength(2); // other variant untouched
+
+    st().undo();
+    expect(items().filter((i) => i.plantId === 'LA')).toHaveLength(2);
+    expect(st().replaceSpecies('LA', 'NE', 'area', true)).toBe(4);
+    expect(bItems().every((i) => i.plantId !== 'LA')).toBe(true);
+    const kept = bItems().find((i) => i.kind === 'drift')!;
+    expect(kept.kind === 'drift' && kept.spacingCm).toBe(40); // keepSpacing: lavender's 40 cm
+    const past = st().past.length;
+    expect(st().replaceSpecies('XX', 'NE', 'project')).toBe(0);
+    expect(st().past.length).toBe(past);
+  });
+});
