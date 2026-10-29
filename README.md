@@ -1,6 +1,6 @@
 # Kerttervező
 
-Mobilbarát, offline is működő ültetéstervező (PWA). **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md).** A specifikáció: [SPEC.md](SPEC.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
+Mobilbarát, offline is működő ültetéstervező (PWA), magyarul és angolul. **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md)** · English guide: [docs/GUIDE.md](docs/GUIDE.md). A specifikáció: [SPEC.md](SPEC.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
 
 ```bash
 npm install
@@ -28,6 +28,8 @@ npm run build      # statikus build a dist/ mappába
 | Változatok | Fába rendezve: a másolat az eredeti alá kerül, mappák, áthelyezés, összecsukás; választott változat, összehasonlítás |
 | Ötletgenerátor | Véletlenszerű, a terület feltételeihez illő összeállítás külön változatba; választható növénytípusok (évelők, díszfüvek, talajtakarók, cserjék, sövény a hátsó szélen, kis fák szabad hellyel); színvilág, hátul magas – elöl alacsony, diófa-zóna; „Újra” gomb |
 | Menetrend | Napokra bontott, pipálható ültetési lista; gondozási naptár Győrre; mulcsajánlás |
+| Nyelv | Magyar és angol felület (Nézet → Nyelv, alapból a böngésző nyelve); angol növénynevek, figyelmeztetések, listák, exportok, útmutató |
+| Súgó | ? gomb: a felhasználói útmutató az alkalmazáson belül, offline is; minden ablakból a saját fejezeténél |
 | Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG jelmagyarázattal, teljes JSON-mentés, csak olvasható link |
 | Látványterv | Bemásolható leírás a ChatGPT-nek (méretek, égtáj, tereptárgyak, foltok helye méterben, fajok kinézete évszak szerint, nézőpont) + rajz PNG-ben |
 

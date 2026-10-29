@@ -93,7 +93,7 @@ export function bomFromEntries(entries: { area: Area; items: PlacedItem[] }[], p
 // ---------- tabular exports ----------
 
 export const fmtInt = (n: number) => Math.round(n).toLocaleString(locale());
-export const fmtFt = (n: number) => `${fmtInt(n)} Ft`;
+export const fmtFt = (n: number) => t(`${fmtInt(n)} Ft`, `${fmtInt(n)} HUF`);
 
 type Cell = string | number;
 

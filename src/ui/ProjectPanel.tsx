@@ -8,6 +8,8 @@ import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
 import { downloadBlob, downloadText } from './download';
 import { planSvg, svgToPng, type LegendRow } from './exportImage';
+import { getLang, t } from '../i18n';
+import { plantName } from '../model/plants';
 
 export type Orientation = 'portrait' | 'landscape';
 
@@ -31,14 +33,22 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
   const fileRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLTextAreaElement>(null);
   const vizRef = useRef<HTMLTextAreaElement>(null);
-  const [viz, setViz] = useState<{ season: Season; viewpoint: Viewpoint; lang: Lang; mature: boolean }>({ season: 1, viewpoint: 'eye', lang: 'hu', mature: true });
+  const [viz, setViz] = useState<{ season: Season; viewpoint: Viewpoint; lang: Lang; mature: boolean }>({ season: 1, viewpoint: 'eye', lang: getLang(), mature: true });
   const [vizText, setVizText] = useState('');
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
 
   const load = async (file: File) => {
     try {
       const p = migrate(parseProject(await file.text()));
-      if (!confirm(`Betöltöd a(z) „${p.name}” projektet (${p.areas.length} terület)? A mostani terv helyére kerül – előtte érdemes elmenteni.`)) return;
+      if (
+        !confirm(
+          t(
+            `Betöltöd a(z) „${p.name}” projektet (${p.areas.length} terület)? A mostani terv helyére kerül – előtte érdemes elmenteni.`,
+            `Load the project “${p.name}” (${p.areas.length} areas)? It replaces the current plan – save that first.`,
+          ),
+        )
+      )
+        return;
       useProject.getState().setLoaded(p);
       onDone();
     } catch (e) {
@@ -52,7 +62,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
     const legend: LegendRow[] = (opts.legend ?? withLegend)
       ? bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
           code: r.plant.code,
-          nameHu: r.plant.nameHu,
+          nameHu: plantName(r.plant),
           nameLat: r.plant.nameLat,
           color: r.plant.color,
           symbol: r.plant.symbol,
@@ -75,7 +85,11 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
     setVizText(text);
     await new Promise((r) => setTimeout(r));
     const ok = await copy(text, vizRef.current);
-    setMsg(ok ? 'A szöveg kimásolva. Illeszd be a ChatGPT-be, és csatold mellé a PNG-t.' : 'Jelöld ki és másold ki a szöveget a mezőből.');
+    setMsg(
+      ok
+        ? t('A szöveg kimásolva. Illeszd be a ChatGPT-be, és csatold mellé a PNG-t.', 'Text copied. Paste it into ChatGPT and attach the PNG.')
+        : t('Jelöld ki és másold ki a szöveget a mezőből.', 'Select and copy the text from the box.'),
+    );
   };
 
   const makeLink = async () => {
@@ -83,31 +97,35 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
     setLink(url);
     if (navigator.share) {
       try {
-        await navigator.share({ title: `${project.name} – kerterv`, url });
+        await navigator.share({ title: t(`${project.name} – kerterv`, `${project.name} – garden plan`), url });
         return;
       } catch {
         /* fall back to copy */
       }
     }
     const ok = await copy(url, linkRef.current);
-    setMsg(ok ? 'A link kimásolva. Telefonon is megnyitható, csak olvasható.' : 'Jelöld ki és másold ki a linket a mezőből.');
+    setMsg(
+      ok
+        ? t('A link kimásolva. Telefonon is megnyitható, csak olvasható.', 'Link copied. It opens on phones too, read-only.')
+        : t('Jelöld ki és másold ki a linket a mezőből.', 'Select and copy the link from the box.'),
+    );
   };
 
   return (
     <div className="form">
       <label className="field">
-        <span>Projekt neve</span>
+        <span>{t('Projekt neve', 'Project name')}</span>
         <input defaultValue={project.name} onBlur={(e) => useProject.getState().renameProject(e.target.value)} />
       </label>
 
       <fieldset className="field-group">
-        <legend>Mentés és visszatöltés</legend>
+        <legend>{t('Mentés és visszatöltés', 'Save and restore')}</legend>
         <div className="form-actions form-actions-start">
-          <button type="button" className="btn btn-small" onClick={() => downloadText(`kerttervezo-${slug(project.name)}-${today()}.json`, exportJson(project), 'application/json')}>
-            Teljes mentés (JSON)
+          <button type="button" className="btn btn-small" onClick={() => downloadText(`${t('kerttervezo', 'garden-planner')}-${slug(project.name)}-${today()}.json`, exportJson(project), 'application/json')}>
+            {t('Teljes mentés (JSON)', 'Full backup (JSON)')}
           </button>
           <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>
-            Betöltés JSON-ból
+            {t('Betöltés JSON-ból', 'Load from JSON')}
           </button>
           <input
             ref={fileRef}
@@ -121,20 +139,23 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
             }}
           />
         </div>
-        <p className="mono muted">Minden adat ezen a készüléken van; a JSON-mentéssel viheted át másik eszközre.</p>
+        <p className="mono muted">{t('Minden adat ezen a készüléken van; a JSON-mentéssel viheted át másik eszközre.', 'All data is on this device; move it to another one with the JSON backup.')}</p>
       </fieldset>
 
       <fieldset className="field-group">
-        <legend>Megosztás</legend>
+        <legend>{t('Megosztás', 'Sharing')}</legend>
         <button type="button" className="btn btn-small" onClick={makeLink}>
-          Csak olvasható link
+          {t('Csak olvasható link', 'Read-only link')}
         </button>
-        {link && <textarea ref={linkRef} className="sched-text" readOnly rows={3} value={link} onFocus={(e) => e.currentTarget.select()} aria-label="Megosztható link" />}
-        <p className="mono muted">A terv a link végében, kódolva utazik – nincs szerver. A választott változatokat mutatja.</p>
+        {link && <textarea ref={linkRef} className="sched-text" readOnly rows={3} value={link} onFocus={(e) => e.currentTarget.select()} aria-label={t('Megosztható link', 'Shareable link')} />}
+        <p className="mono muted">{t('A terv a link végében, kódolva utazik – nincs szerver. A választott változatokat mutatja.', 'The plan travels encoded at the end of the link – no server. It shows the chosen variants.')}</p>
       </fieldset>
 
       <fieldset className="field-group">
-        <legend>Kép a rajzról{area ? ` – ${area.name}` : ''}</legend>
+        <legend>
+          {t('Kép a rajzról', 'Image of the plan')}
+          {area ? ` – ${area.name}` : ''}
+        </legend>
         <div className="form-actions form-actions-start">
           <button type="button" className="btn btn-small" onClick={() => image('png')} disabled={!area}>
             PNG
@@ -145,17 +166,29 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
         </div>
         <label className="check">
           <input type="checkbox" checked={withLegend} onChange={(e) => setWithLegend(e.target.checked)} />
-          <span>Jelmagyarázattal (kód → növény, darabszám)</span>
+          <span>{t('Jelmagyarázattal (kód → növény, darabszám)', 'With legend (code → plant, count)')}</span>
         </label>
-        <p className="mono muted">{month ? 'Az évszaknézet színeivel.' : 'A szerkesztett változat, alapszínekkel. Évszaknézetből az adott hónap színeit kapod.'}</p>
+        <p className="mono muted">
+          {month
+            ? t('Az évszaknézet színeivel.', 'With the season view colours.')
+            : t('A szerkesztett változat, alapszínekkel. Évszaknézetből az adott hónap színeit kapod.', 'The edited variant in base colours. From the season view you get that month’s colours.')}
+        </p>
       </fieldset>
 
       <fieldset className="field-group">
-        <legend>Látványterv ChatGPT-nek{area ? ` – ${area.name}` : ''}</legend>
-        <p className="mono muted">Egy bemásolható leírás (méretek, égtáj, fal, gyep, a foltok helye méterben, minden faj színe, formája, magassága) és mellé a rajz jelmagyarázattal. A kettőt együtt add be a ChatGPT-nek.</p>
+        <legend>
+          {t('Látványterv ChatGPT-nek', 'Visualisation with ChatGPT')}
+          {area ? ` – ${area.name}` : ''}
+        </legend>
+        <p className="mono muted">
+          {t(
+            'Egy bemásolható leírás (méretek, égtáj, fal, gyep, a foltok helye méterben, minden faj színe, formája, magassága) és mellé a rajz jelmagyarázattal. A kettőt együtt add be a ChatGPT-nek.',
+            'A description to paste (sizes, facing, wall, lawn, drift positions in metres, each species’ colour, form and height) plus the plan with a legend. Give both to ChatGPT.',
+          )}
+        </p>
         <div className="field-row">
           <label className="field">
-            <span className="lbl">Évszak</span>
+            <span className="lbl">{t('Évszak', 'Season')}</span>
             <select value={viz.season} onChange={(e) => setViz({ ...viz, season: +e.target.value as Season })}>
               {SEASON_LABEL.map((l, i) => (
                 <option key={l} value={i}>
@@ -165,64 +198,64 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
             </select>
           </label>
           <label className="field">
-            <span className="lbl">Nézőpont</span>
+            <span className="lbl">{t('Nézőpont', 'Viewpoint')}</span>
             <select value={viz.viewpoint} onChange={(e) => setViz({ ...viz, viewpoint: e.target.value as Viewpoint })}>
-              <option value="eye">szemmagasságból</option>
-              <option value="aerial">madártávlatból</option>
-              <option value="both">mindkettő</option>
+              <option value="eye">{t('szemmagasságból', 'eye level')}</option>
+              <option value="aerial">{t('madártávlatból', "bird's-eye")}</option>
+              <option value="both">{t('mindkettő', 'both')}</option>
             </select>
           </label>
         </div>
         <div className="field-row">
           <label className="field">
-            <span className="lbl">Nyelv</span>
+            <span className="lbl">{t('Nyelv', 'Language')}</span>
             <select value={viz.lang} onChange={(e) => setViz({ ...viz, lang: e.target.value as Lang })}>
-              <option value="hu">magyar</option>
-              <option value="en">angol</option>
+              <option value="hu">{t('magyar', 'Hungarian')}</option>
+              <option value="en">{t('angol', 'English')}</option>
             </select>
           </label>
           <label className="check">
             <input type="checkbox" checked={viz.mature} onChange={(e) => setViz({ ...viz, mature: e.target.checked })} />
-            <span>Kifejlett állapot (2–3 év múlva)</span>
+            <span>{t('Kifejlett állapot (2–3 év múlva)', 'Mature (in 2–3 years)')}</span>
           </label>
         </div>
         <div className="form-actions form-actions-start">
           <button type="button" className="btn btn-small btn-primary" onClick={vizPrompt} disabled={!area}>
-            Leírás másolása
+            {t('Leírás másolása', 'Copy description')}
           </button>
           <button
             type="button"
             className="btn btn-small"
-            onClick={() => image('png', { month: SEASON_MONTH[viz.season], legend: true, suffix: '-latvanyterv' })}
+            onClick={() => image('png', { month: SEASON_MONTH[viz.season], legend: true, suffix: t('-latvanyterv', '-visualisation') })}
             disabled={!area}
           >
-            Rajz PNG-ben
+            {t('Rajz PNG-ben', 'Plan as PNG')}
           </button>
         </div>
-        {vizText && <textarea ref={vizRef} className="sched-text" readOnly rows={8} value={vizText} onFocus={(e) => e.currentTarget.select()} aria-label="Leírás a látványtervhez" />}
+        {vizText && <textarea ref={vizRef} className="sched-text" readOnly rows={8} value={vizText} onFocus={(e) => e.currentTarget.select()} aria-label={t('Leírás a látványtervhez', 'Visualisation description')} />}
       </fieldset>
 
       <fieldset className="field-group">
-        <legend>Nyomtatás / PDF (A4)</legend>
+        <legend>{t('Nyomtatás / PDF (A4)', 'Print / PDF (A4)')}</legend>
         <div className="seg">
           <label className="seg-item">
             <input type="radio" name="orient" checked={orient === 'portrait'} onChange={() => setOrient('portrait')} />
-            <span>álló</span>
+            <span>{t('álló', 'portrait')}</span>
           </label>
           <label className="seg-item">
             <input type="radio" name="orient" checked={orient === 'landscape'} onChange={() => setOrient('landscape')} />
-            <span>fekvő</span>
+            <span>{t('fekvő', 'landscape')}</span>
           </label>
         </div>
         <button type="button" className="btn btn-primary" onClick={() => onPrint(orient)}>
-          Nyomtatás / mentés PDF-be
+          {t('Nyomtatás / mentés PDF-be', 'Print / save as PDF')}
         </button>
-        <p className="mono muted">Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A választott változatokból.</p>
+        <p className="mono muted">{t('Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A választott változatokból.', 'One page per area: plan view, four seasons, plant list, warnings. From the chosen variants.')}</p>
       </fieldset>
 
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-small" onClick={onIntro}>
-          Bevezető újra
+          {t('Bevezető újra', 'Show the intro again')}
         </button>
       </div>
       {msg && (

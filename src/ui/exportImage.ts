@@ -3,6 +3,7 @@ import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { StaticPlan } from '../canvas/StaticPlan';
 import type { Area, PlacedItem, Plant } from '../model/types';
+import { t } from '../i18n';
 
 const STYLE_PROPS = [
   'fill',
@@ -102,7 +103,7 @@ export function planSvg(opts: {
   const total = rows.reduce((n, r) => n + r.count, 0);
   const legend = rows.length
     ? `<g transform="translate(${lx} ${ly})">
-<text x="0" y="22" font-family="${mono}" font-size="15" fill="${fg}" letter-spacing="1">JELMAGYARÁZAT</text>
+<text x="0" y="22" font-family="${mono}" font-size="15" fill="${fg}" letter-spacing="1">${t('JELMAGYARÁZAT', 'LEGEND')}</text>
 ${rows
   .map((r, i) => {
     const y = 44 + i * rowH;
@@ -117,10 +118,10 @@ ${rows
     return `${shape}
 <text x="38" y="${y + 19}" font-family="${mono}" font-size="15" font-weight="600" fill="${fg}">${esc(r.code)}</text>
 <text x="76" y="${y + 19}" font-family="${serif}" font-size="16" fill="${fg}">${esc(clip(r.nameHu, 24))} <tspan font-style="italic" font-size="13" fill-opacity=".65">${esc(clip(r.nameLat, 30))}</tspan></text>
-<text x="${(legendW || W - 2 * pad) - 4}" y="${y + 19}" text-anchor="end" font-family="${mono}" font-size="14" fill="${fg}">${r.count} tő</text>`;
+<text x="${(legendW || W - 2 * pad) - 4}" y="${y + 19}" text-anchor="end" font-family="${mono}" font-size="14" fill="${fg}">${t(`${r.count} tő`, `${r.count} plants`)}</text>`;
   })
   .join('\n')}
-<text x="0" y="${44 + rows.length * rowH + 22}" font-family="${mono}" font-size="14" fill="${fg}" fill-opacity=".7">Összesen ${total} tő · ${rows.length} faj</text>
+<text x="0" y="${44 + rows.length * rowH + 22}" font-family="${mono}" font-size="14" fill="${fg}" fill-opacity=".7">${t(`Összesen ${total} tő · ${rows.length} faj`, `Total ${total} plants · ${rows.length} species`)}</text>
 </g>`
     : '';
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
@@ -138,7 +139,7 @@ export async function svgToPng(svg: string, scale = 2): Promise<Blob> {
     img.decoding = 'async';
     await new Promise<void>((res, rej) => {
       img.onload = () => res();
-      img.onerror = () => rej(new Error('A kép nem készíthető el.'));
+      img.onerror = () => rej(new Error(t('A kép nem készíthető el.', 'The image could not be made.')));
       img.src = url;
     });
     const c = document.createElement('canvas');
@@ -147,7 +148,7 @@ export async function svgToPng(svg: string, scale = 2): Promise<Blob> {
     const ctx = c.getContext('2d')!;
     ctx.scale(scale, scale);
     ctx.drawImage(img, 0, 0);
-    return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('A PNG nem készíthető el.'))), 'image/png'));
+    return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error(t('A PNG nem készíthető el.', 'The PNG could not be made.')))), 'image/png'));
   } finally {
     URL.revokeObjectURL(url);
   }

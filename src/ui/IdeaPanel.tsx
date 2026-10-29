@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { DEFAULT_KINDS, generateIdea, KIND_LABEL, PALETTES, poolsFor, type Idea, type PaletteKey, type PlantKind } from '../engine/generator';
 import { areaSunLevel, evaluate } from '../engine/rules';
-import { byPlantName, SOIL_LABEL, SUN_LABEL } from '../model/plants';
+import { byPlantName, plantBloom, plantFoliage, plantName, SOIL_LABEL, SUN_LABEL } from '../model/plants';
 import { AREA_KIND_LABEL } from '../model/types';
 import { fillZone, type ZoneMode } from '../engine/zoneFill';
 import { activeVariant, selectCurrentArea, useProject } from '../store/projectStore';
@@ -9,6 +9,7 @@ import { useUi } from '../store/uiStore';
 import { PlantMultiPicker } from './PlantMultiPicker';
 import { startZoneEdit } from './ShapeEditBar';
 import { PlantChip } from './PlantChip';
+import { labels, t } from '../i18n';
 
 /** Idea generator: a whole new variant for the area, or random planting of a drawn region from my own list. */
 export function IdeaPanel({ onDone }: { onDone: () => void }) {
@@ -17,12 +18,12 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
   const [tab, setTab] = useState<'whole' | 'zone'>(zoneHere ? 'zone' : 'whole');
   return (
     <div className="form">
-      <div className="idea-tabs seg" role="tablist" aria-label="Ötletgenerátor módja">
+      <div className="idea-tabs seg" role="tablist" aria-label={t('Ötletgenerátor módja', 'Idea generator mode')}>
         <button type="button" role="tab" className="chip-btn" aria-selected={tab === 'whole'} aria-pressed={tab === 'whole'} onClick={() => setTab('whole')}>
-          Egész terület → új változat
+          {t('Egész terület → új változat', 'Whole area → new variant')}
         </button>
         <button type="button" role="tab" className="chip-btn" aria-selected={tab === 'zone'} aria-pressed={tab === 'zone'} onClick={() => setTab('zone')}>
-          Kijelölt rész, saját listából
+          {t('Kijelölt rész, saját listából', 'Selected region, my own list')}
         </button>
       </div>
       {tab === 'whole' ? <WholeAreaIdea onDone={onDone} /> : <ZoneFillPanel onDone={onDone} />}
@@ -30,10 +31,11 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
   );
 }
 
-const DENSITY: { v: number; label: string }[] = [
-  { v: 0.8, label: 'sűrűbb' },
-  { v: 0.95, label: 'tőtáv szerint' },
-  { v: 1.2, label: 'lazább' },
+const DENSITY_LABEL = labels({ dense: ['sűrűbb', 'denser'], normal: ['tőtáv szerint', 'by spacing'], loose: ['lazább', 'looser'] });
+const DENSITY: { v: number; key: keyof typeof DENSITY_LABEL }[] = [
+  { v: 0.8, key: 'dense' },
+  { v: 0.95, key: 'normal' },
+  { v: 1.2, key: 'loose' },
 ];
 
 /** Draw a region on the plan; it is planted at random with the plants picked here (edited variant). */
@@ -72,16 +74,18 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
   return (
     <>
       <p className="mono muted">
-        Válaszd ki a növényeket (és ha kell, az arányukat), aztán jelöld ki a rajzon a részt. A program véletlenszerűen, a tőtávot tartva ültet oda a listádból; a gyepet, burkolatot és a már
-        ültetett töveket kikerüli. A szerkesztett változatba kerül, visszavonható.
+        {t(
+          'Válaszd ki a növényeket (és ha kell, az arányukat), aztán jelöld ki a rajzon a részt. A program véletlenszerűen, a tőtávot tartva ültet oda a listádból; a gyepet, burkolatot és a már ültetett töveket kikerüli. A szerkesztett változatba kerül, visszavonható.',
+          'Pick the plants (and their shares if you like), then mark the region on the plan. The app plants it at random from your list, keeping the spacing; it avoids the lawn, paving and existing plants. It goes into the edited variant and can be undone.',
+        )}
       </p>
-      <PlantMultiPicker area={area} options={options} picked={cfg.parts} onChange={(parts) => set({ parts })} label="Ezekből a növényekből" max={12} />
+      <PlantMultiPicker area={area} options={options} picked={cfg.parts} onChange={(parts) => set({ parts })} label={t('Ezekből a növényekből', 'From these plants')} max={12} />
       <fieldset className="field-group">
-        <legend>Elrendezés</legend>
+        <legend>{t('Elrendezés', 'Layout')}</legend>
         {(
           [
-            ['mix', 'vegyesen – tövenként véletlenszerűen keverve'],
-            ['groups', 'kisebb csoportokban – egy-egy fajból 5–9 tő együtt'],
+            ['mix', t('vegyesen – tövenként véletlenszerűen keverve', 'mixed – plant by plant at random')],
+            ['groups', t('kisebb csoportokban – egy-egy fajból 5–9 tő együtt', 'in small groups – 5–9 plants of one species together')],
           ] as [ZoneMode, string][]
         ).map(([m, l]) => (
           <label key={m} className="check">
@@ -90,18 +94,18 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
           </label>
         ))}
         <label className="field">
-          <span className="lbl">Sűrűség</span>
+          <span className="lbl">{t('Sűrűség', 'Density')}</span>
           <select value={cfg.density} onChange={(e) => set({ density: +e.target.value })}>
             {DENSITY.map((d) => (
               <option key={d.v} value={d.v}>
-                {d.label}
+                {DENSITY_LABEL[d.key]}
               </option>
             ))}
           </select>
         </label>
         <label className="check">
           <input type="checkbox" checked={cfg.clear} onChange={(e) => set({ clear: e.target.checked })} />
-          <span>A kijelölt részen lévő növényeket előtte eltávolítja</span>
+          <span>{t('A kijelölt részen lévő növényeket előtte eltávolítja', 'Remove the plants in the region first')}</span>
         </label>
       </fieldset>
       <div className="form-actions form-actions-start">
@@ -114,32 +118,32 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
             onDone();
           }}
         >
-          Rész kijelölése a rajzon
+          {t('Rész kijelölése a rajzon', 'Mark the region on the plan')}
         </button>
         {mine && alive && (
           <button type="button" className="btn" disabled={!cfg.parts.length} onClick={() => run(mine.points, mine.ids)}>
-            Újra ugyanide
+            {t('Újra ugyanide', 'Again, same place')}
           </button>
         )}
       </div>
       {mine && alive && (
         <div className="idea-result" aria-live="polite">
-          <b>Kitöltve: {total} tő</b>
+          <b>{t(`Kitöltve: ${total} tő`, `Filled: ${total} plants`)}</b>
           <ul className="idea-species">
             {Object.entries(mine.counts).map(([code, n]) => {
               const p = byCode.get(code);
               return p ? (
                 <li key={code}>
-                  <PlantChip p={p} size={26} /> {p.nameHu} <span className="muted">{n} tő</span>
+                  <PlantChip p={p} size={26} /> {plantName(p)} <span className="muted">{t(`${n} tő`, `${n} plants`)}</span>
                 </li>
               ) : null;
             })}
           </ul>
-          {total === 0 && <p className="mono muted">Nem fért el egy tő sem: a rész túl kicsi, vagy már tele van.</p>}
+          {total === 0 && <p className="mono muted">{t('Nem fért el egy tő sem: a rész túl kicsi, vagy már tele van.', 'Not a single plant fitted: the region is too small or already full.')}</p>}
           <div className="form-actions">
             <span className="spacer" />
             <button type="button" className="btn btn-primary" onClick={onDone}>
-              Megnézem a rajzon
+              {t('Megnézem a rajzon', 'Show me on the plan')}
             </button>
           </div>
         </div>
@@ -174,8 +178,8 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
       st.setVariantItems(idea.variantId, next.items, notes);
       setIdea({ variantId: idea.variantId, idea: next });
     } else {
-      const n = area.variants.filter((v) => /^Ötlet \d+$/.test(v.name)).length + 1;
-      const id = st.addVariantWith(`Ötlet ${n}`, next.items, notes, 'Ötletek');
+      const n = area.variants.filter((v) => /^(Ötlet|Idea) \d+$/.test(v.name)).length + 1;
+      const id = st.addVariantWith(t(`Ötlet ${n}`, `Idea ${n}`), next.items, notes, t('Ötletek', 'Ideas'));
       if (id) setIdea({ variantId: id, idea: next });
     }
   };
@@ -187,18 +191,21 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
   return (
     <div className="form">
       <p className="mono muted">
-        A terület feltételeihez illő fajokból ({SUN_LABEL[areaSunLevel(area)]}
+        {t('A terület feltételeihez illő fajokból', 'From species that suit the area')} ({SUN_LABEL[areaSunLevel(area)]}
         {c.maxHeightCm != null ? `, max. ${c.maxHeightCm} cm` : ''}
-        {c.nonToxic ? ', nem mérgező' : ''}
-        {c.noThorns ? ', tüske nélkül' : ''}
-        {area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}
-        {area.kind ? `, ${AREA_KIND_LABEL[area.kind].toLowerCase()}` : ''}; {pool.length} faj jöhet szóba) véletlenszerű, de átgondolt összeállítás: egy színvilág, hátul a magasabbak, elöl
-        az alacsonyabbak, ismétlődő ritmusban. Mindegyik ötlet külön változatba kerül, a meglévő terv nem változik.
+        {c.nonToxic ? t(', nem mérgező', ', non-toxic') : ''}
+        {c.noThorns ? t(', tüske nélkül', ', no thorns') : ''}
+        {area.soil ? t(`, ${SOIL_LABEL[area.soil]} talaj`, `, ${SOIL_LABEL[area.soil]} soil`) : ''}
+        {area.kind ? `, ${AREA_KIND_LABEL[area.kind].toLowerCase()}` : ''}; {t(`${pool.length} faj jöhet szóba`, `${pool.length} species qualify`)}){' '}
+        {t(
+          'véletlenszerű, de átgondolt összeállítás: egy színvilág, hátul a magasabbak, elöl az alacsonyabbak, ismétlődő ritmusban. Mindegyik ötlet külön változatba kerül, a meglévő terv nem változik.',
+          'a random but considered composition: one colour scheme, taller plants at the back, lower in front, in a repeating rhythm. Each idea goes into its own variant; the existing plan stays as it is.',
+        )}
       </p>
       <label className="field">
-        <span className="lbl">Színvilág</span>
+        <span className="lbl">{t('Színvilág', 'Colour scheme')}</span>
         <select value={palette} onChange={(e) => setPalette(e.target.value as PaletteKey | '')}>
-          <option value="">Meglepetés</option>
+          <option value="">{t('Meglepetés', 'Surprise me')}</option>
           {(Object.keys(PALETTES) as PaletteKey[]).map((k) => (
             <option key={k} value={k}>
               {PALETTES[k].label}
@@ -207,7 +214,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
         </select>
       </label>
       <fieldset className="field-group">
-        <legend>Milyen növények kerüljenek a tervre?</legend>
+        <legend>{t('Milyen növények kerüljenek a tervre?', 'Which kinds of plants?')}</legend>
         <div className="seg kind-seg">
           {(Object.keys(KIND_LABEL) as PlantKind[]).map((k) => {
             const n = per(k);
@@ -226,29 +233,37 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
             );
           })}
         </div>
-        <p className="mono muted">Sövény a hátsó szélre kerül, a fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.</p>
+        <p className="mono muted">
+          {t(
+            'Sövény a hátsó szélre kerül, a fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.',
+            'A hedge goes along the back edge, trees evenly spread with room around them; shrubs in rhythm in front of them, perennials in drifts at the front.',
+          )}
+        </p>
       </fieldset>
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!kinds.length || pool.length < 1}>
-          {shown ? 'Új ötlet új változatba' : 'Ötlet generálása'}
+          {shown ? t('Új ötlet új változatba', 'New idea in a new variant') : t('Ötlet generálása', 'Generate an idea')}
         </button>
         {shown && (
           <button type="button" className="btn" onClick={() => run(true)}>
-            Újra (ebbe a változatba)
+            {t('Újra (ebbe a változatba)', 'Again (into this variant)')}
           </button>
         )}
       </div>
-      {kinds.length > 0 && pool.length < 1 && <p className="form-error">Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.</p>}
+      {kinds.length > 0 && pool.length < 1 && <p className="form-error">{t('Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.', 'Too few species fit the area. Relax the limits or extend the database.')}</p>}
 
       {shown && (
         <div className="idea-result" aria-live="polite">
           <b>
-            {area.variants.find((v) => v.id === idea!.variantId)?.name}: {PALETTES[shown.palette].label} · {planted} tő
+            {area.variants.find((v) => v.id === idea!.variantId)?.name}: {PALETTES[shown.palette].label} · {t(`${planted} tő`, `${planted} plants`)}
           </b>
           <ul className="idea-species">
             {shown.species.map((p) => (
               <li key={p.code}>
-                <PlantChip p={p} size={26} /> {p.nameHu} <span className="muted">{p.maxHeightCm} cm · {p.bloomColor || p.foliageColor}</span>
+                <PlantChip p={p} size={26} /> {plantName(p)}{' '}
+                <span className="muted">
+                  {p.maxHeightCm} cm · {plantBloom(p) !== '–' ? plantBloom(p) : plantFoliage(p)}
+                </span>
               </li>
             ))}
           </ul>
@@ -257,11 +272,15 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
               {n}
             </p>
           ))}
-          <p className="mono">{issues.length ? `Szabályellenőrzés: ${issues.length} figyelmeztetés – nézd meg a Figyelmeztetések között.` : 'Szabályellenőrzés: nincs figyelmeztetés.'}</p>
+          <p className="mono">
+            {issues.length
+              ? t(`Szabályellenőrzés: ${issues.length} figyelmeztetés – nézd meg a Figyelmeztetések között.`, `Rule check: ${issues.length} warnings – see the Warnings list.`)
+              : t('Szabályellenőrzés: nincs figyelmeztetés.', 'Rule check: no warnings.')}
+          </p>
           <div className="form-actions">
             <span className="spacer" />
             <button type="button" className="btn btn-primary" onClick={onDone}>
-              Megnézem a rajzon
+              {t('Megnézem a rajzon', 'Show me on the plan')}
             </button>
           </div>
         </div>

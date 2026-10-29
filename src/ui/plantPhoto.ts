@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { lookupPhoto } from '../engine/photos';
 import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
+import { t } from '../i18n';
 
 export type PhotoState =
   | { state: 'none' }
@@ -79,6 +80,6 @@ export function usePlantPhoto(plant: Plant | null, enabled = true): PhotoState {
     };
   }, [enabled, own, name, wiki, hasPlant]);
   if (!plant) return { state: 'none' };
-  if (own) return { state: 'ok', src: own, credit: plant.photoCredit ?? 'saját fotó', own: true };
+  if (own) return { state: 'ok', src: own, credit: plant.photoCredit ?? t('saját fotó', 'own photo'), own: true };
   return st;
 }

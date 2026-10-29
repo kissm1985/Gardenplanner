@@ -14,6 +14,7 @@ import {
   useProject,
 } from "../store/projectStore";
 import { useUi } from "../store/uiStore";
+import { t } from '../i18n';
 
 type Stats = ReturnType<typeof variantStats>;
 
@@ -47,11 +48,12 @@ export function VariantsPanel({
   return (
     <div className="form">
       <p className="mono muted">
-        A „választott” változatból készül a növénylista és a nyomtatás. A rajzon
-        mindig a „szerkesztett” változatot látod. A másolat az eredeti alá
-        kerül; mappákkal és áthelyezéssel rendezheted a fát.
+        {t(
+          "A „választott” változatból készül a növénylista és a nyomtatás. A rajzon mindig a „szerkesztett” változatot látod. A másolat az eredeti alá kerül; mappákkal és áthelyezéssel rendezheted a fát.",
+          "The plant list and the printout come from the “chosen” variant. The plan always shows the “edited” variant. A copy goes under its original; arrange the tree with folders and moves.",
+        )}
       </p>
-      <ul className="variant-tree" role="tree" aria-label="Változatok">
+      <ul className="variant-tree" role="tree" aria-label={t("Változatok", "Variants")}>
         {tree.map((n) => (
           <Node key={n.id} n={n} area={area} stats={stats} onDone={onDone} />
         ))}
@@ -62,23 +64,23 @@ export function VariantsPanel({
           className="btn"
           onClick={() => st.addEmptyVariant()}
         >
-          + Üres változat
+          {t("+ Üres változat", "+ Empty variant")}
         </button>
         <button
           type="button"
           className="btn"
           onClick={() => {
-            const name = prompt("Az új mappa neve:", "Mappa");
+            const name = prompt(t("Az új mappa neve:", "Name of the new folder:"), t("Mappa", "Folder"));
             if (name) st.addVariantFolder(name);
           }}
         >
-          + Mappa
+          {t("+ Mappa", "+ Folder")}
         </button>
         <button type="button" className="btn" onClick={onIdeas}>
-          ✦ Ötlet generálása
+          {t("✦ Ötlet generálása", "✦ Generate an idea")}
         </button>
         <button type="button" className="btn" onClick={onReplace}>
-          ⇄ Növény cseréje
+          {t("⇄ Növény cseréje", "⇄ Replace plants")}
         </button>
         <button
           type="button"
@@ -90,7 +92,7 @@ export function VariantsPanel({
             onDone();
           }}
         >
-          Összehasonlítás
+          {t("Összehasonlítás", "Compare")}
         </button>
       </div>
     </div>
@@ -117,7 +119,7 @@ function Node({
       type="button"
       className="tree-more"
       onClick={() => setMenu(!menu)}
-      aria-label={`${n.name}: műveletek`}
+      aria-label={t(`${n.name}: műveletek`, `${n.name}: actions`)}
       aria-expanded={menu}
     >
       ⋯
@@ -133,7 +135,7 @@ function Node({
       type="button"
       className="tree-caret"
       onClick={() => toggle(n.id)}
-      aria-label={collapsed ? `${n.name} kinyitása` : `${n.name} becsukása`}
+      aria-label={collapsed ? t(`${n.name} kinyitása`, `Expand ${n.name}`) : t(`${n.name} becsukása`, `Collapse ${n.name}`)}
       aria-expanded={!collapsed}
     >
       {collapsed ? "▸" : "▾"}
@@ -143,12 +145,12 @@ function Node({
   );
   const hidden =
     collapsed && kids ? (
-      <span className="mono muted tree-hidden">{variantCount(n)} változat</span>
+      <span className="mono muted tree-hidden">{t(`${variantCount(n)} változat`, `${variantCount(n)} variants`)}</span>
     ) : null;
   const rename = mode === "rename" && (
     <RenameField
       name={n.name}
-      label={n.kind === "folder" ? "Mappa neve" : "Változat neve"}
+      label={n.kind === "folder" ? t("Mappa neve", "Folder name") : t("Változat neve", "Variant name")}
       onSave={(name) =>
         n.kind === "folder"
           ? st.renameVariantFolder(n.id, name)
@@ -159,7 +161,7 @@ function Node({
   );
   const move = mode === "move" && (
     <label className="field tree-move">
-      <span className="lbl">Áthelyezés ide</span>
+      <span className="lbl">{t("Áthelyezés ide", "Move to")}</span>
       <select
         autoFocus
         value={
@@ -209,25 +211,28 @@ function Node({
                 className="btn btn-small"
                 onClick={() => setMode("rename")}
               >
-                Átnevezés
+                {t("Átnevezés", "Rename")}
               </button>
               <button
                 type="button"
                 className="btn btn-small"
                 onClick={() => setMode("move")}
               >
-                Áthelyezés
+                {t("Áthelyezés", "Move")}
               </button>
               <button
                 type="button"
                 className="btn btn-small btn-danger"
                 onClick={() =>
                   confirm(
-                    `Törlöd a(z) „${n.name}” mappát? A benne lévő változatok megmaradnak, egy szinttel feljebb kerülnek.`,
+                    t(
+                      `Törlöd a(z) „${n.name}” mappát? A benne lévő változatok megmaradnak, egy szinttel feljebb kerülnek.`,
+                      `Delete the folder “${n.name}”? Its variants stay and move up one level.`,
+                    ),
                   ) && st.deleteVariantFolder(n.id)
                 }
               >
-                Mappa törlése
+                {t("Mappa törlése", "Delete folder")}
               </button>
             </div>
           )}
@@ -250,9 +255,9 @@ function Node({
           {rename || <b className="variant-name">{v.name}</b>}
           <span className="variant-badges">
             {v.id === area.chosenVariantId && (
-              <span className="badge badge-chosen">★ választott</span>
+              <span className="badge badge-chosen">{t("★ választott", "★ chosen")}</span>
             )}
-            {v.id === active && <span className="badge">szerkesztett</span>}
+            {v.id === active && <span className="badge">{t("szerkesztett", "edited")}</span>}
           </span>
           {v.id !== active && (
             <button
@@ -263,15 +268,16 @@ function Node({
                 onDone();
               }}
             >
-              Megnyitás
+              {t("Megnyitás", "Open")}
             </button>
           )}
           {more}
         </div>
         {s && (
           <span className="mono muted">
-            {s.bom.planted} tő · {fmtFt(s.bom.total)} · {s.warnings.length}{" "}
-            figyelmeztetés{s.errors ? ` (${s.errors} hiba)` : ""}
+            {t(`${s.bom.planted} tő`, `${s.bom.planted} plants`)} · {fmtFt(s.bom.total)} ·{" "}
+            {t(`${s.warnings.length} figyelmeztetés`, `${s.warnings.length} warnings`)}
+            {s.errors ? t(` (${s.errors} hiba)`, ` (${s.errors} errors)`) : ""}
             {hidden && <> · </>}
             {hidden}
           </span>
@@ -285,7 +291,7 @@ function Node({
                 className="btn btn-small"
                 onClick={() => st.setChosenVariant(v.id)}
               >
-                Legyen a választott
+                {t("Legyen a választott", "Make it the chosen one")}
               </button>
             )}
             <button
@@ -293,21 +299,21 @@ function Node({
               className="btn btn-small"
               onClick={() => st.duplicateVariant(v.id)}
             >
-              Másolás
+              {t("Másolás", "Copy")}
             </button>
             <button
               type="button"
               className="btn btn-small"
               onClick={() => setMode("rename")}
             >
-              Átnevezés
+              {t("Átnevezés", "Rename")}
             </button>
             <button
               type="button"
               className="btn btn-small"
               onClick={() => setMode("move")}
             >
-              Áthelyezés
+              {t("Áthelyezés", "Move")}
             </button>
             {area.variants.length > 1 && (
               <button
@@ -315,11 +321,14 @@ function Node({
                 className="btn btn-small btn-danger"
                 onClick={() =>
                   confirm(
-                    `Törlöd a(z) „${v.name}” változatot?${kids ? " Az alatta lévők egy szinttel feljebb kerülnek." : ""} Visszavonással visszahozható.`,
+                    t(
+                      `Törlöd a(z) „${v.name}” változatot?${kids ? " Az alatta lévők egy szinttel feljebb kerülnek." : ""} Visszavonással visszahozható.`,
+                      `Delete the variant “${v.name}”?${kids ? " The ones below it move up one level." : ""} Undo brings it back.`,
+                    ),
                   ) && st.deleteVariant(v.id)
                 }
               >
-                Törlés
+                {t("Törlés", "Delete")}
               </button>
             )}
           </div>

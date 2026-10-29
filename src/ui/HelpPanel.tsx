@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef } from 'react';
+import guideEn from '../../docs/GUIDE.md?raw';
 import guideHu from '../../docs/UTMUTATO.md?raw';
+import { getLang } from '../i18n';
 import { markdownToHtml } from './markdown';
 
 // Screenshots of the guide, bundled (and cached offline by the service worker).
-const IMAGES = import.meta.glob('../../docs/img/*.png', { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
+const IMAGES = import.meta.glob(['../../docs/img/*.png', '../../docs/img/en/*.png'], { eager: true, query: '?url', import: 'default' }) as Record<string, string>;
 const imageUrl = (src: string) => IMAGES[`../../docs/${src}`] ?? src;
 
 /** The user guide inside the app; opens at `section` (a heading id) when given. */
 export function HelpPanel({ section }: { section?: string }) {
-  const html = useMemo(() => markdownToHtml(guideHu, imageUrl), []);
+  const html = useMemo(() => markdownToHtml(getLang() === 'en' ? guideEn : guideHu, imageUrl), []);
   const ref = useRef<HTMLDivElement>(null);
 
   const go = (id: string) => {

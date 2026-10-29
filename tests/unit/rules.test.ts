@@ -195,3 +195,32 @@ describe('own spread of a single plant', () => {
     expect(warns()).toHaveLength(0);
   });
 });
+
+describe('English texts', () => {
+  it('rules, list and schedule speak English when the language is English', async () => {
+    const { setLang } = await import('../../src/i18n');
+    const { useProject, selectCurrentArea, selectItems } = await import('../../src/store/projectStore');
+    const { evaluate } = await import('../../src/engine/rules');
+    const { buildBom, toText } = await import('../../src/engine/bom');
+    setLang('en');
+    const st = useProject.getState;
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+    st().placePlant('NE', 60, 300);
+    const a = selectCurrentArea(st())!;
+    expect(a.name).toBe('House-side strip');
+    expect(a.variants[0].name).toBe('Plan A');
+    const w = evaluate(a, selectItems(st()), st().project!.plantDb, st().project!.settings);
+    expect(w.map((x) => x.message)).toContain('Catmint: grows to 60 cm, the area allows 50 cm.');
+    expect(toText(buildBom(st().project!), 'Garden')).toContain('NE Catmint (Nepeta × faassenii');
+    setLang('hu');
+  });
+
+  it('English sun notes are understood', async () => {
+    const { sunHours } = await import('../../src/engine/rules');
+    expect(sunHours('until 13:00')).toBe(6);
+    expect(sunHours('from 14:00')).toBe(5);
+    expect(sunHours('all day')).toBe(10);
+    expect(sunHours('until noon')).toBe(5);
+  });
+});

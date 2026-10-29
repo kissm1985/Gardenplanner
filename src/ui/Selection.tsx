@@ -1,12 +1,18 @@
 import { useMemo, useState } from 'react';
 import { fillPath, fillPolygon, spacingForCount } from '../engine/fill';
-import { byPlantName, JUGLONE_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
+import { byPlantName, JUGLONE_LABEL, plantName, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { ItemStatus, PlacedItem, Plant } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { PlantChip } from './PlantChip';
+import { labels, t } from '../i18n';
 
-export const STATUS_LABEL: Record<ItemStatus, string> = { needed: 'kell', ordered: 'megrendelve', owned: 'megvan', planted: 'beültetve' };
+export const STATUS_LABEL: Record<ItemStatus, string> = labels({
+  needed: ['kell', 'needed'],
+  ordered: ['megrendelve', 'ordered'],
+  owned: ['megvan', 'have it'],
+  planted: ['beültetve', 'planted'],
+});
 
 /** Floating action bar for the current selection. */
 export function SelectionBar({ onProps, onReplace }: { onProps: () => void; onReplace: (code: string) => void }) {
@@ -16,41 +22,41 @@ export function SelectionBar({ onProps, onReplace }: { onProps: () => void; onRe
   if (!selected.length) return null;
   const dup = () => useUi.getState().select(useProject.getState().duplicateItems(selected, 20, 20));
   return (
-    <div className="selbar" role="toolbar" aria-label="Kijelölés">
-      <span className="selbar-count mono" aria-label={`${selected.length} kijelölve`}>
-        {selected.length} db
+    <div className="selbar" role="toolbar" aria-label={t('Kijelölés', 'Selection')}>
+      <span className="selbar-count mono" aria-label={t(`${selected.length} kijelölve`, `${selected.length} selected`)}>
+        {t(`${selected.length} db`, `${selected.length} sel.`)}
       </span>
-      <button type="button" className="btn btn-small" onClick={onProps} aria-label="Tulajdonságok">
-        Adatok
+      <button type="button" className="btn btn-small" onClick={onProps} aria-label={t('Tulajdonságok', 'Properties')}>
+        {t('Adatok', 'Details')}
       </button>
       <button type="button" className="btn btn-small" onClick={dup}>
-        Másolás
+        {t('Másolás', 'Copy')}
       </button>
       {groups > 0 && (
         <button
           type="button"
           className="btn btn-small"
-          title="A folt vagy sor egyedi tövekre bontása (a helyükön maradnak)"
+          title={t('A folt vagy sor egyedi tövekre bontása (a helyükön maradnak)', 'Split the drift or row into single plants (they stay in place)')}
           onClick={() => useUi.getState().select(useProject.getState().explodeItems(selected))}
         >
-          Bontás
+          {t('Bontás', 'Split')}
         </button>
       )}
       <button
         type="button"
         className="btn btn-small"
-        title="Az összes ilyen növény cseréje egy másikra"
+        title={t('Az összes ilyen növény cseréje egy másikra', 'Replace all of this plant with another')}
         onClick={() => {
           const it = selectItems(useProject.getState()).find((i) => i.id === selected[0]);
           if (it) onReplace(it.plantId);
         }}
       >
-        Csere
+        {t('Csere', 'Replace')}
       </button>
       <button type="button" className="btn btn-small btn-danger" onClick={() => useProject.getState().deleteItems(selected)}>
-        Törlés
+        {t('Törlés', 'Delete')}
       </button>
-      <button type="button" className="icon-btn" onClick={() => useUi.getState().select([])} aria-label="Kijelölés megszüntetése">
+      <button type="button" className="icon-btn" onClick={() => useUi.getState().select([])} aria-label={t('Kijelölés megszüntetése', 'Clear selection')}>
         ×
       </button>
     </div>
@@ -65,7 +71,7 @@ export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; on
   const items = useMemo(() => all.filter((i) => selected.includes(i.id)), [all, selected]);
   const byCode = useMemo(() => new Map(plantDb.map((p) => [p.code, p])), [plantDb]);
   const sorted = useMemo(() => [...plantDb].sort(byPlantName), [plantDb]);
-  if (!items.length) return <p className="empty">Nincs kijelölt elem.</p>;
+  if (!items.length) return <p className="empty">{t('Nincs kijelölt elem.', 'Nothing selected.')}</p>;
 
   const ids = items.map((i) => i.id);
   const first = items[0];
@@ -79,23 +85,26 @@ export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; on
     <div className="form">
       {plant && <PlantSummary p={plant} count={items.length} />}
       <label className="field">
-        <span>Faj{items.length > 1 ? ` (mind a ${items.length} elemé)` : ''}</span>
+        <span>
+          {t('Faj', 'Species')}
+          {items.length > 1 ? t(` (mind a ${items.length} elemé)`, ` (all ${items.length} items)`) : ''}
+        </span>
         <select value={species.size === 1 ? first.plantId : ''} onChange={(e) => e.target.value && upd(ids, { plantId: e.target.value })}>
-          {species.size > 1 && <option value="">– vegyes –</option>}
+          {species.size > 1 && <option value="">{t('– vegyes –', '– mixed –')}</option>}
           {sorted.map((p) => (
             <option key={p.code} value={p.code}>
-              {p.code} · {p.nameHu}
+              {p.code} · {plantName(p)}
             </option>
           ))}
         </select>
       </label>
       {plant && (
         <button type="button" className="btn btn-small" onClick={() => onReplace(plant.code)}>
-          Az összes {plant.nameHu.toLowerCase()} cseréje a tervben…
+          {t(`Az összes ${plantName(plant).toLowerCase()} cseréje a tervben…`, `Replace every ${plantName(plant).toLowerCase()} in the plan…`)}
         </button>
       )}
       <fieldset className="field-group">
-        <legend>Státusz</legend>
+        <legend>{t('Státusz', 'Status')}</legend>
         <div className="seg">
           {(Object.keys(STATUS_LABEL) as ItemStatus[]).map((s) => (
             <label key={s} className="seg-item">
@@ -117,7 +126,7 @@ export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; on
       {single && <SingleFields key={single.id} item={single} />}
       <div className="form-actions">
         <button type="button" className="btn btn-primary" onClick={onDone}>
-          Kész
+          {t('Kész', 'Done')}
         </button>
       </div>
     </div>
@@ -130,12 +139,12 @@ function SpreadField({ item, plant }: { item: Extract<PlacedItem, { kind: 'plant
   const own = item.spreadCm != null && item.spreadCm !== plant.spreadCm;
   return (
     <div className="field-row spread-row">
-      <NumField label="Kiterjedés (cm)" v={item.spreadCm ?? plant.spreadCm} on={(v) => v >= 5 && v <= 5000 && upd([item.id], { spreadCm: Math.round(v) === plant.spreadCm ? undefined : Math.round(v) })} />
+      <NumField label={t('Kiterjedés (cm)', 'Spread (cm)')} v={item.spreadCm ?? plant.spreadCm} on={(v) => v >= 5 && v <= 5000 && upd([item.id], { spreadCm: Math.round(v) === plant.spreadCm ? undefined : Math.round(v) })} />
       <div className="field">
-        <span className="mono muted">{own ? `egyedi méret (a faj: ${plant.spreadCm} cm)` : 'a faj mérete'}</span>
+        <span className="mono muted">{own ? t(`egyedi méret (a faj: ${plant.spreadCm} cm)`, `own size (species: ${plant.spreadCm} cm)`) : t('a faj mérete', 'species size')}</span>
         {own && (
           <button type="button" className="btn btn-small" onClick={() => upd([item.id], { spreadCm: undefined })}>
-            Vissza az alapméretre
+            {t('Vissza az alapméretre', 'Back to species size')}
           </button>
         )}
       </div>
@@ -156,7 +165,7 @@ function SingleFields({ item }: { item: PlacedItem }) {
         </div>
       )}
       <label className="field">
-        <span>Jegyzet</span>
+        <span>{t('Jegyzet', 'Note')}</span>
         <textarea rows={2} value={note} onChange={(e) => setNote(e.target.value)} onBlur={() => note !== (item.note ?? '') && upd([item.id], { note })} />
       </label>
     </>
@@ -173,7 +182,14 @@ function GroupFields({ item, onNote }: { item: Group; onNote: (s: string) => voi
     const sp = spacingForCount(countFor, target);
     const got = countFor(sp);
     upd([item.id], { spacingCm: sp });
-    onNote(got === target ? '' : `Ennél az alaknál ${target} db nem jön ki egyenletes tőtávval; a legközelebbi: ${got} db (${sp} cm).`);
+    onNote(
+      got === target
+        ? ''
+        : t(
+            `Ennél az alaknál ${target} db nem jön ki egyenletes tőtávval; a legközelebbi: ${got} db (${sp} cm).`,
+            `${target} does not fit this shape with even spacing; the closest is ${got} (${sp} cm).`,
+          ),
+    );
   };
   const countFor = (sp: number) =>
     item.kind === 'drift' ? fillPolygon(item.polygon, sp, item.pattern).length : fillPath(item.path, sp).length;
@@ -181,29 +197,31 @@ function GroupFields({ item, onNote }: { item: Group; onNote: (s: string) => voi
     <>
       <div className="field-row">
         <NumField
-          label="Darabszám"
+          label={t('Darabszám', 'Count')}
           v={item.count}
           on={(n) => n >= 1 && setCount(n)}
         />
-        <NumField label="Tőtáv (cm)" v={item.spacingCm} on={(sp) => sp >= 3 && (onNote(''), upd([item.id], { spacingCm: sp }))} />
+        <NumField label={t('Tőtáv (cm)', 'Spacing (cm)')} v={item.spacingCm} on={(sp) => sp >= 3 && (onNote(''), upd([item.id], { spacingCm: sp }))} />
       </div>
       {item.kind === 'drift' && (
         <fieldset className="field-group">
-          <legend>Kiosztás</legend>
+          <legend>{t('Kiosztás', 'Layout')}</legend>
           <div className="seg">
             <label className="seg-item">
               <input type="radio" name="pattern" checked={item.pattern === 'staggered'} onChange={() => upd([item.id], { pattern: 'staggered' })} />
-              <span>eltolt (háromszög)</span>
+              <span>{t('eltolt (háromszög)', 'staggered (triangle)')}</span>
             </label>
             <label className="seg-item">
               <input type="radio" name="pattern" checked={item.pattern === 'grid'} onChange={() => upd([item.id], { pattern: 'grid' })} />
-              <span>négyzetes</span>
+              <span>{t('négyzetes', 'grid')}</span>
             </label>
           </div>
         </fieldset>
       )}
       <p className="mono muted">
-        {item.kind === 'drift' ? 'Folt' : 'Sor'}: a csúcspontokat Kijelölés módban húzva alakíthatod.
+        {item.kind === 'drift'
+          ? t('Folt: a csúcspontokat Kijelölés módban húzva alakíthatod.', 'Drift: reshape it by dragging its corners with the Select tool.')
+          : t('Sor: a csúcspontokat Kijelölés módban húzva alakíthatod.', 'Row: reshape it by dragging its points with the Select tool.')}
       </p>
     </>
   );
@@ -244,15 +262,18 @@ function PlantSummary({ p, count }: { p: Plant; count: number }) {
     <div className="psum">
       <PlantChip p={p} size={44} />
       <div>
-        <b>{p.nameHu}</b>
-        {count > 1 && <span className="mono muted"> · {count} tő</span>}
+        <b>{plantName(p)}</b>
+        {count > 1 && <span className="mono muted"> · {t(`${count} tő`, `${count} plants`)}</span>}
         <i className="psum-lat">{p.nameLat}</i>
         <span className="mono muted">
-          max. {p.maxHeightCm} cm · szél. {p.spreadCm} cm · tőtáv {p.spacingCm} cm · {p.sun.map((s) => SUN_LABEL[s]).join('/')} · víz:{' '}
-          {WATER_LABEL[p.water]} · juglone: {JUGLONE_LABEL[p.juglone]} · mérgező: {TOXIC_LABEL[p.toxic]}
-          {p.thorny ? ' · tüskés' : ''}
+          {t(`max. ${p.maxHeightCm} cm · szél. ${p.spreadCm} cm · tőtáv ${p.spacingCm} cm`, `max. ${p.maxHeightCm} cm · wide ${p.spreadCm} cm · spacing ${p.spacingCm} cm`)} ·{' '}
+          {p.sun.map((s) => SUN_LABEL[s]).join('/')} · {t('víz', 'water')}: {WATER_LABEL[p.water]} · juglone: {JUGLONE_LABEL[p.juglone]} · {t('mérgező', 'toxic')}:{' '}
+          {TOXIC_LABEL[p.toxic]}
+          {p.thorny ? t(' · tüskés', ' · thorny') : ''}
         </span>
-        {!!p.verify?.length && <span className="mono warn-text">Ellenőrizendő adat: {p.verify.length}</span>}
+        {!!p.verify?.length && <span className="mono warn-text">
+            {t('Ellenőrizendő adat', 'Data to check')}: {p.verify.length}
+          </span>}
       </div>
     </div>
   );

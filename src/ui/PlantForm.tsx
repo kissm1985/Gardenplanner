@@ -1,7 +1,8 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { JUGLONE_LABEL, MONTHS, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL } from '../model/plants';
+import { JUGLONE_LABEL, MONTHS, plantName, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL } from '../model/plants';
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
 import { usePlantPhoto } from './plantPhoto';
+import { getLang, t, type Lang } from '../i18n';
 
 interface Props {
   initial: Plant;
@@ -24,8 +25,8 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
     <span className="lbl">
       {children}
       {p.verify?.includes(k) && (
-        <button type="button" className="verify-tag" onClick={() => checked(k)} title="Jelöld ellenőrzöttnek">
-          ellenőrizendő ✓
+        <button type="button" className="verify-tag" onClick={() => checked(k)} title={t('Jelöld ellenőrzöttnek', 'Mark as checked')}>
+          {t('ellenőrizendő ✓', 'to check ✓')}
         </button>
       )}
     </span>
@@ -35,8 +36,25 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
     e.preventDefault();
     const errs = validatePlant(p, others);
     setErrors(errs);
-    if (!errs.length) onSave({ ...p, nameHu: p.nameHu.trim(), nameLat: p.nameLat.trim() });
+    if (!errs.length) onSave({ ...p, nameHu: p.nameHu.trim(), nameEn: p.nameEn?.trim() || undefined, nameLat: p.nameLat.trim() });
   };
+
+  // Texts that exist in both languages: the app's language is edited up front, the other one below.
+  type TextKey = 'name' | 'bloom' | 'foliage' | 'notes';
+  const text = (k: TextKey, lang: Lang) => {
+    if (lang === 'hu') return { name: p.nameHu, bloom: p.bloomColor, foliage: p.foliageColor, notes: p.notes }[k];
+    return { name: p.nameEn, bloom: p.en?.bloomColor, foliage: p.en?.foliageColor, notes: p.en?.notes }[k] ?? '';
+  };
+  const setText = (k: TextKey, lang: Lang, v: string) => {
+    if (lang === 'hu') setP((x) => ({ ...x, ...{ name: { nameHu: v }, bloom: { bloomColor: v }, foliage: { foliageColor: v }, notes: { notes: v } }[k] }));
+    else if (k === 'name') setP((x) => ({ ...x, nameEn: v || undefined }));
+    else {
+      const key = ({ bloom: 'bloomColor', foliage: 'foliageColor', notes: 'notes' } as const)[k];
+      setP((x) => ({ ...x, en: { ...x.en, [key]: v || undefined } }));
+    }
+  };
+  const main = getLang();
+  const other: Lang = main === 'hu' ? 'en' : 'hu';
 
   const toggleSoil = (x: Soil) => set('soil', p.soil?.includes(x) ? p.soil.filter((y) => y !== x) : [...(p.soil ?? []), x]);
   const toggleSun = (s: SunNeed) => set('sun', p.sun.includes(s) ? p.sun.filter((x) => x !== s) : [...p.sun, s]);
@@ -47,27 +65,27 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
     <form className="form" onSubmit={submit} noValidate>
       <div className="field-row field-row-code">
         <label className="field">
-          <L k="code">Kód</L>
+          <L k="code">{t('Kód', 'Code')}</L>
           <input value={p.code} maxLength={2} onChange={(e) => set('code', e.target.value.toUpperCase())} autoCapitalize="characters" />
         </label>
         <label className="field">
-          <L k="nameHu">Magyar név</L>
-          <input value={p.nameHu} onChange={(e) => set('nameHu', e.target.value)} />
+          <L k={main === 'hu' ? 'nameHu' : 'nameEn'}>{t('Magyar név', 'Name')}</L>
+          <input value={text('name', main)} onChange={(e) => setText('name', main, e.target.value)} />
         </label>
       </div>
       <label className="field">
-        <L k="nameLat">Latin név</L>
+        <L k="nameLat">{t('Latin név', 'Latin name')}</L>
         <input value={p.nameLat} onChange={(e) => set('nameLat', e.target.value)} lang="la" />
       </label>
       <div className="field-row field-row-3">
-        <Num label={<L k="maxHeightCm">Max. magasság (cm)</L>} v={p.maxHeightCm} on={(v) => set('maxHeightCm', v)} />
-        <Num label={<L k="spreadCm">Kifejlett szélesség (cm)</L>} v={p.spreadCm} on={(v) => set('spreadCm', v)} />
-        <Num label={<L k="spacingCm">Tőtáv (cm)</L>} v={p.spacingCm} on={(v) => set('spacingCm', v)} />
+        <Num label={<L k="maxHeightCm">{t('Max. magasság (cm)', 'Max. height (cm)')}</L>} v={p.maxHeightCm} on={(v) => set('maxHeightCm', v)} />
+        <Num label={<L k="spreadCm">{t('Kifejlett szélesség (cm)', 'Mature spread (cm)')}</L>} v={p.spreadCm} on={(v) => set('spreadCm', v)} />
+        <Num label={<L k="spacingCm">{t('Tőtáv (cm)', 'Spacing (cm)')}</L>} v={p.spacingCm} on={(v) => set('spacingCm', v)} />
       </div>
 
       <fieldset className="field-group">
         <legend>
-          <L k="sun">Napigény</L>
+          <L k="sun">{t('Napigény', 'Light')}</L>
         </legend>
         <div className="seg">
           {(Object.keys(SUN_LABEL) as SunNeed[]).map((s) => (
@@ -81,7 +99,7 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
 
       <fieldset className="field-group">
         <legend>
-          <L k="soil">Talaj (amiben jól fejlődik)</L>
+          <L k="soil">{t('Talaj (amiben jól fejlődik)', 'Soil (where it grows well)')}</L>
         </legend>
         <div className="seg">
           {SOILS.map((x) => (
@@ -94,20 +112,20 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
       </fieldset>
 
       <div className="field-row">
-        <Sel label={<L k="water">Vízigény</L>} v={p.water} opts={WATER_LABEL} on={(v) => set('water', v as WaterNeed)} />
-        <Sel label={<L k="juglone">Juglone-tűrés</L>} v={p.juglone} opts={JUGLONE_LABEL} on={(v) => set('juglone', v as JugloneTolerance)} />
+        <Sel label={<L k="water">{t('Vízigény', 'Water')}</L>} v={p.water} opts={WATER_LABEL} on={(v) => set('water', v as WaterNeed)} />
+        <Sel label={<L k="juglone">{t('Juglone-tűrés', 'Juglone tolerance')}</L>} v={p.juglone} opts={JUGLONE_LABEL} on={(v) => set('juglone', v as JugloneTolerance)} />
       </div>
       <div className="field-row">
-        <Sel label={<L k="toxic">Mérgező</L>} v={p.toxic} opts={TOXIC_LABEL} on={(v) => set('toxic', v as Toxicity)} />
+        <Sel label={<L k="toxic">{t('Mérgező', 'Toxic')}</L>} v={p.toxic} opts={TOXIC_LABEL} on={(v) => set('toxic', v as Toxicity)} />
         <label className="check">
           <input type="checkbox" checked={p.thorny} onChange={(e) => set('thorny', e.target.checked)} />
-          <L k="thorny">Tüskés</L>
+          <L k="thorny">{t('Tüskés', 'Thorny')}</L>
         </label>
       </div>
 
       <fieldset className="field-group">
         <legend>
-          <L k="bloomMonths">Virágzás</L>
+          <L k="bloomMonths">{t('Virágzás', 'Flowering')}</L>
         </legend>
         <div className="months">
           {MONTHS.map((m, i) => (
@@ -120,53 +138,79 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
       </fieldset>
       <div className="field-row">
         <label className="field">
-          <L k="bloomColor">Virágszín</L>
-          <input value={p.bloomColor} onChange={(e) => set('bloomColor', e.target.value)} />
+          <L k="bloomColor">{t('Virágszín', 'Flower colour')}</L>
+          <input value={text('bloom', main)} onChange={(e) => setText('bloom', main, e.target.value)} />
         </label>
         <label className="field">
-          <L k="foliageColor">Lombszín</L>
-          <input value={p.foliageColor} onChange={(e) => set('foliageColor', e.target.value)} />
+          <L k="foliageColor">{t('Lombszín', 'Foliage colour')}</L>
+          <input value={text('foliage', main)} onChange={(e) => setText('foliage', main, e.target.value)} />
         </label>
       </div>
       <label className="check">
         <input type="checkbox" checked={p.winterInterest} onChange={(e) => set('winterInterest', e.target.checked)} />
-        <L k="winterInterest">Télen is díszít</L>
+        <L k="winterInterest">{t('Télen is díszít', 'Winter interest')}</L>
       </label>
 
       <div className="field-row">
         <label className="field">
-          <L k="pot">Kiszerelés</L>
-          <input value={p.pot} onChange={(e) => set('pot', e.target.value)} placeholder="pl. P9, 1–2 l" />
+          <L k="pot">{t('Kiszerelés', 'Pot size')}</L>
+          <input value={p.pot} onChange={(e) => set('pot', e.target.value)} placeholder={t('pl. P9, 1–2 l', 'e.g. P9, 1–2 l')} />
         </label>
-        <Num label={<L k="unitPriceHuf">Egységár (Ft)</L>} v={p.unitPriceHuf} on={(v) => set('unitPriceHuf', v)} />
+        <Num label={<L k="unitPriceHuf">{t('Egységár (Ft)', 'Unit price (HUF)')}</L>} v={p.unitPriceHuf} on={(v) => set('unitPriceHuf', v)} />
       </div>
       <Sel
-        label={<span className="lbl">Ár forrása</span>}
+        label={<span className="lbl">{t('Ár forrása', 'Price source')}</span>}
         v={p.priceSource ?? 'estimate'}
-        opts={{ shop: 'boltlista', estimate: 'becslés' }}
+        opts={{ shop: t('boltlista', 'shop list'), estimate: t('becslés', 'estimate') }}
         on={(v) => set('priceSource', v as 'shop' | 'estimate')}
       />
 
       <div className="field-row">
         <label className="field">
-          <span className="lbl">Szín a rajzon</span>
+          <span className="lbl">{t('Szín a rajzon', 'Colour on the plan')}</span>
           <input type="color" value={p.color} onChange={(e) => set('color', e.target.value)} />
         </label>
         <Sel
-          label={<span className="lbl">Forma</span>}
+          label={<span className="lbl">{t('Forma', 'Shape')}</span>}
           v={p.symbol ?? 'circle'}
-          opts={{ circle: 'kör', square: 'négyzet (talajtakaró)', triangle: 'háromszög (fű)', diamond: 'rombusz (fa)' }}
+          opts={{
+            circle: t('kör', 'circle'),
+            square: t('négyzet (talajtakaró)', 'square (ground cover)'),
+            triangle: t('háromszög (fű)', 'triangle (grass)'),
+            diamond: t('rombusz (fa)', 'diamond (tree)'),
+          }}
           on={(v) => set('symbol', v as Plant['symbol'])}
         />
       </div>
       <label className="check">
         <input type="checkbox" checked={!!p.isTree} onChange={(e) => set('isTree', e.target.checked || undefined)} />
-        <span>Fa (a fák számát a terület korlátja figyeli)</span>
+        <span>{t('Fa (a fák számát a terület korlátja figyeli)', 'Tree (the area limit counts trees)')}</span>
       </label>
       <label className="field">
-        <span className="lbl">Megjegyzés</span>
-        <textarea rows={3} value={p.notes} onChange={(e) => set('notes', e.target.value)} />
+        <span className="lbl">{t('Megjegyzés', 'Notes')}</span>
+        <textarea rows={3} value={text('notes', main)} onChange={(e) => setText('notes', main, e.target.value)} />
       </label>
+      <details className="field-group other-lang">
+        <summary>{t('Angol szövegek (angol nyelvű nézethez)', 'Hungarian texts (for the Hungarian view)')}</summary>
+        <label className="field">
+          <span className="lbl">{t('Angol név', 'Hungarian name')}</span>
+          <input value={text('name', other)} onChange={(e) => setText('name', other, e.target.value)} lang={other} />
+        </label>
+        <div className="field-row">
+          <label className="field">
+            <span className="lbl">{t('Virágszín (angolul)', 'Flower colour (Hungarian)')}</span>
+            <input value={text('bloom', other)} onChange={(e) => setText('bloom', other, e.target.value)} lang={other} />
+          </label>
+          <label className="field">
+            <span className="lbl">{t('Lombszín (angolul)', 'Foliage colour (Hungarian)')}</span>
+            <input value={text('foliage', other)} onChange={(e) => setText('foliage', other, e.target.value)} lang={other} />
+          </label>
+        </div>
+        <label className="field">
+          <span className="lbl">{t('Megjegyzés (angolul)', 'Notes (Hungarian)')}</span>
+          <textarea rows={2} value={text('notes', other)} onChange={(e) => setText('notes', other, e.target.value)} lang={other} />
+        </label>
+      </details>
 
       <PhotoField p={p} set={set} />
 
@@ -184,20 +228,23 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
             className="btn btn-danger"
             onClick={() => {
               const msg = usedCount
-                ? `A(z) ${p.nameHu} ${usedCount} helyen szerepel a tervekben. Törlöd a növényt és ezeket a töveket is?`
-                : `Törlöd a(z) ${p.nameHu} növényt az adatbázisból?`;
+                ? t(
+                    `A(z) ${plantName(p)} ${usedCount} helyen szerepel a tervekben. Törlöd a növényt és ezeket a töveket is?`,
+                    `${plantName(p)} is used in ${usedCount} places in the plans. Delete the plant and those plants too?`,
+                  )
+                : t(`Törlöd a(z) ${plantName(p)} növényt az adatbázisból?`, `Delete ${plantName(p)} from the database?`);
               if (confirm(msg)) onDelete();
             }}
           >
-            Törlés
+            {t('Törlés', 'Delete')}
           </button>
         )}
         <span className="spacer" />
         <button type="button" className="btn" onClick={onCancel}>
-          Mégse
+          {t('Mégse', 'Cancel')}
         </button>
         <button type="submit" className="btn btn-primary">
-          {isNew ? 'Hozzáadás' : 'Mentés'}
+          {isNew ? t('Hozzáadás', 'Add') : t('Mentés', 'Save')}
         </button>
       </div>
     </form>
@@ -253,22 +300,26 @@ function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v
   const isData = p.photoUrl?.startsWith('data:');
   return (
     <fieldset className="field-group">
-      <legend>Fotó</legend>
+      <legend>{t('Fotó', 'Photo')}</legend>
       <div className="photo-field">
         {photo.state === 'ok' ? (
           <figure className="plant-tip-photo">
-            <img src={photo.src} alt={p.nameHu} />
-            <figcaption>{photo.own ? `Saját fotó: ${photo.credit}` : `Wikipédia · ${photo.credit}`}</figcaption>
+            <img src={photo.src} alt={plantName(p)} />
+            <figcaption>{photo.own ? t(`Saját fotó: ${photo.credit}`, `Own photo: ${photo.credit}`) : t(`Wikipédia · ${photo.credit}`, `Wikipedia · ${photo.credit}`)}</figcaption>
           </figure>
         ) : (
           <p className="mono muted">
-            {photo.state === 'loading' ? 'Fotó keresése a Wikipédián…' : photo.state === 'offline' ? 'A Wikipédia-fotóhoz internet kell.' : 'Nincs fotó. Tölts fel sajátot, vagy adj meg egy képlinket.'}
+            {photo.state === 'loading'
+              ? t('Fotó keresése a Wikipédián…', 'Looking for a photo on Wikipedia…')
+              : photo.state === 'offline'
+                ? t('A Wikipédia-fotóhoz internet kell.', 'The Wikipedia photo needs internet.')
+                : t('Nincs fotó. Tölts fel sajátot, vagy adj meg egy képlinket.', 'No photo. Upload your own or give an image link.')}
           </p>
         )}
       </div>
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>
-          Saját fotó feltöltése
+          {t('Saját fotó feltöltése', 'Upload own photo')}
         </button>
         {p.photoUrl && (
           <button
@@ -279,7 +330,7 @@ function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v
               set('photoCredit', undefined);
             }}
           >
-            Vissza a Wikipédia-fotóra
+            {t('Vissza a Wikipédia-fotóra', 'Back to the Wikipedia photo')}
           </button>
         )}
         <input
@@ -293,27 +344,27 @@ function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v
             if (!f) return;
             try {
               set('photoUrl', await shrink(f));
-              set('photoCredit', 'saját fotó');
+              set('photoCredit', t('saját fotó', 'own photo'));
               setErr('');
             } catch {
-              setErr('Ezt a képet nem sikerült beolvasni.');
+              setErr(t('Ezt a képet nem sikerült beolvasni.', 'This image could not be read.'));
             }
           }}
         />
       </div>
       <label className="field">
-        <span className="lbl">Képlink (pl. kertészet oldaláról)</span>
+        <span className="lbl">{t('Képlink (pl. kertészet oldaláról)', 'Image link (e.g. from a nursery site)')}</span>
         <input
           type="url"
           inputMode="url"
           value={isData ? '' : (p.photoUrl ?? '')}
-          placeholder={isData ? 'feltöltött kép' : 'https://…'}
+          placeholder={isData ? t('feltöltött kép', 'uploaded image') : 'https://…'}
           onChange={(e) => set('photoUrl', e.target.value.trim() || undefined)}
         />
       </label>
       {p.photoUrl && (
         <label className="field">
-          <span className="lbl">Fotó forrása / szerzője</span>
+          <span className="lbl">{t('Fotó forrása / szerzője', 'Photo source / author')}</span>
           <input value={p.photoCredit ?? ''} onChange={(e) => set('photoCredit', e.target.value || undefined)} />
         </label>
       )}

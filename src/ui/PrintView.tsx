@@ -11,6 +11,8 @@ import { JUGLONE_LABEL, SUN_LABEL, WATER_LABEL } from "../model/plants";
 import { ORIENTATION_LABEL, type Project } from "../model/types";
 import { areaSunLevel } from "../engine/rules";
 import type { Orientation } from "./ProjectPanel";
+import { locale, t } from '../i18n';
+import { plantName } from '../model/plants';
 
 /**
  * Print-only document (SPEC §4.9): one section per area with plan, four seasons, plant list and
@@ -23,7 +25,7 @@ export function PrintView({
   project: Project;
   orientation: Orientation;
 }) {
-  const date = new Date().toLocaleDateString("hu-HU", {
+  const date = new Date().toLocaleDateString(locale(), {
     year: "numeric",
     month: "long",
     day: "numeric",
@@ -55,16 +57,16 @@ export function PrintView({
                   {area.widthCm} × {area.lengthCm} cm ·{" "}
                   {ORIENTATION_LABEL[area.orientation]} ·{" "}
                   {SUN_LABEL[areaSunLevel(area)]}
-                  {area.sunUntil ? ` (napos ${area.sunUntil})` : ""} · változat:{" "}
-                  {v.name}
+                  {area.sunUntil ? t(` (napos ${area.sunUntil})`, ` (sun ${area.sunUntil})`) : ""} ·{" "}
+                  {t("változat", "variant")}: {v.name}
                 </p>
               </div>
               <dl className="print-kpi">
-                <dt>Tő</dt>
+                <dt>{t("Tő", "Plants")}</dt>
                 <dd>{fmtInt(bom.planted)}</dd>
-                <dt>Rendelés</dt>
-                <dd>{fmtInt(bom.order)} db</dd>
-                <dt>Költség</dt>
+                <dt>{t("Rendelés", "Order")}</dt>
+                <dd>{t(`${fmtInt(bom.order)} db`, `${fmtInt(bom.order)}`)}</dd>
+                <dt>{t("Költség", "Cost")}</dt>
                 <dd>{fmtFt(bom.total)}</dd>
               </dl>
             </header>
@@ -79,7 +81,7 @@ export function PrintView({
                   labelPx={260}
                 />
                 <figcaption className="mono">
-                  Felülnézet a választott változatból
+                  {t("Felülnézet a választott változatból", "Plan view of the chosen variant")}
                 </figcaption>
               </figure>
               <div className="print-seasons">
@@ -109,17 +111,17 @@ export function PrintView({
                 <table className="print-table">
                   <thead>
                     <tr>
-                      <th>Kód</th>
-                      <th>Növény</th>
-                      <th className="n">Ültet.</th>
-                      <th className="n">Rend.</th>
-                      <th>Kiszer.</th>
+                      <th>{t("Kód", "Code")}</th>
+                      <th>{t("Növény", "Plant")}</th>
+                      <th className="n">{t("Ültet.", "Plant")}</th>
+                      <th className="n">{t("Rend.", "Order")}</th>
+                      <th>{t("Kiszer.", "Pot")}</th>
                       <th className="n">Max.</th>
-                      <th className="n">Tőtáv</th>
-                      <th>Víz</th>
+                      <th className="n">{t("Tőtáv", "Spacing")}</th>
+                      <th>{t("Víz", "Water")}</th>
                       <th>Juglone</th>
-                      <th className="n">Egységár</th>
-                      <th className="n">Részösszeg</th>
+                      <th className="n">{t("Egységár", "Unit price")}</th>
+                      <th className="n">{t("Részösszeg", "Subtotal")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -133,8 +135,8 @@ export function PrintView({
                           {r.plant.code}
                         </td>
                         <td>
-                          {r.plant.nameHu}
-                          {r.plant.isTree ? " (fa)" : ""}{" "}
+                          {plantName(r.plant)}
+                          {r.plant.isTree ? t(" (fa)", " (tree)") : ""}{" "}
                           <i>{r.plant.nameLat}</i>
                         </td>
                         <td className="n">{r.planted}</td>
@@ -157,8 +159,10 @@ export function PrintView({
                     <tr className="tot">
                       <td />
                       <td>
-                        Összesen (rendelés +{project.settings.reservePct}%, fák
-                        tartalék nélkül)
+                        {t(
+                          `Összesen (rendelés +${project.settings.reservePct}%, fák tartalék nélkül)`,
+                          `Total (order +${project.settings.reservePct}%, trees without spare)`,
+                        )}
                       </td>
                       <td className="n">{bom.planted}</td>
                       <td className="n">{bom.order}</td>
@@ -168,13 +172,13 @@ export function PrintView({
                   </tbody>
                 </table>
               ) : (
-                <p>Ebben a változatban még nincs növény.</p>
+                <p>{t("Ebben a változatban még nincs növény.", "No plants in this variant yet.")}</p>
               )}
 
               <div className="print-warn">
-                <h2>Figyelmeztetések</h2>
+                <h2>{t("Figyelmeztetések", "Warnings")}</h2>
                 {active.length === 0 ? (
-                  <p>Nincs figyelmeztetés.</p>
+                  <p>{t("Nincs figyelmeztetés.", "No warnings.")}</p>
                 ) : (
                   <ul>
                     {active.map((w) => (
@@ -191,31 +195,31 @@ export function PrintView({
       })}
       {project.areas.length > 1 && (
         <section className="print-page print-summary">
-          <h1>Összesítés</h1>
+          <h1>{t("Összesítés", "Summary")}</h1>
           <p className="mono">
-            {fmtInt(total.planted)} tő · rendelés {fmtInt(total.order)} db ·{" "}
+            {t(`${fmtInt(total.planted)} tő · rendelés ${fmtInt(total.order)} db`, `${fmtInt(total.planted)} plants · order ${fmtInt(total.order)}`)} ·{" "}
             {fmtFt(total.total)}
-            {total.estimated ? ` · ${total.estimated} tétel ára becslés` : ""}
+            {total.estimated ? t(` · ${total.estimated} tétel ára becslés`, ` · ${total.estimated} prices estimated`) : ""}
           </p>
           <table className="print-table">
             <thead>
               <tr>
-                <th>Növény</th>
+                <th>{t("Növény", "Plant")}</th>
                 {project.areas.map((a) => (
                   <th key={a.id} className="n">
                     {a.name}
                   </th>
                 ))}
-                <th className="n">Ültet.</th>
-                <th className="n">Rend.</th>
-                <th className="n">Részösszeg</th>
+                <th className="n">{t("Ültet.", "Plant")}</th>
+                <th className="n">{t("Rend.", "Order")}</th>
+                <th className="n">{t("Részösszeg", "Subtotal")}</th>
               </tr>
             </thead>
             <tbody>
               {total.rows.map((r) => (
                 <tr key={r.plant.code}>
                   <td>
-                    {r.plant.code} {r.plant.nameHu}
+                    {r.plant.code} {plantName(r.plant)}
                   </td>
                   {project.areas.map((a) => (
                     <td key={a.id} className="n">

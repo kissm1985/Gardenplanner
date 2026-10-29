@@ -42,6 +42,8 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
    - **Gyepsávos kert**: 500 × 1200 cm, ívelt gyepsáv a közepén, ágyások két oldalt, diófával a szomszédban.
 3. Nyomd meg a **Kezdés** gombot. Ha egy sablont sem választasz, üres projekttel indulsz, és a területet magad hozod létre (lásd [3. fejezet](#3-területek)).
 
+A kezdőképernyő jobb felső sarkában átválthatsz angol nyelvre (később: *Nézet → Nyelv*). Az alkalmazás alapból a böngésző nyelvét követi.
+
 Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosabb gombokat. Később a **⋯ → Bevezető újra** gombbal újra megnézheted.
 
 <br clear="right">
@@ -54,7 +56,7 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 
 - **A terület neve ▾**: itt váltasz a területek között, és itt hozol létre újat. Alatta látszik a terület mérete, a tövek száma, az égtáj és a napsütés.
 - **↶ / ↷**: visszavonás és újra (100 lépésig). Számítógépen **Ctrl+Z** és **Ctrl+Y** is működik.
-- **◫ Nézet**: rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes; innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
+- **◫ Nézet**: rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes, **nyelv** (magyar / angol); innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
 - **? Súgó**: ez az útmutató, az alkalmazáson belül, internet nélkül is. Az éppen használt eszközhöz tartozó fejezetnél nyílik meg.
 - **⋯ Projekt**: mentés, betöltés, megosztás, képek, látványterv, nyomtatás.
 - **Kerek szám**: a figyelmeztetések száma. Zöld, ha nincs gond, piros, ha hiba van.
@@ -476,6 +478,9 @@ A szabályok a megadott korlátokból és a növény adataiból dolgoznak. Ha a 
 
 **Telefonon nem látom az ablak × gombját.**
 Az ablakok a ténylegesen látható képernyőrészhez igazodnak, így a Safari címsávja nem takarja el a fejlécet. Ha mégis, húzd lefelé az ablak fejlécét, vagy koppints az ablak fölötti sötét háttérre.
+
+**Át tudom állítani angolra?**
+Igen: *Nézet → Nyelv → English*. A felület, a figyelmeztetések, a listák és az exportok is angolul jelennek meg, a növényeknek angol nevük is van. A tervek nem változnak, bármikor visszaválthatsz.
 
 **Elrontottam valamit.**
 **↶ Visszavonás**, akár 100 lépésig. A törölt terület, változat és csere is visszahozható.
