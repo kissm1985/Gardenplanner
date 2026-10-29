@@ -101,6 +101,15 @@ export interface Variant {
   notes: string;
   /** Warning ids the user accepted as deliberate exceptions. */
   muted?: string[];
+  /** Parent variant or folder in the variant tree; missing = top level. */
+  parentId?: string;
+}
+
+/** A folder that only groups variants in the tree (no plants of its own). */
+export interface VariantFolder {
+  id: string;
+  name: string;
+  parentId?: string;
 }
 
 export interface Background {
@@ -135,6 +144,7 @@ export interface Area {
   constraints: Constraints;
   fixtures: Fixture[];
   variants: Variant[];
+  variantFolders?: VariantFolder[];
   /** The variant the final list and print are made from. */
   chosenVariantId: string;
   /** The variant being edited on the plan (defaults to the chosen one). */

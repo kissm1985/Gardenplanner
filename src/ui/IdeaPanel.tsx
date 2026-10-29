@@ -26,7 +26,7 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
       setIdea({ variantId: idea.variantId, idea: next });
     } else {
       const n = area.variants.filter((v) => /^Ötlet \d+$/.test(v.name)).length + 1;
-      const id = st.addVariantWith(`Ötlet ${n}`, next.items, notes);
+      const id = st.addVariantWith(`Ötlet ${n}`, next.items, notes, 'Ötletek');
       if (id) setIdea({ variantId: id, idea: next });
     }
   };

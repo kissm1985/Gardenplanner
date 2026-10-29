@@ -14,6 +14,7 @@ test('variants: copy, edit B, choose, compare', async ({ page }) => {
   const pill = page.locator('.variant-pill');
   await expect(pill).toContainText('A terv ★');
   await pill.click();
+  await page.getByRole('button', { name: 'A terv: műveletek' }).click();
   await page.getByRole('button', { name: 'Másolás', exact: true }).click();
   await expect(page.locator('.variant-card')).toHaveCount(2);
   await page.getByRole('button', { name: 'Bezárás' }).last().click();
@@ -45,6 +46,7 @@ test('variants: copy, edit B, choose, compare', async ({ page }) => {
   // Choose B → list follows.
   await page.getByRole('button', { name: '← Vissza a tervhez' }).click();
   await pill.click();
+  await page.getByRole('button', { name: 'B terv: műveletek' }).click();
   await page.getByRole('button', { name: 'Legyen a választott' }).click();
   await page.getByRole('button', { name: 'Bezárás' }).last().click();
   await expect(pill).toContainText('B terv ★');
@@ -70,4 +72,31 @@ test('idea generator: new variant with a fitting composition, "Újra" replaces i
   await expect(page.locator('.variant-pill')).toContainText('Ötlet 1');
   await expect(page.locator('g.group').first()).toBeVisible();
   expect(first.length).toBeGreaterThan(0);
+});
+
+test('variant tree: copies nest, folders group, move and collapse', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  await page.locator('.variant-pill').click();
+  const dlg = page.locator('dialog[open]');
+  await dlg.getByRole('button', { name: 'A terv: műveletek' }).click();
+  await dlg.getByRole('button', { name: 'Másolás' }).click(); // B under A
+  const tree = dlg.getByRole('tree');
+  await expect(tree.getByRole('treeitem', { name: /A terv/ }).getByRole('group')).toContainText('B terv');
+
+  page.once('dialog', (d) => d.accept('Tavaszi'));
+  await dlg.getByRole('button', { name: '+ Mappa' }).click();
+  await expect(tree).toContainText('📁 Tavaszi');
+
+  // Move B into the folder.
+  const b = tree.getByRole('treeitem', { name: /^B terv/ });
+  await b.getByRole('button', { name: 'B terv: műveletek' }).click();
+  await b.getByRole('button', { name: 'Áthelyezés' }).click();
+  await b.getByLabel('Áthelyezés ide').selectOption({ label: '📁 Tavaszi' });
+  const folder = tree.getByRole('treeitem', { name: /Tavaszi/ });
+  await expect(folder.getByRole('group')).toContainText('B terv');
+
+  await folder.getByRole('button', { name: 'Tavaszi becsukása' }).click();
+  await expect(folder).toContainText('1 változat');
+  await expect(folder.getByRole('group')).toHaveCount(0);
 });

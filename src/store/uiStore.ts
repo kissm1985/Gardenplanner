@@ -36,6 +36,9 @@ export interface UiState {
   calibrate: [number, number][] | null;
   /** Plant filters shared by the database list and the palette. */
   plantFilter: PlantFilter;
+  /** Collapsed nodes of the variant tree. */
+  collapsed: string[];
+  toggleCollapsed: (id: string) => void;
   /** Area outline editor: drawing a new outline point by point, or editing corners. */
   shapeEdit: { areaId: string; mode: 'draw' | 'edit'; points: [number, number][]; selected: number | null } | null;
   setShapeEdit: (v: UiState['shapeEdit']) => void;
@@ -72,6 +75,8 @@ export const useUi = create<UiState>()((set) => ({
   page: null,
   calibrate: null,
   plantFilter: NO_FILTER,
+  collapsed: [],
+  toggleCollapsed: (id) => set((s) => ({ collapsed: s.collapsed.includes(id) ? s.collapsed.filter((x) => x !== id) : [...s.collapsed, id] })),
   shapeEdit: null,
   setShapeEdit: (shapeEdit) => set({ shapeEdit, selected: [], selectedFixture: null }),
   setPlantFilter: (plantFilter) => set({ plantFilter }),

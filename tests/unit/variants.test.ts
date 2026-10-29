@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildBom } from '../../src/engine/bom';
 import { compareVariants } from '../../src/engine/compare';
+import { moveTargets, variantTree, type TreeNode } from '../../src/model/variantTree';
 import { activeVariant, nextVariantName, selectCurrentArea, selectItems, useProject } from '../../src/store/projectStore';
 
 const st = () => useProject.getState();
@@ -66,5 +67,39 @@ describe('variants', () => {
     expect(c.a.errors).toBe(0);
     expect(c.b.errors).toBe(1);
     expect(c.rows.find((r) => r.plant.code === 'NE')).toMatchObject({ a: 0, b: 1 });
+  });
+});
+
+describe('variant tree', () => {
+  beforeEach(() => {
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+  });
+  const names = (ns: TreeNode[]): unknown => ns.map((n) => (n.children.length ? { [n.name]: names(n.children) } : n.name));
+
+  it('copies hang under their source; ideas go into the "Ötletek" folder', () => {
+    const a = area().variants[0].id;
+    const b = st().duplicateVariant(a)!;
+    st().duplicateVariant(b);
+    st().addVariantWith('Ötlet 1', [], '', 'Ötletek');
+    st().addVariantWith('Ötlet 2', [], '', 'Ötletek');
+    expect(names(variantTree(area()))).toEqual([{ Ötletek: ['Ötlet 1', 'Ötlet 2'] }, { 'A terv': [{ 'B terv': ['C terv'] }] }]);
+  });
+
+  it('move refuses cycles; folder and variant deletion lift children one level', () => {
+    const a = area().variants[0].id;
+    const b = st().duplicateVariant(a)!;
+    const c = st().duplicateVariant(b)!;
+    st().moveVariantNode(a, c); // would be a cycle
+    expect(area().variants.find((v) => v.id === a)!.parentId).toBeUndefined();
+    const f = st().addVariantFolder('Tavaszi')!;
+    st().moveVariantNode(c, f);
+    expect(names(variantTree(area()))).toEqual([{ Tavaszi: ['C terv'] }, { 'A terv': ['B terv'] }]);
+    expect(moveTargets(area(), a).map((t) => t.label.trim())).toEqual(['— legfelső szint —', '📁 Tavaszi', 'C terv']);
+    st().deleteVariantFolder(f);
+    st().deleteVariant(a);
+    expect(names(variantTree(area()))).toEqual(['B terv', 'C terv']);
+    st().undo();
+    expect(names(variantTree(area()))).toEqual([{ 'A terv': ['B terv'] }, 'C terv']);
   });
 });

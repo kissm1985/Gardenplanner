@@ -1509,7 +1509,8 @@ table.bom {
   color: var(--mute);
   font-size: 11px;
 }
-.variant-list {
+.variant-list,
+.variant-tree {
   list-style: none;
   margin: 0;
   padding: 0;
@@ -1522,6 +1523,64 @@ table.bom {
   padding: 10px 12px;
   display: grid;
   gap: 6px;
+}
+.variant-tree .variant-tree {
+  margin-top: 6px;
+  padding-left: 14px;
+  border-left: 2px solid var(--line);
+  margin-left: 12px;
+}
+.variant-folder {
+  background: var(--bg);
+  border-style: dashed;
+}
+.tree-caret {
+  width: 28px;
+  min-height: 28px;
+  flex: none;
+  border: 0;
+  background: none;
+  color: var(--mute);
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+}
+.variant-tree .variant-card {
+  padding: 6px 8px;
+  gap: 4px;
+}
+.variant-tree .variant-card > .mono {
+  padding-left: 36px;
+  font-size: 11.5px;
+}
+.variant-tree .variant-name {
+  font-size: 16px;
+}
+.variant-tree .card-actions {
+  padding-left: 36px;
+}
+.tree-open {
+  margin-left: auto;
+}
+.tree-more {
+  min-width: 40px;
+  min-height: 36px;
+  border: 1px solid var(--line);
+  background: var(--bg);
+  color: var(--fg);
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+}
+.variant-folder .tree-more,
+.variant-card.is-active .tree-more {
+  margin-left: auto;
+}
+.tree-hidden {
+  font-size: 11.5px;
+}
+.tree-move select {
+  white-space: pre;
 }
 .variant-card.is-active {
   border-left: 4px solid var(--accent);
