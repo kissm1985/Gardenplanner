@@ -1,5 +1,6 @@
 import { create } from 'zustand';
-import { itemCount, type Pattern } from '../engine/fill';
+import { itemCount, itemPositions, type Pattern } from '../engine/fill';
+import { mixAssign, type MixPart } from '../engine/mix';
 import { SEED_PLANTS, SEED_SINCE } from '../data/plants.seed';
 import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
@@ -42,9 +43,11 @@ export interface ProjectState {
   deleteItems: (ids: string[]) => void;
   /**
    * Replace every plant of one species with another in the chosen scope. Drifts and rows take the
-   * new plant's spacing (their count is recomputed) unless keepSpacing. Returns the number of items changed.
+   * new plant's spacing (their count is recomputed) unless keepSpacing. With several targets the species are
+   * mixed at random in proportion to their weights, per item or (mode 'plant') per single plant.
+   * Returns the number of items (or plants) changed.
    */
-  replaceSpecies: (from: string, to: string, scope: ReplaceScope, keepSpacing?: boolean) => number;
+  replaceSpecies: (from: string, to: string | MixPart[], scope: ReplaceScope, keepSpacing?: boolean, mode?: 'item' | 'plant') => number;
   duplicateItems: (ids: string[], dx: number, dy: number) => string[];
 
   setMuted: (warningId: string, muted: boolean) => void;
@@ -315,35 +318,40 @@ export const useProject = create<ProjectState>()((set, get) => {
       );
     },
 
-    replaceSpecies: (from, to, scope, keepSpacing = false) => {
+    replaceSpecies: (from, to, scope, keepSpacing = false, mode = 'item') => {
       const p0 = get().project;
       const areaId = get().currentAreaId;
-      const target = p0?.plantDb.find((x) => x.code === to);
-      if (!p0 || !target || from === to) return 0;
-      let n = 0;
-      const swap = (items: PlacedItem[]) =>
-        items.some((it) => it.plantId === from)
-          ? items.map((it) => {
-              if (it.plantId !== from) return it;
-              n++;
-              if (it.kind === 'plant') return { ...it, plantId: to };
-              return withCount({ ...it, plantId: to, spacingCm: keepSpacing ? it.spacingCm : target.spacingCm });
-            })
-          : items;
-      commit((p) => {
-        const areas = p.areas.map((a) => {
-          if (scope !== 'project' && a.id !== areaId) return a;
-          const editing = activeVariant(a).id;
-          const variants = a.variants.map((v) => {
-            if (scope === 'variant' && v.id !== editing) return v;
-            const items = swap(v.items);
-            return items === v.items ? v : { ...v, items };
-          });
-          return variants.some((v, i) => v !== a.variants[i]) ? { ...a, variants } : a;
+      if (!p0) return 0;
+      const byCode = new Map(p0.plantDb.map((x) => [x.code, x]));
+      const parts = (typeof to === 'string' ? [{ code: to, weight: 1 }] : to).filter((x) => x.code !== from && byCode.has(x.code) && x.weight > 0);
+      if (!parts.length) return 0;
+      // Several targets "per plant": drifts and rows are split into single plants at their current positions.
+      const perPlant = parts.length > 1 && mode === 'plant';
+      const inScope = (a: Area, v: Variant) => (scope === 'project' || a.id === areaId) && (scope !== 'variant' || v.id === activeVariant(a).id);
+      let slots = 0;
+      for (const a of p0.areas)
+        for (const v of a.variants)
+          if (inScope(a, v)) for (const it of v.items) if (it.plantId === from) slots += perPlant ? itemPositions(it).length : 1;
+      if (!slots) return 0;
+      const assign = mixAssign(slots, parts);
+      let k = 0;
+      const swap = (items: PlacedItem[]): PlacedItem[] =>
+        items.flatMap((it): PlacedItem[] => {
+          if (it.plantId !== from) return [it];
+          if (perPlant && it.kind !== 'plant')
+            return itemPositions(it).map(([x, y]) => ({ kind: 'plant', id: uid('i'), plantId: assign[k++], x: round1(x), y: round1(y), status: it.status, ...(it.note ? { note: it.note } : {}) }));
+          const code = assign[k++];
+          if (it.kind === 'plant') return [{ ...it, plantId: code }];
+          return [withCount({ ...it, plantId: code, spacingCm: keepSpacing ? it.spacingCm : byCode.get(code)!.spacingCm })];
         });
-        return n ? { ...p, areas } : p; // nothing to replace: no history entry
-      });
-      return n;
+      commit((p) => ({
+        ...p,
+        areas: p.areas.map((a) => {
+          const variants = a.variants.map((v) => (inScope(a, v) && v.items.some((it) => it.plantId === from) ? { ...v, items: swap(v.items) } : v));
+          return variants.some((v, i) => v !== a.variants[i]) ? { ...a, variants } : a;
+        }),
+      }));
+      return slots;
     },
 
     deleteItems: (ids) => {

@@ -1,4 +1,5 @@
 import { SEED_SINCE } from '../../src/data/plants.seed';
+import { mixAssign, mixCounts } from '../../src/engine/mix';
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { curvedLawn } from '../../src/data/templates';
@@ -225,5 +226,40 @@ describe('replace species', () => {
     const past = st().past.length;
     expect(st().replaceSpecies('XX', 'NE', 'project')).toBe(0);
     expect(st().past.length).toBe(past);
+  });
+});
+
+describe('mixed replacement', () => {
+  it('mixCounts follows the weights exactly', () => {
+    expect(mixCounts(100, [{ code: 'A', weight: 1 }, { code: 'B', weight: 1 }])).toEqual([50, 50]);
+    expect(mixCounts(10, [{ code: 'A', weight: 2 }, { code: 'B', weight: 1 }])).toEqual([7, 3]);
+    expect(mixAssign(9, [{ code: 'A', weight: 1 }, { code: 'B', weight: 2 }]).filter((c) => c === 'B')).toHaveLength(6);
+  });
+
+  it('a row of cherry laurel becomes a random mix of photinia and forsythia, per plant', () => {
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['lawn-garden']);
+    st().addRow('LN', [[100, 100], [100, 1100]]); // one row, many plants
+    st().placePlant('LN', 300, 300);
+    const before = selectItems(st()).reduce((s, it) => s + (it.kind === 'plant' ? 1 : it.count), 0);
+    const n = st().replaceSpecies('LN', [{ code: 'PF', weight: 1 }, { code: 'FO', weight: 1 }], 'variant', false, 'plant');
+    expect(n).toBe(before);
+    const items = selectItems(st());
+    expect(items.every((it) => it.kind === 'plant')).toBe(true);
+    expect(items).toHaveLength(before);
+    const pf = items.filter((it) => it.plantId === 'PF').length;
+    expect(Math.abs(pf - (before - pf))).toBeLessThanOrEqual(1);
+    st().undo();
+    expect(selectItems(st()).filter((it) => it.kind === 'row')).toHaveLength(1);
+  });
+
+  it('per item: each drift or row gets one of the targets, with its spacing', () => {
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+    for (let i = 0; i < 6; i++) st().addDrift('LA', [[0, i * 200], [120, i * 200], [120, i * 200 + 150], [0, i * 200 + 150]], 'grid');
+    expect(st().replaceSpecies('LA', [{ code: 'SA', weight: 1 }, { code: 'NE', weight: 2 }], 'variant')).toBe(6);
+    const items = selectItems(st());
+    expect(items.filter((it) => it.plantId === 'NE')).toHaveLength(4);
+    for (const it of items) if (it.kind === 'drift') expect(it.spacingCm).toBe(st().project!.plantDb.find((p) => p.code === it.plantId)!.spacingCm);
   });
 });
