@@ -1,41 +1,12 @@
 import { useRef, useState } from 'react';
 import { polygonArea } from '../model/geometry';
+import { FIXTURE_LABEL, newFixture } from '../model/fixtures';
 import type { Area, Fixture, FixtureType } from '../model/types';
 import { startLawnEdit } from './ShapeEditBar';
 import { selectCurrentArea, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 
-export const FIXTURE_LABEL: Record<FixtureType, string> = {
-  walnut: 'Diófa',
-  tree: 'Fa',
-  window: 'Ablak',
-  tap: 'Csap',
-  manhole: 'Akna',
-  paving: 'Burkolat',
-  fence: 'Kerítés',
-  lawn: 'Gyep',
-  wall: 'Fal',
-  other: 'Egyéb',
-};
-
-/** Defaults for a new fixture, centred on (x, y). */
-function newFixture(type: FixtureType, x: number, y: number): Omit<Fixture, 'id'> {
-  const label = FIXTURE_LABEL[type];
-  switch (type) {
-    case 'walnut':
-      return { type, label, x, y, radius: 450 };
-    case 'tree':
-      return { type, label, x, y, radius: 150 };
-    case 'window':
-      return { type, label, x: x - 60, y: y - 10, w: 120, h: 20 };
-    case 'paving':
-      return { type, label, x: x - 50, y: y - 50, w: 100, h: 100 };
-    case 'fence':
-      return { type, label, x: x - 3, y: y - 100, w: 6, h: 200 };
-    default:
-      return { type, label, x: x - 20, y: y - 20, w: 40, h: 40 };
-  }
-}
+export { FIXTURE_LABEL };
 
 const ADDABLE: FixtureType[] = ['walnut', 'tree', 'window', 'tap', 'manhole', 'paving', 'fence', 'other'];
 

@@ -2,7 +2,8 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { fillPath, fillPolygon } from '../engine/fill';
 import { bbox, centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
 import { plantMap } from '../model/plants';
-import type { Area, Plant, Pt, Settings } from '../model/types';
+import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, newFixture } from '../model/fixtures';
+import type { Area, Fixture, FixtureType, Plant, Pt, Settings } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import type { Warning } from '../engine/rules';
@@ -32,7 +33,8 @@ type Gesture =
   | { mode: 'fixture'; id: string; start: P2; anchor: Pt; moved: boolean }
   | { mode: 'shapeVertex'; index: number; start: P2; moved: boolean }
   | { mode: 'vertex'; id: string; index: number; points: Pt[]; start: P2; moved: boolean }
-  | { mode: 'pinch'; view: View; start: Map<number, P2> };
+  | { mode: 'pinch'; view: View; start: Map<number, P2> }
+  | { mode: 'fxrect'; type: FixtureType; a: Pt; startPx: P2; moved: boolean };
 
 const DOUBLE_TAP_MS = 300;
 /** Height of the floating tool row over the top of the plan; fitting keeps the area below it. */
@@ -73,6 +75,8 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const [drag, setDrag] = useState<DragOffset | null>(null);
   const [lassoPts, setLassoPts] = useState<Pt[] | null>(null);
   const [draft, setDraft] = useState<{ kind: 'drift' | 'curve' | 'line'; points: Pt[] } | null>(null);
+  const [fxDraft, setFxDraft] = useState<Omit<Fixture, 'id'> | null>(null);
+  const fixtureTool = useUi((s) => s.fixtureTool);
   const [shape, setShape] = useState<ShapeOverride | null>(null);
   const pendingLineStart = useRef<Pt | null>(null);
   const [pendingStart, setPendingStart] = useState<Pt | null>(null);
@@ -236,7 +240,9 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
         ui.select(ids);
       }
       gesture.current = { mode: 'move', start: p, ids, anchor: itemPos(hitId), moved: false, tappedId: hitId, additive, wasSelected };
-    } else if (tool === 'select' && fxId) {
+    } else if (tool === 'fixtures' && fixtureTool && DRAG_DRAWN.has(fixtureTool) && !fxId) {
+      gesture.current = { mode: 'fxrect', type: fixtureTool, a: snapPt(toWorld(p)), startPx: p, moved: false };
+    } else if ((tool === 'select' || tool === 'fixtures') && fxId) {
       const f = area.fixtures.find((x) => x.id === fxId);
       useUi.getState().selectFixture(fxId);
       gesture.current = { mode: 'fixture', id: fxId, start: p, anchor: f ? [f.x, f.y] : [0, 0], moved: false };
@@ -291,6 +297,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       if (g.kind === 'line') g.points = [g.points[0], snapPt(w)];
       else if (dist(g.points[g.points.length - 1], w) * viewRef.current!.s > 3) g.points.push(w);
       setDraft({ kind: g.kind, points: [...g.points] });
+    } else if (g.mode === 'fxrect') {
+      if (!g.moved && Math.hypot(p.x - g.startPx.x, p.y - g.startPx.y) < TAP_SLOP_PX) return;
+      g.moved = true;
+      setFxDraft(dragFixture(g.type, g.a, snapPt(toWorld(p))));
     } else if (g.mode === 'shapeVertex') {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
       g.moved = true;
@@ -357,6 +367,12 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       return;
     }
     if (g.mode === 'shapeVertex') return;
+    if (g.mode === 'fxrect') {
+      setFxDraft(null);
+      const w = snapPt(toWorld(p));
+      addFixtureAt(g.moved ? dragFixture(g.type, g.a, w) : newFixture(g.type, Math.round(w[0]), Math.round(w[1])));
+      return;
+    }
     if (g.mode === 'fixture') {
       setFxDrag(null);
       if (g.moved) {
@@ -474,6 +490,15 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     hint(`Méretarány beállítva (×${k.toLocaleString('hu-HU', { maximumFractionDigits: 2 })}).`);
   };
 
+  /** Add a fixture from the Elemek tool and select it, so it can be moved or edited at once. */
+  const addFixtureAt = (f: Omit<Fixture, 'id'>) => {
+    const id = useProject.getState().addFixture(f);
+    if (id) {
+      useUi.getState().selectFixture(id);
+      hint(`${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod; a Tulajdonságoknál pontos méret.`);
+    }
+  };
+
   const onTap = (p: P2, g: Extract<Gesture, { mode: 'pan' }>) => {
     if (useUi.getState().calibrate) return calibrateTap(toWorld(p));
     const se = useUi.getState().shapeEdit;
@@ -484,6 +509,12 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       // Tapping the first corner again closes the outline.
       if (first && se.points.length >= 3 && dist(first, w) * viewRef.current!.s < 16) return useUi.getState().setShapeEdit({ ...se, mode: 'edit', selected: null });
       return useUi.getState().setShapeEdit({ ...se, points: [...se.points, w] });
+    }
+    if (tool === 'fixtures') {
+      const ft = useUi.getState().fixtureTool;
+      if (!ft) return useUi.getState().selectFixture(null);
+      const w = snapPt(toWorld(p));
+      return addFixtureAt(newFixture(ft, Math.round(w[0]), Math.round(w[1])));
     }
     if (tool === 'plant' || tool === 'drift' || tool === 'row') {
       if (!activePlant) hint('Előbb válassz növényt a palettán.');
@@ -595,8 +626,9 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
               </g>
             )}
             {layers.fixtures && (
-              <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select'} />
+              <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select' || tool === 'fixtures'} />
             )}
+            {fxDraft && <rect className={`fx-draft fx-draft-${fxDraft.type}`} x={fxDraft.x} y={fxDraft.y} width={fxDraft.w} height={fxDraft.h} vectorEffect="non-scaling-stroke" />}
             <AreaShapeEl area={area} className={`area-outline${shapeEdit && shapeEdit.target?.kind !== 'lawn' ? ' is-editing' : ''}`} />
             {layers.plants && (
               <PlantsLayer

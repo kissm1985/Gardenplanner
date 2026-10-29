@@ -22,6 +22,7 @@ import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
 import { VariantsPanel } from './ui/VariantsPanel';
 import { IdeaPanel } from './ui/IdeaPanel';
+import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
 
@@ -31,6 +32,7 @@ const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
   { id: 'plant', label: 'Növény', icon: '✿', ready: true },
   { id: 'drift', label: 'Folt', icon: '⬭', ready: true },
   { id: 'row', label: 'Sor', icon: '⋯', ready: true },
+  { id: 'fixtures', label: 'Elemek', icon: '▦', ready: true },
   { id: 'season', label: 'Évszak', icon: '◐', ready: true },
   { id: 'list', label: 'Lista', icon: '☰', ready: true },
 ];
@@ -205,7 +207,7 @@ export function App({ loading }: { loading: boolean }) {
               </div>
             )}
             {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} />}
-            {tool === 'select' && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
+            {(tool === 'select' || tool === 'fixtures') && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
               <FixtureBar id={selectedFixture} label={(() => {
                 const f = area.fixtures.find((x) => x.id === selectedFixture);
                 return f ? f.label || FIXTURE_LABEL[f.type] : '';
@@ -223,6 +225,7 @@ export function App({ loading }: { loading: boolean }) {
       </main>
 
       {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && !page && !compare && <PlantPalette onOpenDb={() => setSheet('plantdb')} onOpenFilters={() => setSheet('filters')} />}
+      {tool === 'fixtures' && area && !page && !compare && !shapeEditing && <FixtureTools onList={() => setSheet('fixtures')} />}
       {tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}
 
       <nav className="toolbar" aria-label="Eszközök">

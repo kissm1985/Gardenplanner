@@ -1,7 +1,8 @@
 import { create } from 'zustand';
+import type { FixtureType } from '../model/types';
 import { NO_FILTER, type PlantFilter } from '../model/plantFilter';
 
-export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'season' | 'list';
+export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'fixtures' | 'season' | 'list';
 
 export interface Layers {
   background: boolean;
@@ -36,6 +37,9 @@ export interface UiState {
   calibrate: [number, number][] | null;
   /** Plant filters shared by the database list and the palette. */
   plantFilter: PlantFilter;
+  /** Fixture type armed in the Elemek tool (tap or drag on the plan to add one). */
+  fixtureTool: FixtureType | null;
+  setFixtureTool: (t: FixtureType | null) => void;
   /** Collapsed nodes of the variant tree. */
   collapsed: string[];
   toggleCollapsed: (id: string) => void;
@@ -82,6 +86,8 @@ export const useUi = create<UiState>()((set) => ({
   page: null,
   calibrate: null,
   plantFilter: NO_FILTER,
+  fixtureTool: null,
+  setFixtureTool: (fixtureTool) => set({ fixtureTool }),
   collapsed: [],
   toggleCollapsed: (id) => set((s) => ({ collapsed: s.collapsed.includes(id) ? s.collapsed.filter((x) => x !== id) : [...s.collapsed, id] })),
   shapeEdit: null,
