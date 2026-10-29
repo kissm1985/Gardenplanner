@@ -31,7 +31,10 @@ test('first launch → templates → canvas → new area persists after reload',
   // Autosave → survives a reload.
   await page.waitForTimeout(600);
   await page.reload();
+  // The last open area comes back.
+  await expect(page.locator('.area-name')).toHaveText('Teszt ágyás');
   await page.locator('.area-switch').click();
-  await expect(page.getByRole('button', { name: /Teszt ágyás/ })).toBeVisible();
-  await expect(page.getByRole('button', { name: /Gyepsávos kert/ }).first()).toBeVisible();
+  const list = page.locator('.area-list');
+  await expect(list.getByRole('button', { name: /Teszt ágyás/ })).toBeVisible();
+  await expect(list.getByRole('button', { name: /Gyepsávos kert/ })).toBeVisible();
 });

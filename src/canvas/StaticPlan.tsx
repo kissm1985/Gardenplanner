@@ -30,7 +30,7 @@ export function StaticPlan({ area, items, plantDb, month, showMature = true, lab
   const w = maxX - minX;
   const h = maxY - minY;
   return (
-    <svg className="static-plan" viewBox={`${minX} ${minY} ${w} ${h}`} role="img" aria-label={title ?? area.name} preserveAspectRatio="xMidYMid meet">
+    <svg className="static-plan" viewBox={`${minX} ${minY} ${w} ${h}`} style={{ aspectRatio: `${w} / ${h}` }} role="img" aria-label={title ?? area.name} preserveAspectRatio="xMidYMid meet">
       <rect className="area-bed" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
       <FixturesLayer area={area} scale={labelPx / w} drag={null} selected={null} interactive={false} />
       <rect className="area-outline" x={0} y={0} width={area.widthCm} height={area.lengthCm} />

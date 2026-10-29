@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'season' | 'list';
 
 export interface Layers {
+  background: boolean;
   warnings: boolean;
   plants: boolean;
   spacing: boolean;
@@ -30,6 +31,9 @@ export interface UiState {
   compare: boolean;
   /** Full-screen page opened from a menu (planting schedule & care). */
   page: 'schedule' | null;
+  /** Background scale calibration: points tapped so far (cm), or null when off. */
+  calibrate: [number, number][] | null;
+  setCalibrate: (v: [number, number][] | null) => void;
   setPage: (p: 'schedule' | null) => void;
   setCompare: (v: boolean) => void;
   setMonth: (m: number) => void;
@@ -59,13 +63,15 @@ export const useUi = create<UiState>()((set) => ({
   fourUp: false,
   compare: false,
   page: null,
+  calibrate: null,
+  setCalibrate: (calibrate) => set({ calibrate }),
   setPage: (page) => set({ page, compare: false }),
   setCompare: (compare) => set({ compare }),
   setMonth: (month) => set({ month }),
   setFourUp: (fourUp) => set({ fourUp }),
   setDriftPattern: (driftPattern) => set({ driftPattern }),
   setRowMode: (rowMode) => set({ rowMode }),
-  layers: { warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
+  layers: { background: true, warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
   setTool: (tool) => set((s) => ({ tool, lasso: tool === 'select' ? s.lasso : false, compare: false, page: null })),
   setActivePlant: (activePlant) => set({ activePlant }),
   select: (selected) => set((s) => ({ selected, selectedFixture: selected.length ? null : s.selectedFixture })),

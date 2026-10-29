@@ -1,23 +1,45 @@
 # Kerttervező
 
-Mobilbarát, offline is működő ültetéstervező (PWA). A specifikáció: [SPEC.md](SPEC.md).
+Mobilbarát, offline is működő ültetéstervező (PWA). A specifikáció: [SPEC.md](SPEC.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
 
 ```bash
 npm install
 npm run dev        # fejlesztői szerver
 npm test           # egységtesztek (Vitest)
-npm run test:e2e   # Playwright smoke teszt mobil nézetben
-npm run build      # statikus build a dist/ mappába (Netlify / Vercel / GitHub Pages)
+npm run test:e2e   # Playwright tesztek mobil nézetben (buildet is készít)
+npm run build      # statikus build a dist/ mappába
 ```
 
-## Állapot
+**Telepítés:** a `dist/` mappa bármilyen statikus tárhelyre feltölthető (Netlify, Vercel, GitHub Pages – relatív útvonalakkal, almappában is működik). Első megnyitás után telepíthető a kezdőképernyőre, és internet nélkül is fut.
 
-- [x] 1. fázis – Alap: projekt, területek, SVG vászon cm-ben, nagyítás/mozgatás, IndexedDB mentés, PWA
-- [x] 2. fázis – Növények: adatbázis (30 faj), paletta, elhelyezés, mozgatás, lasszó, visszavonás
-- [x] 3. fázis – Gyors ültetés: folt (eltolt/négyzetes rács), egyenes sor, ív, automatikus darabszám
-- [x] 4. fázis – Szabálymotor (12 szabály, elnémítás, ugrás), rögzített elemek húzása és szerkesztése
-- [x] 5. fázis – Növénylista: összesítő és területenkénti tábla, tartalék, árak, státuszok, másolás (szöveg/Excel), CSV, XLSX, megosztás
-- [x] 6. fázis – Évszaknézet: négy évszak + havi csúszka, virágzó fajok, négy évszak egymás mellett
-- [x] 7. fázis – Változatok: másolás, átnevezés, választott, összehasonlítás (darab, költség, figyelmeztetés, évszak)
-- [x] 8. fázis – Ültetési menetrend (pipálható, napokra bontva), gondozási naptár Győrre, mulcsajánlás
-- [ ] 9. fázis – Export, megosztás, finomhangolás
+## Mit tud
+
+| | |
+|---|---|
+| Területek | Két sablon (Házoldali sáv, Gyepsávos kert), saját terület méretekkel, égtájjal, napsütéssel, korlátokkal; háttérkép két pontos méretaránnyal |
+| Rajz | SVG cm-ben, rácsháló, vonalzó, két ujjas nagyítás/mozgatás, dupla koppintás = illesztés, rétegek, mágnes 10 cm-es rácsra |
+| Ültetés | Egyedi tő (koppintás vagy ráhúzás), folt (eltolt/négyzetes rács), egyenes sor, ív; automatikus darabszám; kijelölés, lasszó, másolás, törlés, 100 lépés visszavonás |
+| Növények | 30 faj kezdőlista, „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
+| Szabályok | Magasság, tüske, mérgező, juglone-zóna (állítható sugár), tőtáv, határon kívül, fajkorlát, fák száma, vízigény, napigény, csap/akna, ablak; ugrás és elnémítás |
+| Lista | Ültetett és rendelendő darab (+tartalék), árak, státuszok; másolás szövegként és táblázatként, CSV, XLSX, megosztás |
+| Évszakok | Négy évszak és havi csúszka, négy évszak egymás mellett |
+| Változatok | A/B terv, választott változat, összehasonlítás |
+| Menetrend | Napokra bontott, pipálható ültetési lista; gondozási naptár Győrre; mulcsajánlás |
+| Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG, teljes JSON-mentés, csak olvasható link |
+
+## Elfogadási feltételek (SPEC §8)
+
+- [x] 120 × 1200 cm-es terület, folt kitöltése 20 mp alatt, darabszám látszik – `tests/e2e/drift.spec.ts`
+- [x] 200+ növény folyékony – 221 tővel húzás közben 16,7 ms/képkocka (headless Chromium, asztali gép)
+- [x] 50 cm feletti növény az 50 cm-es sávban azonnal figyelmeztet – `tests/e2e/rules.spec.ts`
+- [x] Excelbe beillesztve helyes oszlopok – `tests/e2e/list.spec.ts`
+- [x] Internet nélkül megnyílik és ment – `tests/e2e/offline.spec.ts`
+- [x] JSON-ból visszatöltve pontosan ugyanaz – `tests/unit/io.test.ts`, `tests/e2e/export.spec.ts`
+- [x] A4 PDF-ben nincs szétcsúszás, levágás – álló és fekvő PDF ellenőrizve
+- [ ] Valódi iPhone Safari és Android Chrome – még nem próbáltuk ki valódi eszközön
+
+## Még nincs meg
+
+- Szabad sokszög / ív alakú terület (SPEC §4.1 „második lépés”) – most téglalap
+- Mágnesezés más elemek széléhez (csak rácsra van)
+- Oldalszám a PDF-ben Safariban (a Chrome-alapú böngészők kiírják)

@@ -105,6 +105,8 @@ export interface Background {
   x: number;
   y: number;
   widthCm: number;
+  /** Image height / width, to size it without decoding. */
+  aspect: number;
 }
 
 export type AreaShape = { kind: 'rect' } | { kind: 'polygon'; points: Pt[] };

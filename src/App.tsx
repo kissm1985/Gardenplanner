@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { flushSync } from 'react-dom';
 import { PlanCanvas, SNAP_CM } from './canvas/PlanCanvas';
 import { evaluate, partition } from './engine/rules';
 import { ORIENTATION_LABEL } from './model/types';
@@ -8,9 +9,12 @@ import { AreasPanel } from './ui/AreasPanel';
 import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantPalette } from './ui/PlantPalette';
+import { Coach, introDone } from './ui/Coach';
 import { CompareView } from './ui/CompareView';
 import { ListView } from './ui/ListView';
 import { SchedulePage } from './ui/SchedulePage';
+import { PrintView } from './ui/PrintView';
+import { ProjectPanel, type Orientation } from './ui/ProjectPanel';
 import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
@@ -29,6 +33,7 @@ const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
 ];
 
 const LAYER_LABELS: Record<keyof Layers, string> = {
+  background: 'Háttérkép',
   warnings: 'Figyelmeztetések',
   plants: 'Növények',
   spacing: 'Tőtáv-körök',
@@ -38,7 +43,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -58,6 +63,22 @@ export function App({ loading }: { loading: boolean }) {
   const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
   const compare = useUi((s) => s.compare);
   const page = useUi((s) => s.page);
+  const [print, setPrint] = useState<Orientation | null>(null);
+  const [coach, setCoach] = useState(() => !introDone());
+
+  // Ctrl+P / browser print menu also gets the print document (portrait by default).
+  // Once requested it stays mounted; it is hidden on screen by the print stylesheet.
+  useEffect(() => {
+    const before = () => flushSync(() => setPrint((o) => o ?? 'portrait'));
+    window.addEventListener('beforeprint', before);
+    return () => window.removeEventListener('beforeprint', before);
+  }, []);
+  const startPrint = (o: Orientation) => {
+    setSheet(null);
+    flushSync(() => setPrint(o));
+    // Give the dialog close a frame, then open the system print dialog (PDF on phones).
+    requestAnimationFrame(() => window.print());
+  };
 
   // Rule engine: re-runs after every change of the area, its items, plants or settings.
   const { active: warnings, muted } = useMemo(() => {
@@ -106,6 +127,9 @@ export function App({ loading }: { loading: boolean }) {
           </button>
           <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label="Nézet és rétegek">
             ◫
+          </button>
+          <button type="button" className="icon-btn" onClick={() => setSheet('project')} aria-label="Projekt: mentés, megosztás, nyomtatás">
+            ⋯
           </button>
           <button
             type="button"
@@ -224,6 +248,18 @@ export function App({ loading }: { loading: boolean }) {
       <Sheet open={sheet === 'props'} title="Tulajdonságok" onClose={() => setSheet(null)}>
         <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} />
       </Sheet>
+      <Sheet open={sheet === 'project'} title="Projekt" onClose={() => setSheet(null)}>
+        <ProjectPanel
+          onPrint={startPrint}
+          onIntro={() => {
+            setSheet(null);
+            setCoach(true);
+          }}
+          onDone={() => setSheet(null)}
+        />
+      </Sheet>
+      {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
+      {print && <PrintView project={project} orientation={print} />}
       <Sheet open={sheet === 'variants'} title="Változatok" onClose={() => setSheet(null)}>
         <VariantsPanel onDone={() => setSheet(null)} />
       </Sheet>

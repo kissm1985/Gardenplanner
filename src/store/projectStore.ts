@@ -47,6 +47,8 @@ export interface ProjectState {
   moveFixture: (id: string, dx: number, dy: number) => void;
   deleteFixture: (id: string) => void;
 
+  renameProject: (name: string) => void;
+  setBackground: (bg: Area['background'] | null) => void;
   setScheduleWindow: (start: string, end: string) => void;
   toggleTask: (taskId: string) => void;
 
@@ -351,6 +353,23 @@ export const useProject = create<ProjectState>()((set, get) => {
     },
 
     deleteFixture: (fid) => mapFixtures((fs) => fs.filter((f) => f.id !== fid)),
+
+    setBackground: (bg) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => {
+        if (!bg) {
+          const { background: _drop, ...rest } = a;
+          return rest;
+        }
+        return { ...a, background: bg };
+      });
+    },
+
+    renameProject: (name) => {
+      const n = name.trim();
+      if (n) commit((p) => (p.name === n ? p : { ...p, name: n }));
+    },
 
     setScheduleWindow: (start, end) =>
       commit((p) => ({ ...p, schedule: { start, end, done: p.schedule?.done ?? [] } })),

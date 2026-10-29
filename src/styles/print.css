@@ -1,0 +1,233 @@
+/* Print document (SPEC §4.9): A4, one section per area. Only visible when printing. */
+.print-root {
+  display: none;
+}
+
+@page {
+  @bottom-right {
+    content: 'Kerttervező · ' counter(page) ' / ' counter(pages);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 8pt;
+    color: #5d6b60;
+  }
+}
+
+@media print {
+  :root,
+  :root[data-theme='dark'] {
+    /* Always print the light palette. */
+    --bg: #ffffff;
+    --panel: #f6f7f3;
+    --fg: #1c261f;
+    --mute: #5d6b60;
+    --line: #cdd4ca;
+    --accent: #2d6a4f;
+    --soil: #e4dccd;
+    --lawn: #c9dbb4;
+    --edge: #7b8577;
+    --wall: #4a524d;
+    --chip: #e1e6dd;
+    --ring: rgba(20, 30, 20, 0.35);
+    --juglone: #8a5a2b;
+    color-scheme: light;
+  }
+  html,
+  body,
+  #root {
+    height: auto;
+    background: #fff;
+  }
+  body {
+    font-size: 9.5pt;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .app > :not(.print-root),
+  dialog {
+    display: none !important;
+  }
+  .app {
+    display: block;
+    height: auto;
+  }
+  .print-root {
+    display: block;
+    color: #1c261f;
+  }
+  .print-page {
+    break-after: page;
+  }
+  .print-page:last-child {
+    break-after: auto;
+  }
+  .print-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 6mm;
+    border-bottom: 0.6pt solid #1c261f;
+    padding-bottom: 2mm;
+    margin-bottom: 3mm;
+  }
+  .print-head h1 {
+    font-size: 18pt;
+    line-height: 1.1;
+  }
+  .print-head p {
+    margin: 1mm 0 0;
+    font-size: 8pt;
+  }
+  .print-kpi {
+    display: grid;
+    grid-template-columns: auto auto;
+    gap: 0.5mm 3mm;
+    margin: 0;
+    font-size: 9pt;
+    align-content: end;
+  }
+  .print-kpi dt {
+    font-family: var(--mono);
+    font-size: 7pt;
+    text-transform: uppercase;
+    color: #5d6b60;
+  }
+  .print-kpi dd {
+    margin: 0;
+    font-weight: 600;
+    text-align: right;
+  }
+  .print-plans {
+    display: flex;
+    gap: 4mm;
+    align-items: flex-start;
+    break-inside: avoid;
+    margin-bottom: 3mm;
+  }
+  .print-plans figure {
+    margin: 0;
+    /* Caption wraps to the drawing's width instead of widening the column. */
+    width: min-content;
+  }
+  .print-plans figcaption {
+    min-width: 22mm;
+    font-size: 7.5pt;
+    margin-top: 1mm;
+  }
+  .print-plans .static-plan {
+    max-height: none;
+    width: auto;
+    border-width: 0.4pt;
+  }
+  .print-main .static-plan {
+    height: 125mm;
+    max-width: 90mm;
+  }
+  .print-seasons {
+    display: flex;
+    gap: 2.5mm;
+    flex: 1;
+    min-width: 0;
+    flex-wrap: wrap;
+  }
+  .print-seasons .static-plan {
+    height: 60mm;
+    max-width: 42mm;
+  }
+  .print-landscape .print-main .static-plan {
+    height: 68mm;
+    max-width: 110mm;
+  }
+  .print-landscape .print-seasons .static-plan {
+    height: 68mm;
+    max-width: 50mm;
+  }
+  .print-landscape .print-seasons {
+    flex-wrap: nowrap;
+  }
+  /* Landscape: list and warnings side by side. */
+  .print-landscape .print-bottom {
+    display: grid;
+    grid-template-columns: minmax(0, 2.7fr) minmax(0, 1fr);
+    gap: 5mm;
+    align-items: start;
+  }
+  .print-landscape .print-table th:nth-child(8),
+  .print-landscape .print-table td:nth-child(8) {
+    display: none; /* water need – kept in portrait, space is tight here */
+  }
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 7.5pt;
+    margin-bottom: 3mm;
+  }
+  .print-table th,
+  .print-table td {
+    border-bottom: 0.3pt solid #cdd4ca;
+    padding: 0.8mm 1.2mm;
+    text-align: left;
+    vertical-align: top;
+  }
+  .print-table th {
+    font-family: var(--mono);
+    font-size: 6.5pt;
+    text-transform: uppercase;
+    color: #5d6b60;
+    font-weight: 500;
+  }
+  .print-table thead {
+    display: table-header-group;
+  }
+  .print-table tr {
+    break-inside: avoid;
+  }
+  .print-table .n {
+    text-align: right;
+    font-family: var(--mono);
+    white-space: nowrap;
+  }
+  .print-table i {
+    color: #5d6b60;
+  }
+  .print-table tr.tot td {
+    border-top: 0.6pt solid #1c261f;
+    font-weight: 600;
+  }
+  .print-table td:first-child {
+    white-space: nowrap;
+  }
+  .print-code {
+    display: inline-block;
+    width: 2.4mm;
+    height: 2.4mm;
+    border-radius: 50%;
+    margin-right: 1mm;
+    vertical-align: -0.3mm;
+  }
+  .print-warn {
+    break-inside: avoid;
+  }
+  .print-warn h2 {
+    font-size: 11pt;
+    margin-bottom: 1mm;
+    break-after: avoid;
+  }
+  .print-warn ul {
+    margin: 0;
+    padding-left: 4mm;
+    font-size: 8pt;
+  }
+  .print-warn li {
+    break-inside: avoid;
+    margin-bottom: 0.6mm;
+  }
+  .print-warn .sev-error b {
+    color: #a3362b;
+  }
+  .print-warn p {
+    font-size: 8pt;
+    margin: 0;
+  }
+  .print-summary h1 {
+    font-size: 16pt;
+  }
+}

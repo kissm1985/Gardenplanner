@@ -53,6 +53,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const lasso = useUi((s) => s.lasso);
   const layers = useUi((s) => s.layers);
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
+  const calibrate = useUi((s) => s.calibrate);
   const plants = useMemo(() => plantMap(plantDb), [plantDb]);
 
   const pointers = useRef(new Map<number, P2>());
@@ -185,7 +186,9 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const handle = target.getAttribute?.('data-handle');
     const fxId = hitId ? null : (target.closest?.('[data-fixture]')?.getAttribute('data-fixture') ?? null);
     const editing = editable();
-    if (tool === 'select' && handle != null && editing) {
+    if (useUi.getState().calibrate) {
+      gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: true, additive: false };
+    } else if (tool === 'select' && handle != null && editing) {
       gesture.current = { mode: 'vertex', id: editing.id, index: +handle, points: editing.points, start: p, moved: false };
     } else if ((tool === 'drift' || tool === 'row') && activePlant) {
       const kind = tool === 'drift' ? 'drift' : rowMode === 'curve' ? 'curve' : 'line';
@@ -401,7 +404,27 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     setPendingStart(null);
   }, [tool, activePlant, rowMode]);
 
+  /** Background scale from two tapped points whose real distance the user knows. */
+  const calibrateTap = (w: Pt) => {
+    const ui = useUi.getState();
+    const pts = [...(ui.calibrate ?? []), w];
+    if (pts.length < 2) return ui.setCalibrate(pts as [number, number][]);
+    ui.setCalibrate(null);
+    const bg = area.background;
+    const measured = dist(pts[0], pts[1]);
+    if (!bg || measured < 1) return;
+    const input = prompt(`Mekkora a valódi távolság a két pont között (cm)? A kép szerint most ${Math.round(measured)} cm.`);
+    const real = input ? parseFloat(input.replace(',', '.')) : NaN;
+    if (!(real > 0)) return hint('A méretarány nem változott.');
+    // Scale the image about the first point so that point stays put.
+    const k = real / measured;
+    const [ax, ay] = pts[0];
+    useProject.getState().setBackground({ ...bg, widthCm: bg.widthCm * k, x: ax - (ax - bg.x) * k, y: ay - (ay - bg.y) * k });
+    hint(`Méretarány beállítva (×${k.toLocaleString('hu-HU', { maximumFractionDigits: 2 })}).`);
+  };
+
   const onTap = (p: P2, g: Extract<Gesture, { mode: 'pan' }>) => {
+    if (useUi.getState().calibrate) return calibrateTap(toWorld(p));
     if (tool === 'plant' || tool === 'drift' || tool === 'row') {
       if (!activePlant) hint('Előbb válassz növényt a palettán.');
       else if (tool === 'plant') place(activePlant, toWorld(p));
@@ -489,6 +512,19 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
           <g transform={`translate(${view.tx} ${view.ty}) scale(${view.s})`}>
             {layers.zones && <FixtureZonesLayer area={area} settings={settings} drag={fxDrag} />}
             <rect className="area-bed" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
+            {layers.background && area.background && (
+              <image
+                className="bg-image"
+                href={area.background.dataUrl}
+                x={area.background.x}
+                y={area.background.y}
+                width={area.background.widthCm}
+                height={area.background.widthCm * area.background.aspect}
+                opacity={area.background.opacity}
+                preserveAspectRatio="none"
+                pointerEvents="none"
+              />
+            )}
             {layers.grid && <GridLayer w={area.widthCm} h={area.lengthCm} step={niceStep(view.s, 14)} />}
             {layers.fixtures && (
               <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select'} />
@@ -514,6 +550,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
             {layers.dimensions && <Dimensions area={area} s={view.s} />}
             {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
+            {calibrate?.map(([x, y], i) => <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />)}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>
           <Rulers view={view} w={size.w} h={size.h} />
@@ -522,6 +559,11 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       {toast && (
         <p className="canvas-toast" role="status">
           {toast}
+        </p>
+      )}
+      {calibrate && !toast && (
+        <p className="canvas-toast" role="status">
+          Méretarány: koppints a kép {calibrate.length ? 'második' : 'első'} pontjára (pl. egy ismert hosszúságú fal két végére).
         </p>
       )}
       {pendingStart && !toast && (

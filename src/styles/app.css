@@ -1842,3 +1842,133 @@ table.cmp-table {
   gap: 6px;
   font-size: 14px;
 }
+
+/* ---------- phase 9: intro, read-only view ---------- */
+.coach {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(420px, calc(100% - 24px));
+  z-index: 40;
+  background: var(--fg);
+  color: var(--bg);
+  padding: 12px 14px;
+  border-radius: 6px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  display: grid;
+  gap: 4px;
+}
+.coach.coach-top {
+  top: calc(env(safe-area-inset-top, 0px) + 64px);
+}
+.coach.coach-bottom {
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 72px);
+}
+.coach h2 {
+  font-size: 18px;
+}
+.coach p {
+  margin: 0 0 4px;
+  font-size: 15px;
+}
+.coach .muted {
+  color: color-mix(in srgb, var(--bg) 70%, var(--fg));
+}
+.coach .btn {
+  background: transparent;
+  color: var(--bg);
+  border-color: color-mix(in srgb, var(--bg) 40%, transparent);
+}
+.coach .btn-primary {
+  background: var(--bg);
+  color: var(--fg);
+}
+.coach-target {
+  position: relative;
+  z-index: 41;
+  outline: 3px solid var(--accent);
+  outline-offset: -3px;
+  animation: coach-pulse 1.4s ease-in-out infinite;
+}
+@keyframes coach-pulse {
+  50% {
+    outline-color: transparent;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .coach-target {
+    animation: none;
+  }
+}
+.readonly {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: calc(env(safe-area-inset-top, 0px) + 16px) 16px 24px;
+  display: grid;
+  gap: 14px;
+}
+.ro-head {
+  display: grid;
+  gap: 8px;
+}
+.ro-head h1 {
+  font-size: clamp(26px, 7vw, 36px);
+  line-height: 1.1;
+}
+.ro-body {
+  display: grid;
+  gap: 14px;
+}
+@media (min-width: 760px) {
+  .ro-body {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    align-items: start;
+  }
+}
+.ro-plan .static-plan {
+  height: 72vh;
+  width: auto;
+  max-width: 100%;
+  max-height: none;
+  margin: 0 auto;
+}
+.ro-kpi {
+  margin: 0 0 8px;
+}
+.ro-rows {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+}
+.ro-rows li {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+  padding: 4px 0;
+  border-bottom: 1px solid var(--line);
+  font-size: 15px;
+}
+.ro-rows i {
+  color: var(--mute);
+  font-size: 13px;
+}
+.ro-foot {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+a.btn {
+  display: inline-flex;
+  align-items: center;
+  text-decoration: none;
+  color: inherit;
+}
+a.btn-primary {
+  color: var(--accent-fg);
+}
+.bg-image {
+  image-rendering: auto;
+}

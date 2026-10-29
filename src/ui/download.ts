@@ -13,8 +13,8 @@ export function downloadText(filename: string, text: string, mime: string) {
 
 export const readFileText = (f: File) => f.text();
 
-export function downloadBlob(filename: string, data: Uint8Array, mime: string) {
-  const url = URL.createObjectURL(new Blob([data as BlobPart], { type: mime }));
+export function downloadBlob(filename: string, data: Uint8Array | Blob, mime: string) {
+  const url = URL.createObjectURL(data instanceof Blob ? data : new Blob([data as BlobPart], { type: mime }));
   const a = document.createElement('a');
   a.href = url;
   a.download = filename;

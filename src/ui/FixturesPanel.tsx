@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import type { Fixture, FixtureType } from '../model/types';
+import { useRef, useState } from 'react';
+import type { Area, Fixture, FixtureType } from '../model/types';
 import { selectCurrentArea, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 
@@ -85,6 +85,7 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
           </button>
         ))}
       </div>
+      <BackgroundSection area={area} onCalibrate={onDone} />
       <fieldset className="field-group">
         <legend>Juglone-zóna (diófa körül)</legend>
         <label className="field">
@@ -160,5 +161,112 @@ function FixtureForm({ f, onBack }: { f: Fixture; onBack: () => void }) {
         </button>
       </div>
     </div>
+  );
+}
+
+/** Downscale a photo to keep the project (and its JSON backup) small. */
+async function loadImage(file: File, maxPx = 1600): Promise<{ dataUrl: string; aspect: number }> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    await new Promise<void>((res, rej) => {
+      img.onload = () => res();
+      img.onerror = () => rej(new Error('Ezt a képet nem lehet megnyitni.'));
+      img.src = url;
+    });
+    const k = Math.min(1, maxPx / Math.max(img.width, img.height));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.width * k);
+    c.height = Math.round(img.height * k);
+    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+    return { dataUrl: c.toDataURL('image/jpeg', 0.82), aspect: img.height / img.width };
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function BackgroundSection({ area, onCalibrate }: { area: Area; onCalibrate: () => void }) {
+  const ref = useRef<HTMLInputElement>(null);
+  const [err, setErr] = useState('');
+  const bg = area.background;
+  const set = useProject.getState().setBackground;
+  return (
+    <fieldset className="field-group">
+      <legend>Háttérkép (fotó vagy tervrajz)</legend>
+      <div className="form-actions form-actions-start">
+        <button type="button" className="btn btn-small" onClick={() => ref.current?.click()}>
+          {bg ? 'Csere' : 'Kép feltöltése'}
+        </button>
+        {bg && (
+          <>
+            <button
+              type="button"
+              className="btn btn-small"
+              onClick={() => {
+                useUi.getState().setTool('select');
+                useUi.getState().setCalibrate([]);
+                onCalibrate();
+              }}
+            >
+              Méretarány két ponttal
+            </button>
+            <button type="button" className="btn btn-small btn-danger" onClick={() => set(null)}>
+              Törlés
+            </button>
+          </>
+        )}
+        <input
+          ref={ref}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            e.target.value = '';
+            if (!f) return;
+            try {
+              const { dataUrl, aspect } = await loadImage(f);
+              set({ dataUrl, aspect, opacity: bg?.opacity ?? 0.5, x: 0, y: 0, widthCm: area.widthCm });
+              setErr('');
+            } catch (x) {
+              setErr((x as Error).message);
+            }
+          }}
+        />
+      </div>
+      {bg && (
+        <>
+          <label className="field">
+            <span>Átlátszatlanság: {Math.round(bg.opacity * 100)}%</span>
+            <input type="range" min={0.1} max={1} step={0.05} value={bg.opacity} onChange={(e) => set({ ...bg, opacity: +e.target.value })} />
+          </label>
+          <div className="field-row field-row-3">
+            <BgNum label="x (cm)" v={bg.x} on={(x) => set({ ...bg, x })} />
+            <BgNum label="y (cm)" v={bg.y} on={(y) => set({ ...bg, y })} />
+            <BgNum label="Szélesség (cm)" v={bg.widthCm} on={(w) => w > 0 && set({ ...bg, widthCm: w })} />
+          </div>
+        </>
+      )}
+      <p className="mono muted">A kép a rajz alá kerül. Két ismert pont megjelölésével igazítod a méretarányt; a Nézet → Rétegek alatt ki is kapcsolható.</p>
+      {err && <p className="form-error">{err}</p>}
+    </fieldset>
+  );
+}
+
+function BgNum({ label, v, on }: { label: string; v: number; on: (v: number) => void }) {
+  return (
+    <label className="field">
+      <span>{label}</span>
+      <input
+        key={v}
+        type="number"
+        inputMode="decimal"
+        defaultValue={Math.round(v * 10) / 10}
+        onBlur={(e) => {
+          const n = parseFloat(e.target.value);
+          if (Number.isFinite(n) && n !== v) on(n);
+        }}
+      />
+    </label>
   );
 }
