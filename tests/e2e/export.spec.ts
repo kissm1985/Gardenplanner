@@ -66,6 +66,10 @@ test('print document: one page per area plus summary; images download', async ({
   const svgText = readFileSync((await svg.path())!, 'utf8');
   expect(svgText).toContain('<svg');
   expect(svgText).not.toContain('var(--'); // colours resolved
+  // Legend explains the codes.
+  expect(svgText).toContain('JELMAGYARÁZAT');
+  expect(svgText).toContain('Levendula');
+  expect(svgText).toContain('11 tő');
   await page.getByRole('button', { name: 'Nyomtatás / mentés PDF-be' }).click();
   await page.emulateMedia({ media: 'print' });
   await expect(page.locator('.print-page')).toHaveCount(3);

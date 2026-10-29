@@ -1,10 +1,11 @@
 import { useRef, useState } from 'react';
+import { bomFromEntries } from '../engine/bom';
 import { exportJson, parseProject, shareUrl } from '../engine/io';
 import { activeVariant, migrate, selectCurrentArea, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
 import { downloadBlob, downloadText } from './download';
-import { planSvg, svgToPng } from './exportImage';
+import { planSvg, svgToPng, type LegendRow } from './exportImage';
 
 export type Orientation = 'portrait' | 'landscape';
 
@@ -24,6 +25,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
   const [msg, setMsg] = useState('');
   const [link, setLink] = useState('');
   const [orient, setOrient] = useState<Orientation>('portrait');
+  const [withLegend, setWithLegend] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLTextAreaElement>(null);
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
@@ -42,7 +44,17 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
   const image = async (kind: 'png' | 'svg') => {
     if (!area) return;
     const v = activeVariant(area);
-    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month, caption: `${area.name} – ${v.name} · ${area.widthCm} × ${area.lengthCm} cm` });
+    const legend: LegendRow[] = withLegend
+      ? bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
+          code: r.plant.code,
+          nameHu: r.plant.nameHu,
+          nameLat: r.plant.nameLat,
+          color: r.plant.color,
+          symbol: r.plant.symbol,
+          count: r.planted,
+        }))
+      : [];
+    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month, legend, caption: `${area.name} – ${v.name} · ${area.widthCm} × ${area.lengthCm} cm` });
     const name = `${slug(area.name)}-${slug(v.name)}`;
     try {
       if (kind === 'svg') downloadText(`${name}.svg`, svg, 'image/svg+xml');
@@ -117,6 +129,10 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
             SVG
           </button>
         </div>
+        <label className="check">
+          <input type="checkbox" checked={withLegend} onChange={(e) => setWithLegend(e.target.checked)} />
+          <span>Jelmagyarázattal (kód → növény, darabszám)</span>
+        </label>
         <p className="mono muted">{month ? 'Az évszaknézet színeivel.' : 'A szerkesztett változat, alapszínekkel. Évszaknézetből az adott hónap színeit kapod.'}</p>
       </fieldset>
 
