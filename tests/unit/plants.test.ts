@@ -4,9 +4,11 @@ import { parseCsv, plantsFromCsv, plantsFromJson, plantsToCsv, suggestCode, vali
 import { pointInPolygon } from '../../src/model/geometry';
 
 describe('seed plant list', () => {
-  it('has 25–40 species with unique 2-letter codes and valid data', () => {
-    expect(SEED_PLANTS.length).toBeGreaterThanOrEqual(25);
-    expect(SEED_PLANTS.length).toBeLessThanOrEqual(40);
+  it('has about 60 species with unique 2-letter codes, soil data and valid values', () => {
+    expect(SEED_PLANTS.length).toBeGreaterThanOrEqual(55);
+    expect(SEED_PLANTS.every((p) => p.soil && p.soil.length > 0)).toBe(true);
+    // Shade plants exist for the shady strips.
+    expect(SEED_PLANTS.filter((p) => p.sun.includes('shade')).length).toBeGreaterThanOrEqual(12);
     const codes = SEED_PLANTS.map((p) => p.code);
     expect(new Set(codes).size).toBe(codes.length);
     SEED_PLANTS.forEach((p, i) => expect(validatePlant(p, SEED_PLANTS.slice(0, i))).toEqual([]));

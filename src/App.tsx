@@ -8,6 +8,7 @@ import { useUi, type Layers, type Tool } from './store/uiStore';
 import { AreasPanel } from './ui/AreasPanel';
 import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
+import { PlantFilterForm } from './ui/PlantFilterForm';
 import { PlantPalette } from './ui/PlantPalette';
 import { Coach, introDone } from './ui/Coach';
 import { CompareView } from './ui/CompareView';
@@ -43,7 +44,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -217,7 +218,7 @@ export function App({ loading }: { loading: boolean }) {
         )}
       </main>
 
-      {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && !page && !compare && <PlantPalette onOpenDb={() => setSheet('plantdb')} />}
+      {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && !page && !compare && <PlantPalette onOpenDb={() => setSheet('plantdb')} onOpenFilters={() => setSheet('filters')} />}
       {tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}
 
       <nav className="toolbar" aria-label="Eszközök">
@@ -260,6 +261,16 @@ export function App({ loading }: { loading: boolean }) {
       </Sheet>
       {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
       {print && <PrintView project={project} orientation={print} />}
+      <Sheet open={sheet === 'filters'} title="Növényszűrők" onClose={() => setSheet(null)}>
+        <div className="form">
+          <PlantFilterForm />
+          <div className="form-actions">
+            <button type="button" className="btn btn-primary" onClick={() => setSheet(null)}>
+              Kész
+            </button>
+          </div>
+        </div>
+      </Sheet>
       <Sheet open={sheet === 'variants'} title="Változatok" onClose={() => setSheet(null)}>
         <VariantsPanel onDone={() => setSheet(null)} />
       </Sheet>

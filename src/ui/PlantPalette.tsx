@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState, type PointerEvent } from 'react';
+import { activeFilterCount, filterPlants, NO_FILTER } from '../model/plantFilter';
 import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
@@ -13,25 +14,23 @@ const TOOL_HINT: Record<string, string> = {
   curve: 'húzd végig ujjal az ív mentén',
 };
 
-export const matchesQuery = (p: Plant, q: string) => {
-  const s = q.trim().toLowerCase();
-  return !s || p.code.toLowerCase().includes(s) || p.nameHu.toLowerCase().includes(s) || p.nameLat.toLowerCase().includes(s);
-};
-
 /**
  * Docked palette above the toolbar (plant tool). Tap a plant to arm it, then tap the plan;
  * or drag the plant upwards onto the plan.
  */
-export function PlantPalette({ onOpenDb }: { onOpenDb: () => void }) {
+export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void; onOpenFilters: () => void }) {
   const plantDb = useProject((s) => s.project!.plantDb);
   const active = useUi((s) => s.activePlant);
   const tool = useUi((s) => s.tool);
   const rowMode = useUi((s) => s.rowMode);
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(true);
+  // The palette has its own search box but shares the database filters.
+  const filter = useUi((s) => s.plantFilter);
+  const nFilters = activeFilterCount(filter);
   const list = useMemo(
-    () => plantDb.filter((p) => matchesQuery(p, q)).sort((a, b) => a.nameHu.localeCompare(b.nameHu, 'hu')),
-    [plantDb, q],
+    () => filterPlants(plantDb, { ...filter, q }).sort((a, b) => a.nameHu.localeCompare(b.nameHu, 'hu')),
+    [plantDb, filter, q],
   );
   const activePlant = plantDb.find((p) => p.code === active);
 
@@ -88,9 +87,19 @@ export function PlantPalette({ onOpenDb }: { onOpenDb: () => void }) {
       </div>
       {open && (
         <>
-          <input className="palette-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Keresés: név, latin név, kód" aria-label="Növény keresése" />
+          <div className="palette-searchrow">
+            <input className="palette-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Keresés: név, latin név, kód" aria-label="Növény keresése" />
+            <button type="button" className={`btn btn-small${nFilters ? ' btn-primary' : ''}`} onClick={onOpenFilters}>
+              Szűrők{nFilters ? ` (${nFilters})` : ''}
+            </button>
+            {nFilters > 0 && (
+              <button type="button" className="icon-btn" aria-label="Szűrők törlése" onClick={() => useUi.getState().setPlantFilter({ ...NO_FILTER, q: filter.q })}>
+                ×
+              </button>
+            )}
+          </div>
           <div className="palette-strip" role="listbox" aria-label="Növények">
-            {list.length === 0 && <p className="empty">Nincs találat. Próbálj rövidebb keresőszót.</p>}
+            {list.length === 0 && <p className="empty">{nFilters ? 'A szűrőknek egy növény sem felel meg.' : 'Nincs találat. Próbálj rövidebb keresőszót.'}</p>}
             {list.map((p) => (
               <button
                 key={p.code}

@@ -1,4 +1,4 @@
-import type { Plant } from '../model/types';
+import type { Plant, Soil } from '../model/types';
 
 // Starting plant list. The first 19 species, heights, spreads, pots, juglone notes and
 // seasonal colours come from the K-07 sheet; unit prices and pot sizes from K-08
@@ -10,12 +10,48 @@ import type { Plant } from '../model/types';
 type Seed = Omit<Plant, 'spacingCm' | 'color' | 'notes' | 'verify'> &
   Partial<Pick<Plant, 'spacingCm' | 'color' | 'notes' | 'verify'>>;
 
+// Soils each species grows well in (general horticultural guidance; species added after K-07
+// also carry a `soil` verification flag).
+const SOIL: Record<string, Soil[]> = {
+  LA: ['sandy', 'loam', 'chalky', 'poor'],
+  SA: ['loam', 'sandy', 'chalky'],
+  CO: ['sandy', 'loam', 'poor'],
+  FE: ['sandy', 'poor', 'loam'],
+  TH: ['sandy', 'poor', 'chalky'],
+  ST: ['sandy', 'loam', 'poor'],
+  NE: ['loam', 'sandy', 'chalky'],
+  EF: ['loam', 'clay', 'chalky'],
+  SD: ['sandy', 'poor', 'loam'],
+  AR: ['sandy', 'poor'],
+  EC: ['loam', 'clay'],
+  MO: ['loam', 'acidic', 'clay'],
+  CK: ['loam', 'clay'],
+  MI: ['loam', 'clay'],
+  GR: ['loam', 'clay', 'chalky'],
+  HH: ['loam', 'sandy', 'poor'],
+  BE: ['loam', 'clay', 'chalky'],
+  AC: ['loam', 'acidic'],
+  MG: ['loam', 'acidic'],
+  SE: ['sandy', 'poor'],
+  HO: ['loam', 'clay'],
+  HE: ['loam'],
+  AL: ['loam', 'clay'],
+  AM: ['sandy', 'poor', 'loam'],
+  PE: ['sandy', 'chalky', 'poor'],
+  HM: ['loam', 'clay'],
+  IR: ['loam', 'sandy', 'chalky'],
+  EU: ['sandy', 'loam', 'poor'],
+  BB: ['loam', 'sandy', 'clay'],
+  CA: ['loam', 'acidic'],
+};
+
 const mk = (s: Seed): Plant => {
   const verify = new Set<keyof Plant>(['toxic', ...(s.verify ?? [])]);
   if (s.juglone === 'unknown') verify.add('juglone');
   if (s.priceSource === 'estimate') verify.add('unitPriceHuf');
   return {
     ...s,
+    soil: s.soil ?? SOIL[s.code] ?? [],
     spacingCm: s.spacingCm ?? s.spreadCm,
     color: s.color ?? s.seasonColors?.[1] ?? '#6f9a5a',
     symbol: s.symbol ?? 'circle',
@@ -24,7 +60,7 @@ const mk = (s: Seed): Plant => {
   };
 };
 
-const EXTRA: (keyof Plant)[] = ['sun', 'water', 'bloomMonths', 'maxHeightCm', 'spreadCm', 'pot'];
+const EXTRA: (keyof Plant)[] = ['sun', 'water', 'soil', 'bloomMonths', 'maxHeightCm', 'spreadCm', 'pot'];
 
 export const SEED_PLANTS: Plant[] = [
   // ---- K-07 / K-08 ----
@@ -60,4 +96,38 @@ export const SEED_PLANTS: Plant[] = [
   mk({ code: 'EU', nameHu: 'Színváltó kutyatej', nameLat: 'Euphorbia epithymoides (E. polychroma)', maxHeightCm: 40, spreadCm: 50, sun: ['sun'], water: 'low', toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'sárgászöld', foliageColor: 'zöld, ősszel vörös', winterInterest: false, seasonColors: ['#d8d040', '#7fa86a', '#c8603a', '#9a8a64'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', color: '#d8d040', verify: EXTRA, notes: 'Tejnedve bőrirritáló.' }),
   mk({ code: 'BB', nameHu: 'Japán borbolya', nameLat: "Berberis thunbergii 'Atropurpurea Nana'", maxHeightCm: 60, spreadCm: 60, sun: ['sun', 'part'], water: 'low', toxic: 'unknown', thorny: true, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'sárga', foliageColor: 'bordó', winterInterest: false, seasonColors: ['#8a3a3a', '#7a2f3a', '#c8402a', '#7a5a4a'], pot: '1 l', unitPriceHuf: 2499, priceSource: 'estimate', verify: EXTRA, notes: 'Tüskés.' }),
   mk({ code: 'CA', nameHu: 'Japán sás', nameLat: "Carex oshimensis 'Evergold'", maxHeightCm: 30, spreadCm: 35, sun: ['part', 'shade'], water: 'medium', toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [4], bloomColor: 'barna', foliageColor: 'sárga–zöld csíkos', winterInterest: true, seasonColors: ['#b8b860', '#b0b050', '#b8b060', '#a8a058'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', symbol: 'triangle', verify: EXTRA, notes: 'A K-07 előzményében a ház felőli szegélyben volt.' }),
+
+  // ---- Second expansion: shade plants, more grasses, shrubs, bulbs (starting values) ----
+  mk({ code: 'AS', nameHu: 'Tollbuga', nameLat: 'Astilbe × arendsii', maxHeightCm: 60, spreadCm: 45, sun: ['part', 'shade'], water: 'high', soil: ['loam', 'acidic', 'clay'], toxic: 'no', thorny: false, juglone: 'tolerant', bloomMonths: [6, 7], bloomColor: 'rózsaszín', foliageColor: 'sötétzöld', winterInterest: true, seasonColors: ['#5f8a5a', '#e07aa8', '#8a6a5a', '#7a5a4a'], pot: 'P9', unitPriceHuf: 1499, priceSource: 'estimate', verify: [...EXTRA, 'juglone'], notes: 'Télen a barna bugák díszítenek.' }),
+  mk({ code: 'PU', nameHu: 'Tüdőfű', nameLat: "Pulmonaria officinalis 'Sissinghurst White'", maxHeightCm: 30, spreadCm: 45, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'clay'], toxic: 'no', thorny: false, juglone: 'tolerant', bloomMonths: [3, 4], bloomColor: 'fehér / kék', foliageColor: 'ezüstfoltos zöld', winterInterest: false, seasonColors: ['#d8e4f0', '#5f8a5a', '#6f8a5a', '#9a8a64'], pot: 'P9', unitPriceHuf: 1499, priceSource: 'estimate', color: '#9fb5d8', verify: [...EXTRA, 'juglone'] }),
+  mk({ code: 'EP', nameHu: 'Püspöksüveg', nameLat: 'Epimedium × versicolor', maxHeightCm: 30, spreadCm: 40, sun: ['part', 'shade'], water: 'low', soil: ['loam', 'acidic', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'sárga', foliageColor: 'bronz–zöld', winterInterest: true, seasonColors: ['#e0c050', '#6f9a5a', '#a07040', '#8a6a4a'], pot: 'P9', unitPriceHuf: 1699, priceSource: 'estimate', symbol: 'square', verify: EXTRA, notes: 'Száraz árnyékba is (pl. fák alá).' }),
+  mk({ code: 'BR', nameHu: 'Kaukázusi nefelejcs', nameLat: "Brunnera macrophylla 'Jack Frost'", maxHeightCm: 40, spreadCm: 50, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'clay'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'égszínkék', foliageColor: 'ezüst erezett', winterInterest: false, seasonColors: ['#7aa0e0', '#b8c8c0', '#a0b0a0', '#9a8a64'], pot: 'P9', unitPriceHuf: 1699, priceSource: 'estimate', color: '#b0c4c8', verify: EXTRA }),
+  mk({ code: 'LU', nameHu: 'Foltos árvacsalán', nameLat: "Lamium maculatum 'White Nancy'", maxHeightCm: 20, spreadCm: 45, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'clay', 'sandy'], toxic: 'no', thorny: false, juglone: 'tolerant', bloomMonths: [5, 6, 7], bloomColor: 'fehér', foliageColor: 'ezüst', winterInterest: true, seasonColors: ['#c8d4c8', '#e8ece8', '#c0ccc0', '#a8b4a8'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', symbol: 'square', verify: [...EXTRA, 'juglone'] }),
+  mk({ code: 'VI', nameHu: 'Kis meténg', nameLat: 'Vinca minor', maxHeightCm: 15, spreadCm: 40, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'clay', 'chalky'], toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'kék', foliageColor: 'fényes sötétzöld', winterInterest: true, seasonColors: ['#6a7ad0', '#3f6a40', '#3f6a40', '#3f6040'], pot: 'P9', unitPriceHuf: 999, priceSource: 'estimate', symbol: 'square', verify: EXTRA, notes: 'Örökzöld talajtakaró; erősen terjed.' }),
+  mk({ code: 'PA', nameHu: 'Japán kövérke', nameLat: 'Pachysandra terminalis', maxHeightCm: 20, spreadCm: 30, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'acidic'], toxic: 'unknown', thorny: false, juglone: 'unknown', bloomMonths: [4], bloomColor: 'fehér', foliageColor: 'sötétzöld', winterInterest: true, seasonColors: ['#4f7a4a', '#4f7a4a', '#4f7a4a', '#4a704a'], pot: 'P9', unitPriceHuf: 1199, priceSource: 'estimate', symbol: 'square', verify: EXTRA }),
+  mk({ code: 'HL', nameHu: 'Keleti hunyor', nameLat: 'Helleborus × hybridus', maxHeightCm: 40, spreadCm: 45, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'chalky', 'clay'], toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [2, 3, 4], bloomColor: 'krém / bordó', foliageColor: 'sötétzöld', winterInterest: true, seasonColors: ['#b05a7a', '#3f6a40', '#3f6a40', '#a06080'], pot: '1 l', unitPriceHuf: 2999, priceSource: 'estimate', verify: EXTRA, notes: 'Télvégi virágzás; minden része mérgező.' }),
+  mk({ code: 'GM', nameHu: 'Illatos gólyaorr', nameLat: "Geranium macrorrhizum 'Spessart'", maxHeightCm: 35, spreadCm: 50, sun: ['sun', 'part', 'shade'], water: 'low', soil: ['loam', 'sandy', 'clay', 'chalky'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [5, 6], bloomColor: 'halvány rózsaszín', foliageColor: 'zöld, ősszel vörös', winterInterest: true, seasonColors: ['#7fa86a', '#e8b8c8', '#c0604a', '#8a6a4a'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', symbol: 'square', verify: EXTRA, notes: 'Száraz árnyékot is tűr.' }),
+  mk({ code: 'DR', nameHu: 'Erdei pajzsika (páfrány)', nameLat: 'Dryopteris filix-mas', maxHeightCm: 80, spreadCm: 70, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'acidic', 'clay'], toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [], bloomColor: '–', foliageColor: 'élénkzöld', winterInterest: false, seasonColors: ['#7fb06a', '#5f9a5a', '#a09050', '#8a7a5a'], pot: '1 l', unitPriceHuf: 1999, priceSource: 'estimate', symbol: 'triangle', verify: EXTRA }),
+  mk({ code: 'HK', nameHu: 'Japán erdei fű', nameLat: "Hakonechloa macra 'Aureola'", maxHeightCm: 35, spreadCm: 45, sun: ['part', 'shade'], water: 'medium', soil: ['loam', 'acidic'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [8], bloomColor: 'zöldes', foliageColor: 'aranysárga csíkos', winterInterest: true, seasonColors: ['#c8c060', '#d0c050', '#d09040', '#b8a070'], pot: 'P9', unitPriceHuf: 1999, priceSource: 'estimate', symbol: 'triangle', verify: EXTRA }),
+  mk({ code: 'PN', nameHu: 'Tollborzfű', nameLat: "Pennisetum alopecuroides 'Hameln'", maxHeightCm: 60, spreadCm: 60, sun: ['sun'], water: 'medium', soil: ['loam', 'sandy', 'clay'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [8, 9, 10], bloomColor: 'krém–rózsás kalász', foliageColor: 'zöld, ősszel arany', winterInterest: true, seasonColors: ['#8fb060', '#c8c0a0', '#d8b060', '#c8b080'], pot: 'P9', unitPriceHuf: 1499, priceSource: 'estimate', symbol: 'triangle', verify: EXTRA }),
+  mk({ code: 'SI', nameHu: 'Hajszálas árvalányhaj', nameLat: "Stipa tenuissima 'Pony Tails'", maxHeightCm: 50, spreadCm: 40, sun: ['sun'], water: 'low', soil: ['sandy', 'poor', 'chalky'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7, 8], bloomColor: 'szőke', foliageColor: 'világoszöld', winterInterest: true, seasonColors: ['#b0c880', '#d8d0a0', '#d8c890', '#c8b888'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', symbol: 'triangle', verify: EXTRA, notes: 'Magról szóródhat.' }),
+  mk({ code: 'HB', nameHu: 'Kék zabfű', nameLat: 'Helictotrichon sempervirens', maxHeightCm: 60, spreadCm: 50, sun: ['sun'], water: 'low', soil: ['sandy', 'chalky', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7], bloomColor: 'szalmaszín', foliageColor: 'acélkék', winterInterest: true, seasonColors: ['#8fb0c8', '#9ab4c4', '#9ab0c0', '#90a8b8'], pot: 'P9', unitPriceHuf: 1499, priceSource: 'estimate', symbol: 'triangle', verify: EXTRA }),
+  mk({ code: 'AH', nameHu: 'Őszi szellőrózsa', nameLat: "Anemone × hybrida 'Honorine Jobert'", maxHeightCm: 90, spreadCm: 60, sun: ['sun', 'part'], water: 'medium', soil: ['loam', 'clay'], toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [8, 9, 10], bloomColor: 'fehér', foliageColor: 'zöld', winterInterest: false, seasonColors: ['#6f9a5a', '#7fa86a', '#f0f0f0', '#9a8a64'], pot: '1 l', unitPriceHuf: 1999, priceSource: 'estimate', color: '#e8ece4', verify: EXTRA }),
+  mk({ code: 'RU', nameHu: 'Sárga kúpvirág', nameLat: "Rudbeckia fulgida 'Goldsturm'", maxHeightCm: 60, spreadCm: 45, sun: ['sun', 'part'], water: 'medium', soil: ['loam', 'clay'], toxic: 'unknown', thorny: false, juglone: 'tolerant', bloomMonths: [7, 8, 9], bloomColor: 'aranysárga', foliageColor: 'sötétzöld', winterInterest: true, seasonColors: ['#6f9a5a', '#f0b020', '#d09a30', '#5a4a3a'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', verify: [...EXTRA, 'juglone'], notes: 'Télen a fekete termésfejek díszítenek.' }),
+  mk({ code: 'LE', nameHu: 'Margitvirág', nameLat: "Leucanthemum × superbum 'Becky'", maxHeightCm: 70, spreadCm: 45, sun: ['sun'], water: 'medium', soil: ['loam', 'clay', 'chalky'], toxic: 'pet', thorny: false, juglone: 'unknown', bloomMonths: [6, 7, 8], bloomColor: 'fehér', foliageColor: 'sötétzöld', winterInterest: false, seasonColors: ['#6f9a5a', '#f4f4ee', '#8a9a6a', '#9a8a64'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', color: '#ecece2', verify: EXTRA }),
+  mk({ code: 'VS', nameHu: 'Macskafarkú veronika', nameLat: "Veronica spicata 'Ulster Blue Dwarf'", maxHeightCm: 40, spreadCm: 35, sun: ['sun'], water: 'low', soil: ['sandy', 'loam', 'chalky'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7, 8], bloomColor: 'kék', foliageColor: 'zöld', winterInterest: false, seasonColors: ['#7fa86a', '#4a5ac8', '#8a9070', '#9a8a64'], pot: 'P9', unitPriceHuf: 1299, priceSource: 'estimate', verify: EXTRA }),
+  mk({ code: 'AG', nameHu: 'Ánizsizsóp', nameLat: "Agastache 'Blue Fortune'", maxHeightCm: 80, spreadCm: 45, sun: ['sun'], water: 'low', soil: ['sandy', 'loam', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [7, 8, 9], bloomColor: 'levendulakék', foliageColor: 'zöld, illatos', winterInterest: true, seasonColors: ['#7fa86a', '#7a6ad0', '#8a7a90', '#7a6a5a'], pot: 'P9', unitPriceHuf: 1499, priceSource: 'estimate', verify: EXTRA, notes: 'Méhlegelő; nedves télben kifagyhat.' }),
+  mk({ code: 'GA', nameHu: 'Gyertyavirág', nameLat: "Gaura lindheimeri 'Whirling Butterflies'", maxHeightCm: 70, spreadCm: 50, sun: ['sun'], water: 'low', soil: ['sandy', 'loam', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7, 8, 9, 10], bloomColor: 'fehér–rózsás', foliageColor: 'zöld', winterInterest: false, seasonColors: ['#7fa86a', '#f0e0e8', '#d8c0c8', '#9a8a64'], pot: 'P9', unitPriceHuf: 1499, priceSource: 'estimate', color: '#ecd8e0', verify: EXTRA, notes: 'Rövid életű lehet; jó vízelvezetést kér.' }),
+  mk({ code: 'OR', nameHu: 'Szurokfű', nameLat: "Origanum vulgare 'Compactum'", maxHeightCm: 20, spreadCm: 30, sun: ['sun'], water: 'low', soil: ['sandy', 'chalky', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7, 8], bloomColor: 'rózsaszín', foliageColor: 'zöld, illatos', winterInterest: false, seasonColors: ['#6f9a5a', '#d890b8', '#7a9a6a', '#7a8a6a'], pot: 'P9', unitPriceHuf: 1099, priceSource: 'estimate', symbol: 'square', verify: EXTRA }),
+  mk({ code: 'SN', nameHu: 'Cipruska', nameLat: 'Santolina chamaecyparissus', maxHeightCm: 40, spreadCm: 50, sun: ['sun'], water: 'low', soil: ['sandy', 'chalky', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7], bloomColor: 'sárga', foliageColor: 'ezüstszürke', winterInterest: true, seasonColors: ['#b8c0b0', '#e8d040', '#b8c0b0', '#a8b0a0'], pot: '1 l', unitPriceHuf: 1999, priceSource: 'estimate', color: '#c0c8b8', verify: EXTRA, notes: 'Levendula mellé; tavasszal formára nyírható.' }),
+  mk({ code: 'CT', nameHu: 'Molyhos madárhúr', nameLat: 'Cerastium tomentosum', maxHeightCm: 15, spreadCm: 40, sun: ['sun'], water: 'low', soil: ['sandy', 'poor', 'chalky'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [5, 6], bloomColor: 'fehér', foliageColor: 'ezüst', winterInterest: true, seasonColors: ['#c0ccc0', '#f0f2ee', '#c0ccc0', '#b0bcb0'], pot: 'P9', unitPriceHuf: 999, priceSource: 'estimate', symbol: 'square', verify: EXTRA }),
+  mk({ code: 'PS', nameHu: 'Árlevelű lángvirág', nameLat: "Phlox subulata 'Emerald Blue'", maxHeightCm: 12, spreadCm: 40, sun: ['sun'], water: 'low', soil: ['sandy', 'loam', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'halványkék', foliageColor: 'zöld', winterInterest: true, seasonColors: ['#a8b8f0', '#5f8a5a', '#5f8a5a', '#5a805a'], pot: 'P9', unitPriceHuf: 1199, priceSource: 'estimate', symbol: 'square', color: '#a8b8f0', verify: EXTRA }),
+  mk({ code: 'AU', nameHu: 'Pázsitviola', nameLat: 'Aubrieta × cultorum', maxHeightCm: 10, spreadCm: 40, sun: ['sun'], water: 'low', soil: ['chalky', 'sandy', 'poor'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [4, 5], bloomColor: 'lila', foliageColor: 'szürkészöld', winterInterest: true, seasonColors: ['#9060c0', '#7a9a7a', '#7a9a7a', '#7a907a'], pot: 'P9', unitPriceHuf: 1099, priceSource: 'estimate', symbol: 'square', color: '#9060c0', verify: EXTRA }),
+  mk({ code: 'BX', nameHu: 'Puszpáng', nameLat: 'Buxus sempervirens', maxHeightCm: 60, spreadCm: 50, spacingCm: 35, sun: ['sun', 'part', 'shade'], water: 'medium', soil: ['loam', 'chalky', 'clay'], toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [], bloomColor: '–', foliageColor: 'sötétzöld', winterInterest: true, seasonColors: ['#3f6a3a', '#3f6a3a', '#3f6a3a', '#3a603a'], pot: '2 l, 20–25 cm', unitPriceHuf: 2499, priceSource: 'estimate', symbol: 'square', verify: EXTRA, notes: 'Nyírt szegélynek; puszpángmoly ellen figyelni kell.' }),
+  mk({ code: 'IC', nameHu: 'Japán magyal', nameLat: "Ilex crenata 'Dark Green'", maxHeightCm: 80, spreadCm: 60, spacingCm: 40, sun: ['sun', 'part'], water: 'medium', soil: ['acidic', 'loam'], toxic: 'unknown', thorny: false, juglone: 'unknown', bloomMonths: [], bloomColor: '–', foliageColor: 'sötétzöld', winterInterest: true, seasonColors: ['#2f5a34', '#2f5a34', '#2f5a34', '#2f5530'], pot: '2–3 l', unitPriceHuf: 3999, priceSource: 'estimate', symbol: 'square', verify: EXTRA, notes: 'A puszpáng molymentes helyettesítője; savanyú talajt kér.' }),
+  mk({ code: 'HA', nameHu: 'Cserjés hortenzia', nameLat: "Hydrangea arborescens 'Annabelle'", maxHeightCm: 120, spreadCm: 120, sun: ['part', 'sun'], water: 'high', soil: ['loam', 'clay'], toxic: 'both', thorny: false, juglone: 'unknown', bloomMonths: [6, 7, 8, 9], bloomColor: 'krémfehér', foliageColor: 'zöld', winterInterest: true, seasonColors: ['#6f9a5a', '#f2f0e0', '#c8c0a0', '#a89070'], pot: '3 l', unitPriceHuf: 4999, priceSource: 'estimate', color: '#ece8d4', verify: EXTRA, notes: 'Cserje; télen a száraz virágzat díszít, tavasszal visszavágható.' }),
+  mk({ code: 'SJ', nameHu: 'Japán gyöngyvessző', nameLat: "Spiraea japonica 'Little Princess'", maxHeightCm: 60, spreadCm: 80, sun: ['sun', 'part'], water: 'medium', soil: ['loam', 'sandy', 'clay'], toxic: 'no', thorny: false, juglone: 'unknown', bloomMonths: [6, 7], bloomColor: 'rózsaszín', foliageColor: 'világoszöld, ősszel narancs', winterInterest: false, seasonColors: ['#a8c870', '#e090b0', '#d08040', '#8a6a50'], pot: '2 l', unitPriceHuf: 2999, priceSource: 'estimate', verify: EXTRA }),
+  mk({ code: 'CC', nameHu: 'Bordó cserszömörce', nameLat: "Cotinus coggygria 'Royal Purple'", maxHeightCm: 300, spreadCm: 250, sun: ['sun'], water: 'low', soil: ['chalky', 'poor', 'loam'], toxic: 'unknown', thorny: false, juglone: 'unknown', bloomMonths: [6, 7], bloomColor: 'rózsás füstfelhő', foliageColor: 'bordó, ősszel vörös', winterInterest: false, seasonColors: ['#6a2a3a', '#7a3a4a', '#c0402a', '#6a5a4a'], pot: 'C5', unitPriceHuf: 6999, priceSource: 'estimate', isTree: true, symbol: 'diamond', verify: EXTRA, notes: 'Nagycserje / kis fa; metszéssel kisebb tartható.' }),
+  mk({ code: 'AP', nameHu: 'Díszhagyma', nameLat: "Allium 'Purple Sensation'", maxHeightCm: 70, spreadCm: 15, sun: ['sun'], water: 'low', soil: ['sandy', 'loam', 'chalky'], toxic: 'pet', thorny: false, juglone: 'unknown', bloomMonths: [5, 6], bloomColor: 'bíborlila gömb', foliageColor: 'szürkészöld (nyárra elsárgul)', winterInterest: false, seasonColors: ['#8a50b0', '#c8b080', '#9a8a64', '#9a8a64'], pot: 'hagyma', unitPriceHuf: 250, priceSource: 'estimate', color: '#8a50b0', verify: EXTRA, notes: 'Hagyma: ősszel ültetendő, évelők közé szórva.' }),
+  mk({ code: 'NA', nameHu: 'Nárcisz', nameLat: "Narcissus 'Tête-à-Tête'", maxHeightCm: 20, spreadCm: 10, sun: ['sun', 'part'], water: 'medium', soil: ['loam', 'sandy', 'clay'], toxic: 'both', thorny: false, juglone: 'tolerant', bloomMonths: [3, 4], bloomColor: 'sárga', foliageColor: 'zöld (nyárra visszahúzódik)', winterInterest: false, seasonColors: ['#f0d030', '#9a8a64', '#9a8a64', '#9a8a64'], pot: 'hagyma', unitPriceHuf: 120, priceSource: 'estimate', color: '#f0d030', verify: [...EXTRA, 'juglone'], notes: 'Hagyma: ősszel ültetendő; minden része mérgező.' }),
 ];

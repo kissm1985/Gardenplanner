@@ -1,7 +1,7 @@
 // Rule engine (SPEC §4.5). Pure function of the area, its active items, the plant list and the
 // settings; runs after every change. Warnings carry a stable id so the user can mute them.
 import { centroid, dist, pointInPolygon } from '../model/geometry';
-import { JUGLONE_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
+import { JUGLONE_LABEL, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings, SunNeed, WaterNeed } from '../model/types';
 import { itemPositions } from './fill';
 
@@ -17,6 +17,7 @@ export type RuleId =
   | 'trees'
   | 'water-mix'
   | 'sun'
+  | 'soil'
   | 'fixture'
   | 'window';
 
@@ -42,6 +43,7 @@ export const RULE_LABEL: Record<RuleId, string> = {
   trees: 'Fák száma',
   'water-mix': 'Vízigény',
   sun: 'Napigény',
+  soil: 'Talaj',
   fixture: 'Rögzített elem',
   window: 'Ablak',
 };
@@ -169,6 +171,14 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
         'warn',
         `${name} napigénye: ${p.sun.map((s) => SUN_LABEL[s]).join('/')}, a terület ${SUN_LABEL[sunLevel]}${area.sunUntil ? ` (napos ${area.sunUntil})` : ''}.`,
         sunLevel === 'sun' ? 'Tűző napon öntözd az első évben.' : 'Az első évben figyeld, elég napot kap-e.',
+      );
+
+    if (area.soil && p.soil?.length && !p.soil.includes(area.soil))
+      add(
+        'soil',
+        'info',
+        `${name}: ${SOIL_LABEL[area.soil]} talajba kevésbé való (kedveli: ${p.soil.map((x) => SOIL_LABEL[x]).join(', ')}).`,
+        area.soil === 'clay' ? 'Agyagos talajba homokot, apró kavicsot keverj az ültetőgödörbe, vagy válassz más fajt.' : 'Javítsd a talajt az ültetőgödörben, vagy válassz más fajt.',
       );
 
     // Juglone: any position within the walnut radius.

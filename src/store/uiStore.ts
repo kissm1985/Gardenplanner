@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { NO_FILTER, type PlantFilter } from '../model/plantFilter';
 
 export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'season' | 'list';
 
@@ -33,6 +34,9 @@ export interface UiState {
   page: 'schedule' | null;
   /** Background scale calibration: points tapped so far (cm), or null when off. */
   calibrate: [number, number][] | null;
+  /** Plant filters shared by the database list and the palette. */
+  plantFilter: PlantFilter;
+  setPlantFilter: (f: PlantFilter) => void;
   setCalibrate: (v: [number, number][] | null) => void;
   setPage: (p: 'schedule' | null) => void;
   setCompare: (v: boolean) => void;
@@ -64,6 +68,8 @@ export const useUi = create<UiState>()((set) => ({
   compare: false,
   page: null,
   calibrate: null,
+  plantFilter: NO_FILTER,
+  setPlantFilter: (plantFilter) => set({ plantFilter }),
   setCalibrate: (calibrate) => set({ calibrate }),
   setPage: (page) => set({ page, compare: false }),
   setCompare: (compare) => set({ compare }),

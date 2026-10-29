@@ -2022,3 +2022,41 @@ a.btn-primary {
   color: var(--warn);
   font-family: var(--mono);
 }
+.palette-searchrow {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.palette-searchrow .palette-search {
+  flex: 1;
+  min-width: 0;
+}
+.palette-searchrow .btn {
+  white-space: nowrap;
+}
+.range {
+  border: 0;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 4px;
+  align-items: center;
+}
+.range legend {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--mute);
+  margin-bottom: 4px;
+  padding: 0;
+}
+.range input {
+  min-height: var(--tap);
+  width: 100%;
+  padding: 6px 8px;
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 16px;
+}

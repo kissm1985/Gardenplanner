@@ -74,10 +74,25 @@ const seedPlants = () => SEED_PLANTS.map((p) => ({ ...p }));
 export function migrate(p: Project): Project {
   let out = p;
   if (!out.plantDb?.length) out = { ...out, plantDb: seedPlants() };
-  if (!out.settings) out = { ...out, settings: { ...DEFAULT_SETTINGS } };
-  else out = { ...out, settings: { ...DEFAULT_SETTINGS, ...out.settings } };
+  const seedVersion = out.settings?.seedVersion ?? 1;
+  if (seedVersion < SEED_VERSION) {
+    // Merge the expanded built-in list once: add new species, fill soil on built-in ones.
+    // Plants the user edited keep their values; a deleted built-in species stays deleted later.
+    const have = new Map(out.plantDb.map((x) => [x.code, x]));
+    const seeds = seedPlants();
+    const byCode = new Map(seeds.map((x) => [x.code, x]));
+    const updated = out.plantDb.map((x) => {
+      const seed = byCode.get(x.code);
+      return seed && !x.soil?.length && seed.nameLat === x.nameLat ? { ...x, soil: seed.soil } : x;
+    });
+    out = { ...out, plantDb: [...updated, ...seeds.filter((x) => !have.has(x.code))] };
+  }
+  out = { ...out, settings: { ...DEFAULT_SETTINGS, ...out.settings, seedVersion: Math.max(seedVersion, SEED_VERSION) } };
   return out;
 }
+
+/** Bump when the built-in plant list grows. */
+export const SEED_VERSION = 2;
 
 export const activeVariant = (a: Area): Variant =>
   a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0];

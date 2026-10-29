@@ -124,6 +124,8 @@ export interface Area {
   sunUntil: string;
   /** Overrides the sun level derived from orientation + sunUntil. */
   sunLevel?: SunNeed;
+  /** Soil of the area (optional; used by the soil rule and the idea generator). */
+  soil?: Soil;
   notes: string;
   shape: AreaShape;
   constraints: Constraints;
@@ -140,6 +142,8 @@ export interface Settings {
   reservePct: number;
   walnutRadiusCm: number;
   showMatureSize: boolean;
+  /** Version of the built-in plant list last merged into this project. */
+  seedVersion?: number;
 }
 
 /** Planting window and ticked checklist tasks; the task list itself is derived. */
@@ -170,7 +174,7 @@ export const ORIENTATION_LABEL: Record<Orientation, string> = {
   NW: 'északnyugat',
 };
 
-export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true };
+export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 2 };
 
 export const DEFAULT_CONSTRAINTS: Constraints = {
   maxHeightCm: null,

@@ -1,6 +1,6 @@
 import { useState, type FormEvent, type ReactNode } from 'react';
-import { JUGLONE_LABEL, MONTHS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL } from '../model/plants';
-import type { JugloneTolerance, Plant, SunNeed, Toxicity, WaterNeed } from '../model/types';
+import { JUGLONE_LABEL, MONTHS, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL } from '../model/plants';
+import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
 
 interface Props {
   initial: Plant;
@@ -37,6 +37,7 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
     if (!errs.length) onSave({ ...p, nameHu: p.nameHu.trim(), nameLat: p.nameLat.trim() });
   };
 
+  const toggleSoil = (x: Soil) => set('soil', p.soil?.includes(x) ? p.soil.filter((y) => y !== x) : [...(p.soil ?? []), x]);
   const toggleSun = (s: SunNeed) => set('sun', p.sun.includes(s) ? p.sun.filter((x) => x !== s) : [...p.sun, s]);
   const toggleMonth = (m: number) =>
     set('bloomMonths', p.bloomMonths.includes(m) ? p.bloomMonths.filter((x) => x !== m) : [...p.bloomMonths, m].sort((a, b) => a - b));
@@ -72,6 +73,20 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
             <label key={s} className="seg-item">
               <input type="checkbox" checked={p.sun.includes(s)} onChange={() => toggleSun(s)} />
               <span>{SUN_LABEL[s]}</span>
+            </label>
+          ))}
+        </div>
+      </fieldset>
+
+      <fieldset className="field-group">
+        <legend>
+          <L k="soil">Talaj (amiben jól fejlődik)</L>
+        </legend>
+        <div className="seg">
+          {SOILS.map((x) => (
+            <label key={x} className="seg-item">
+              <input type="checkbox" checked={!!p.soil?.includes(x)} onChange={() => toggleSoil(x)} />
+              <span>{SOIL_LABEL[x]}</span>
             </label>
           ))}
         </div>

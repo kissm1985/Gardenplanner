@@ -1,6 +1,7 @@
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from './types';
 
 export const SUN_LABEL: Record<SunNeed, string> = { sun: 'nap', part: 'félárnyék', shade: 'árnyék' };
+export const SOILS: Soil[] = ['sandy', 'loam', 'clay', 'chalky', 'acidic', 'poor'];
 export const SOIL_LABEL: Record<Soil, string> = {
   sandy: 'homokos',
   loam: 'vályog',
@@ -99,6 +100,7 @@ const CSV_COLS: { key: keyof Plant; head: string }[] = [
   { key: 'spacingCm', head: 'totav_cm' },
   { key: 'sun', head: 'napigeny' },
   { key: 'water', head: 'vizigeny' },
+  { key: 'soil', head: 'talaj' },
   { key: 'toxic', head: 'mergezo' },
   { key: 'thorny', head: 'tuskes' },
   { key: 'juglone', head: 'juglone' },
@@ -197,6 +199,7 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       spacingCm: num('totav_cm', num('szelesseg_cm', base.spacingCm)),
       sun: list('napigeny').filter((s): s is SunNeed => ['sun', 'part', 'shade'].includes(s)),
       water: enumOf(get('vizigeny'), ['low', 'medium', 'high'] as const, 'medium'),
+      soil: list('talaj').filter((x): x is Soil => (SOILS as string[]).includes(x)),
       toxic: enumOf(get('mergezo'), ['no', 'human', 'pet', 'both', 'unknown'] as const, 'unknown'),
       thorny: bool('tuskes'),
       juglone: enumOf(get('juglone'), ['tolerant', 'sensitive', 'unknown'] as const, 'unknown'),

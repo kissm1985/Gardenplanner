@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { AREA_TEMPLATES } from '../data/templates';
+import { SOIL_LABEL } from '../model/plants';
 import { ORIENTATION_LABEL, type Area } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { AreaForm } from './AreaForm';
@@ -95,6 +96,7 @@ function AreaCard({ a, current, onOpen, onEdit, onDelete }: {
   const tags = [
     c.maxHeightCm != null && `max. ${c.maxHeightCm} cm`,
     c.maxTrees != null && `max. ${c.maxTrees} fa`,
+    a.soil && `talaj: ${SOIL_LABEL[a.soil]}`,
     c.noThorns && 'tüskementes',
     c.nonToxic && 'nem mérgező',
     c.drip && 'csepegtető',

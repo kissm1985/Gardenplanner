@@ -1,41 +1,19 @@
 import { useMemo, useRef, useState } from 'react';
-import { blankPlant, JUGLONE_LABEL, plantsFromCsv, plantsFromJson, plantsToCsv, SUN_LABEL, suggestCode } from '../model/plants';
-import type { JugloneTolerance, Plant, SunNeed } from '../model/types';
+import { activeFilterCount, filterPlants } from '../model/plantFilter';
+import { blankPlant, JUGLONE_LABEL, plantsFromCsv, plantsFromJson, plantsToCsv, SOIL_LABEL, SUN_LABEL, suggestCode, TOXIC_LABEL } from '../model/plants';
+import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
+import { useUi } from '../store/uiStore';
 import { downloadText } from './download';
 import { PlantChip } from './PlantChip';
 import { PlantForm } from './PlantForm';
-import { matchesQuery } from './PlantPalette';
-
-interface Filters {
-  q: string;
-  maxH: string;
-  sun: '' | SunNeed;
-  thorny: '' | 'yes' | 'no';
-  juglone: '' | JugloneTolerance;
-  color: string;
-}
-const NO_FILTER: Filters = { q: '', maxH: '', sun: '', thorny: '', juglone: '', color: '' };
-
-export function filterPlants(db: Plant[], f: Filters): Plant[] {
-  const maxH = parseFloat(f.maxH);
-  const color = f.color.trim().toLowerCase();
-  return db.filter(
-    (p) =>
-      matchesQuery(p, f.q) &&
-      (!Number.isFinite(maxH) || p.maxHeightCm <= maxH) &&
-      (!f.sun || p.sun.includes(f.sun)) &&
-      (!f.thorny || p.thorny === (f.thorny === 'yes')) &&
-      (!f.juglone || p.juglone === f.juglone) &&
-      (!color || p.bloomColor.toLowerCase().includes(color) || p.foliageColor.toLowerCase().includes(color)),
-  );
-}
+import { PlantFilterForm } from './PlantFilterForm';
 
 /** Plant database: search, filters, add / edit / delete, JSON & CSV import/export. */
 export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
   const project = useProject((s) => s.project)!;
   const db = project.plantDb;
-  const [f, setF] = useState<Filters>(NO_FILTER);
+  const f = useUi((s) => s.plantFilter);
   const [editing, setEditing] = useState<{ plant: Plant; isNew: boolean } | null>(null);
   const [msg, setMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
@@ -76,58 +54,15 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
     );
   };
 
-  const set = <K extends keyof Filters>(k: K, v: Filters[K]) => setF((x) => ({ ...x, [k]: v }));
-  const filtered = JSON.stringify(f) !== JSON.stringify(NO_FILTER);
+  const nFilters = activeFilterCount(f);
   const unchecked = db.filter((p) => p.verify?.length).length;
 
   return (
     <div className="plantdb">
-      <input className="palette-search" type="search" value={f.q} onChange={(e) => set('q', e.target.value)} placeholder="Keresés: név, latin név, kód" aria-label="Keresés az adatbázisban" />
-      <details className="filters">
-        <summary>Szűrők{filtered ? ' (aktív)' : ''}</summary>
-        <div className="filter-grid">
-          <label className="field">
-            <span>Max. magasság (cm)</span>
-            <input type="number" inputMode="numeric" value={f.maxH} onChange={(e) => set('maxH', e.target.value)} />
-          </label>
-          <label className="field">
-            <span>Nap</span>
-            <select value={f.sun} onChange={(e) => set('sun', e.target.value as Filters['sun'])}>
-              <option value="">mind</option>
-              {(Object.keys(SUN_LABEL) as SunNeed[]).map((s) => (
-                <option key={s} value={s}>
-                  {SUN_LABEL[s]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Tüske</span>
-            <select value={f.thorny} onChange={(e) => set('thorny', e.target.value as Filters['thorny'])}>
-              <option value="">mind</option>
-              <option value="no">tüskementes</option>
-              <option value="yes">tüskés</option>
-            </select>
-          </label>
-          <label className="field">
-            <span>Juglone</span>
-            <select value={f.juglone} onChange={(e) => set('juglone', e.target.value as Filters['juglone'])}>
-              <option value="">mind</option>
-              {(Object.keys(JUGLONE_LABEL) as JugloneTolerance[]).map((j) => (
-                <option key={j} value={j}>
-                  {JUGLONE_LABEL[j]}
-                </option>
-              ))}
-            </select>
-          </label>
-          <label className="field">
-            <span>Szín</span>
-            <input value={f.color} onChange={(e) => set('color', e.target.value)} placeholder="pl. lila, ezüst" />
-          </label>
-          <button type="button" className="btn btn-small" onClick={() => setF(NO_FILTER)} disabled={!filtered}>
-            Szűrők törlése
-          </button>
-        </div>
+      <input className="palette-search" type="search" value={f.q} onChange={(e) => useUi.getState().setPlantFilter({ ...f, q: e.target.value })} placeholder="Keresés: név, latin név, kód" aria-label="Keresés az adatbázisban" />
+      <details className="filters" open={nFilters > 0 || undefined}>
+        <summary>Szűrők{nFilters ? ` (${nFilters} aktív)` : ''}</summary>
+        <PlantFilterForm />
       </details>
 
       <p className="mono muted">
@@ -143,7 +78,9 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
                 <b>{p.nameHu}</b>
                 <i>{p.nameLat}</i>
                 <span className="mono muted">
-                  max. {p.maxHeightCm} cm · tőtáv {p.spacingCm} cm · {p.sun.map((s) => SUN_LABEL[s]).join('/')} · juglone: {JUGLONE_LABEL[p.juglone]}
+                  {p.maxHeightCm} cm magas · {p.spreadCm} cm széles · {p.sun.map((s) => SUN_LABEL[s]).join('/')}
+                  {p.soil?.length ? ` · ${p.soil.map((x) => SOIL_LABEL[x]).join('/')}` : ''} · mérgező: {TOXIC_LABEL[p.toxic]} · juglone:{' '}
+                  {JUGLONE_LABEL[p.juglone]}
                   {p.thorny ? ' · tüskés' : ''}
                   {usage.get(p.code) ? ` · ${usage.get(p.code)} tő` : ''}
                 </span>

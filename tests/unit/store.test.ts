@@ -160,3 +160,25 @@ describe('drifts and rows', () => {
     expect(items()[0]).toMatchObject({ path: [[60, 0], [60, 1200]] });
   });
 });
+
+describe('plant list migration', () => {
+  it('merges the expanded built-in list once into an older project, keeping user edits', () => {
+    st().createProject(['house-strip']);
+    const p = st().project!;
+    const old = {
+      ...p,
+      settings: { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true },
+      plantDb: p.plantDb.slice(0, 30).map((x) => ({ ...x, soil: undefined, nameHu: x.code === 'LA' ? 'Saját levendula' : x.nameHu })),
+    };
+    st().setLoaded(old);
+    const db = st().project!.plantDb;
+    expect(db.length).toBe(p.plantDb.length);
+    expect(db.find((x) => x.code === 'LA')!.nameHu).toBe('Saját levendula');
+    expect(db.find((x) => x.code === 'LA')!.soil).toContain('sandy');
+    expect(st().project!.settings.seedVersion).toBe(2);
+    // A built-in species deleted afterwards does not come back on the next load.
+    st().deletePlant('VI');
+    st().setLoaded(st().project!);
+    expect(st().project!.plantDb.some((x) => x.code === 'VI')).toBe(false);
+  });
+});

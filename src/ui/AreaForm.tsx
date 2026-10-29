@@ -1,10 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import type { AreaInput } from '../data/templates';
 import { areaSunLevel } from '../engine/rules';
-import { SUN_LABEL } from '../model/plants';
-import { DEFAULT_CONSTRAINTS, ORIENTATION_LABEL, type Area, type Orientation, type SunNeed } from '../model/types';
+import { SOIL_LABEL, SOILS, SUN_LABEL } from '../model/plants';
+import { DEFAULT_CONSTRAINTS, ORIENTATION_LABEL, type Area, type Orientation, type Soil, type SunNeed } from '../model/types';
 
-type Draft = AreaInput & { constraints: Area['constraints']; sunLevel?: SunNeed };
+type Draft = AreaInput & { constraints: Area['constraints']; sunLevel?: SunNeed; soil?: Soil };
 
 const blank: Draft = {
   name: '',
@@ -31,6 +31,7 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: {
           orientation: initial.orientation,
           sunUntil: initial.sunUntil,
           sunLevel: initial.sunLevel,
+          soil: initial.soil,
           notes: initial.notes,
           constraints: { ...initial.constraints },
         }
@@ -97,6 +98,18 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: {
           {(Object.keys(SUN_LABEL) as SunNeed[]).map((k) => (
             <option key={k} value={k}>
               {SUN_LABEL[k]}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="field">
+        <span>Talaj</span>
+        <select value={d.soil ?? ''} onChange={(e) => set('soil', (e.target.value || undefined) as Soil | undefined)}>
+          <option value="">nincs megadva</option>
+          {SOILS.map((k) => (
+            <option key={k} value={k}>
+              {SOIL_LABEL[k]}
             </option>
           ))}
         </select>
