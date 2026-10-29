@@ -5,7 +5,9 @@ import { pointInPolygon } from '../../src/model/geometry';
 
 describe('seed plant list', () => {
   it('has about 60 species with unique 2-letter codes, soil data and valid values', () => {
-    expect(SEED_PLANTS.length).toBeGreaterThanOrEqual(85);
+    expect(SEED_PLANTS.length).toBeGreaterThanOrEqual(140);
+    expect(SEED_PLANTS.filter((p) => p.isTree).length).toBeGreaterThanOrEqual(40);
+    expect(SEED_PLANTS.find((p) => p.code === 'LC')!.nameHu).toBe('Leylandi ciprus');
     expect(new Set(SEED_PLANTS.map((p) => p.code)).size).toBe(SEED_PLANTS.length);
     expect(SEED_PLANTS.filter((p) => p.maxHeightCm >= 200).length).toBeGreaterThanOrEqual(20);
     expect(SEED_PLANTS.every((p) => p.soil && p.soil.length > 0)).toBe(true);

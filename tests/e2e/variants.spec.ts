@@ -109,7 +109,7 @@ test('idea generator: plant types to use; impossible ones are disabled', async (
   const dlg = page.locator('dialog[open]');
   // House strip: max 50 cm → no hedges, shrubs or trees.
   await expect(dlg.getByLabel(/Sövény/)).toBeDisabled();
-  await expect(dlg.getByLabel(/Kis fák/)).toBeDisabled();
+  await expect(dlg.getByLabel(/Fák/)).toBeDisabled();
   await expect(dlg.getByLabel(/Évelők/)).toBeChecked();
   for (const l of [/Évelők/, /Díszfüvek/, /Talajtakarók/]) await dlg.getByLabel(l).uncheck();
   await expect(dlg.getByRole('button', { name: 'Ötlet generálása' })).toBeDisabled();

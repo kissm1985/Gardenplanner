@@ -103,7 +103,7 @@ describe('idea generator: plant types', () => {
     const idea = generateIdea(back, db, proj.settings, { seed: 5, kinds: ['hedge', 'tree', 'perennial'] });
     const rows = idea.items.filter((it) => it.kind === 'row');
     expect(rows.length).toBeGreaterThan(0);
-    for (const r of rows) if (r.kind === 'row') expect(r.path[0][0]).toBeLessThan(120);
+    for (const r of rows) if (r.kind === 'row') expect(r.path[0][0]).toBeLessThan(200); // centre of the hedge: half its spread from the fence
     expect(idea.items.filter((it) => kinds(it).has('tree')).length).toBeLessThanOrEqual(2);
   });
 

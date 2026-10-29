@@ -59,7 +59,7 @@ export const KIND_LABEL: Record<PlantKind, string> = {
   groundcover: 'Talajtakarók, elterülők',
   shrub: 'Cserjék (magasabbak)',
   hedge: 'Sövény (hátsó sor)',
-  tree: 'Kis fák',
+  tree: 'Fák',
 };
 export const DEFAULT_KINDS: PlantKind[] = ['perennial', 'grass', 'groundcover'];
 const DRIFT_KINDS: PlantKind[] = ['perennial', 'grass', 'groundcover'];
@@ -69,7 +69,7 @@ export function plantKinds(p: Plant): Set<PlantKind> {
   const k = new Set<PlantKind>();
   if (p.isTree) return k.add('tree');
   const h = p.maxHeightCm;
-  if (h >= 150 && (/sövény/i.test(p.notes) || p.spacingCm <= 0.6 * p.spreadCm)) k.add('hedge');
+  if ((h >= 150 && (/sövény/i.test(p.notes) || p.spacingCm <= 0.6 * p.spreadCm)) || (h >= 80 && /sövény/i.test(p.notes))) k.add('hedge');
   if (h >= 100 && p.symbol !== 'triangle') k.add('shrub');
   if (p.symbol === 'square' || (p.spreadCm >= 1.5 * h && h <= 120)) k.add('groundcover');
   if (p.symbol === 'triangle') k.add('grass');
@@ -96,6 +96,14 @@ function driftOk(p: Plant): boolean {
   return !p.isTree && p.symbol !== 'diamond' && p.spacingCm >= 15 && (p.spreadCm <= 120 || (k.has('groundcover') && p.spacingCm <= 120));
 }
 
+/** Whether a tree's mature crown fits the area (the layout keeps a slice of ~0.9 × spread for it). */
+function treeFits(area: Area, p: Plant): boolean {
+  const b = bbox(areaPoints(area));
+  const long = Math.max(b.maxX - b.minX, b.maxY - b.minY);
+  const short = Math.min(b.maxX - b.minX, b.maxY - b.minY);
+  return p.spacingCm * 0.9 * 1.5 <= long && p.spreadCm * 0.6 <= short;
+}
+
 /** Eligible species per requested type. */
 export function poolsFor(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFAULT_KINDS) {
   const ok = plantDb.filter((p) => siteOk(area, p));
@@ -105,7 +113,8 @@ export function poolsFor(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFA
     drift: ok.filter((p) => driftOk(p) && DRIFT_KINDS.some((k) => has(p, k))),
     hedge: ok.filter((p) => has(p, 'hedge')),
     shrub: ok.filter((p) => has(p, 'shrub') && !p.isTree && p.spacingCm >= 60),
-    tree: area.constraints.maxTrees === 0 ? [] : ok.filter((p) => has(p, 'tree')),
+    // A tree needs room for its crown: along the area and across it.
+    tree: area.constraints.maxTrees === 0 ? [] : ok.filter((p) => has(p, 'tree') && treeFits(area, p)),
   };
 }
 

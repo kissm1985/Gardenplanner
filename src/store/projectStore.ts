@@ -115,7 +115,7 @@ export function migrate(p: Project): Project {
 }
 
 /** Bump when the built-in plant list grows. */
-export const SEED_VERSION = 3;
+export const SEED_VERSION = 4;
 
 /** Copy with a new parent; a missing parent removes the field (top level). */
 function withParent<T extends { parentId?: string }>(x: T, parentId: string | undefined): T {

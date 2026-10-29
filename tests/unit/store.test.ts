@@ -3,7 +3,7 @@ import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { curvedLawn } from '../../src/data/templates';
 import { loadProject, saveProject } from '../../src/store/persist';
-import { HISTORY_LIMIT, selectCurrentArea, selectItems, useProject } from '../../src/store/projectStore';
+import { HISTORY_LIMIT, SEED_VERSION, selectCurrentArea, selectItems, useProject } from '../../src/store/projectStore';
 
 const st = () => useProject.getState();
 
@@ -176,7 +176,7 @@ describe('plant list migration', () => {
     expect(db.length).toBe(p.plantDb.length);
     expect(db.find((x) => x.code === 'LA')!.nameHu).toBe('Saját levendula');
     expect(db.find((x) => x.code === 'LA')!.soil).toContain('sandy');
-    expect(st().project!.settings.seedVersion).toBe(3);
+    expect(st().project!.settings.seedVersion).toBe(SEED_VERSION);
     // A built-in species deleted afterwards does not come back on the next load.
     st().deletePlant('VI');
     st().setLoaded(st().project!);

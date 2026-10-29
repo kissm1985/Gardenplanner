@@ -138,7 +138,11 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
     const h = opt.mature ? p.maxHeightCm : Math.max(10, Math.round(p.maxHeightCm * 0.4));
     const w = opt.mature ? p.spreadCm : Math.max(8, Math.round(p.spreadCm * 0.35));
     const f = p.isTree
-      ? FORM.diamond[opt.lang]
+      ? p.maxHeightCm > 800
+        ? opt.lang === 'hu'
+          ? 'nagy fa (itt fiatal, telepített állapotú is lehet)'
+          : 'large tree (may be shown as a young planted tree)'
+        : FORM.diamond[opt.lang]
       : p.maxHeightCm >= 120 && p.symbol !== 'triangle'
         ? (opt.lang === 'hu' ? (p.winterInterest ? 'cserje (télen is lombos / örökzöld)' : 'lombhullató cserje') : p.winterInterest ? 'shrub (evergreen / keeps winter structure)' : 'deciduous shrub')
         : FORM[p.symbol ?? 'circle'][opt.lang];
