@@ -8,6 +8,7 @@ import { AreasPanel } from './ui/AreasPanel';
 import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantPalette } from './ui/PlantPalette';
+import { ListView } from './ui/ListView';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
 import { WarningsPanel } from './ui/WarningsPanel';
@@ -20,7 +21,7 @@ const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
   { id: 'drift', label: 'Folt', icon: '⬭', ready: true },
   { id: 'row', label: 'Sor', icon: '⋯', ready: true },
   { id: 'season', label: 'Évszak', icon: '◐', ready: false },
-  { id: 'list', label: 'Lista', icon: '☰', ready: false },
+  { id: 'list', label: 'Lista', icon: '☰', ready: true },
 ];
 
 const LAYER_LABELS: Record<keyof Layers, string> = {
@@ -110,8 +111,10 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </header>
 
-      <main className="stage">
-        {area ? (
+      <main className={`stage${tool === 'list' ? ' stage-scroll' : ''}`}>
+        {tool === 'list' ? (
+          <ListView />
+        ) : area ? (
           <>
             <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
             {tool === 'select' && (

@@ -39,6 +39,8 @@ export interface ProjectState {
   duplicateItems: (ids: string[], dx: number, dy: number) => string[];
 
   setMuted: (warningId: string, muted: boolean) => void;
+  /** Set the status of every item of a species in the chosen variants of the given areas. */
+  setSpeciesStatus: (code: string, status: ItemStatus, areaIds: string[], onlyFrom?: ItemStatus | null) => void;
 
   addFixture: (f: Omit<Fixture, 'id'>) => string | null;
   updateFixture: (id: string, patch: Partial<Omit<Fixture, 'id'>>) => void;
@@ -281,6 +283,28 @@ export const useProject = create<ProjectState>()((set, get) => {
         return { ...a, variants: a.variants.map((x) => (x.id === v.id ? { ...x, muted: next } : x)) };
       });
     },
+
+    setSpeciesStatus: (code, status, areaIds, onlyFrom) =>
+      commit((p) => ({
+        ...p,
+        areas: p.areas.map((a) =>
+          !areaIds.includes(a.id)
+            ? a
+            : {
+                ...a,
+                variants: a.variants.map((v) =>
+                  v.id !== a.chosenVariantId
+                    ? v
+                    : {
+                        ...v,
+                        items: v.items.map((it) =>
+                          it.plantId === code && (!onlyFrom || it.status === onlyFrom) && it.status !== status ? { ...it, status } : it,
+                        ),
+                      },
+                ),
+              },
+        ),
+      })),
 
     addFixture: (f) => {
       const areaId = get().currentAreaId;
