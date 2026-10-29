@@ -196,12 +196,17 @@ A kijelölés alatt megjelenő sáv gombjai:
 Ha egy faj nem tetszik (pl. a sövénynek választott növény), egy lépésben lecserélheted egy másikra. Elérhető a kijelölés sáv **Csere** gombjával, az *Adatok* lapról, vagy a változatoknál a **⇄ Növény cseréje** gombbal.
 
 1. **Ezt cserélem**: a lecserélendő faj (a kijelöltből indítva előre ki van választva).
-2. **Erre cserélem**:
+2. **Erre cserélem (egy vagy több növény)**:
+   - koppints egy vagy több fajra; újabb koppintás kiveszi;
    - elöl a **hasonló típusú** fajok állnak (sövény helyett sövény, cserje helyett cserje), azon belül a hasonló magasságúak;
    - ha egy faj nem illik a területhez, a ⚠ jel mutatja, miért.
-3. **Hol cseréljem**: csak a szerkesztett változatban, a terület összes változatában, vagy az egész projektben.
-4. **Tőtáv**: alapból a foltok és sorok az új növény tőtávját kapják, és a darabszám újraszámolódik.
-5. Az előnézet megmutatja, mi lesz belőle; a **Csere** gomb elvégzi. Visszavonással visszaállítható.
+3. **Több növény esetén** a program véletlenszerűen keveri őket:
+   - **arány**: minden kiválasztott fajnál megadható (pl. 2 : 1). A darabszámok pontosan ezt követik, csak a sorrend véletlen;
+   - **tövenként**: a foltok és sorok egyedi tövekre bomlanak, és minden tő helyére véletlenszerűen kerül valamelyik faj. Például 100 babérmeggy helyére 50 korallberkenye és 50 aranyvessző kerül, összekeverve. A tövek a régi helyükön maradnak; ha az új növények nagyobbak, a figyelmeztetések jelzik a túl sűrű helyeket;
+   - **elemenként**: egy-egy folt vagy sor egészében egy fajt kap.
+4. **Hol cseréljem**: csak a szerkesztett változatban, a terület összes változatában, vagy az egész projektben.
+5. **Tőtáv**: alapból a megmaradó foltok és sorok az új növény tőtávját kapják, és a darabszám újraszámolódik.
+6. Az előnézet megmutatja, mi lesz belőle; a **Csere** gomb elvégzi. Visszavonással visszaállítható.
 
 <br clear="right">
 
@@ -296,7 +301,12 @@ Egy területre több tervet is készíthetsz (A terv, B terv, ötletek), és ös
 
 <img src="img/12-otletgenerator.png" width="280" align="right" alt="Ötletgenerátor">
 
-Ha nem tudod, hol kezdd, kérj ötletet. Megnyitása: változatok → **✦ Ötlet generálása**, vagy *Nézet → Ötletgenerátor*.
+Ha nem tudod, hol kezdd, kérj ötletet. Megnyitása: változatok → **✦ Ötlet generálása**, vagy *Nézet → Ötletgenerátor*. Fent két mód közül választhatsz:
+
+- **Egész terület → új változat**: a program maga válogat a terület feltételeihez illő fajokból (lásd lent);
+- **Kijelölt rész, saját listából**: te adod meg a növényeket, és a rajzon kijelölt részre kerülnek (lásd [Kijelölt rész kitöltése](#kijelölt-rész-kitöltése-saját-listából)).
+
+### Egész terület → új változat
 
 1. **Színvilág**: *Meglepetés*, vagy lila–ezüst, meleg sárga–bordó, fehér–kék–zöld, rózsaszín–lila.
 2. **Milyen növények kerüljenek a tervre**:
@@ -324,6 +334,23 @@ Az eredményt a szabálymotor rögtön ellenőrzi. Ezután a változatot ugyanú
 <br clear="right">
 
 <img src="img/13-otlet-terv.png" width="280" alt="Egy generált ötlet a Gyepsávos kertben">
+
+### Kijelölt rész kitöltése saját listából
+
+1. Az ötletgenerátorban válaszd a **Kijelölt rész, saját listából** fület.
+2. **Ezekből a növényekből**: keress rá és koppints a fajokra (akár 12 is lehet). Mindegyiknél megadhatod az **arányt**.
+3. **Elrendezés**:
+   - **vegyesen**: a fajok tövenként, véletlenszerűen keverednek, mint egy természetes ágyásban vagy réten;
+   - **kisebb csoportokban**: egy-egy fajból 5–9 tő kerül egymás mellé, a csoportok véletlenszerűen váltakoznak.
+4. **Sűrűség**: *sűrűbb*, *tőtáv szerint* vagy *lazább*.
+5. **A kijelölt részen lévő növényeket előtte eltávolítja**: ha bejelölöd, a régi tövek helyére kerül az új kitöltés; ha nem, a program kikerüli a már ültetett töveket.
+6. **Rész kijelölése a rajzon**: koppints a rész sarkaira, majd **Kész**. A program azonnal kitölti.
+
+A tövek a tőtávot tartva kerülnek a helyükre; a gyepet, a burkolatot, a csapot és az aknát kikerülik, és a terület szélén belül maradnak. Az eredmény a **szerkesztett változatba** kerül, és fajonként kiírja, hány tő lett.
+
+- **Újra ugyanide**: ugyanazt a részt új véletlen elrendezéssel tölti ki; az előző kitöltés eltűnik.
+- **Visszavonás**: minden kitöltés egy lépésben visszavonható.
+- **Figyelmeztetések**: a saját listádat nem szűri a terület feltételei szerint, ezért ha egy faj nem illik oda (pl. túl magas, nem napos), azt a figyelmeztetések jelzik.
 
 ## 12. Évszaknézet
 
@@ -434,7 +461,10 @@ Foltokkal és sorokkal: egy mozdulat, és a darabszám automatikus. Egyedi töve
 6. Nézd meg a **Lista** és a **Menetrend** oldalt, és készíts PDF-et.
 
 **Nem tetszik egy faj, de már sok helyen szerepel. Mit tegyek?**
-Használd a **Csere** funkciót ([6. fejezet](#növény-cseréje-mindenhol)); az összes tövét egy lépésben lecseréli.
+Használd a **Csere** funkciót ([6. fejezet](#növény-cseréje-mindenhol)); az összes tövét egy lépésben lecseréli, akár több faj véletlenszerű keverékére is.
+
+**Egy ágyásrészt gyorsan szeretnék beültetni pár kedvenc növényemmel.**
+Ötletgenerátor → **Kijelölt rész, saját listából**: kiválasztod a növényeket, kijelölöd a részt, és a program véletlenszerűen beülteti ([11. fejezet](#kijelölt-rész-kitöltése-saját-listából)).
 
 **Miért jelez egy növényt, ha az szerintem jó oda?**
 A szabályok a megadott korlátokból és a növény adataiból dolgoznak. Ha a növény adata pontatlan, javítsd az adatbázisban; ha szándékos kivétel, használd az **Elnémítás** gombot.

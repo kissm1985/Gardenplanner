@@ -22,6 +22,12 @@ export function startLawnEdit(area: Area, lawn?: Fixture) {
   });
 }
 
+/** Draw the region the zone fill will plant (the plants come from the list in the idea panel). */
+export function startZoneEdit(area: Area) {
+  useUi.getState().setTool('select');
+  useUi.getState().setShapeEdit({ areaId: area.id, mode: 'draw', points: [], selected: null, target: { kind: 'zone' } });
+}
+
 /** Save a lawn outline: corners kept inside the area's bounding box, whole cm. */
 function saveLawn(area: Area, fixtureId: string | undefined, points: [number, number][]) {
   const b = bbox(areaPoints(area));
@@ -38,20 +44,25 @@ export function ShapeEditBar() {
   const ui = useUi.getState();
   const n = se.points.length;
   const lawn = se.target?.kind === 'lawn';
+  const zone = se.target?.kind === 'zone';
   const finish = () => {
     if (n < 3) return;
     const area = useProject.getState().project?.areas.find((a) => a.id === se.areaId);
-    if (lawn && area) saveLawn(area, se.target!.fixtureId, se.points);
+    if (zone) ui.setZoneDraft({ areaId: se.areaId, points: se.points.map(([x, y]) => [Math.round(x), Math.round(y)]) });
+    else if (lawn && area && se.target?.kind === 'lawn') saveLawn(area, se.target.fixtureId, se.points);
     else useProject.getState().setAreaShape(se.areaId, se.points);
     ui.setShapeEdit(null);
   };
   return (
-    <div className={`shape-bar${lawn ? ' is-lawn' : ''}`} role="toolbar" aria-label={lawn ? 'Gyepsáv alakja' : 'Terület alakja'}>
+    <div className={`shape-bar${lawn ? ' is-lawn' : ''}${zone ? ' is-zone' : ''}`} role="toolbar" aria-label={zone ? 'Kitöltendő rész' : lawn ? 'Gyepsáv alakja' : 'Terület alakja'}>
       <p className="shape-hint">
         {lawn && <b>Gyepsáv: </b>}
+        {zone && <b>Kitöltendő rész: </b>}
         {se.mode === 'draw'
           ? n === 0
-            ? lawn
+            ? zone
+              ? 'Koppints a rész első sarkára; ide kerülnek a listádból a növények.'
+              : lawn
               ? 'Koppints a gyep első sarkára (ide nem kerül növény).'
               : 'Koppints a terület első sarkára.'
             : n < 3

@@ -1,6 +1,15 @@
 import { create } from 'zustand';
-import type { FixtureType } from '../model/types';
+import type { MixPart } from '../engine/mix';
+import type { ZoneMode } from '../engine/zoneFill';
+import type { FixtureType, Pt } from '../model/types';
 import { NO_FILTER, type PlantFilter } from '../model/plantFilter';
+
+export interface ZoneConfig {
+  parts: MixPart[];
+  mode: ZoneMode;
+  density: number;
+  clear: boolean;
+}
 
 export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'fixtures' | 'season' | 'list';
 
@@ -40,6 +49,13 @@ export interface UiState {
   /** Fixture type armed in the Elemek tool (tap or drag on the plan to add one). */
   fixtureTool: FixtureType | null;
   setFixtureTool: (t: FixtureType | null) => void;
+  /** Zone fill: settings kept while the region is drawn, the region just drawn, and the last fill (for "Újra"). */
+  zoneConfig: ZoneConfig;
+  setZoneConfig: (c: ZoneConfig) => void;
+  zoneDraft: { areaId: string; points: Pt[] } | null;
+  setZoneDraft: (z: { areaId: string; points: Pt[] } | null) => void;
+  lastZone: { areaId: string; points: Pt[]; ids: string[]; counts: Record<string, number> } | null;
+  setLastZone: (z: UiState['lastZone']) => void;
   /** Collapsed nodes of the variant tree. */
   collapsed: string[];
   toggleCollapsed: (id: string) => void;
@@ -50,7 +66,7 @@ export interface UiState {
     points: [number, number][];
     selected: number | null;
     /** What is being shaped: the area outline (default) or a lawn inside it (new or existing fixture). */
-    target?: { kind: 'lawn'; fixtureId?: string };
+    target?: { kind: 'lawn'; fixtureId?: string } | { kind: 'zone' };
   } | null;
   setShapeEdit: (v: UiState['shapeEdit']) => void;
   setPlantFilter: (f: PlantFilter) => void;
@@ -88,6 +104,12 @@ export const useUi = create<UiState>()((set) => ({
   plantFilter: NO_FILTER,
   fixtureTool: null,
   setFixtureTool: (fixtureTool) => set({ fixtureTool }),
+  zoneConfig: { parts: [], mode: 'mix', density: 0.95, clear: false },
+  setZoneConfig: (zoneConfig) => set({ zoneConfig }),
+  zoneDraft: null,
+  setZoneDraft: (zoneDraft) => set({ zoneDraft }),
+  lastZone: null,
+  setLastZone: (lastZone) => set({ lastZone }),
   collapsed: [],
   toggleCollapsed: (id) => set((s) => ({ collapsed: s.collapsed.includes(id) ? s.collapsed.filter((x) => x !== id) : [...s.collapsed, id] })),
   shapeEdit: null,

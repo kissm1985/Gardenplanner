@@ -206,7 +206,7 @@ export function clipRect(poly: Pt[], x0: number, y0: number, x1: number, y1: num
 const BLOCKING = new Set(['lawn', 'paving', 'tap', 'manhole']);
 
 /** Polygon of a blocking fixture (lawn, paving, tap, manhole), padded for small ones. */
-function fixturePoly(f: Fixture): Pt[] | null {
+export function fixturePoly(f: Fixture): Pt[] | null {
   if (!BLOCKING.has(f.type)) return null;
   if (f.polygon?.length) return f.polygon;
   const pad = f.type === 'tap' || f.type === 'manhole' ? 25 : 0;

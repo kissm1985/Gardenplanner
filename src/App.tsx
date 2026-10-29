@@ -65,6 +65,11 @@ export function App({ loading }: { loading: boolean }) {
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
   const [replaceFrom, setReplaceFrom] = useState<string | undefined>(undefined);
+  // A zone drawn on the plan goes straight back to the idea panel, which fills it.
+  const zoneDraft = useUi((s) => s.zoneDraft);
+  useEffect(() => {
+    if (zoneDraft) setSheet('ideas');
+  }, [zoneDraft]);
   const openReplace = (code?: string) => {
     setReplaceFrom(code);
     setSheet('replace');

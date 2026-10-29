@@ -2356,3 +2356,16 @@ polyline.shape-line {
   width: 56px;
   min-height: 36px;
 }
+.shape-editor.is-zone .shape-line {
+  fill: color-mix(in srgb, var(--lav) 18%, transparent);
+  stroke: var(--lav);
+  stroke-dasharray: 6 4;
+}
+.shape-bar.is-zone {
+  border-color: var(--lav);
+}
+.idea-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+}

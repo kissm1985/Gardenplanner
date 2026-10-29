@@ -41,6 +41,8 @@ export interface ProjectState {
   moveItems: (ids: string[], dx: number, dy: number) => void;
   updateItems: (ids: string[], patch: ItemPatch) => void;
   deleteItems: (ids: string[]) => void;
+  /** Add plants (and remove some) in the edited variant as one undoable step (zone fill). */
+  applyFill: (add: PlacedItem[], removeIds: string[]) => void;
   /**
    * Replace every plant of one species with another in the chosen scope. Drifts and rows take the
    * new plant's spacing (their count is recomputed) unless keepSpacing. With several targets the species are
@@ -352,6 +354,12 @@ export const useProject = create<ProjectState>()((set, get) => {
         }),
       }));
       return slots;
+    },
+
+    applyFill: (add, removeIds) => {
+      if (!add.length && !removeIds.length) return;
+      const rm = new Set(removeIds);
+      mapItems((items) => [...items.filter((i) => !rm.has(i.id)), ...add]);
     },
 
     deleteItems: (ids) => {
