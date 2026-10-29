@@ -1,5 +1,6 @@
 // Planting schedule (SPEC §4.7): day-by-day checklist for a time window, in the K-06/K-07
 // order per area: soil → drip line → landscape fabric → trees → perennials → mulch → watering in.
+import { areaPoints } from '../model/area';
 import { polygonArea } from '../model/geometry';
 import type { Area, Plant, Project } from '../model/types';
 import { chosenItems } from './bom';
@@ -47,7 +48,7 @@ export function defaultWindow(today = new Date()): { start: string; end: string 
 /** Bed area in m²: the area minus any lawn polygon. */
 export function bedAreaM2(a: Area): number {
   const lawn = a.fixtures.filter((f) => f.type === 'lawn' && f.polygon).reduce((s, f) => s + polygonArea(f.polygon!), 0);
-  return Math.max(0, a.widthCm * a.lengthCm - lawn) / 10000;
+  return Math.max(0, polygonArea(areaPoints(a)) - lawn) / 10000;
 }
 
 const r1 = (n: number) => Math.round(n * 10) / 10;
@@ -110,7 +111,9 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
     out.push({
       id: id('mulch'),
       title: `Mulcsozás – ${a.name}`,
-      detail: m.gravel.length
+      detail: a.kind === 'gravel'
+        ? 'Világos 4–8 mm-es kavics az egész kőkertre, ~4–5 cm vastagon, agrotextilen.'
+        : m.gravel.length
         ? `Világos 4–8 mm-es kavics (~4–5 cm) ${m.bark.length ? `a szárazságtűrők körül (${m.gravel.map((p) => p.nameHu.toLowerCase()).join(', ')}), máshol kéreg is lehet` : 'az egész ágyásra'}.`
         : 'Fenyőkéreg vagy komposztált kéreg ~5 cm vastagon, a tövektől 3–5 cm-re.',
       areaId: a.id,

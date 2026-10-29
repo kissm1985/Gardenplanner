@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { AREA_TEMPLATES } from '../data/templates';
 import { SOIL_LABEL } from '../model/plants';
-import { ORIENTATION_LABEL, type Area } from '../model/types';
+import { AREA_KIND_LABEL, ORIENTATION_LABEL, type Area } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { AreaForm } from './AreaForm';
+import { startShapeEdit } from './ShapeEditBar';
+import { useUi } from '../store/uiStore';
 
 type Mode = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; id: string };
 
@@ -19,8 +21,12 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
       <AreaForm
         submitLabel="Terület létrehozása"
         onCancel={() => setMode({ kind: 'list' })}
-        onSubmit={(d) => {
-          addArea(d);
+        onSubmit={({ freeShape, ...d }) => {
+          const id = addArea(d);
+          if (freeShape) {
+            useUi.getState().setTool('select');
+            useUi.getState().setShapeEdit({ areaId: id, mode: 'draw', points: [], selected: null });
+          }
           onDone();
         }}
       />
@@ -61,6 +67,11 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
               onDone();
             }}
             onEdit={() => setMode({ kind: 'edit', id: a.id })}
+            onShape={() => {
+              selectArea(a.id);
+              startShapeEdit(a);
+              onDone();
+            }}
             onDelete={() => {
               if (confirm(`Biztosan törlöd a(z) „${a.name}” területet? Visszavonással visszahozható.`)) deleteArea(a.id);
             }}
@@ -85,11 +96,12 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
   );
 }
 
-function AreaCard({ a, current, onOpen, onEdit, onDelete }: {
+function AreaCard({ a, current, onOpen, onEdit, onShape, onDelete }: {
   a: Area;
   current: boolean;
   onOpen: () => void;
   onEdit: () => void;
+  onShape: () => void;
   onDelete: () => void;
 }) {
   const c = a.constraints;
@@ -97,6 +109,8 @@ function AreaCard({ a, current, onOpen, onEdit, onDelete }: {
     c.maxHeightCm != null && `max. ${c.maxHeightCm} cm`,
     c.maxTrees != null && `max. ${c.maxTrees} fa`,
     a.soil && `talaj: ${SOIL_LABEL[a.soil]}`,
+    a.kind && AREA_KIND_LABEL[a.kind],
+    a.shape.kind === 'polygon' && 'szabad alak',
     c.noThorns && 'tüskementes',
     c.nonToxic && 'nem mérgező',
     c.drip && 'csepegtető',
@@ -121,6 +135,9 @@ function AreaCard({ a, current, onOpen, onEdit, onDelete }: {
       <div className="card-actions">
         <button type="button" className="btn btn-small" onClick={onEdit}>
           Szerkesztés
+        </button>
+        <button type="button" className="btn btn-small" onClick={onShape}>
+          Alak szerkesztése
         </button>
         <button type="button" className="btn btn-small btn-danger" onClick={onDelete}>
           Törlés

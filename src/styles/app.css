@@ -2060,3 +2060,71 @@ a.btn-primary {
   background: var(--panel);
   font-size: 16px;
 }
+
+/* ---------- free-shape areas ---------- */
+.area-bed.kind-gravel {
+  fill: color-mix(in srgb, var(--soil) 70%, #e8e4dc);
+}
+.area-bed.kind-shade {
+  fill: color-mix(in srgb, var(--soil) 80%, #4a5a48);
+}
+.area-bed.kind-pots {
+  fill: color-mix(in srgb, var(--soil) 60%, var(--chip));
+}
+.area-outline.is-editing {
+  stroke-dasharray: 4 4;
+  opacity: 0.5;
+}
+.plan-svg.is-shape-edit .plants,
+.plan-svg.is-shape-edit .group-labels {
+  opacity: 0.35;
+  pointer-events: none;
+}
+.shape-line {
+  fill: color-mix(in srgb, var(--accent) 10%, transparent);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+polyline.shape-line {
+  fill: none;
+}
+.shape-vertex {
+  fill: var(--bg);
+  stroke: var(--accent);
+  stroke-width: 2.5;
+  cursor: grab;
+}
+.shape-vertex.is-selected,
+.shape-vertex.is-first {
+  fill: var(--accent);
+}
+.shape-mid {
+  fill: var(--accent);
+  fill-opacity: 0.35;
+  stroke: var(--accent);
+  stroke-width: 1;
+  cursor: copy;
+}
+.shape-bar {
+  position: absolute;
+  left: 30px;
+  right: 64px;
+  bottom: 12px;
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
+  padding: 8px 10px;
+  display: grid;
+  gap: 6px;
+}
+.shape-hint {
+  margin: 0;
+  font-size: 14px;
+}
+.shape-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}

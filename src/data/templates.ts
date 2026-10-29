@@ -1,5 +1,5 @@
 import { uid } from '../model/ids';
-import { DEFAULT_CONSTRAINTS, type Area, type Fixture, type Orientation, type Pt, type Soil, type SunNeed } from '../model/types';
+import { DEFAULT_CONSTRAINTS, type Area, type Fixture, type Orientation, type AreaKind, type Pt, type Soil, type SunNeed } from '../model/types';
 
 export interface AreaInput {
   name: string;
@@ -9,6 +9,7 @@ export interface AreaInput {
   sunUntil: string;
   sunLevel?: SunNeed;
   soil?: Soil;
+  kind?: AreaKind;
   notes: string;
   constraints?: Partial<Area['constraints']>;
   fixtures?: Fixture[];
@@ -25,6 +26,7 @@ export function makeArea(input: AreaInput): Area {
     sunUntil: input.sunUntil,
     ...(input.sunLevel ? { sunLevel: input.sunLevel } : {}),
     ...(input.soil ? { soil: input.soil } : {}),
+    ...(input.kind ? { kind: input.kind } : {}),
     notes: input.notes,
     shape: { kind: 'rect' },
     constraints: { ...DEFAULT_CONSTRAINTS, ...input.constraints, speciesLimits: { ...input.constraints?.speciesLimits } },
@@ -71,6 +73,7 @@ export const AREA_TEMPLATES: AreaTemplate[] = [
         lengthCm: 1200,
         orientation: 'S',
         sunUntil: '13:00-ig',
+        kind: 'gravel',
         notes: 'Kőkert a ház mellett (K-06 / K-07). Felül a hátsó kerítés, alul a járda.',
         constraints: { maxHeightCm: 50, noThorns: true, nonToxic: true, drip: true, mulchCover: true },
         fixtures: [
@@ -90,6 +93,7 @@ export const AREA_TEMPLATES: AreaTemplate[] = [
         lengthCm: 1200,
         orientation: 'E',
         sunUntil: '12:00-ig',
+        kind: 'bed',
         notes: 'Előkert (K-05 / K-07): középen ívelt gyepsáv, két oldalán ágyás. Legfeljebb 2 fa, 150–200 cm.',
         constraints: { noThorns: true, nonToxic: true, drip: true, mulchCover: true, maxTrees: 2 },
         fixtures: [

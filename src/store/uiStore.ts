@@ -36,6 +36,9 @@ export interface UiState {
   calibrate: [number, number][] | null;
   /** Plant filters shared by the database list and the palette. */
   plantFilter: PlantFilter;
+  /** Area outline editor: drawing a new outline point by point, or editing corners. */
+  shapeEdit: { areaId: string; mode: 'draw' | 'edit'; points: [number, number][]; selected: number | null } | null;
+  setShapeEdit: (v: UiState['shapeEdit']) => void;
   setPlantFilter: (f: PlantFilter) => void;
   setCalibrate: (v: [number, number][] | null) => void;
   setPage: (p: 'schedule' | null) => void;
@@ -69,6 +72,8 @@ export const useUi = create<UiState>()((set) => ({
   page: null,
   calibrate: null,
   plantFilter: NO_FILTER,
+  shapeEdit: null,
+  setShapeEdit: (shapeEdit) => set({ shapeEdit, selected: [], selectedFixture: null }),
   setPlantFilter: (plantFilter) => set({ plantFilter }),
   setCalibrate: (calibrate) => set({ calibrate }),
   setPage: (page) => set({ page, compare: false }),

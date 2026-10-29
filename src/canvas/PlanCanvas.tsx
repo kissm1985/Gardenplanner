@@ -6,6 +6,7 @@ import type { Area, Plant, Pt, Settings } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import type { Warning } from '../engine/rules';
+import { AreaClip, AreaShapeEl } from './AreaShape';
 import { FixturesLayer, FixtureZonesLayer, type FixtureDrag } from './layers/Fixtures';
 import { GridLayer } from './layers/Grid';
 import { CountLabel, GroupLabels, PlantsLayer, plantRadius, VertexHandles, type DragOffset, type ShapeOverride } from './layers/Plants';
@@ -29,6 +30,7 @@ type Gesture =
   | { mode: 'lasso'; points: Pt[] }
   | { mode: 'draw'; kind: 'drift' | 'curve' | 'line'; points: Pt[]; startPx: P2; moved: boolean }
   | { mode: 'fixture'; id: string; start: P2; anchor: Pt; moved: boolean }
+  | { mode: 'shapeVertex'; index: number; start: P2; moved: boolean }
   | { mode: 'vertex'; id: string; index: number; points: Pt[]; start: P2; moved: boolean }
   | { mode: 'pinch'; view: View; start: Map<number, P2> };
 
@@ -59,6 +61,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const layers = useUi((s) => s.layers);
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
   const calibrate = useUi((s) => s.calibrate);
+  const shapeEditAll = useUi((s) => s.shapeEdit);
+  const shapeEdit = shapeEditAll?.areaId === area.id ? shapeEditAll : null;
+  const setShapePts = (points: [number, number][], selected: number | null = shapeEdit?.selected ?? null) =>
+    shapeEdit && useUi.getState().setShapeEdit({ ...shapeEdit, points, selected });
   const plants = useMemo(() => plantMap(plantDb), [plantDb]);
 
   const pointers = useRef(new Map<number, P2>());
@@ -197,7 +203,23 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const handle = target.getAttribute?.('data-handle');
     const fxId = hitId ? null : (target.closest?.('[data-fixture]')?.getAttribute('data-fixture') ?? null);
     const editing = editable();
-    if (useUi.getState().calibrate) {
+    const sv = target.getAttribute?.('data-shape-vertex');
+    const sm = target.getAttribute?.('data-shape-mid');
+    if (shapeEdit && sv != null) {
+      setShapePts(shapeEdit.points, +sv);
+      gesture.current = { mode: 'shapeVertex', index: +sv, start: p, moved: false };
+    } else if (shapeEdit && sm != null) {
+      // Insert a corner in the middle of the edge and drag it straight away.
+      const i = +sm;
+      const a = shapeEdit.points[i];
+      const b = shapeEdit.points[(i + 1) % shapeEdit.points.length];
+      const pts = [...shapeEdit.points];
+      pts.splice(i + 1, 0, [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2]);
+      setShapePts(pts, i + 1);
+      gesture.current = { mode: 'shapeVertex', index: i + 1, start: p, moved: false };
+    } else if (shapeEdit) {
+      gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: true, additive: false };
+    } else if (useUi.getState().calibrate) {
       gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: true, additive: false };
     } else if (tool === 'select' && handle != null && editing) {
       gesture.current = { mode: 'vertex', id: editing.id, index: +handle, points: editing.points, start: p, moved: false };
@@ -269,6 +291,14 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       if (g.kind === 'line') g.points = [g.points[0], snapPt(w)];
       else if (dist(g.points[g.points.length - 1], w) * viewRef.current!.s > 3) g.points.push(w);
       setDraft({ kind: g.kind, points: [...g.points] });
+    } else if (g.mode === 'shapeVertex') {
+      if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
+      g.moved = true;
+      const se = useUi.getState().shapeEdit;
+      if (!se) return;
+      const pts = [...se.points];
+      pts[g.index] = snapPt(toWorld(p));
+      useUi.getState().setShapeEdit({ ...se, points: pts, selected: g.index });
     } else if (g.mode === 'fixture') {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < TAP_SLOP_PX) return;
       g.moved = true;
@@ -326,6 +356,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       }
       return;
     }
+    if (g.mode === 'shapeVertex') return;
     if (g.mode === 'fixture') {
       setFxDrag(null);
       if (g.moved) {
@@ -445,6 +476,15 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
 
   const onTap = (p: P2, g: Extract<Gesture, { mode: 'pan' }>) => {
     if (useUi.getState().calibrate) return calibrateTap(toWorld(p));
+    const se = useUi.getState().shapeEdit;
+    if (se && se.areaId === area.id) {
+      if (se.mode !== 'draw') return useUi.getState().setShapeEdit({ ...se, selected: null });
+      const w = snapPt(toWorld(p));
+      const first = se.points[0];
+      // Tapping the first corner again closes the outline.
+      if (first && se.points.length >= 3 && dist(first, w) * viewRef.current!.s < 16) return useUi.getState().setShapeEdit({ ...se, mode: 'edit', selected: null });
+      return useUi.getState().setShapeEdit({ ...se, points: [...se.points, w] });
+    }
     if (tool === 'plant' || tool === 'drift' || tool === 'row') {
       if (!activePlant) hint('Előbb válassz növényt a palettán.');
       else if (tool === 'plant') place(activePlant, toWorld(p));
@@ -515,7 +555,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     <div className="canvas-box" ref={boxRef}>
       {view && size.w > 0 && (
         <svg
-          className={`plan-svg tool-${tool}${lasso && tool === 'select' ? ' is-lasso' : ''}`}
+          className={`plan-svg tool-${tool}${lasso && tool === 'select' ? ' is-lasso' : ''}${shapeEdit ? ' is-shape-edit' : ''}`}
           width={size.w}
           height={size.h}
           role="application"
@@ -532,7 +572,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
         >
           <g transform={`translate(${view.tx} ${view.ty}) scale(${view.s})`}>
             {layers.zones && <FixtureZonesLayer area={area} settings={settings} drag={fxDrag} />}
-            <rect className="area-bed" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
+            <defs>
+              <AreaClip area={area} id={`clip-${area.id}`} />
+            </defs>
+            <AreaShapeEl area={area} className={`area-bed kind-${area.kind ?? 'bed'}`} />
             {layers.background && area.background && (
               <image
                 className="bg-image"
@@ -546,11 +589,15 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
                 pointerEvents="none"
               />
             )}
-            {layers.grid && <GridLayer w={area.widthCm} h={area.lengthCm} step={niceStep(view.s, 14)} />}
+            {layers.grid && (
+              <g clipPath={`url(#clip-${area.id})`}>
+                <GridLayer w={area.widthCm} h={area.lengthCm} step={niceStep(view.s, 14)} />
+              </g>
+            )}
             {layers.fixtures && (
               <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select'} />
             )}
-            <rect className="area-outline" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
+            <AreaShapeEl area={area} className={`area-outline${shapeEdit ? ' is-editing' : ''}`} />
             {layers.plants && (
               <PlantsLayer
                 items={items}
@@ -569,7 +616,8 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
               <Draft draft={draft} plant={plants.get(activePlant)!} pattern={driftPattern} s={view.s} mature={settings.showMatureSize} />
             )}
             {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
-            {layers.dimensions && <Dimensions area={area} s={view.s} />}
+            {layers.dimensions && !shapeEdit && <Dimensions area={area} s={view.s} />}
+            {shapeEdit && <ShapeEditor points={shapeEdit.points} mode={shapeEdit.mode} selected={shapeEdit.selected} s={view.s} />}
             {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
             {calibrate?.map(([x, y], i) => <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />)}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
@@ -652,6 +700,32 @@ function Draft({ draft, plant, pattern, s, mature }: {
         <circle key={i} cx={x} cy={y} r={r} fill={plant.color} fillOpacity={0.55} />
       ))}
       <CountLabel x={(b.minX + b.maxX) / 2} y={b.minY - 6 / s} fs={12 / s} text={`${plant.code} × ${positions.length}`} />
+    </g>
+  );
+}
+
+/** Outline being drawn/edited: corners, edge midpoints (tap to insert), edge lengths in cm. */
+function ShapeEditor({ points, mode, selected, s }: { points: Pt[]; mode: 'draw' | 'edit'; selected: number | null; s: number }) {
+  const closed = mode === 'edit' && points.length >= 3;
+  const line = points.map((p) => p.join(',')).join(' ');
+  const edges = points.map((a, i) => [a, points[(i + 1) % points.length]] as const).slice(0, closed ? points.length : Math.max(0, points.length - 1));
+  const r = 10 / s;
+  return (
+    <g className="shape-editor">
+      {closed ? <polygon className="shape-line" points={line} vectorEffect="non-scaling-stroke" /> : <polyline className="shape-line" points={line} vectorEffect="non-scaling-stroke" />}
+      {edges.map(([a, b], i) => {
+        const mx = (a[0] + b[0]) / 2;
+        const my = (a[1] + b[1]) / 2;
+        return (
+          <g key={`e${i}`}>
+            <CountLabel x={mx} y={my - 8 / s} fs={10 / s} text={`${Math.round(dist(a, b))} cm`} />
+            {mode === 'edit' && <circle className="shape-mid" data-shape-mid={i} cx={mx} cy={my} r={r * 0.7} vectorEffect="non-scaling-stroke" />}
+          </g>
+        );
+      })}
+      {points.map(([x, y], i) => (
+        <circle key={i} className={`shape-vertex${i === selected ? ' is-selected' : ''}${i === 0 && mode === 'draw' ? ' is-first' : ''}`} data-shape-vertex={i} cx={x} cy={y} r={r} vectorEffect="non-scaling-stroke" />
+      ))}
     </g>
   );
 }

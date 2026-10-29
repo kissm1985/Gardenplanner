@@ -75,6 +75,7 @@ export function areaSunLevel(area: Area): SunNeed {
   if (area.sunLevel) return area.sunLevel;
   const h = sunHours(area.sunUntil);
   if (h != null) return h >= 6 ? 'sun' : h >= 3 ? 'part' : 'shade';
+  if (area.kind === 'shade') return 'shade';
   return ['S', 'SE', 'SW'].includes(area.orientation) ? 'sun' : ['E', 'W'].includes(area.orientation) ? 'part' : 'shade';
 }
 

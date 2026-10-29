@@ -48,6 +48,8 @@ export interface ProjectState {
   deleteFixture: (id: string) => void;
 
   renameProject: (name: string) => void;
+  /** Replace the outline with a free polygon; everything is shifted so the outline starts at 0,0. */
+  setAreaShape: (areaId: string, points: Pt[]) => void;
   setBackground: (bg: Area['background'] | null) => void;
   setScheduleWindow: (start: string, end: string) => void;
   toggleTask: (taskId: string) => void;
@@ -379,6 +381,32 @@ export const useProject = create<ProjectState>()((set, get) => {
         }
         return { ...a, background: bg };
       });
+    },
+
+    setAreaShape: (areaId, pts) => {
+      if (pts.length < 3) return;
+      // Whole centimetres are plenty for an outline drawn on a phone.
+      const whole = pts.map(([x, y]) => [Math.round(x), Math.round(y)] as Pt);
+      const xs = whole.map((p) => p[0]);
+      const ys = whole.map((p) => p[1]);
+      const [minX, minY] = [Math.min(...xs), Math.min(...ys)];
+      const dx = -minX;
+      const dy = -minY;
+      const points = whole.map(([x, y]) => [x + dx, y + dy] as Pt);
+      mapArea(areaId, (a) => ({
+        ...a,
+        shape: { kind: 'polygon', points },
+        widthCm: Math.max(...xs) - minX,
+        lengthCm: Math.max(...ys) - minY,
+        variants: a.variants.map((v) => ({ ...v, items: v.items.map((it) => withCount(roundItem(translateItem(it, dx, dy)))) })),
+        fixtures: a.fixtures.map((f) => ({
+          ...f,
+          x: round1(f.x + dx),
+          y: round1(f.y + dy),
+          ...(f.polygon ? { polygon: f.polygon.map(([x, y]) => [round1(x + dx), round1(y + dy)] as Pt) } : {}),
+        })),
+        ...(a.background ? { background: { ...a.background, x: a.background.x + dx, y: a.background.y + dy } } : {}),
+      }));
     },
 
     renameProject: (name) => {

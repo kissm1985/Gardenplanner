@@ -14,6 +14,7 @@ import { Coach, introDone } from './ui/Coach';
 import { CompareView } from './ui/CompareView';
 import { ListView } from './ui/ListView';
 import { SchedulePage } from './ui/SchedulePage';
+import { ShapeEditBar } from './ui/ShapeEditBar';
 import { PrintView } from './ui/PrintView';
 import { ProjectPanel, type Orientation } from './ui/ProjectPanel';
 import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
@@ -64,6 +65,7 @@ export function App({ loading }: { loading: boolean }) {
   const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
   const compare = useUi((s) => s.compare);
   const page = useUi((s) => s.page);
+  const shapeEditing = useUi((s) => !!s.shapeEdit);
   const [print, setPrint] = useState<Orientation | null>(null);
   const [coach, setCoach] = useState(() => !introDone());
 
@@ -160,7 +162,8 @@ export function App({ loading }: { loading: boolean }) {
               {activeVariant(area).id === area.chosenVariantId ? ' ★' : ''}
               {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
             </button>
-            {tool === 'select' && (
+            {shapeEditing && <ShapeEditBar />}
+            {tool === 'select' && !shapeEditing && (
               <div className="stage-tools" role="toolbar" aria-label="Kijelölés módja">
                 <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
                   Lasszó

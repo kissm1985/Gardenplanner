@@ -113,6 +113,9 @@ export interface Background {
   aspect: number;
 }
 
+/** What the area is used for; drives mulch advice and the idea generator. */
+export type AreaKind = 'bed' | 'gravel' | 'shade' | 'border' | 'pots';
+
 export type AreaShape = { kind: 'rect' } | { kind: 'polygon'; points: Pt[] };
 
 export interface Area {
@@ -126,6 +129,7 @@ export interface Area {
   sunLevel?: SunNeed;
   /** Soil of the area (optional; used by the soil rule and the idea generator). */
   soil?: Soil;
+  kind?: AreaKind;
   notes: string;
   shape: AreaShape;
   constraints: Constraints;
@@ -175,6 +179,14 @@ export const ORIENTATION_LABEL: Record<Orientation, string> = {
 };
 
 export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 2 };
+
+export const AREA_KIND_LABEL: Record<AreaKind, string> = {
+  bed: 'évelőágyás',
+  gravel: 'kavicsos / kőkert',
+  shade: 'árnyékágyás',
+  border: 'szegély, alacsony sövény',
+  pots: 'dézsás terasz',
+};
 
 export const DEFAULT_CONSTRAINTS: Constraints = {
   maxHeightCm: null,

@@ -1,6 +1,7 @@
 import { useMemo } from 'react';
 import { plantMap } from '../model/plants';
 import type { Area, PlacedItem, Plant } from '../model/types';
+import { AreaShapeEl } from './AreaShape';
 import { FixturesLayer } from './layers/Fixtures';
 import { PlantsLayer } from './layers/Plants';
 
@@ -31,9 +32,9 @@ export function StaticPlan({ area, items, plantDb, month, showMature = true, lab
   const h = maxY - minY;
   return (
     <svg className="static-plan" viewBox={`${minX} ${minY} ${w} ${h}`} style={{ aspectRatio: `${w} / ${h}` }} role="img" aria-label={title ?? area.name} preserveAspectRatio="xMidYMid meet">
-      <rect className="area-bed" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
+      <AreaShapeEl area={area} className={`area-bed kind-${area.kind ?? 'bed'}`} />
       <FixturesLayer area={area} scale={labelPx / w} drag={null} selected={null} interactive={false} />
-      <rect className="area-outline" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
+      <AreaShapeEl area={area} className="area-outline" />
       <PlantsLayer items={items} plants={plants} selected={NO_SELECTION} drag={null} shape={null} showMature={showMature} showSpacing={false} month={month} />
     </svg>
   );
