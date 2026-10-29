@@ -11,6 +11,7 @@ import { GridLayer } from './layers/Grid';
 import { CountLabel, GroupLabels, PlantsLayer, plantRadius, VertexHandles, type DragOffset, type ShapeOverride } from './layers/Plants';
 import { Rulers, RULER } from './layers/Rulers';
 import { WarningsLayer } from './layers/Warnings';
+import { PlantTooltip } from '../ui/PlantTooltip';
 import { fitView, niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
 
 interface Props {
@@ -50,6 +51,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const selected = useUi((s) => s.selected);
   const selectedFixture = useUi((s) => s.selectedFixture);
   const [fxDrag, setFxDrag] = useState<FixtureDrag | null>(null);
+  // Plant info card: follows the mouse; on touch it opens on a long press and stays until the next touch.
+  const [hover, setHover] = useState<{ id: string; x: number; y: number; pinned: boolean } | null>(null);
+  const pressTimer = useRef<number | undefined>(undefined);
+  const clearPress = () => window.clearTimeout(pressTimer.current);
   const lasso = useUi((s) => s.lasso);
   const layers = useUi((s) => s.layers);
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
@@ -168,6 +173,12 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     (e.currentTarget as Element).setPointerCapture(e.pointerId);
     const p = local(e);
     pointers.current.set(e.pointerId, p);
+    clearPress();
+    if (e.pointerType !== 'mouse') {
+      setHover(null);
+      const id = (e.target as Element).closest?.('[data-id]')?.getAttribute('data-id');
+      if (id) pressTimer.current = window.setTimeout(() => setHover({ id, x: p.x, y: p.y, pinned: true }), 500);
+    }
 
     if (pointers.current.size >= 2) {
       // Second finger: abandon move / lasso and pinch instead.
@@ -216,8 +227,16 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   };
 
   const onPointerMove = (e: PointerEvent) => {
+    if (e.pointerType === 'mouse' && !pointers.current.size) {
+      const id = (e.target as Element).closest?.('[data-id]')?.getAttribute('data-id');
+      const q = local(e);
+      setHover(id ? { id, x: q.x, y: q.y, pinned: false } : null);
+      return;
+    }
     if (!pointers.current.has(e.pointerId) || !gesture.current) return;
     const p = local(e);
+    const s0 = pointers.current.get(e.pointerId);
+    if (s0 && Math.hypot(p.x - s0.x, p.y - s0.y) > TAP_SLOP_PX) clearPress();
     pointers.current.set(e.pointerId, p);
     const g = gesture.current;
     if (g.mode === 'pinch') {
@@ -279,6 +298,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   };
 
   const onPointerUp = (e: PointerEvent) => {
+    clearPress();
     const p = pointers.current.get(e.pointerId);
     pointers.current.delete(e.pointerId);
     const g = gesture.current;
@@ -505,6 +525,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
+          onPointerLeave={() => setHover((h) => (h?.pinned ? h : null))}
           onWheel={onWheel}
           onKeyDown={onKeyDown}
           data-scale={view.s.toFixed(4)}
@@ -556,6 +577,13 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
           <Rulers view={view} w={size.w} h={size.h} />
         </svg>
       )}
+      {hover &&
+        !drag &&
+        (() => {
+          const it = items.find((i) => i.id === hover.id);
+          const pl = it && plants.get(it.plantId);
+          return it && pl ? <PlantTooltip plant={pl} item={it} x={hover.x} y={hover.y} boxW={size.w} boxH={size.h} /> : null;
+        })()}
       {toast && (
         <p className="canvas-toast" role="status">
           {toast}

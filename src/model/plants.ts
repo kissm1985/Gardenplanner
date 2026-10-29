@@ -1,6 +1,14 @@
-import type { JugloneTolerance, Plant, SunNeed, Toxicity, WaterNeed } from './types';
+import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from './types';
 
 export const SUN_LABEL: Record<SunNeed, string> = { sun: 'nap', part: 'félárnyék', shade: 'árnyék' };
+export const SOIL_LABEL: Record<Soil, string> = {
+  sandy: 'homokos',
+  loam: 'vályog',
+  clay: 'agyagos',
+  chalky: 'meszes',
+  acidic: 'savanyú',
+  poor: 'tápanyagszegény',
+};
 export const WATER_LABEL: Record<WaterNeed, string> = { low: 'alacsony', medium: 'közepes', high: 'magas' };
 export const TOXIC_LABEL: Record<Toxicity, string> = {
   no: 'nem',

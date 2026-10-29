@@ -8,6 +8,8 @@ export type SunNeed = 'sun' | 'part' | 'shade';
 export type WaterNeed = 'low' | 'medium' | 'high';
 export type Toxicity = 'no' | 'human' | 'pet' | 'both' | 'unknown';
 export type JugloneTolerance = 'tolerant' | 'sensitive' | 'unknown';
+/** Soil the plant tolerates / the area has. */
+export type Soil = 'sandy' | 'loam' | 'clay' | 'chalky' | 'acidic' | 'poor';
 export type ItemStatus = 'needed' | 'ordered' | 'owned' | 'planted';
 
 export interface Plant {
@@ -19,6 +21,8 @@ export interface Plant {
   spacingCm: number;
   sun: SunNeed[];
   water: WaterNeed;
+  /** Soils it grows well in; empty / missing = not documented. */
+  soil?: Soil[];
   toxic: Toxicity;
   thorny: boolean;
   juglone: JugloneTolerance;
