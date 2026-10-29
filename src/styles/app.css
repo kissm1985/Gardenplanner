@@ -2400,6 +2400,7 @@ polyline.shape-line {
   gap: 6px;
 }
 .resize-line {
+  pointer-events: none;
   stroke: var(--accent);
   stroke-width: 1.5;
   stroke-dasharray: 4 3;
