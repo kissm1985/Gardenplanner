@@ -59,6 +59,7 @@ export function candidates(area: Area, plantDb: Plant[]): Plant[] {
     (p) =>
       !p.isTree &&
       p.symbol !== 'diamond' &&
+      p.spreadCm <= 120 && // large shrubs need their own planning, not drifts
       p.sun.includes(sun) &&
       (c.maxHeightCm == null || p.maxHeightCm <= c.maxHeightCm) &&
       !(c.noThorns && p.thorny) &&

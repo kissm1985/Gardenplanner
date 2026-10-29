@@ -194,7 +194,7 @@ export const ORIENTATION_LABEL: Record<Orientation, string> = {
   NW: 'északnyugat',
 };
 
-export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 2 };
+export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 3 };
 
 export const AREA_KIND_LABEL: Record<AreaKind, string> = {
   bed: 'évelőágyás',

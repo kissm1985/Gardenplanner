@@ -1,3 +1,4 @@
+import { SEED_SINCE } from '../../src/data/plants.seed';
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { curvedLawn } from '../../src/data/templates';
@@ -175,10 +176,22 @@ describe('plant list migration', () => {
     expect(db.length).toBe(p.plantDb.length);
     expect(db.find((x) => x.code === 'LA')!.nameHu).toBe('Saját levendula');
     expect(db.find((x) => x.code === 'LA')!.soil).toContain('sandy');
-    expect(st().project!.settings.seedVersion).toBe(2);
+    expect(st().project!.settings.seedVersion).toBe(3);
     // A built-in species deleted afterwards does not come back on the next load.
     st().deletePlant('VI');
     st().setLoaded(st().project!);
     expect(st().project!.plantDb.some((x) => x.code === 'VI')).toBe(false);
+  });
+
+  it('a version-2 project gets only the back-garden species, deleted older ones stay deleted', () => {
+    st().createProject(['house-strip']);
+    const p = st().project!;
+    const v2 = { ...p, settings: { ...p.settings, seedVersion: 2 }, plantDb: p.plantDb.filter((x) => !SEED_SINCE[x.code] && x.code !== 'VI') };
+    st().setLoaded(v2);
+    const db = st().project!.plantDb;
+    expect(db.some((x) => x.code === 'VI')).toBe(false);
+    expect(db.find((x) => x.code === 'PF')!.nameHu).toBe('Korallberkenye');
+    expect(db.some((x) => x.code === 'LO')).toBe(true);
+    expect(db.length).toBe(p.plantDb.length - 1);
   });
 });

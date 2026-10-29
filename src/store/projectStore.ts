@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { itemCount, type Pattern } from '../engine/fill';
-import { SEED_PLANTS } from '../data/plants.seed';
+import { SEED_PLANTS, SEED_SINCE } from '../data/plants.seed';
 import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
 import { isAncestor } from '../model/variantTree';
@@ -98,14 +98,16 @@ export function migrate(p: Project): Project {
       const seed = byCode.get(x.code);
       return seed && !x.soil?.length && seed.nameLat === x.nameLat ? { ...x, soil: seed.soil } : x;
     });
-    out = { ...out, plantDb: [...updated, ...seeds.filter((x) => !have.has(x.code))] };
+    // Only species newer than the project's list are added, so earlier deletions stick.
+    const added = seeds.filter((x) => !have.has(x.code) && (SEED_SINCE[x.code] ?? 2) > seedVersion);
+    out = { ...out, plantDb: [...updated, ...added] };
   }
   out = { ...out, settings: { ...DEFAULT_SETTINGS, ...out.settings, seedVersion: Math.max(seedVersion, SEED_VERSION) } };
   return out;
 }
 
 /** Bump when the built-in plant list grows. */
-export const SEED_VERSION = 2;
+export const SEED_VERSION = 3;
 
 /** Copy with a new parent; a missing parent removes the field (top level). */
 function withParent<T extends { parentId?: string }>(x: T, parentId: string | undefined): T {

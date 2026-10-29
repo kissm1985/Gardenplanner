@@ -130,7 +130,11 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
     const look = plantLook(p, month);
     const h = opt.mature ? p.maxHeightCm : Math.max(10, Math.round(p.maxHeightCm * 0.4));
     const w = opt.mature ? p.spreadCm : Math.max(8, Math.round(p.spreadCm * 0.35));
-    const f = FORM[p.symbol ?? 'circle'][opt.lang];
+    const f = p.isTree
+      ? FORM.diamond[opt.lang]
+      : p.maxHeightCm >= 120 && p.symbol !== 'triangle'
+        ? (opt.lang === 'hu' ? (p.winterInterest ? 'cserje (télen is lombos / örökzöld)' : 'lombhullató cserje') : p.winterInterest ? 'shrub (evergreen / keeps winter structure)' : 'deciduous shrub')
+        : FORM[p.symbol ?? 'circle'][opt.lang];
     const form = f[0].toUpperCase() + f.slice(1);
     const state = hu
       ? look.blooming

@@ -19,7 +19,7 @@ npm run build      # statikus build a dist/ mappába
 | Területek | Két sablon (Házoldali sáv, Gyepsávos kert), saját terület méretekkel, égtájjal, napsütéssel, korlátokkal; háttérkép két pontos méretaránnyal |
 | Rajz | SVG cm-ben, rácsháló, vonalzó, két ujjas nagyítás/mozgatás, dupla koppintás = illesztés, rétegek, mágnes 10 cm-es rácsra |
 | Ültetés | Egyedi tő (koppintás vagy ráhúzás), folt (eltolt/négyzetes rács), egyenes sor, ív; automatikus darabszám; kijelölés, lasszó, másolás, törlés, 100 lépés visszavonás |
-| Növények | 62 faj kezdőlista, talajigénnyel; infókártya fotóval (Wikipédia/Commons, szerzővel és licenccel, a készüléken tárolva; vagy saját fotó), „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
+| Növények | 89 faj kezdőlista (köztük 27 sövény-, takaró- és nagycserje, kis fa a hátsó kertbe), talajigénnyel; infókártya fotóval (Wikipédia/Commons, szerzővel és licenccel, a készüléken tárolva; vagy saját fotó), „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
 | Szabályok | Magasság, tüske, mérgező, juglone-zóna (állítható sugár), tőtáv, határon kívül, fajkorlát, fák száma, vízigény, napigény, csap/akna, ablak; ugrás és elnémítás |
 | Lista | Ültetett és rendelendő darab (+tartalék), árak, státuszok; másolás szövegként és táblázatként, CSV, XLSX, megosztás |
 | Évszakok | Négy évszak és havi csúszka, négy évszak egymás mellett |
