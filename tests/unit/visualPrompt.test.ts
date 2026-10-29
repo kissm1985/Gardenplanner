@@ -18,7 +18,7 @@ describe('visualisation prompt for ChatGPT', () => {
     const t = prompt();
     expect(t).toContain('Gyepsávos kert: 5,0 × 12,0 m');
     expect(t).toContain('keleti fekvés');
-    expect(t).toContain('Ívelt gyepsáv');
+    expect(t).toContain('Gyepsáv: ívelt, lágy szélű nyírt gyep');
     expect(t).toContain('Diófa');
     expect(t).toMatch(/\*\*LA – Levendula\*\* \(\*Lavandula angustifolia 'Munstead'\*\), \d+ tő/);
     expect(t).toContain('folt: x 0,1–1,1 m, y 2,8–4,8 m');

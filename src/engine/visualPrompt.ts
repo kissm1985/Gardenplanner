@@ -63,10 +63,17 @@ function fixtureLines(area: Area, lang: Lang): string[] {
     const label = f.label ?? f.type;
     if (f.type === 'lawn' && f.polygon) {
       const b = bbox(f.polygon);
+      const curved = f.polygon.length > 12;
+      const corners = f.polygon.map(([x, y]) => (lang === 'hu' ? `(${fmt(x)}; ${fmt(y)})` : `(${fmt(x)}, ${fmt(y)})`)).join(', ');
+      const name = f.label || (lang === 'hu' ? 'Gyep' : 'Lawn');
       out.push(
         lang === 'hu'
-          ? `Ívelt gyepsáv (nyírt fű) a terület közepén, kb. x ${fmt(b.minX)}–${fmt(b.maxX)} m között hullámzó, lágy S-ívű szélekkel; két oldalán ágyások.`
-          : `Curved lawn strip (mown grass) through the middle, roughly x ${fmt(b.minX)}–${fmt(b.maxX)} m, with soft S-shaped edges; beds on both sides.`,
+          ? curved
+            ? `${name}: ívelt, lágy szélű nyírt gyep, kb. x ${fmt(b.minX)}–${fmt(b.maxX)} m, y ${fmt(b.minY)}–${fmt(b.maxY)} m között (alakja a mellékelt rajzon). Növény nincs rajta.`
+            : `${name}: nyírt gyep, sarokpontjai (m): ${corners}. Növény nincs rajta.`
+          : curved
+            ? `${name}: mown lawn with soft curved edges, roughly x ${fmt(b.minX)}–${fmt(b.maxX)} m, y ${fmt(b.minY)}–${fmt(b.maxY)} m (exact shape on the attached plan). No plants on it.`
+            : `${name}: mown lawn, corners (m): ${corners}. No plants on it.`,
       );
     } else if (f.type === 'walnut' || f.type === 'tree') {
       out.push(

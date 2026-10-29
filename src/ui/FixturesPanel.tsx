@@ -1,5 +1,7 @@
 import { useRef, useState } from 'react';
+import { polygonArea } from '../model/geometry';
 import type { Area, Fixture, FixtureType } from '../model/types';
+import { startLawnEdit } from './ShapeEditBar';
 import { selectCurrentArea, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 
@@ -46,7 +48,18 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
   if (!area) return null;
   const f = area.fixtures.find((x) => x.id === editing);
 
-  if (f) return <FixtureForm key={f.id} f={f} onBack={() => setEditing(null)} />;
+  if (f)
+    return (
+      <FixtureForm
+        key={f.id}
+        f={f}
+        onBack={() => setEditing(null)}
+        onReshape={() => {
+          startLawnEdit(area, f);
+          onDone();
+        }}
+      />
+    );
 
   const add = (type: FixtureType) => {
     const [x, y] = canvasBridge.center?.() ?? [area.widthCm / 2, area.lengthCm / 2];
@@ -70,13 +83,26 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
                 <b>{x.label || FIXTURE_LABEL[x.type]}</b>
                 <span className="mono muted">
                   {FIXTURE_LABEL[x.type]} · x {x.x} · y {x.y}
-                  {x.radius ? ` · sugár ${x.radius} cm` : x.w ? ` · ${x.w} × ${x.h} cm` : ''}
+                  {x.polygon ? ` · ${m2(x.polygon)} m²` : x.radius ? ` · sugár ${x.radius} cm` : x.w ? ` · ${x.w} × ${x.h} cm` : ''}
                 </span>
               </span>
             </button>
           </li>
         ))}
       </ul>
+      <div className="form-actions form-actions-start">
+        <button
+          type="button"
+          className="btn btn-primary"
+          onClick={() => {
+            startLawnEdit(area);
+            onDone();
+          }}
+        >
+          + Gyepsáv rajzolása
+        </button>
+      </div>
+      <p className="mono muted">A gyepre nem kerül növény: ha mégis oda tennél, figyelmeztet. A gyep nem számít bele az ágyás területébe (mulcs, talajtakarás).</p>
       <h3 className="sub-h">Új elem a nézet közepére</h3>
       <div className="seg">
         {ADDABLE.map((t) => (
@@ -105,7 +131,9 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
   );
 }
 
-function FixtureForm({ f, onBack }: { f: Fixture; onBack: () => void }) {
+const m2 = (pts: [number, number][]) => (polygonArea(pts) / 10000).toLocaleString('hu-HU', { maximumFractionDigits: 1 });
+
+function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void; onReshape: () => void }) {
   const upd = (patch: Partial<Fixture>) => useProject.getState().updateFixture(f.id, patch);
   const num = (k: 'x' | 'y' | 'w' | 'h' | 'radius', label: string) => (
     <label className="field">
@@ -141,7 +169,16 @@ function FixtureForm({ f, onBack }: { f: Fixture; onBack: () => void }) {
           {num('h', 'Hossz (cm)')}
         </div>
       ) : (
-        <p className="mono muted">Ennek az elemnek szabad alakja van; az alakítás egy későbbi fázisban jön.</p>
+        <>
+          <p className="mono muted">
+            Szabad alakú elem, {f.polygon.length} sarokpont, {m2(f.polygon)} m².
+          </p>
+          <div className="form-actions form-actions-start">
+            <button type="button" className="btn btn-small" onClick={onReshape}>
+              Alak szerkesztése a rajzon
+            </button>
+          </div>
+        </>
       )}
       <div className="form-actions">
         <button

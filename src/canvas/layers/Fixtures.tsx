@@ -1,3 +1,4 @@
+import { useUi } from '../../store/uiStore';
 import { memo } from 'react';
 import type { Area, Fixture, FixtureType, Settings } from '../../model/types';
 
@@ -24,7 +25,9 @@ export const FixturesLayer = memo(function FixturesLayer({ area, scale, drag, se
 }) {
   const fs = 10 / scale;
   // Lawn first so it sits beneath everything else.
-  const sorted = [...area.fixtures].sort((a, b) => (a.type === 'lawn' ? -1 : 0) - (b.type === 'lawn' ? -1 : 0));
+  // The lawn being reshaped is drawn by the shape editor instead.
+  const editingLawn = useUi((s) => (s.shapeEdit?.target?.kind === 'lawn' ? s.shapeEdit.target.fixtureId : undefined));
+  const sorted = [...area.fixtures].filter((f) => f.id !== editingLawn).sort((a, b) => (a.type === 'lawn' ? -1 : 0) - (b.type === 'lawn' ? -1 : 0));
   return (
     <g className="fixtures">
       {sorted.map((f) => (

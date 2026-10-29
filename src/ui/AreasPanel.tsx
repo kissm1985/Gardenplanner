@@ -4,7 +4,7 @@ import { SOIL_LABEL } from '../model/plants';
 import { AREA_KIND_LABEL, ORIENTATION_LABEL, type Area } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { AreaForm } from './AreaForm';
-import { startShapeEdit } from './ShapeEditBar';
+import { startLawnEdit, startShapeEdit } from './ShapeEditBar';
 import { useUi } from '../store/uiStore';
 
 type Mode = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; id: string };
@@ -72,6 +72,11 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
               startShapeEdit(a);
               onDone();
             }}
+            onLawn={() => {
+              selectArea(a.id);
+              startLawnEdit(a);
+              onDone();
+            }}
             onDelete={() => {
               if (confirm(`Biztosan törlöd a(z) „${a.name}” területet? Visszavonással visszahozható.`)) deleteArea(a.id);
             }}
@@ -96,12 +101,13 @@ export function AreasPanel({ onDone }: { onDone: () => void }) {
   );
 }
 
-function AreaCard({ a, current, onOpen, onEdit, onShape, onDelete }: {
+function AreaCard({ a, current, onOpen, onEdit, onShape, onLawn, onDelete }: {
   a: Area;
   current: boolean;
   onOpen: () => void;
   onEdit: () => void;
   onShape: () => void;
+  onLawn: () => void;
   onDelete: () => void;
 }) {
   const c = a.constraints;
@@ -138,6 +144,9 @@ function AreaCard({ a, current, onOpen, onEdit, onShape, onDelete }: {
         </button>
         <button type="button" className="btn btn-small" onClick={onShape}>
           Alak szerkesztése
+        </button>
+        <button type="button" className="btn btn-small" onClick={onLawn}>
+          + Gyepsáv
         </button>
         <button type="button" className="btn btn-small btn-danger" onClick={onDelete}>
           Törlés

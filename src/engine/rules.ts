@@ -19,7 +19,8 @@ export type RuleId =
   | 'sun'
   | 'soil'
   | 'fixture'
-  | 'window';
+  | 'window'
+  | 'lawn';
 
 export interface Warning {
   id: string;
@@ -46,6 +47,7 @@ export const RULE_LABEL: Record<RuleId, string> = {
   soil: 'Talaj',
   fixture: 'Rögzített elem',
   window: 'Ablak',
+  lawn: 'Gyep',
 };
 
 const SEVERITY_ORDER: Record<Severity, number> = { error: 0, warn: 1, info: 2 };
@@ -252,6 +254,19 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
       });
 
     for (const f of area.fixtures) {
+      if (f.type === 'lawn' && f.polygon && f.polygon.length >= 3) {
+        const hit = ps.filter((q) => pointInPolygon(q, f.polygon!));
+        if (hit.length)
+          out.push({
+            id: `lawn:${it.id}:${f.id}`,
+            rule: 'lawn',
+            severity: 'warn',
+            itemIds: [it.id],
+            at: hit[0],
+            message: `${p.nameHu}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label || 'gyep'}” területére esik.`,
+            hint: 'A gyepre nem kerül növény; húzd az ágyásba, vagy igazítsd a gyep alakját.',
+          });
+      }
       if (f.type === 'tap' || f.type === 'manhole' || f.type === 'paving') {
         const hit = ps.filter((q) => inRect(f, q));
         if (hit.length)

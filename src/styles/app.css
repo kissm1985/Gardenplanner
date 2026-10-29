@@ -2252,3 +2252,10 @@ polyline.shape-line {
 .photo-field .plant-tip-photo img {
   height: 200px;
 }
+.shape-editor.is-lawn .shape-line {
+  fill: color-mix(in srgb, #7fae5f 45%, transparent);
+  stroke: #4f8a3a;
+}
+.shape-bar.is-lawn {
+  border-color: #4f8a3a;
+}

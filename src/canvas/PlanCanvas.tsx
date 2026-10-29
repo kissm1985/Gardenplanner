@@ -597,7 +597,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             {layers.fixtures && (
               <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select'} />
             )}
-            <AreaShapeEl area={area} className={`area-outline${shapeEdit ? ' is-editing' : ''}`} />
+            <AreaShapeEl area={area} className={`area-outline${shapeEdit && shapeEdit.target?.kind !== 'lawn' ? ' is-editing' : ''}`} />
             {layers.plants && (
               <PlantsLayer
                 items={items}
@@ -617,7 +617,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             )}
             {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
             {layers.dimensions && !shapeEdit && <Dimensions area={area} s={view.s} />}
-            {shapeEdit && <ShapeEditor points={shapeEdit.points} mode={shapeEdit.mode} selected={shapeEdit.selected} s={view.s} />}
+            {shapeEdit && <ShapeEditor points={shapeEdit.points} mode={shapeEdit.mode} selected={shapeEdit.selected} s={view.s} lawn={shapeEdit.target?.kind === 'lawn'} />}
             {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
             {calibrate?.map(([x, y], i) => <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />)}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
@@ -705,13 +705,13 @@ function Draft({ draft, plant, pattern, s, mature }: {
 }
 
 /** Outline being drawn/edited: corners, edge midpoints (tap to insert), edge lengths in cm. */
-function ShapeEditor({ points, mode, selected, s }: { points: Pt[]; mode: 'draw' | 'edit'; selected: number | null; s: number }) {
+function ShapeEditor({ points, mode, selected, s, lawn }: { points: Pt[]; mode: 'draw' | 'edit'; selected: number | null; s: number; lawn?: boolean }) {
   const closed = mode === 'edit' && points.length >= 3;
   const line = points.map((p) => p.join(',')).join(' ');
   const edges = points.map((a, i) => [a, points[(i + 1) % points.length]] as const).slice(0, closed ? points.length : Math.max(0, points.length - 1));
   const r = 10 / s;
   return (
-    <g className="shape-editor">
+    <g className={`shape-editor${lawn ? ' is-lawn' : ''}`}>
       {closed ? <polygon className="shape-line" points={line} vectorEffect="non-scaling-stroke" /> : <polyline className="shape-line" points={line} vectorEffect="non-scaling-stroke" />}
       {edges.map(([a, b], i) => {
         const mx = (a[0] + b[0]) / 2;

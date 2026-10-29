@@ -16,7 +16,7 @@ npm run build      # statikus build a dist/ mappába
 
 | | |
 |---|---|
-| Területek | Két sablon (Házoldali sáv, Gyepsávos kert), saját terület méretekkel, égtájjal, napsütéssel, korlátokkal; háttérkép két pontos méretaránnyal |
+| Területek | Két sablon (Házoldali sáv, Gyepsávos kert), saját terület (téglalap vagy rajzolt alak), rajzolható gyepsáv (ide nem kerül növény, figyelmeztet; m²-ben kiírja) méretekkel, égtájjal, napsütéssel, korlátokkal; háttérkép két pontos méretaránnyal |
 | Rajz | SVG cm-ben, rácsháló, vonalzó, két ujjas nagyítás/mozgatás, dupla koppintás = illesztés, rétegek, mágnes 10 cm-es rácsra |
 | Ültetés | Egyedi tő (koppintás vagy ráhúzás), folt (eltolt/négyzetes rács), egyenes sor, ív; automatikus darabszám; kijelölés, lasszó, másolás, törlés, 100 lépés visszavonás |
 | Növények | 89 faj kezdőlista (köztük 27 sövény-, takaró- és nagycserje, kis fa a hátsó kertbe), talajigénnyel; infókártya fotóval (Wikipédia/Commons, szerzővel és licenccel, a készüléken tárolva; vagy saját fotó), „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |

@@ -40,7 +40,14 @@ export interface UiState {
   collapsed: string[];
   toggleCollapsed: (id: string) => void;
   /** Area outline editor: drawing a new outline point by point, or editing corners. */
-  shapeEdit: { areaId: string; mode: 'draw' | 'edit'; points: [number, number][]; selected: number | null } | null;
+  shapeEdit: {
+    areaId: string;
+    mode: 'draw' | 'edit';
+    points: [number, number][];
+    selected: number | null;
+    /** What is being shaped: the area outline (default) or a lawn inside it (new or existing fixture). */
+    target?: { kind: 'lawn'; fixtureId?: string };
+  } | null;
   setShapeEdit: (v: UiState['shapeEdit']) => void;
   setPlantFilter: (f: PlantFilter) => void;
   setCalibrate: (v: [number, number][] | null) => void;
