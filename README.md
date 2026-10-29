@@ -1,6 +1,6 @@
 # Kerttervező
 
-Mobilbarát, offline is működő ültetéstervező (PWA). A specifikáció: [SPEC.md](SPEC.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
+Mobilbarát, offline is működő ültetéstervező (PWA). **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md).** A specifikáció: [SPEC.md](SPEC.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
 
 ```bash
 npm install

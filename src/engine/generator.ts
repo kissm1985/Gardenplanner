@@ -438,7 +438,7 @@ export function generateIdea(
   notes.push(`Színvilág: ${PALETTES[palette].label}.`);
   const parts: string[] = [];
   if (hedge && usedCodes.has(hedge.code)) parts.push(`hátul ${hedge.nameHu.toLowerCase()} sövény`);
-  if (tree && usedCodes.has(tree.code)) parts.push(`${treesPlaced > 1 ? 'kis fák' : 'kis fa'} (${tree.nameHu.toLowerCase()}) körülöttük szabad hellyel`);
+  if (tree && usedCodes.has(tree.code)) parts.push(`${treesPlaced > 1 ? 'fák' : 'egy fa'} (${tree.nameHu.toLowerCase()}) körülöttük szabad hellyel`);
   const sh = shrubs.filter((p) => usedCodes.has(p.code));
   if (sh.length) parts.push(`előtte cserjék ritmusban (${sh.map((p) => p.nameHu.toLowerCase()).join(', ')})`);
   const dr = species.filter((p) => usedCodes.has(p.code));

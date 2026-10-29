@@ -84,7 +84,7 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
             );
           })}
         </div>
-        <p className="mono muted">Sövény a hátsó szélre kerül, a kis fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.</p>
+        <p className="mono muted">Sövény a hátsó szélre kerül, a fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.</p>
       </fieldset>
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!kinds.length || pool.length < 1}>
