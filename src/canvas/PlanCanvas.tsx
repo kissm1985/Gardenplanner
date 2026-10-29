@@ -5,16 +5,19 @@ import { plantMap } from '../model/plants';
 import type { Area, Plant, Pt, Settings } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
-import { FixturesLayer, FixtureZonesLayer } from './layers/Fixtures';
+import type { Warning } from '../engine/rules';
+import { FixturesLayer, FixtureZonesLayer, type FixtureDrag } from './layers/Fixtures';
 import { GridLayer } from './layers/Grid';
 import { CountLabel, GroupLabels, PlantsLayer, plantRadius, VertexHandles, type DragOffset, type ShapeOverride } from './layers/Plants';
 import { Rulers, RULER } from './layers/Rulers';
+import { WarningsLayer } from './layers/Warnings';
 import { fitView, niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
 
 interface Props {
   area: Area;
   settings: Settings;
   plantDb: Plant[];
+  warnings: Warning[];
 }
 
 type P2 = { x: number; y: number };
@@ -24,6 +27,7 @@ type Gesture =
   | { mode: 'move'; start: P2; ids: string[]; anchor: Pt; moved: boolean; tappedId: string; additive: boolean; wasSelected: boolean }
   | { mode: 'lasso'; points: Pt[] }
   | { mode: 'draw'; kind: 'drift' | 'curve' | 'line'; points: Pt[]; startPx: P2; moved: boolean }
+  | { mode: 'fixture'; id: string; start: P2; anchor: Pt; moved: boolean }
   | { mode: 'vertex'; id: string; index: number; points: Pt[]; start: P2; moved: boolean }
   | { mode: 'pinch'; view: View; start: Map<number, P2> };
 
@@ -31,7 +35,7 @@ const DOUBLE_TAP_MS = 300;
 const TAP_SLOP_PX = 8;
 export const SNAP_CM = 10;
 
-export function PlanCanvas({ area, settings, plantDb }: Props) {
+export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState({ w: 0, h: 0 });
   const [view, setView] = useState<View | null>(null);
@@ -42,6 +46,8 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
   const tool = useUi((s) => s.tool);
   const activePlant = useUi((s) => s.activePlant);
   const selected = useUi((s) => s.selected);
+  const selectedFixture = useUi((s) => s.selectedFixture);
+  const [fxDrag, setFxDrag] = useState<FixtureDrag | null>(null);
   const lasso = useUi((s) => s.lasso);
   const layers = useUi((s) => s.layers);
   const plants = useMemo(() => plantMap(plantDb), [plantDb]);
@@ -128,6 +134,24 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
     };
   });
 
+  // Warning list jumps and "add fixture here" use these.
+  useEffect(() => {
+    canvasBridge.focus = (x, y) => {
+      const v = viewRef.current;
+      if (!v) return;
+      const s = Math.max(v.s, 1.2);
+      setView({ s, tx: size.w / 2 - x * s, ty: size.h / 2 - y * s });
+    };
+    canvasBridge.center = () => {
+      const v = viewRef.current;
+      return v ? screenToWorld(v, size.w / 2, size.h / 2) : [area.widthCm / 2, area.lengthCm / 2];
+    };
+    return () => {
+      canvasBridge.focus = null;
+      canvasBridge.center = null;
+    };
+  });
+
   const itemPos = (id: string): Pt => {
     const it = items.find((i) => i.id === id);
     if (!it) return [0, 0];
@@ -147,6 +171,7 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
       setLassoPts(null);
       setDraft(null);
       setShape(null);
+      setFxDrag(null);
       gesture.current = { mode: 'pinch', view, start: new Map(pointers.current) };
       return;
     }
@@ -155,6 +180,7 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
     const target = e.target as Element;
     const hitId = target.closest?.('[data-id]')?.getAttribute('data-id') ?? null;
     const handle = target.getAttribute?.('data-handle');
+    const fxId = hitId ? null : (target.closest?.('[data-fixture]')?.getAttribute('data-fixture') ?? null);
     const editing = editable();
     if (tool === 'select' && handle != null && editing) {
       gesture.current = { mode: 'vertex', id: editing.id, index: +handle, points: editing.points, start: p, moved: false };
@@ -171,6 +197,10 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
         ui.select(ids);
       }
       gesture.current = { mode: 'move', start: p, ids, anchor: itemPos(hitId), moved: false, tappedId: hitId, additive, wasSelected };
+    } else if (tool === 'select' && fxId) {
+      const f = area.fixtures.find((x) => x.id === fxId);
+      useUi.getState().selectFixture(fxId);
+      gesture.current = { mode: 'fixture', id: fxId, start: p, anchor: f ? [f.x, f.y] : [0, 0], moved: false };
     } else if (tool === 'select' && lasso) {
       gesture.current = { mode: 'lasso', points: [toWorld(p)] };
       setLassoPts([toWorld(p)]);
@@ -214,6 +244,10 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
       if (g.kind === 'line') g.points = [g.points[0], snapPt(w)];
       else if (dist(g.points[g.points.length - 1], w) * viewRef.current!.s > 3) g.points.push(w);
       setDraft({ kind: g.kind, points: [...g.points] });
+    } else if (g.mode === 'fixture') {
+      if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < TAP_SLOP_PX) return;
+      g.moved = true;
+      setFxDrag({ id: g.id, ...fixtureDelta(g, p) });
     } else if (g.mode === 'vertex') {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
       g.moved = true;
@@ -228,6 +262,13 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
     const s = viewRef.current!.s;
     const [ax, ay] = g.anchor;
     const [nx, ny] = snapPt([ax + dxs / s, ay + dys / s]);
+    return { dx: nx - ax, dy: ny - ay };
+  };
+
+  const fixtureDelta = (g: Extract<Gesture, { mode: 'fixture' }>, p: P2) => {
+    const s = viewRef.current!.s;
+    const [ax, ay] = g.anchor;
+    const [nx, ny] = snapPt([ax + (p.x - g.start.x) / s, ay + (p.y - g.start.y) / s]);
     return { dx: nx - ax, dy: ny - ay };
   };
 
@@ -256,6 +297,14 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
         useUi.getState().toggleSelect(g.tappedId);
       } else if (!g.additive) {
         useUi.getState().select([g.tappedId]);
+      }
+      return;
+    }
+    if (g.mode === 'fixture') {
+      setFxDrag(null);
+      if (g.moved) {
+        const { dx, dy } = fixtureDelta(g, p);
+        useProject.getState().moveFixture(g.id, dx, dy);
       }
       return;
     }
@@ -363,7 +412,10 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
       return;
     }
     lastTap.current = { t: now, x: p.x, y: p.y };
-    if (g.onEmpty && !g.additive) useUi.getState().select([]);
+    if (g.onEmpty && !g.additive) {
+      useUi.getState().select([]);
+      useUi.getState().selectFixture(null);
+    }
   };
 
   const onWheel = (e: WheelEvent) => {
@@ -393,7 +445,11 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
       useProject.getState().moveItems(sel, arrows[k][0] * step, arrows[k][1] * step);
     } else if (arrows[k]) setView({ ...view, tx: view.tx - arrows[k][0] * 40, ty: view.ty - arrows[k][1] * 40 });
     else if ((k === 'Delete' || k === 'Backspace') && sel.length) useProject.getState().deleteItems(sel);
-    else if (k === 'Escape') useUi.getState().select([]);
+    else if ((k === 'Delete' || k === 'Backspace') && selectedFixture) useProject.getState().deleteFixture(selectedFixture);
+    else if (k === 'Escape') {
+      useUi.getState().select([]);
+      useUi.getState().selectFixture(null);
+    }
     else if (mod && k.toLowerCase() === 'a') useUi.getState().select(items.map((i) => i.id));
     else if (mod && k.toLowerCase() === 'd' && sel.length) useUi.getState().select(useProject.getState().duplicateItems(sel, 20, 20));
     else return;
@@ -428,10 +484,12 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
           data-scale={view.s.toFixed(4)}
         >
           <g transform={`translate(${view.tx} ${view.ty}) scale(${view.s})`}>
-            {layers.zones && <FixtureZonesLayer area={area} settings={settings} />}
+            {layers.zones && <FixtureZonesLayer area={area} settings={settings} drag={fxDrag} />}
             <rect className="area-bed" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
             {layers.grid && <GridLayer w={area.widthCm} h={area.lengthCm} step={niceStep(view.s, 14)} />}
-            {layers.fixtures && <FixturesLayer area={area} scale={view.s} />}
+            {layers.fixtures && (
+              <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select'} />
+            )}
             <rect className="area-outline" x={0} y={0} width={area.widthCm} height={area.lengthCm} />
             {layers.plants && (
               <PlantsLayer
@@ -451,6 +509,7 @@ export function PlanCanvas({ area, settings, plantDb }: Props) {
             )}
             {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
             {layers.dimensions && <Dimensions area={area} s={view.s} />}
+            {layers.warnings && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>
           <Rulers view={view} w={size.w} h={size.h} />

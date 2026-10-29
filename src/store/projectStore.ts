@@ -3,7 +3,7 @@ import { itemCount, type Pattern } from '../engine/fill';
 import { SEED_PLANTS } from '../data/plants.seed';
 import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
-import { DEFAULT_SETTINGS, type Area, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Settings, type Variant } from '../model/types';
+import { DEFAULT_SETTINGS, type Area, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Settings, type Variant } from '../model/types';
 
 export const HISTORY_LIMIT = 100;
 
@@ -37,6 +37,13 @@ export interface ProjectState {
   updateItems: (ids: string[], patch: ItemPatch) => void;
   deleteItems: (ids: string[]) => void;
   duplicateItems: (ids: string[], dx: number, dy: number) => string[];
+
+  setMuted: (warningId: string, muted: boolean) => void;
+
+  addFixture: (f: Omit<Fixture, 'id'>) => string | null;
+  updateFixture: (id: string, patch: Partial<Omit<Fixture, 'id'>>) => void;
+  moveFixture: (id: string, dx: number, dy: number) => void;
+  deleteFixture: (id: string) => void;
 
   undo: () => void;
   redo: () => void;
@@ -94,6 +101,11 @@ export const useProject = create<ProjectState>()((set, get) => {
       if (items === v.items) return a;
       return { ...a, variants: a.variants.map((x) => (x.id === v.id ? { ...x, items } : x)) };
     });
+  };
+
+  const mapFixtures = (fn: (fs: Fixture[]) => Fixture[]) => {
+    const id = get().currentAreaId;
+    if (id) mapArea(id, (a) => ({ ...a, fixtures: fn(a.fixtures) }));
   };
 
   return {
@@ -257,6 +269,46 @@ export const useProject = create<ProjectState>()((set, get) => {
       });
       return created;
     },
+
+    setMuted: (wid, muted) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => {
+        const v = activeVariant(a);
+        const cur = v.muted ?? [];
+        if (cur.includes(wid) === muted) return a;
+        const next = muted ? [...cur, wid] : cur.filter((x) => x !== wid);
+        return { ...a, variants: a.variants.map((x) => (x.id === v.id ? { ...x, muted: next } : x)) };
+      });
+    },
+
+    addFixture: (f) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('f');
+      mapArea(areaId, (a) => ({ ...a, fixtures: [...a.fixtures, { ...f, id }] }));
+      return id;
+    },
+
+    updateFixture: (fid, patch) => mapFixtures((fs) => fs.map((f) => (f.id === fid ? { ...f, ...patch } : f))),
+
+    moveFixture: (fid, dx, dy) => {
+      if (dx === 0 && dy === 0) return;
+      mapFixtures((fs) =>
+        fs.map((f) =>
+          f.id === fid
+            ? {
+                ...f,
+                x: round1(f.x + dx),
+                y: round1(f.y + dy),
+                ...(f.polygon ? { polygon: f.polygon.map(([x, y]) => [round1(x + dx), round1(y + dy)] as Pt) } : {}),
+              }
+            : f,
+        ),
+      );
+    },
+
+    deleteFixture: (fid) => mapFixtures((fs) => fs.filter((f) => f.id !== fid)),
 
     undo: () => {
       const { past, project, future } = get();

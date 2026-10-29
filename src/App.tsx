@@ -1,13 +1,16 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { PlanCanvas, SNAP_CM } from './canvas/PlanCanvas';
+import { evaluate, partition } from './engine/rules';
 import { ORIENTATION_LABEL } from './model/types';
-import { selectCurrentArea, selectItems, useProject } from './store/projectStore';
+import { activeVariant, selectCurrentArea, selectItems, useProject } from './store/projectStore';
 import { useUi, type Layers, type Tool } from './store/uiStore';
 import { AreasPanel } from './ui/AreasPanel';
+import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantPalette } from './ui/PlantPalette';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
+import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
 
 // Tools arrive phase by phase (SPEC §7); unavailable ones are shown but disabled.
@@ -21,6 +24,7 @@ const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
 ];
 
 const LAYER_LABELS: Record<keyof Layers, string> = {
+  warnings: 'Figyelmeztetések',
   plants: 'Növények',
   spacing: 'Tőtáv-körök',
   grid: 'Rácsháló',
@@ -29,7 +33,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -44,6 +48,15 @@ export function App({ loading }: { loading: boolean }) {
   const rowMode = useUi((s) => s.rowMode);
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
+  const items = useProject(selectItems);
+  const selectedFixture = useUi((s) => s.selectedFixture);
+
+  // Rule engine: re-runs after every change of the area, its items, plants or settings.
+  const { active: warnings, muted } = useMemo(() => {
+    if (!area || !project) return { active: [], muted: [] };
+    return partition(evaluate(area, items, project.plantDb, project.settings), activeVariant(area).muted);
+  }, [area, items, project]);
+  const errors = warnings.filter((w) => w.severity === 'error').length;
 
   // Desktop keyboard shortcuts for undo/redo.
   useEffect(() => {
@@ -86,16 +99,21 @@ export function App({ loading }: { loading: boolean }) {
           <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label="Nézet és rétegek">
             ◫
           </button>
-          <span className="warn-badge is-ok" title="Figyelmeztetések (a szabálymotor a 4. fázisban érkezik)" aria-label="0 figyelmeztetés">
-            0
-          </span>
+          <button
+            type="button"
+            className={`warn-badge${warnings.length === 0 ? ' is-ok' : errors ? ' is-error' : ''}`}
+            onClick={() => setSheet('warnings')}
+            aria-label={`${warnings.length} figyelmeztetés`}
+          >
+            {warnings.length}
+          </button>
         </div>
       </header>
 
       <main className="stage">
         {area ? (
           <>
-            <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} />
+            <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
             {tool === 'select' && (
               <div className="stage-tools" role="toolbar" aria-label="Kijelölés módja">
                 <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
@@ -137,6 +155,12 @@ export function App({ loading }: { loading: boolean }) {
               </div>
             )}
             {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} />}
+            {tool === 'select' && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
+              <FixtureBar id={selectedFixture} label={(() => {
+                const f = area.fixtures.find((x) => x.id === selectedFixture);
+                return f ? f.label || FIXTURE_LABEL[f.type] : '';
+              })()} onProps={() => setSheet('fixtures')} />
+            )}
           </>
         ) : (
           <div className="empty-stage">
@@ -177,6 +201,12 @@ export function App({ loading }: { loading: boolean }) {
       </Sheet>
       <Sheet open={sheet === 'props'} title="Tulajdonságok" onClose={() => setSheet(null)}>
         <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} />
+      </Sheet>
+      <Sheet open={sheet === 'warnings'} title={`Figyelmeztetések (${warnings.length})`} onClose={() => setSheet(null)}>
+        <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
+      </Sheet>
+      <Sheet open={sheet === 'fixtures'} title="Rögzített elemek" onClose={() => setSheet(null)}>
+        <FixturesPanel onDone={() => setSheet(null)} />
       </Sheet>
       <Sheet open={sheet === 'view'} title="Nézet" onClose={() => setSheet(null)}>
         <div className="form">
@@ -220,9 +250,36 @@ export function App({ loading }: { loading: boolean }) {
             <button type="button" className="btn" onClick={() => setSheet('plantdb')}>
               Növényadatbázis
             </button>
+            <button type="button" className="btn" onClick={() => setSheet('fixtures')}>
+              Rögzített elemek
+            </button>
           </div>
         </div>
       </Sheet>
+    </div>
+  );
+}
+
+function FixtureBar({ id, label, onProps }: { id: string; label: string; onProps: () => void }) {
+  return (
+    <div className="selbar" role="toolbar" aria-label="Kijelölt elem">
+      <span className="selbar-count mono">{label}</span>
+      <button type="button" className="btn btn-small" onClick={onProps}>
+        Adatok
+      </button>
+      <button
+        type="button"
+        className="btn btn-small btn-danger"
+        onClick={() => {
+          useProject.getState().deleteFixture(id);
+          useUi.getState().selectFixture(null);
+        }}
+      >
+        Törlés
+      </button>
+      <button type="button" className="icon-btn" onClick={() => useUi.getState().selectFixture(null)} aria-label="Kijelölés megszüntetése">
+        ×
+      </button>
     </div>
   );
 }

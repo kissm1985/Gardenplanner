@@ -3,6 +3,7 @@ import { create } from 'zustand';
 export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'season' | 'list';
 
 export interface Layers {
+  warnings: boolean;
   plants: boolean;
   spacing: boolean;
   grid: boolean;
@@ -16,6 +17,7 @@ export interface UiState {
   tool: Tool;
   activePlant: string | null;
   selected: string[];
+  selectedFixture: string | null;
   lasso: boolean;
   snap: boolean;
   layers: Layers;
@@ -26,6 +28,7 @@ export interface UiState {
   setTool: (t: Tool) => void;
   setActivePlant: (code: string | null) => void;
   select: (ids: string[]) => void;
+  selectFixture: (id: string | null) => void;
   toggleSelect: (id: string) => void;
   setLasso: (v: boolean) => void;
   setSnap: (v: boolean) => void;
@@ -36,16 +39,18 @@ export const useUi = create<UiState>()((set) => ({
   tool: 'select',
   activePlant: null,
   selected: [],
+  selectedFixture: null,
   lasso: false,
   snap: false,
   driftPattern: 'staggered',
   rowMode: 'line',
   setDriftPattern: (driftPattern) => set({ driftPattern }),
   setRowMode: (rowMode) => set({ rowMode }),
-  layers: { plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
+  layers: { warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
   setTool: (tool) => set((s) => ({ tool, lasso: tool === 'select' ? s.lasso : false })),
   setActivePlant: (activePlant) => set({ activePlant }),
-  select: (selected) => set({ selected }),
+  select: (selected) => set((s) => ({ selected, selectedFixture: selected.length ? null : s.selectedFixture })),
+  selectFixture: (selectedFixture) => set((s) => ({ selectedFixture, selected: selectedFixture ? [] : s.selected })),
   toggleSelect: (id) => set((s) => ({ selected: s.selected.includes(id) ? s.selected.filter((x) => x !== id) : [...s.selected, id] })),
   setLasso: (lasso) => set({ lasso }),
   setSnap: (snap) => set({ snap }),
@@ -53,4 +58,10 @@ export const useUi = create<UiState>()((set) => ({
 }));
 
 /** The canvas registers this so the palette can drop a plant at a screen position. */
-export const canvasBridge: { dropAt: ((clientX: number, clientY: number, plantId: string) => boolean) | null } = { dropAt: null };
+export const canvasBridge: {
+  dropAt: ((clientX: number, clientY: number, plantId: string) => boolean) | null;
+  /** Centre the view on a point (cm), zooming in if needed. */
+  focus: ((x: number, y: number) => void) | null;
+  /** Current view centre in cm (for adding fixtures where the user is looking). */
+  center: (() => [number, number]) | null;
+} = { dropAt: null, focus: null, center: null };

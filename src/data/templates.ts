@@ -1,5 +1,5 @@
 import { uid } from '../model/ids';
-import { DEFAULT_CONSTRAINTS, type Area, type Fixture, type Orientation, type Pt } from '../model/types';
+import { DEFAULT_CONSTRAINTS, type Area, type Fixture, type Orientation, type Pt, type SunNeed } from '../model/types';
 
 export interface AreaInput {
   name: string;
@@ -7,6 +7,7 @@ export interface AreaInput {
   lengthCm: number;
   orientation: Orientation;
   sunUntil: string;
+  sunLevel?: SunNeed;
   notes: string;
   constraints?: Partial<Area['constraints']>;
   fixtures?: Fixture[];
@@ -21,6 +22,7 @@ export function makeArea(input: AreaInput): Area {
     lengthCm: input.lengthCm,
     orientation: input.orientation,
     sunUntil: input.sunUntil,
+    ...(input.sunLevel ? { sunLevel: input.sunLevel } : {}),
     notes: input.notes,
     shape: { kind: 'rect' },
     constraints: { ...DEFAULT_CONSTRAINTS, ...input.constraints, speciesLimits: { ...input.constraints?.speciesLimits } },

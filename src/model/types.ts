@@ -95,6 +95,8 @@ export interface Variant {
   name: string;
   items: PlacedItem[];
   notes: string;
+  /** Warning ids the user accepted as deliberate exceptions. */
+  muted?: string[];
 }
 
 export interface Background {
@@ -114,6 +116,8 @@ export interface Area {
   lengthCm: number;
   orientation: Orientation;
   sunUntil: string;
+  /** Overrides the sun level derived from orientation + sunUntil. */
+  sunLevel?: SunNeed;
   notes: string;
   shape: AreaShape;
   constraints: Constraints;

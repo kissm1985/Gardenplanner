@@ -1,8 +1,10 @@
 import { useState, type FormEvent } from 'react';
 import type { AreaInput } from '../data/templates';
-import { DEFAULT_CONSTRAINTS, ORIENTATION_LABEL, type Area, type Orientation } from '../model/types';
+import { areaSunLevel } from '../engine/rules';
+import { SUN_LABEL } from '../model/plants';
+import { DEFAULT_CONSTRAINTS, ORIENTATION_LABEL, type Area, type Orientation, type SunNeed } from '../model/types';
 
-type Draft = AreaInput & { constraints: Area['constraints'] };
+type Draft = AreaInput & { constraints: Area['constraints']; sunLevel?: SunNeed };
 
 const blank: Draft = {
   name: '',
@@ -28,12 +30,18 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: {
           lengthCm: initial.lengthCm,
           orientation: initial.orientation,
           sunUntil: initial.sunUntil,
+          sunLevel: initial.sunLevel,
           notes: initial.notes,
           constraints: { ...initial.constraints },
         }
       : blank,
   );
   const [error, setError] = useState('');
+  const [limits, setLimits] = useState(() =>
+    Object.entries(d.constraints.speciesLimits)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join(', '),
+  );
   const set = <K extends keyof Draft>(k: K, v: Draft[K]) => setD((p) => ({ ...p, [k]: v }));
   const setC = <K extends keyof Draft['constraints']>(k: K, v: Draft['constraints'][K]) =>
     setD((p) => ({ ...p, constraints: { ...p.constraints, [k]: v } }));
@@ -43,8 +51,10 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: {
     if (!d.name.trim()) return setError('Adj nevet a területnek, például „Házoldali sáv”.');
     if (!(d.widthCm >= 10 && d.widthCm <= 10000 && d.lengthCm >= 10 && d.lengthCm <= 10000))
       return setError('A méret 10 és 10 000 cm között lehet.');
+    const parsed = parseLimits(limits);
+    if (parsed == null) return setError('A fajonkénti korlát formája: kód: darab, pl. „LA: 12, TH: 40”.');
     setError('');
-    onSubmit({ ...d, name: d.name.trim() });
+    onSubmit({ ...d, name: d.name.trim(), constraints: { ...d.constraints, speciesLimits: parsed } });
   };
 
   return (
@@ -80,6 +90,18 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: {
         </label>
       </div>
 
+      <label className="field">
+        <span>Napfény a szabályokhoz</span>
+        <select value={d.sunLevel ?? ''} onChange={(e) => set('sunLevel', (e.target.value || undefined) as SunNeed | undefined)}>
+          <option value="">automatikus ({SUN_LABEL[areaSunLevel({ ...(initial ?? ({} as Area)), ...d, sunLevel: undefined, shape: { kind: 'rect' } } as Area)]})</option>
+          {(Object.keys(SUN_LABEL) as SunNeed[]).map((k) => (
+            <option key={k} value={k}>
+              {SUN_LABEL[k]}
+            </option>
+          ))}
+        </select>
+      </label>
+
       <fieldset className="field-group">
         <legend>Korlátok</legend>
         <label className="field">
@@ -99,6 +121,10 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: {
             value={d.constraints.maxTrees ?? ''}
             onChange={(e) => setC('maxTrees', e.target.value === '' ? null : +e.target.value)}
           />
+        </label>
+        <label className="field">
+          <span>Fajonkénti korlát (pl. LA: 12, TH: 40)</span>
+          <input value={limits} onChange={(e) => setLimits(e.target.value)} autoCapitalize="characters" />
         </label>
         <Check label="Tüskementes legyen" v={d.constraints.noThorns} on={(v) => setC('noThorns', v)} />
         <Check label="Nem mérgező legyen" v={d.constraints.nonToxic} on={(v) => setC('nonToxic', v)} />
@@ -135,4 +161,15 @@ function Check({ label, v, on }: { label: string; v: boolean; on: (v: boolean) =
       <span>{label}</span>
     </label>
   );
+}
+
+/** "LA: 12, th 40" → { LA: 12, TH: 40 }; null when malformed. */
+export function parseLimits(text: string): Record<string, number> | null {
+  const out: Record<string, number> = {};
+  for (const part of text.split(/[,;\n]/).map((x) => x.trim()).filter(Boolean)) {
+    const m = part.match(/^([a-zA-Z0-9]{2})\s*[:=]?\s*(\d+)$/);
+    if (!m) return null;
+    out[m[1].toUpperCase()] = +m[2];
+  }
+  return out;
 }
