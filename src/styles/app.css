@@ -367,10 +367,17 @@ html[data-save-error] .topbar {
   color: var(--fg);
   width: 100%;
   max-width: 100%;
+  /* Height of what is actually visible: Safari's address bar must not cover the header (×). */
   max-height: 88vh;
+  max-height: calc(var(--visible-h, 100svh) - env(safe-area-inset-top, 0px) - 16px);
   margin: auto 0 0;
   border-radius: 10px 10px 0 0;
   box-shadow: 0 -8px 30px rgba(0, 0, 0, 0.2);
+  overflow: hidden;
+}
+.sheet[open] {
+  display: flex;
+  flex-direction: column;
 }
 .sheet::backdrop {
   background: rgba(10, 16, 12, 0.45);
@@ -385,6 +392,8 @@ html[data-save-error] .topbar {
 .sheet-head {
   position: sticky;
   top: 0;
+  flex: none;
+  touch-action: none;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -397,7 +406,27 @@ html[data-save-error] .topbar {
   font-size: 20px;
 }
 .sheet-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   padding: 14px 16px calc(20px + env(safe-area-inset-bottom, 0px));
+}
+.sheet-grip {
+  position: absolute;
+  top: 4px;
+  left: 50%;
+  width: 40px;
+  height: 4px;
+  margin-left: -20px;
+  border-radius: 2px;
+  background: var(--line);
+}
+@media (min-width: 700px) {
+  .sheet-grip {
+    display: none;
+  }
 }
 
 /* ---------- forms ---------- */

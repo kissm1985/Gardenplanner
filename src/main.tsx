@@ -77,4 +77,10 @@ registerSW({ immediate: true });
 // A share link (#view=…) opens the read-only page and never touches the local plan.
 const share = location.hash.startsWith(SHARE_PREFIX) ? location.hash.slice(SHARE_PREFIX.length) : null;
 
+// The visible height (without Safari's address bar); sheets size themselves to it.
+const setVisibleH = () => document.documentElement.style.setProperty('--visible-h', `${Math.round(window.visualViewport?.height ?? window.innerHeight)}px`);
+setVisibleH();
+window.visualViewport?.addEventListener('resize', setVisibleH);
+window.addEventListener('resize', setVisibleH);
+
 createRoot(document.getElementById('root')!).render(<StrictMode>{share ? <ReadOnlyView code={share} /> : <Root />}</StrictMode>);
