@@ -23,6 +23,11 @@ export interface UiState {
   layers: Layers;
   driftPattern: 'grid' | 'staggered';
   rowMode: 'line' | 'curve';
+  /** Season view month (1–12) and side-by-side mode. */
+  month: number;
+  fourUp: boolean;
+  setMonth: (m: number) => void;
+  setFourUp: (v: boolean) => void;
   setDriftPattern: (p: 'grid' | 'staggered') => void;
   setRowMode: (m: 'line' | 'curve') => void;
   setTool: (t: Tool) => void;
@@ -44,6 +49,10 @@ export const useUi = create<UiState>()((set) => ({
   snap: false,
   driftPattern: 'staggered',
   rowMode: 'line',
+  month: new Date().getMonth() + 1,
+  fourUp: false,
+  setMonth: (month) => set({ month }),
+  setFourUp: (fourUp) => set({ fourUp }),
   setDriftPattern: (driftPattern) => set({ driftPattern }),
   setRowMode: (rowMode) => set({ rowMode }),
   layers: { warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },

@@ -17,7 +17,7 @@ npm run build      # statikus build a dist/ mappába (Netlify / Vercel / GitHub 
 - [x] 3. fázis – Gyors ültetés: folt (eltolt/négyzetes rács), egyenes sor, ív, automatikus darabszám
 - [x] 4. fázis – Szabálymotor (12 szabály, elnémítás, ugrás), rögzített elemek húzása és szerkesztése
 - [x] 5. fázis – Növénylista: összesítő és területenkénti tábla, tartalék, árak, státuszok, másolás (szöveg/Excel), CSV, XLSX, megosztás
-- [ ] 6. fázis – Évszaknézet
+- [x] 6. fázis – Évszaknézet: négy évszak + havi csúszka, virágzó fajok, négy évszak egymás mellett
 - [ ] 7. fázis – Változatok
 - [ ] 8. fázis – Menetrend, gondozás
 - [ ] 9. fázis – Export, megosztás, finomhangolás

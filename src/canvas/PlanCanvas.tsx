@@ -50,6 +50,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const [fxDrag, setFxDrag] = useState<FixtureDrag | null>(null);
   const lasso = useUi((s) => s.lasso);
   const layers = useUi((s) => s.layers);
+  const month = useUi((s) => (s.tool === 'season' ? s.month : null));
   const plants = useMemo(() => plantMap(plantDb), [plantDb]);
 
   const pointers = useRef(new Map<number, P2>());
@@ -500,6 +501,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
                 shape={shape}
                 showMature={settings.showMatureSize}
                 showSpacing={layers.spacing}
+                month={month}
               />
             )}
             {layers.plants && <GroupLabels items={items} plants={plants} drag={drag} shape={shape} s={view.s} />}
@@ -509,7 +511,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             )}
             {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
             {layers.dimensions && <Dimensions area={area} s={view.s} />}
-            {layers.warnings && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
+            {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>
           <Rulers view={view} w={size.w} h={size.h} />

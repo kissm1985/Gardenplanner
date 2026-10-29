@@ -1390,3 +1390,94 @@ table.bom {
 .lv-empty {
   padding: 24px 0;
 }
+
+/* ---------- phase 6: seasons ---------- */
+.season-panel {
+  border-top: 1px solid var(--line);
+  background: var(--bg);
+  padding: 8px max(10px, env(safe-area-inset-right, 0px)) 8px max(10px, env(safe-area-inset-left, 0px));
+  display: grid;
+  gap: 6px;
+}
+.season-btns {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+  gap: 6px;
+}
+.season-btns .chip-btn {
+  min-height: var(--tap);
+  padding: 6px 4px;
+}
+@media (max-width: 420px) {
+  .season-btns {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+  .season-btns .chip-btn:last-child {
+    grid-column: 1 / -1;
+    min-height: 38px;
+  }
+}
+.month-slider {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+}
+.month-slider input {
+  width: 100%;
+  min-height: 36px;
+  accent-color: var(--accent);
+}
+.season-hint {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.3;
+  color: var(--mute);
+}
+.four-seasons {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  padding: 12px max(12px, env(safe-area-inset-right, 0px)) 20px max(12px, env(safe-area-inset-left, 0px));
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.four-seasons.is-wide {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+@media (min-width: 900px) {
+  .four-seasons.is-wide {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+.four-cell {
+  margin: 0;
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-width: 0;
+}
+.four-cell figcaption {
+  font-size: 15px;
+  display: grid;
+  line-height: 1.2;
+}
+.four-cell figcaption .mono {
+  font-size: 11px;
+}
+.four-hint {
+  margin: 0;
+  hyphens: auto;
+  overflow-wrap: anywhere;
+  font-size: 12px;
+  line-height: 1.3;
+  color: var(--mute);
+}
+.static-plan {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 70vh;
+  background: var(--panel);
+  border: 1px solid var(--line);
+}

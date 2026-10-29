@@ -9,6 +9,7 @@ import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantPalette } from './ui/PlantPalette';
 import { ListView } from './ui/ListView';
+import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
 import { WarningsPanel } from './ui/WarningsPanel';
@@ -20,7 +21,7 @@ const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
   { id: 'plant', label: 'Növény', icon: '✿', ready: true },
   { id: 'drift', label: 'Folt', icon: '⬭', ready: true },
   { id: 'row', label: 'Sor', icon: '⋯', ready: true },
-  { id: 'season', label: 'Évszak', icon: '◐', ready: false },
+  { id: 'season', label: 'Évszak', icon: '◐', ready: true },
   { id: 'list', label: 'Lista', icon: '☰', ready: true },
 ];
 
@@ -51,6 +52,7 @@ export function App({ loading }: { loading: boolean }) {
   const [sheet, setSheet] = useState<SheetId>(null);
   const items = useProject(selectItems);
   const selectedFixture = useUi((s) => s.selectedFixture);
+  const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
 
   // Rule engine: re-runs after every change of the area, its items, plants or settings.
   const { active: warnings, muted } = useMemo(() => {
@@ -111,9 +113,11 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </header>
 
-      <main className={`stage${tool === 'list' ? ' stage-scroll' : ''}`}>
+      <main className={`stage${tool === 'list' || fourUp ? ' stage-scroll' : ''}`}>
         {tool === 'list' ? (
           <ListView />
+        ) : fourUp && area ? (
+          <FourSeasons area={area} plantDb={project.plantDb} showMature={project.settings.showMatureSize} />
         ) : area ? (
           <>
             <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
@@ -176,6 +180,7 @@ export function App({ loading }: { loading: boolean }) {
       </main>
 
       {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && <PlantPalette onOpenDb={() => setSheet('plantdb')} />}
+      {tool === 'season' && area && <SeasonPanel area={area} plantDb={project.plantDb} />}
 
       <nav className="toolbar" aria-label="Eszközök">
         {TOOLS.map((t) => (
