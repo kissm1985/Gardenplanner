@@ -52,3 +52,22 @@ test('variants: copy, edit B, choose, compare', async ({ page }) => {
   await page.getByRole('button', { name: 'Házoldali sáv', exact: true }).click();
   await expect(page.locator('.lv-sum')).toContainText('12 tő');
 });
+
+test('idea generator: new variant with a fitting composition, "Újra" replaces it', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  await page.locator('.variant-pill').click();
+  await page.getByRole('button', { name: '✦ Ötlet generálása' }).click();
+  const dlg = page.locator('dialog[open]');
+  await dlg.getByLabel('Színvilág').selectOption('purple-silver');
+  await dlg.getByRole('button', { name: 'Ötlet generálása' }).click();
+  await expect(dlg.locator('.idea-result')).toContainText('Ötlet 1: Lila–ezüst');
+  await expect(dlg.locator('.idea-result')).toContainText('nincs figyelmeztetés');
+  const first = await dlg.locator('.idea-species').innerText();
+  await dlg.getByRole('button', { name: 'Újra (ebbe a változatba)' }).click();
+  await expect(dlg.locator('.idea-result')).toContainText('Ötlet 1');
+  await dlg.getByRole('button', { name: 'Megnézem a rajzon' }).click();
+  await expect(page.locator('.variant-pill')).toContainText('Ötlet 1');
+  await expect(page.locator('g.group').first()).toBeVisible();
+  expect(first.length).toBeGreaterThan(0);
+});

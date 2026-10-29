@@ -2128,3 +2128,25 @@ polyline.shape-line {
   gap: 6px;
   justify-content: flex-end;
 }
+
+/* ---------- idea generator ---------- */
+.idea-result {
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+}
+.idea-species {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+}
+.idea-species li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

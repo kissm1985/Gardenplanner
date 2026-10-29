@@ -19,11 +19,12 @@ npm run build      # statikus build a dist/ mappába
 | Területek | Két sablon (Házoldali sáv, Gyepsávos kert), saját terület méretekkel, égtájjal, napsütéssel, korlátokkal; háttérkép két pontos méretaránnyal |
 | Rajz | SVG cm-ben, rácsháló, vonalzó, két ujjas nagyítás/mozgatás, dupla koppintás = illesztés, rétegek, mágnes 10 cm-es rácsra |
 | Ültetés | Egyedi tő (koppintás vagy ráhúzás), folt (eltolt/négyzetes rács), egyenes sor, ív; automatikus darabszám; kijelölés, lasszó, másolás, törlés, 100 lépés visszavonás |
-| Növények | 30 faj kezdőlista, „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
+| Növények | 62 faj kezdőlista, talajigénnyel, „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
 | Szabályok | Magasság, tüske, mérgező, juglone-zóna (állítható sugár), tőtáv, határon kívül, fajkorlát, fák száma, vízigény, napigény, csap/akna, ablak; ugrás és elnémítás |
 | Lista | Ültetett és rendelendő darab (+tartalék), árak, státuszok; másolás szövegként és táblázatként, CSV, XLSX, megosztás |
 | Évszakok | Négy évszak és havi csúszka, négy évszak egymás mellett |
 | Változatok | A/B terv, választott változat, összehasonlítás |
+| Ötletgenerátor | Véletlenszerű, a terület feltételeihez illő összeállítás (színvilág, hátul magas – elöl alacsony, 3–5 faj ritmusban, diófa-zóna) külön változatba; „Újra” gomb |
 | Menetrend | Napokra bontott, pipálható ültetési lista; gondozási naptár Győrre; mulcsajánlás |
 | Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG jelmagyarázattal, teljes JSON-mentés, csak olvasható link |
 | Látványterv | Bemásolható leírás a ChatGPT-nek (méretek, égtáj, tereptárgyak, foltok helye méterben, fajok kinézete évszak szerint, nézőpont) + rajz PNG-ben |
@@ -41,6 +42,5 @@ npm run build      # statikus build a dist/ mappába
 
 ## Még nincs meg
 
-- Szabad sokszög / ív alakú terület (SPEC §4.1 „második lépés”) – most téglalap
 - Mágnesezés más elemek széléhez (csak rácsra van)
 - Oldalszám a PDF-ben Safariban (a Chrome-alapú böngészők kiírják)

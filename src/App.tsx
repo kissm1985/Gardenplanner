@@ -21,6 +21,7 @@ import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
 import { VariantsPanel } from './ui/VariantsPanel';
+import { IdeaPanel } from './ui/IdeaPanel';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
 
@@ -45,7 +46,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -275,7 +276,10 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </Sheet>
       <Sheet open={sheet === 'variants'} title="Változatok" onClose={() => setSheet(null)}>
-        <VariantsPanel onDone={() => setSheet(null)} />
+        <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} />
+      </Sheet>
+      <Sheet open={sheet === 'ideas'} title="Ötletgenerátor" onClose={() => setSheet(null)}>
+        <IdeaPanel onDone={() => setSheet(null)} />
       </Sheet>
       <Sheet open={sheet === 'warnings'} title={`Figyelmeztetések (${warnings.length})`} onClose={() => setSheet(null)}>
         <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
@@ -327,6 +331,9 @@ export function App({ loading }: { loading: boolean }) {
             </button>
             <button type="button" className="btn" onClick={() => setSheet('fixtures')}>
               Rögzített elemek
+            </button>
+            <button type="button" className="btn" onClick={() => setSheet('ideas')}>
+              ✦ Ötletgenerátor
             </button>
             <button
               type="button"

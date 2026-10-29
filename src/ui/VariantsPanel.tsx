@@ -6,7 +6,7 @@ import { activeVariant, selectCurrentArea, useProject } from '../store/projectSt
 import { useUi } from '../store/uiStore';
 
 /** Plan variants of the current area: open, choose, copy, rename, delete, compare. */
-export function VariantsPanel({ onDone }: { onDone: () => void }) {
+export function VariantsPanel({ onDone, onIdeas }: { onDone: () => void; onIdeas: () => void }) {
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
   const [renaming, setRenaming] = useState<string | null>(null);
@@ -75,6 +75,9 @@ export function VariantsPanel({ onDone }: { onDone: () => void }) {
       <div className="form-actions">
         <button type="button" className="btn" onClick={() => st.addEmptyVariant()}>
           + Üres változat
+        </button>
+        <button type="button" className="btn" onClick={onIdeas}>
+          ✦ Ötlet generálása
         </button>
         <button
           type="button"

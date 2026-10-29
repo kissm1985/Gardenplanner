@@ -56,6 +56,10 @@ export interface ProjectState {
 
   duplicateVariant: (variantId: string) => string | null;
   addEmptyVariant: () => string | null;
+  /** New variant with ready items (e.g. from the idea generator); it becomes the edited one. */
+  addVariantWith: (name: string, items: PlacedItem[], notes: string) => string | null;
+  /** Replace a variant's items in one undoable step (idea generator "Újra"). */
+  setVariantItems: (variantId: string, items: PlacedItem[], notes: string) => void;
   renameVariant: (variantId: string, name: string) => void;
   deleteVariant: (variantId: string) => void;
   setActiveVariant: (variantId: string) => void;
@@ -450,6 +454,20 @@ export const useProject = create<ProjectState>()((set, get) => {
       const id = uid('v');
       mapArea(areaId, (a) => ({ ...a, variants: [...a.variants, { id, name: nextVariantName(a.variants), items: [], notes: '' }], activeVariantId: id }));
       return id;
+    },
+
+    addVariantWith: (name, items, notes) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('v');
+      mapArea(areaId, (a) => ({ ...a, variants: [...a.variants, { id, name, items, notes }], activeVariantId: id }));
+      return id;
+    },
+
+    setVariantItems: (vid, items, notes) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return;
+      mapArea(areaId, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, items, notes, muted: [] } : v)) }));
     },
 
     renameVariant: (vid, name) => {
