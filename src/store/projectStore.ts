@@ -9,7 +9,7 @@ import { DEFAULT_SETTINGS, type Area, type Fixture, type ItemStatus, type Placed
 
 export const HISTORY_LIMIT = 100;
 
-export type ItemPatch = Partial<{ plantId: string; status: ItemStatus; note: string; x: number; y: number; pattern: Pattern; spacingCm: number }>;
+export type ItemPatch = Partial<{ plantId: string; status: ItemStatus; note: string; x: number; y: number; pattern: Pattern; spacingCm: number; spreadCm: number | undefined }>;
 
 /** Where a species replacement applies: the edited variant, every variant of the area, or the whole project. */
 export type ReplaceScope = 'variant' | 'area' | 'project';

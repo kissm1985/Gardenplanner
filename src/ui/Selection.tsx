@@ -113,11 +113,31 @@ export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; on
           {note}
         </p>
       )}
+      {single && single.kind === 'plant' && plant && <SpreadField key={`${single.id}:${single.spreadCm ?? ''}`} item={single} plant={plant} />}
       {single && <SingleFields key={single.id} item={single} />}
       <div className="form-actions">
         <button type="button" className="btn btn-primary" onClick={onDone}>
           Kész
         </button>
+      </div>
+    </div>
+  );
+}
+
+/** This plant's own spread (bigger or smaller than the species); also draggable on the plan. */
+function SpreadField({ item, plant }: { item: Extract<PlacedItem, { kind: 'plant' }>; plant: Plant }) {
+  const upd = useProject.getState().updateItems;
+  const own = item.spreadCm != null && item.spreadCm !== plant.spreadCm;
+  return (
+    <div className="field-row spread-row">
+      <NumField label="Kiterjedés (cm)" v={item.spreadCm ?? plant.spreadCm} on={(v) => v >= 5 && v <= 5000 && upd([item.id], { spreadCm: Math.round(v) === plant.spreadCm ? undefined : Math.round(v) })} />
+      <div className="field">
+        <span className="mono muted">{own ? `egyedi méret (a faj: ${plant.spreadCm} cm)` : 'a faj mérete'}</span>
+        {own && (
+          <button type="button" className="btn btn-small" onClick={() => upd([item.id], { spreadCm: undefined })}>
+            Vissza az alapméretre
+          </button>
+        )}
       </div>
     </div>
   );

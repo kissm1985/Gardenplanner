@@ -1,7 +1,7 @@
 // Rule engine (SPEC §4.5). Pure function of the area, its active items, the plant list and the
 // settings; runs after every change. Warnings carry a stable id so the user can mute them.
 import { centroid, dist, pointInPolygon } from '../model/geometry';
-import { JUGLONE_LABEL, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
+import { effectivePlant, JUGLONE_LABEL, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings, SunNeed, WaterNeed } from '../model/types';
 import { itemPositions } from './fill';
 
@@ -140,7 +140,8 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
     if (!plant) continue;
     const ps = itemPositions(it);
     posByItem.set(it.id, ps);
-    for (const p of ps) all.push({ item: it, plant, p });
+    const placed = effectivePlant(plant, it);
+    for (const p of ps) all.push({ item: it, plant: placed, p });
   }
 
   // Species-level rules: one warning per species, listing all its items.

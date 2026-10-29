@@ -2399,3 +2399,15 @@ polyline.shape-line {
   grid-template-columns: 1fr 1fr;
   gap: 6px;
 }
+.resize-line {
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 4 3;
+}
+.resize-handle {
+  cursor: ew-resize;
+  fill: var(--accent);
+}
+.spread-row .field .btn {
+  justify-self: start;
+}

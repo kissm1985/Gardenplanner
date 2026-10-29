@@ -2,7 +2,7 @@ import { memo, useMemo } from 'react';
 import { fillPath, fillPolygon } from '../../engine/fill';
 import { plantLook } from '../../engine/season';
 import { bbox, centroid } from '../../model/geometry';
-import { textOn } from '../../model/plants';
+import { effectivePlant, textOn } from '../../model/plants';
 import type { PlacedItem, Plant, Pt } from '../../model/types';
 
 export interface DragOffset {
@@ -49,8 +49,9 @@ export const PlantsLayer = memo(function PlantsLayer({ items, plants, selected, 
     <g className="plants">
       {items.map((raw) => {
         const it = withShape(raw, shape);
-        const p = plants.get(it.plantId);
-        if (!p) return null;
+        const base = plants.get(it.plantId);
+        if (!base) return null;
+        const p = effectivePlant(base, it);
         const moving = drag?.ids.has(it.id);
         const dx = moving ? drag!.dx : 0;
         const dy = moving ? drag!.dy : 0;

@@ -1,4 +1,4 @@
-import { JUGLONE_LABEL, MONTHS, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
+import { effectivePlant, JUGLONE_LABEL, MONTHS, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { PlacedItem, Plant } from '../model/types';
 import { PlantChip } from './PlantChip';
 import { STATUS_LABEL } from './Selection';
@@ -27,7 +27,7 @@ export function PlantTooltip({ plant, item, x, y, boxW, boxH }: { plant: Plant; 
   const top = Math.min(Math.max(8, y + 16), Math.max(8, boxH - 340));
   return (
     <div className="plant-tip" style={{ left, top, width: W }} role="tooltip">
-      <PlantCard plant={plant} item={item} />
+      <PlantCard plant={effectivePlant(plant, item)} item={item} />
     </div>
   );
 }

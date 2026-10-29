@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from 'react';
 import { fillPath, fillPolygon } from '../engine/fill';
 import { bbox, centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
-import { plantMap } from '../model/plants';
+import { effectivePlant, plantMap } from '../model/plants';
 import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, newFixture } from '../model/fixtures';
 import type { Area, Fixture, FixtureType, Plant, Pt, Settings } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
@@ -34,13 +34,17 @@ type Gesture =
   | { mode: 'shapeVertex'; index: number; start: P2; moved: boolean }
   | { mode: 'vertex'; id: string; index: number; points: Pt[]; start: P2; moved: boolean }
   | { mode: 'pinch'; view: View; start: Map<number, P2> }
-  | { mode: 'fxrect'; type: FixtureType; a: Pt; startPx: P2; moved: boolean };
+  | { mode: 'fxrect'; type: FixtureType; a: Pt; startPx: P2; moved: boolean }
+  | { mode: 'resize'; id: string; center: Pt; plant: Plant; start: P2; moved: boolean };
 
 const DOUBLE_TAP_MS = 300;
 /** Height of the floating tool row over the top of the plan; fitting keeps the area below it. */
 const OVERLAY_TOP = 52;
 const TAP_SLOP_PX = 8;
 export const SNAP_CM = 10;
+
+/** Spread (cm, in 5 cm steps) whose drawn radius is r — the inverse of plantRadius. */
+const spreadFromRadius = (r: number, mature: boolean) => Math.min(5000, Math.max(5, Math.round((mature ? r * 2 : r / 0.2) / 5) * 5));
 
 export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const boxRef = useRef<HTMLDivElement>(null);
@@ -78,6 +82,8 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const [fxDraft, setFxDraft] = useState<Omit<Fixture, 'id'> | null>(null);
   const fixtureTool = useUi((s) => s.fixtureTool);
   const [shape, setShape] = useState<ShapeOverride | null>(null);
+  /** Live spread while a single plant's size handle is dragged. */
+  const [resize, setResize] = useState<{ id: string; spreadCm: number } | null>(null);
   const pendingLineStart = useRef<Pt | null>(null);
   const [pendingStart, setPendingStart] = useState<Pt | null>(null);
   const driftPattern = useUi((s) => s.driftPattern);
@@ -225,6 +231,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: true, additive: false };
     } else if (useUi.getState().calibrate) {
       gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: true, additive: false };
+    } else if (tool === 'select' && target.getAttribute?.('data-resize')) {
+      const it = items.find((i) => i.id === target.getAttribute('data-resize'));
+      const pl = it && plants.get(it.plantId);
+      if (it?.kind === 'plant' && pl) gesture.current = { mode: 'resize', id: it.id, center: [it.x, it.y], plant: pl, start: p, moved: false };
     } else if (tool === 'select' && handle != null && editing) {
       gesture.current = { mode: 'vertex', id: editing.id, index: +handle, points: editing.points, start: p, moved: false };
     } else if ((tool === 'drift' || tool === 'row') && activePlant) {
@@ -297,6 +307,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       if (g.kind === 'line') g.points = [g.points[0], snapPt(w)];
       else if (dist(g.points[g.points.length - 1], w) * viewRef.current!.s > 3) g.points.push(w);
       setDraft({ kind: g.kind, points: [...g.points] });
+    } else if (g.mode === 'resize') {
+      if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
+      g.moved = true;
+      setResize({ id: g.id, spreadCm: spreadFromRadius(dist(toWorld(p), g.center), settings.showMatureSize) });
     } else if (g.mode === 'fxrect') {
       if (!g.moved && Math.hypot(p.x - g.startPx.x, p.y - g.startPx.y) < TAP_SLOP_PX) return;
       g.moved = true;
@@ -367,6 +381,14 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       return;
     }
     if (g.mode === 'shapeVertex') return;
+    if (g.mode === 'resize') {
+      setResize(null);
+      if (g.moved) {
+        const sp = spreadFromRadius(dist(toWorld(p), g.center), settings.showMatureSize);
+        useProject.getState().updateItems([g.id], { spreadCm: sp === g.plant.spreadCm ? undefined : sp });
+      }
+      return;
+    }
     if (g.mode === 'fxrect') {
       setFxDraft(null);
       const w = snapPt(toWorld(p));
@@ -573,8 +595,26 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     e.preventDefault();
   };
 
+  const viewItems = resize ? items.map((i) => (i.id === resize.id && i.kind === 'plant' ? { ...i, spreadCm: resize.spreadCm } : i)) : items;
+
   const Handles = () => {
     const e = editable();
+    if (!e && !drag) {
+      // A single plant: a handle on its right edge sets its own spread.
+      const sel = useUi.getState().selected;
+      const it = sel.length === 1 ? viewItems.find((i) => i.id === sel[0]) : undefined;
+      const pl = it && plants.get(it.plantId);
+      if (it?.kind !== 'plant' || !pl) return null;
+      const r = plantRadius(effectivePlant(pl, it), settings.showMatureSize);
+      const k = 9 / view!.s;
+      return (
+        <g className="handles">
+          <line className="resize-line" x1={it.x} y1={it.y} x2={it.x + r} y2={it.y} vectorEffect="non-scaling-stroke" />
+          <circle className="handle resize-handle" data-resize={it.id} cx={it.x + r} cy={it.y} r={k} vectorEffect="non-scaling-stroke" />
+          {resize && <CountLabel x={it.x} y={it.y - r - 10 / view!.s} fs={11 / view!.s} text={`⌀ ${resize.spreadCm} cm`} />}
+        </g>
+      );
+    }
     if (!e || drag) return null;
     const pts = shape?.id === e.id ? shape.points : e.points;
     return <VertexHandles points={pts} s={view!.s} />;
@@ -632,7 +672,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             <AreaShapeEl area={area} className={`area-outline${shapeEdit && !shapeEdit.target ? ' is-editing' : ''}`} />
             {layers.plants && (
               <PlantsLayer
-                items={items}
+                items={viewItems}
                 plants={plants}
                 selected={selectedSet}
                 drag={drag}

@@ -1,4 +1,4 @@
-import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from './types';
+import type { JugloneTolerance, PlacedItem, Plant, Soil, SunNeed, Toxicity, WaterNeed } from './types';
 
 export const SUN_LABEL: Record<SunNeed, string> = { sun: 'nap', part: 'félárnyék', shade: 'árnyék' };
 export const SOILS: Soil[] = ['sandy', 'loam', 'clay', 'chalky', 'acidic', 'poor'];
@@ -22,6 +22,12 @@ export const JUGLONE_LABEL: Record<JugloneTolerance, string> = { tolerant: 'tűr
 export const MONTHS = ['jan', 'feb', 'márc', 'ápr', 'máj', 'jún', 'júl', 'aug', 'szept', 'okt', 'nov', 'dec'];
 
 export const plantMap = (db: Plant[]) => new Map(db.map((p) => [p.code, p]));
+
+/** The plant as placed: a single plant may have its own spread; the spacing scales with it. */
+export function effectivePlant(p: Plant, it: PlacedItem): Plant {
+  if (it.kind !== 'plant' || !it.spreadCm || it.spreadCm === p.spreadCm) return p;
+  return { ...p, spreadCm: it.spreadCm, spacingCm: Math.round((p.spacingCm * it.spreadCm) / p.spreadCm) };
+}
 
 /** Readable text colour (dark or white) on top of a hex fill. */
 export function textOn(hex: string): string {

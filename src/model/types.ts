@@ -84,7 +84,17 @@ export interface Fixture {
 }
 
 export type PlacedItem =
-  | { kind: 'plant'; id: string; plantId: string; x: number; y: number; status: ItemStatus; note?: string }
+  | {
+      kind: 'plant';
+      id: string;
+      plantId: string;
+      x: number;
+      y: number;
+      status: ItemStatus;
+      note?: string;
+      /** This plant's own spread in cm (e.g. a bigger, older specimen); the species value otherwise. */
+      spreadCm?: number;
+    }
   | {
       kind: 'drift';
       id: string;

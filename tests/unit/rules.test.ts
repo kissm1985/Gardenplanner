@@ -177,3 +177,21 @@ describe('lawn', () => {
     expect(bedAreaM2(a)).toBeCloseTo(before - 2.4, 5);
   });
 });
+
+describe('own spread of a single plant', () => {
+  it('a bigger specimen triggers the spacing rule; the species value does not', async () => {
+    const { useProject, selectCurrentArea, selectItems } = await import('../../src/store/projectStore');
+    const { evaluate } = await import('../../src/engine/rules');
+    const st = useProject.getState;
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+    const a = st().placePlant('LA', 60, 300)!;
+    st().placePlant('LA', 60, 360);
+    const warns = () => evaluate(selectCurrentArea(st())!, selectItems(st()), st().project!.plantDb, st().project!.settings).filter((w) => w.rule === 'spacing');
+    expect(warns()).toHaveLength(0);
+    st().updateItems([a], { spreadCm: 200 });
+    expect(warns()).toHaveLength(1);
+    st().updateItems([a], { spreadCm: undefined });
+    expect(warns()).toHaveLength(0);
+  });
+});
