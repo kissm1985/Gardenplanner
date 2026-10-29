@@ -4,6 +4,7 @@ import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import { PlantChip } from './PlantChip';
+import { PlantCard } from './PlantTooltip';
 
 const DRAG_START_PX = 12;
 
@@ -37,14 +38,29 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
   const drag = useRef<{ id: number; x: number; y: number; code: string; dragging: boolean } | null>(null);
   const [ghost, setGhost] = useState<{ x: number; y: number; p: Plant } | null>(null);
 
+  // Info card: after a short hover with the mouse, or a long press with a finger.
+  const [tip, setTip] = useState<{ p: Plant; r: DOMRect } | null>(null);
+  const tipTimer = useRef<number | undefined>(undefined);
+  const showTipLater = (e: PointerEvent, p: Plant, ms: number) => {
+    const r = (e.currentTarget as Element).getBoundingClientRect();
+    clearTimeout(tipTimer.current);
+    tipTimer.current = window.setTimeout(() => setTip({ p, r }), ms);
+  };
+  const hideTip = () => {
+    clearTimeout(tipTimer.current);
+    setTip(null);
+  };
+
   const down = (e: PointerEvent, p: Plant) => {
     drag.current = { id: e.pointerId, x: e.clientX, y: e.clientY, code: p.code, dragging: false };
+    if (e.pointerType !== 'mouse') showTipLater(e, p, 500);
   };
   const move = (e: PointerEvent, p: Plant) => {
     const d = drag.current;
     if (!d || d.id !== e.pointerId) return;
     const dx = e.clientX - d.x;
     const dy = e.clientY - d.y;
+    if (e.pointerType !== 'mouse' && Math.hypot(dx, dy) > DRAG_START_PX) hideTip();
     if (!d.dragging && -dy > DRAG_START_PX && Math.abs(dy) > Math.abs(dx)) {
       d.dragging = true;
       (e.currentTarget as Element).setPointerCapture(e.pointerId);
@@ -52,6 +68,7 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
     if (d.dragging) setGhost({ x: e.clientX, y: e.clientY, p });
   };
   const up = (e: PointerEvent) => {
+    if (e.pointerType !== 'mouse') hideTip();
     const d = drag.current;
     drag.current = null;
     setGhost(null);
@@ -60,6 +77,7 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
     if (d.dragging) canvasBridge.dropAt?.(e.clientX, e.clientY, d.code);
   };
   const cancel = () => {
+    hideTip();
     drag.current = null;
     setGhost(null);
   };
@@ -111,6 +129,9 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
                 onPointerMove={(e) => move(e, p)}
                 onPointerUp={up}
                 onPointerCancel={cancel}
+                onPointerEnter={(e) => e.pointerType === 'mouse' && showTipLater(e, p, 300)}
+                onPointerLeave={(e) => e.pointerType === 'mouse' && hideTip()}
+                onContextMenu={(e) => e.preventDefault()}
                 onKeyDown={(e) => {
                   if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -127,6 +148,19 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
             ))}
           </div>
         </>
+      )}
+      {tip && (
+        <div
+          className="plant-tip is-fixed"
+          role="tooltip"
+          style={{
+            width: 260,
+            left: Math.max(8, Math.min(window.innerWidth - 268, tip.r.left + tip.r.width / 2 - 130)),
+            bottom: window.innerHeight - tip.r.top + 8,
+          }}
+        >
+          <PlantCard plant={tip.p} />
+        </div>
       )}
       {ghost && (
         <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }} aria-hidden="true">

@@ -322,6 +322,14 @@ export function App({ loading }: { loading: boolean }) {
             </div>
           </fieldset>
           <label className="check">
+            <input
+              type="checkbox"
+              checked={project.settings.wikiPhotos !== false}
+              onChange={(e) => useProject.getState().updateSettings({ wikiPhotos: e.target.checked })}
+            />
+            <span>Növényfotók a Wikipédiáról (első alkalommal internet kell)</span>
+          </label>
+          <label className="check">
             <input type="checkbox" checked={snapOn} onChange={(e) => ui.setSnap(e.target.checked)} />
             <span>Mágnesezés {SNAP_CM} cm-es rácsra</span>
           </label>

@@ -1,6 +1,7 @@
-import { useState, type FormEvent, type ReactNode } from 'react';
+import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { JUGLONE_LABEL, MONTHS, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL } from '../model/plants';
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
+import { usePlantPhoto } from './plantPhoto';
 
 interface Props {
   initial: Plant;
@@ -167,6 +168,8 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
         <textarea rows={3} value={p.notes} onChange={(e) => set('notes', e.target.value)} />
       </label>
 
+      <PhotoField p={p} set={set} />
+
       {errors.length > 0 && (
         <div className="form-error" role="alert">
           {errors.map((e) => (
@@ -222,5 +225,99 @@ function Sel({ label, v, opts, on }: { label: ReactNode; v: string; opts: Record
         ))}
       </select>
     </label>
+  );
+}
+
+/** Downscale an image file to a JPEG data URL (max 640 px), so the project stays small. */
+async function shrink(file: File, max = 640): Promise<string> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = new Image();
+    img.src = url;
+    await img.decode();
+    const k = Math.min(1, max / Math.max(img.naturalWidth, img.naturalHeight));
+    const c = document.createElement('canvas');
+    c.width = Math.round(img.naturalWidth * k);
+    c.height = Math.round(img.naturalHeight * k);
+    c.getContext('2d')!.drawImage(img, 0, 0, c.width, c.height);
+    return c.toDataURL('image/jpeg', 0.82);
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
+
+function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v: Plant[K]) => void }) {
+  const photo = usePlantPhoto(p);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const [err, setErr] = useState('');
+  const isData = p.photoUrl?.startsWith('data:');
+  return (
+    <fieldset className="field-group">
+      <legend>Fotó</legend>
+      <div className="photo-field">
+        {photo.state === 'ok' ? (
+          <figure className="plant-tip-photo">
+            <img src={photo.src} alt={p.nameHu} />
+            <figcaption>{photo.own ? `Saját fotó: ${photo.credit}` : `Wikipédia · ${photo.credit}`}</figcaption>
+          </figure>
+        ) : (
+          <p className="mono muted">
+            {photo.state === 'loading' ? 'Fotó keresése a Wikipédián…' : photo.state === 'offline' ? 'A Wikipédia-fotóhoz internet kell.' : 'Nincs fotó. Tölts fel sajátot, vagy adj meg egy képlinket.'}
+          </p>
+        )}
+      </div>
+      <div className="form-actions form-actions-start">
+        <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>
+          Saját fotó feltöltése
+        </button>
+        {p.photoUrl && (
+          <button
+            type="button"
+            className="btn btn-small"
+            onClick={() => {
+              set('photoUrl', undefined);
+              set('photoCredit', undefined);
+            }}
+          >
+            Vissza a Wikipédia-fotóra
+          </button>
+        )}
+        <input
+          ref={fileRef}
+          type="file"
+          accept="image/*"
+          hidden
+          onChange={async (e) => {
+            const f = e.target.files?.[0];
+            e.target.value = '';
+            if (!f) return;
+            try {
+              set('photoUrl', await shrink(f));
+              set('photoCredit', 'saját fotó');
+              setErr('');
+            } catch {
+              setErr('Ezt a képet nem sikerült beolvasni.');
+            }
+          }}
+        />
+      </div>
+      <label className="field">
+        <span className="lbl">Képlink (pl. kertészet oldaláról)</span>
+        <input
+          type="url"
+          inputMode="url"
+          value={isData ? '' : (p.photoUrl ?? '')}
+          placeholder={isData ? 'feltöltött kép' : 'https://…'}
+          onChange={(e) => set('photoUrl', e.target.value.trim() || undefined)}
+        />
+      </label>
+      {p.photoUrl && (
+        <label className="field">
+          <span className="lbl">Fotó forrása / szerzője</span>
+          <input value={p.photoCredit ?? ''} onChange={(e) => set('photoCredit', e.target.value || undefined)} />
+        </label>
+      )}
+      {err && <p className="form-error">{err}</p>}
+    </fieldset>
   );
 }

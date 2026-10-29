@@ -19,11 +19,11 @@ npm run build      # statikus build a dist/ mappába
 | Területek | Két sablon (Házoldali sáv, Gyepsávos kert), saját terület méretekkel, égtájjal, napsütéssel, korlátokkal; háttérkép két pontos méretaránnyal |
 | Rajz | SVG cm-ben, rácsháló, vonalzó, két ujjas nagyítás/mozgatás, dupla koppintás = illesztés, rétegek, mágnes 10 cm-es rácsra |
 | Ültetés | Egyedi tő (koppintás vagy ráhúzás), folt (eltolt/négyzetes rács), egyenes sor, ív; automatikus darabszám; kijelölés, lasszó, másolás, törlés, 100 lépés visszavonás |
-| Növények | 62 faj kezdőlista, talajigénnyel, „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
+| Növények | 62 faj kezdőlista, talajigénnyel; infókártya fotóval (Wikipédia/Commons, szerzővel és licenccel, a készüléken tárolva; vagy saját fotó), „ellenőrizendő” jelölésekkel; kereső, szűrők, saját növény; JSON/CSV import-export |
 | Szabályok | Magasság, tüske, mérgező, juglone-zóna (állítható sugár), tőtáv, határon kívül, fajkorlát, fák száma, vízigény, napigény, csap/akna, ablak; ugrás és elnémítás |
 | Lista | Ültetett és rendelendő darab (+tartalék), árak, státuszok; másolás szövegként és táblázatként, CSV, XLSX, megosztás |
 | Évszakok | Négy évszak és havi csúszka, négy évszak egymás mellett |
-| Változatok | A/B terv, választott változat, összehasonlítás |
+| Változatok | Fába rendezve: a másolat az eredeti alá kerül, mappák, áthelyezés, összecsukás; választott változat, összehasonlítás |
 | Ötletgenerátor | Véletlenszerű, a terület feltételeihez illő összeállítás (színvilág, hátul magas – elöl alacsony, 3–5 faj ritmusban, diófa-zóna) külön változatba; „Újra” gomb |
 | Menetrend | Napokra bontott, pipálható ültetési lista; gondozási naptár Győrre; mulcsajánlás |
 | Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG jelmagyarázattal, teljes JSON-mentés, csak olvasható link |

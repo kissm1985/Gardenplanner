@@ -39,6 +39,10 @@ export interface Plant {
   symbol?: 'circle' | 'square' | 'triangle' | 'diamond';
   isTree?: boolean;
   notes: string;
+  /** Own photo: an image link or an uploaded (downscaled) data URL. Overrides the Wikipedia photo. */
+  photoUrl?: string;
+  /** Credit line for the own photo. */
+  photoCredit?: string;
   /** Field names whose values still need checking ("ellenőrizendő"). */
   verify?: (keyof Plant)[];
 }
@@ -156,6 +160,8 @@ export interface Settings {
   reservePct: number;
   walnutRadiusCm: number;
   showMatureSize: boolean;
+  /** Look up plant photos on Wikipedia (default on). */
+  wikiPhotos?: boolean;
   /** Version of the built-in plant list last merged into this project. */
   seedVersion?: number;
 }

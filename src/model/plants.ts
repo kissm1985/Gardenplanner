@@ -116,6 +116,8 @@ const CSV_COLS: { key: keyof Plant; head: string }[] = [
   { key: 'symbol', head: 'szimbolum' },
   { key: 'isTree', head: 'fa' },
   { key: 'notes', head: 'megjegyzes' },
+  { key: 'photoUrl', head: 'foto_url' },
+  { key: 'photoCredit', head: 'foto_forras' },
   { key: 'verify', head: 'ellenorizendo' },
 ];
 
@@ -215,11 +217,15 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       symbol: enumOf(get('szimbolum'), ['circle', 'square', 'triangle', 'diamond'] as const, 'circle'),
       isTree: bool('fa') || undefined,
       notes: get('megjegyzes'),
+      photoUrl: get('foto_url') || undefined,
+      photoCredit: get('foto_forras') || undefined,
       verify: list('ellenorizendo') as (keyof Plant)[],
     };
     if (!p.sun.length) p.sun = ['sun'];
     if (p.seasonColors === undefined) delete p.seasonColors;
     if (p.isTree === undefined) delete p.isTree;
+    if (p.photoUrl === undefined) delete p.photoUrl;
+    if (p.photoCredit === undefined) delete p.photoCredit;
     const errs = validatePlant(p, plants);
     if (errs.length) errors.push(`${n + 2}. sor: ${errs.join(' ')}`);
     else plants.push(p);

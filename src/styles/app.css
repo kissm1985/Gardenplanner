@@ -2209,3 +2209,46 @@ polyline.shape-line {
   align-items: center;
   gap: 8px;
 }
+
+/* ---------- plant photo in the info card ---------- */
+.plant-tip-photo {
+  margin: -10px -12px 8px;
+  border-radius: 6px 6px 0 0;
+  overflow: hidden;
+  background: var(--panel);
+}
+.plant-tip-photo img {
+  display: block;
+  width: 100%;
+  height: 150px;
+  object-fit: cover;
+}
+.plant-tip-photo figcaption {
+  font-family: var(--mono);
+  font-size: 9.5px;
+  color: var(--mute);
+  padding: 3px 8px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.plant-tip-photo.is-empty {
+  height: 44px;
+  display: grid;
+  place-items: center;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  color: var(--mute);
+}
+.plant-tip.is-fixed {
+  position: fixed;
+  z-index: 40;
+}
+.photo-field .plant-tip-photo {
+  margin: 0 0 6px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+}
+.photo-field .plant-tip-photo img {
+  height: 200px;
+}
