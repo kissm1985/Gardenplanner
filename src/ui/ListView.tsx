@@ -4,38 +4,13 @@ import { buildXlsx } from '../engine/xlsx';
 import { JUGLONE_LABEL, WATER_LABEL } from '../model/plants';
 import type { ItemStatus } from '../model/types';
 import { useProject } from '../store/projectStore';
+import { useUi } from '../store/uiStore';
 import { downloadBlob, downloadText } from './download';
 import { PlantChip } from './PlantChip';
 import { STATUS_LABEL } from './Selection';
+import { copy } from './clipboard';
 
 type Scope = 'all' | string;
-
-/** Copy with fallbacks: rich (HTML + text) → plain text → execCommand on the visible textarea. */
-async function copy(text: string, ta: HTMLTextAreaElement | null, html?: string): Promise<boolean> {
-  try {
-    if (html && typeof ClipboardItem !== 'undefined' && navigator.clipboard?.write) {
-      await navigator.clipboard.write([
-        new ClipboardItem({ 'text/plain': new Blob([text], { type: 'text/plain' }), 'text/html': new Blob([html], { type: 'text/html' }) }),
-      ]);
-      return true;
-    }
-    if (navigator.clipboard?.writeText) {
-      await navigator.clipboard.writeText(text);
-      return true;
-    }
-  } catch {
-    /* fall through to execCommand */
-  }
-  if (!ta) return false;
-  ta.value = text;
-  ta.focus();
-  ta.select();
-  try {
-    return document.execCommand('copy');
-  } catch {
-    return false;
-  }
-}
 
 /** Plant list and shopping (SPEC §4.6). */
 export function ListView() {
@@ -87,6 +62,9 @@ export function ListView() {
     <div className="listview">
       <header className="lv-head">
         <div className="eyebrow">Növénylista · a választott változatokból</div>
+        <button type="button" className="btn btn-small" onClick={() => useUi.getState().setPage('schedule')}>
+          Ültetési menetrend és gondozás →
+        </button>
         <div className="seg" role="group" aria-label="Terület">
           <ScopeChip on={scope === 'all'} onClick={() => setScope('all')}>
             Összesítve

@@ -10,6 +10,7 @@ import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantPalette } from './ui/PlantPalette';
 import { CompareView } from './ui/CompareView';
 import { ListView } from './ui/ListView';
+import { SchedulePage } from './ui/SchedulePage';
 import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
@@ -56,6 +57,7 @@ export function App({ loading }: { loading: boolean }) {
   const selectedFixture = useUi((s) => s.selectedFixture);
   const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
   const compare = useUi((s) => s.compare);
+  const page = useUi((s) => s.page);
 
   // Rule engine: re-runs after every change of the area, its items, plants or settings.
   const { active: warnings, muted } = useMemo(() => {
@@ -116,8 +118,10 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </header>
 
-      <main className={`stage${tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
-        {tool === 'list' ? (
+      <main className={`stage${page || tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
+        {page === 'schedule' ? (
+          <SchedulePage />
+        ) : tool === 'list' ? (
           <ListView />
         ) : compare && area ? (
           <CompareView area={area} />
@@ -189,8 +193,8 @@ export function App({ loading }: { loading: boolean }) {
         )}
       </main>
 
-      {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && <PlantPalette onOpenDb={() => setSheet('plantdb')} />}
-      {tool === 'season' && area && <SeasonPanel area={area} plantDb={project.plantDb} />}
+      {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && !page && !compare && <PlantPalette onOpenDb={() => setSheet('plantdb')} />}
+      {tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}
 
       <nav className="toolbar" aria-label="Eszközök">
         {TOOLS.map((t) => (
@@ -273,6 +277,16 @@ export function App({ loading }: { loading: boolean }) {
             </button>
             <button type="button" className="btn" onClick={() => setSheet('fixtures')}>
               Rögzített elemek
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                ui.setPage('schedule');
+                setSheet(null);
+              }}
+            >
+              Menetrend és gondozás
             </button>
           </div>
         </div>

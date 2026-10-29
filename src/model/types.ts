@@ -136,6 +136,13 @@ export interface Settings {
   showMatureSize: boolean;
 }
 
+/** Planting window and ticked checklist tasks; the task list itself is derived. */
+export interface Schedule {
+  start: string; // YYYY-MM-DD
+  end: string; // YYYY-MM-DD
+  done: string[];
+}
+
 export interface Project {
   schemaVersion: 1;
   id: string;
@@ -143,6 +150,7 @@ export interface Project {
   areas: Area[];
   plantDb: Plant[];
   settings: Settings;
+  schedule?: Schedule;
 }
 
 export const ORIENTATION_LABEL: Record<Orientation, string> = {

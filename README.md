@@ -19,5 +19,5 @@ npm run build      # statikus build a dist/ mappába (Netlify / Vercel / GitHub 
 - [x] 5. fázis – Növénylista: összesítő és területenkénti tábla, tartalék, árak, státuszok, másolás (szöveg/Excel), CSV, XLSX, megosztás
 - [x] 6. fázis – Évszaknézet: négy évszak + havi csúszka, virágzó fajok, négy évszak egymás mellett
 - [x] 7. fázis – Változatok: másolás, átnevezés, választott, összehasonlítás (darab, költség, figyelmeztetés, évszak)
-- [ ] 8. fázis – Menetrend, gondozás
+- [x] 8. fázis – Ültetési menetrend (pipálható, napokra bontva), gondozási naptár Győrre, mulcsajánlás
 - [ ] 9. fázis – Export, megosztás, finomhangolás

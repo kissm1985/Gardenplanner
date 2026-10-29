@@ -47,6 +47,9 @@ export interface ProjectState {
   moveFixture: (id: string, dx: number, dy: number) => void;
   deleteFixture: (id: string) => void;
 
+  setScheduleWindow: (start: string, end: string) => void;
+  toggleTask: (taskId: string) => void;
+
   duplicateVariant: (variantId: string) => string | null;
   addEmptyVariant: () => string | null;
   renameVariant: (variantId: string, name: string) => void;
@@ -348,6 +351,16 @@ export const useProject = create<ProjectState>()((set, get) => {
     },
 
     deleteFixture: (fid) => mapFixtures((fs) => fs.filter((f) => f.id !== fid)),
+
+    setScheduleWindow: (start, end) =>
+      commit((p) => ({ ...p, schedule: { start, end, done: p.schedule?.done ?? [] } })),
+
+    toggleTask: (tid) =>
+      commit((p) => {
+        if (!p.schedule) return p;
+        const done = p.schedule.done.includes(tid) ? p.schedule.done.filter((x) => x !== tid) : [...p.schedule.done, tid];
+        return { ...p, schedule: { ...p.schedule, done } };
+      }),
 
     duplicateVariant: (vid) => {
       const areaId = get().currentAreaId;
