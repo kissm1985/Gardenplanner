@@ -10,6 +10,8 @@ npm run test:e2e   # Playwright tesztek mobil nézetben (buildet is készít)
 npm run build      # statikus build a dist/ mappába
 ```
 
+**Telefonról (iPhone, Android):** a gép és a telefon legyen ugyanazon a wifin. `npm run dev` után a terminál kiír egy `Network: http://192.168.x.x:5173/` címet – ezt nyisd meg a telefon böngészőjében. Windowson az első indításkor a tűzfal rákérdez: engedélyezd a *magánhálózat* elérését. Telepíthető, offline is működő változathoz HTTPS kell: töltsd fel a `dist/` mappát pl. a Netlify Drop-ra (app.netlify.com/drop), és a kapott https-címet nyisd meg Safariban → Megosztás → *Főképernyőhöz adás*.
+
 **Telepítés:** a `dist/` mappa bármilyen statikus tárhelyre feltölthető (Netlify, Vercel, GitHub Pages – relatív útvonalakkal, almappában is működik). Első megnyitás után telepíthető a kezdőképernyőre, és internet nélkül is fut.
 
 ## Mit tud

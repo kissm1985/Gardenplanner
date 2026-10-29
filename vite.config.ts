@@ -5,6 +5,11 @@ import { VitePWA } from 'vite-plugin-pwa';
 // Relative base so the build works on GitHub Pages sub-paths as well as Netlify/Vercel roots.
 export default defineConfig({
   base: './',
+  // Listen on the local network too, so a phone on the same Wi-Fi can open the dev/preview server.
+  server: { host: true },
+  preview: { host: true },
+  // Older iPhones (iOS 15) still run the build.
+  build: { target: ['es2020', 'safari15'] },
   plugins: [
     react(),
     VitePWA({
