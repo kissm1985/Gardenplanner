@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { SEED_PLANTS } from '../../src/data/plants.seed';
-import { candidates, clipRect, colourFamilies, generateIdea } from '../../src/engine/generator';
+import { candidates, clipRect, colourFamilies, generateIdea, plantKinds, type PlantKind } from '../../src/engine/generator';
 import { evaluate } from '../../src/engine/rules';
 import { newProject } from '../../src/store/projectStore';
 
@@ -57,5 +57,59 @@ describe('idea generator', () => {
     const back = xs.filter((p) => p.x < 30).map((p) => p.h);
     const front = xs.filter((p) => p.x >= 30).map((p) => p.h);
     expect(Math.min(...back)).toBeGreaterThanOrEqual(Math.max(...front));
+  });
+});
+
+describe('idea generator: plant types', () => {
+  // A plain back garden: 8 × 15 m, sunny, no restrictions, a fence at the back (x = 0).
+  const back = (() => {
+    const p = newProject(['lawn-garden']);
+    const a = p.areas[0];
+    return {
+      ...a,
+      name: 'Hátsó kert',
+      widthCm: 800,
+      lengthCm: 1500,
+      constraints: { ...a.constraints, nonToxic: false, noThorns: false, maxTrees: 2 },
+      fixtures: [{ id: 'f1', type: 'fence' as const, label: 'Kerítés', x: -6, y: 0, w: 6, h: 1500 }],
+    };
+  })();
+  const kinds = (it: { plantId: string }) => plantKinds(db.find((p) => p.code === it.plantId)!);
+
+  it('classifies the built-in list', () => {
+    const k = (c: string) => [...plantKinds(db.find((p) => p.code === c)!)].sort();
+    expect(k('LN')).toContain('hedge');
+    expect(k('TS')).toContain('hedge');
+    expect(k('JH')).toContain('groundcover');
+    expect(k('MI')).toEqual(['grass']);
+    expect(k('LA')).toEqual(['perennial']);
+    expect(k('FA')).toEqual(['tree']);
+    expect(k('PH')).toContain('shrub');
+  });
+
+  for (const set of [['hedge', 'shrub', 'perennial'], ['tree', 'shrub', 'groundcover'], ['hedge', 'tree', 'shrub', 'perennial', 'grass', 'groundcover'], ['shrub'], ['hedge']] as PlantKind[][])
+    it(`back garden with ${set.join(' + ')}: requested types appear, no warnings`, () => {
+      for (let seed = 1; seed <= 12; seed++) {
+        const idea = generateIdea(back, db, proj.settings, { seed, kinds: set });
+        expect(idea.items.length).toBeGreaterThan(0);
+        const bad = evaluate(back, idea.items, db, proj.settings).filter((w) => w.severity !== 'info');
+        expect(bad.map((w) => `${seed}: ${w.message}`)).toEqual([]);
+        const got = new Set(idea.items.flatMap((it) => [...kinds(it)]));
+        for (const k of set) if (k !== 'grass' && k !== 'groundcover') expect([seed, k, got.has(k)]).toEqual([seed, k, true]);
+      }
+    });
+
+  it('hedge runs along the fence side; trees stand alone', () => {
+    const idea = generateIdea(back, db, proj.settings, { seed: 5, kinds: ['hedge', 'tree', 'perennial'] });
+    const rows = idea.items.filter((it) => it.kind === 'row');
+    expect(rows.length).toBeGreaterThan(0);
+    for (const r of rows) if (r.kind === 'row') expect(r.path[0][0]).toBeLessThan(120);
+    expect(idea.items.filter((it) => kinds(it).has('tree')).length).toBeLessThanOrEqual(2);
+  });
+
+  it('house strip (max 50 cm, non-toxic) explains why hedges are impossible', () => {
+    const idea = generateIdea(strip, db, proj.settings, { seed: 2, kinds: ['hedge', 'perennial'] });
+    expect(idea.notes.join(' ')).toContain('Sövény (hátsó sor): ehhez a területhez');
+    expect(idea.items.length).toBeGreaterThan(0);
   });
 });

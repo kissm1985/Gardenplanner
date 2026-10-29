@@ -4,7 +4,7 @@ import { areaPoints } from '../model/area';
 import { bbox, dist, pointInPolygon } from '../model/geometry';
 import { uid } from '../model/ids';
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings } from '../model/types';
-import { fillPolygon } from './fill';
+import { fillPath, fillPolygon } from './fill';
 import { areaSunLevel } from './rules';
 
 export type PaletteKey = 'purple-silver' | 'warm' | 'white-blue' | 'pink-purple';
@@ -51,23 +51,68 @@ export function rng(seed: number) {
 
 const seasonsOf = (p: Plant) => new Set<number>(p.bloomMonths.map((m) => (m >= 3 && m <= 5 ? 0 : m >= 6 && m <= 8 ? 1 : m >= 9 && m <= 11 ? 2 : 3)));
 
-/** Species that suit the area: sun, height limit, thorns, toxicity, soil, no trees. */
-export function candidates(area: Area, plantDb: Plant[]): Plant[] {
+/** Plant types the generator can be asked for. */
+export type PlantKind = 'perennial' | 'grass' | 'groundcover' | 'shrub' | 'hedge' | 'tree';
+export const KIND_LABEL: Record<PlantKind, string> = {
+  perennial: 'Évelők',
+  grass: 'Díszfüvek',
+  groundcover: 'Talajtakarók, elterülők',
+  shrub: 'Cserjék (magasabbak)',
+  hedge: 'Sövény (hátsó sor)',
+  tree: 'Kis fák',
+};
+export const DEFAULT_KINDS: PlantKind[] = ['perennial', 'grass', 'groundcover'];
+const DRIFT_KINDS: PlantKind[] = ['perennial', 'grass', 'groundcover'];
+
+/** What a species can be used as (a species can be several, e.g. a low spreading shrub). */
+export function plantKinds(p: Plant): Set<PlantKind> {
+  const k = new Set<PlantKind>();
+  if (p.isTree) return k.add('tree');
+  const h = p.maxHeightCm;
+  if (h >= 150 && (/sövény/i.test(p.notes) || p.spacingCm <= 0.6 * p.spreadCm)) k.add('hedge');
+  if (h >= 100 && p.symbol !== 'triangle') k.add('shrub');
+  if (p.symbol === 'square' || (p.spreadCm >= 1.5 * h && h <= 120)) k.add('groundcover');
+  if (p.symbol === 'triangle') k.add('grass');
+  if (h < 100 && (p.symbol ?? 'circle') === 'circle') k.add('perennial');
+  return k;
+}
+
+/** Fits the site: sun, height limit, thorns, toxicity, soil, species limits. */
+function siteOk(area: Area, p: Plant): boolean {
   const c = area.constraints;
-  const sun = areaSunLevel(area);
-  return plantDb.filter(
-    (p) =>
-      !p.isTree &&
-      p.symbol !== 'diamond' &&
-      p.spreadCm <= 120 && // large shrubs need their own planning, not drifts
-      p.sun.includes(sun) &&
-      (c.maxHeightCm == null || p.maxHeightCm <= c.maxHeightCm) &&
-      !(c.noThorns && p.thorny) &&
-      !(c.nonToxic && p.toxic !== 'no') &&
-      !(area.soil && p.soil?.length && !p.soil.includes(area.soil)) &&
-      p.spacingCm >= 15 && // skip bulbs and tiny fillers; they don't carry a composition
-      (c.speciesLimits[p.code] ?? 1) > 0,
+  return (
+    p.sun.includes(areaSunLevel(area)) &&
+    (c.maxHeightCm == null || p.maxHeightCm <= c.maxHeightCm) &&
+    !(c.noThorns && p.thorny) &&
+    !(c.nonToxic && p.toxic !== 'no') &&
+    !(area.soil && p.soil?.length && !p.soil.includes(area.soil)) &&
+    (c.speciesLimits[p.code] ?? 1) > 0
   );
+}
+
+/** Species for drifts: perennials, grasses, ground covers small enough to repeat in patches. */
+function driftOk(p: Plant): boolean {
+  const k = plantKinds(p);
+  return !p.isTree && p.symbol !== 'diamond' && p.spacingCm >= 15 && (p.spreadCm <= 120 || (k.has('groundcover') && p.spacingCm <= 120));
+}
+
+/** Eligible species per requested type. */
+export function poolsFor(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFAULT_KINDS) {
+  const ok = plantDb.filter((p) => siteOk(area, p));
+  const want = new Set(kinds);
+  const has = (p: Plant, k: PlantKind) => want.has(k) && plantKinds(p).has(k);
+  return {
+    drift: ok.filter((p) => driftOk(p) && DRIFT_KINDS.some((k) => has(p, k))),
+    hedge: ok.filter((p) => has(p, 'hedge')),
+    shrub: ok.filter((p) => has(p, 'shrub') && !p.isTree && p.spacingCm >= 60),
+    tree: area.constraints.maxTrees === 0 ? [] : ok.filter((p) => has(p, 'tree')),
+  };
+}
+
+/** All species the generator may use for the area and the requested types. */
+export function candidates(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFAULT_KINDS): Plant[] {
+  const p = poolsFor(area, plantDb, kinds);
+  return [...new Set([...p.drift, ...p.hedge, ...p.shrub, ...p.tree])];
 }
 
 export interface Idea {
@@ -175,60 +220,101 @@ function subtract(base: Interval, cuts: Interval[]): Interval[] {
   return out;
 }
 
-export function generateIdea(area: Area, plantDb: Plant[], settings: Settings, opts: { seed?: number; palette?: PaletteKey } = {}): Idea {
+export function generateIdea(
+  area: Area,
+  plantDb: Plant[],
+  settings: Settings,
+  opts: { seed?: number; palette?: PaletteKey; kinds?: PlantKind[] } = {},
+): Idea {
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const r = rng(seed);
+  const kinds = opts.kinds?.length ? opts.kinds : DEFAULT_KINDS;
   const keys = Object.keys(PALETTES) as PaletteKey[];
-  const pool = candidates(area, plantDb);
+  const pools = poolsFor(area, plantDb, kinds);
+  const all = [...new Set([...pools.drift, ...pools.hedge, ...pools.shrub, ...pools.tree])];
   // Palette: the requested one, or a random one that the pool can actually serve.
-  const serve = (k: PaletteKey) => pool.filter((p) => [...colourFamilies(p)].some((f) => PALETTES[k].families.includes(f) && f !== 'green')).length;
+  const serve = (k: PaletteKey) => all.filter((p) => [...colourFamilies(p)].some((f) => PALETTES[k].families.includes(f) && f !== 'green')).length;
   const palette = opts.palette ?? weighted(r, keys, (k) => (serve(k) >= 3 ? 1 : 0)) ?? keys[Math.floor(r() * keys.length)];
 
   const pts = areaPoints(area);
   const bb = bbox(pts);
   const m2 = ((bb.maxX - bb.minX) * (bb.maxY - bb.minY)) / 1e4;
-  const n = m2 < 4 ? 3 : m2 < 12 ? 4 : 5;
+  const notes: string[] = [];
+
   // Mostly under a walnut: plan with juglone-tolerant species only (if there are enough).
-  const walnutFx = area.fixtures.filter((f) => f.type === 'walnut');
+  const walnuts = area.fixtures.filter((f) => f.type === 'walnut');
+  const inWalnut = (q: Pt) => walnuts.some((f) => dist(q, [f.x, f.y]) <= settings.walnutRadiusCm);
   let inZone = 0;
   let total = 0;
   for (let x = bb.minX + 25; x < bb.maxX; x += 50)
     for (let y = bb.minY + 25; y < bb.maxY; y += 50)
       if (pointInPolygon([x, y], pts)) {
         total++;
-        if (walnutFx.some((f) => dist([x, y], [f.x, f.y]) <= settings.walnutRadiusCm)) inZone++;
+        if (inWalnut([x, y])) inZone++;
       }
-  const tolerantPool = pool.filter((p) => p.juglone === 'tolerant');
-  const underWalnut = total > 0 && inZone / total > 0.4 && tolerantPool.length >= 3;
-  const species = pickSpecies(underWalnut ? tolerantPool : pool, palette, n, r);
-  const notes: string[] = [];
+  const underWalnut = total > 0 && inZone / total > 0.4 && all.filter((p) => p.juglone === 'tolerant').length >= 3;
+  const tol = (xs: Plant[]) => (underWalnut ? xs.filter((p) => p.juglone === 'tolerant') : xs);
   if (underWalnut) notes.push('A terület nagy része a diófa zónájában van, ezért csak juglone-tűrő fajokból válogattam.');
-  if (!species.length) return { seed, palette, species, items: [], notes: ['Nincs a terület feltételeinek megfelelő faj az adatbázisban.'] };
+
+  // One water band for everything (low+medium or medium+high), so neighbours don't clash.
+  const lowSide = all.filter((p) => p.water !== 'high').length >= all.filter((p) => p.water !== 'low').length;
+  const wb = (xs: Plant[]) => tol(xs).filter((p) => (lowSide ? p.water !== 'high' : p.water !== 'low'));
+
+  const hedge = pickSpecies(wb(pools.hedge), palette, 1, r)[0];
+  const trees = pickSpecies(wb(pools.tree).filter((p) => p !== hedge), palette, 1, r);
+  const shrubs = pickSpecies(wb(pools.shrub).filter((p) => p !== hedge), palette, m2 > 20 ? 2 : 1, r);
+  const woody = !!hedge || trees.length > 0 || shrubs.length > 0;
+  const nDrift = (m2 < 4 ? 3 : m2 < 12 ? 4 : 5) - (woody ? 1 : 0);
+  // On large areas tiny plants would mean hundreds of pots per patch.
+  const minSpacing = m2 > 40 ? 25 : 15;
+  const species = pickSpecies(
+    wb(pools.drift).filter((p) => p !== hedge && !shrubs.includes(p) && p.spacingCm >= minSpacing),
+    palette,
+    nDrift,
+    r,
+  );
+  for (const k of kinds) {
+    const empty = k === 'hedge' ? !hedge : k === 'tree' ? !trees.length : k === 'shrub' ? !shrubs.length : !species.some((p) => plantKinds(p).has(k));
+    if (empty) notes.push(`${KIND_LABEL[k]}: ehhez a területhez (fény, magasság, mérgező, talaj, korlátok) nincs megfelelő faj.`);
+  }
+  if (!species.length && !woody) return { seed, palette, species: [], items: [], notes: [...notes, 'Nincs a terület feltételeinek megfelelő faj az adatbázisban.'] };
 
   // Long axis u, short axis v.
   const alongY = bb.maxY - bb.minY >= bb.maxX - bb.minX;
-  const U = (x: number, y: number): Pt => (alongY ? [y, x] : [x, y]);
+  const U = (u: number, v: number): Pt => (alongY ? [v, u] : [u, v]);
   const [u0, u1] = alongY ? [bb.minY, bb.maxY] : [bb.minX, bb.maxX];
   const [v0, v1] = alongY ? [bb.minX, bb.maxX] : [bb.minY, bb.maxY];
   const blockers = area.fixtures.map(fixturePoly).filter((p): p is Pt[] => !!p);
   const walls = area.fixtures.filter((f) => f.type === 'wall' || f.type === 'fence');
-  const walnuts = area.fixtures.filter((f) => f.type === 'walnut');
   const gap = 6; // cm between neighbouring drifts, so their edge plants keep spacing
-  const tolerant = species.filter((p) => p.juglone === 'tolerant');
+  const tolerantDrift = species.filter((p) => p.juglone === 'tolerant');
+  const inside = (q: Pt) => pointInPolygon(q, pts);
 
   const items: PlacedItem[] = [];
   const cellBase = 150 + Math.round(r() * 80);
   const usedCodes = new Set<string>();
+  const add = (it: PlacedItem) => {
+    usedCodes.add(it.plantId);
+    items.push(it);
+  };
+
+  // Trees: evenly along the long axis, each in its own slice with nothing else around it.
+  const tree = trees[0];
+  const maxTrees = area.constraints.maxTrees ?? 2;
+  const treeLen = tree ? Math.max(cellBase, Math.round(tree.spacingCm * 0.9)) : 0;
+  const nTrees = tree ? Math.min(maxTrees, Math.max(u1 - u0 >= treeLen * 1.5 ? 1 : 0, Math.floor((u1 - u0) / (treeLen * 2.5)))) : 0;
+  const treeAt = Array.from({ length: nTrees }, (_, k) => u0 + ((k + 0.5) * (u1 - u0)) / nTrees);
+  let treesPlaced = 0;
 
   // Distance from v to a wall/fence on the short axis (for deciding which side is "back").
-  const wallV = walls.map((f) => {
-    const c = alongY ? f.x + (f.w ?? 0) / 2 : f.y + (f.h ?? 0) / 2;
-    return c;
-  });
+  const wallV = walls.map((f) => (alongY ? f.x + (f.w ?? 0) / 2 : f.y + (f.h ?? 0) / 2));
 
   for (let s = u0, cell = 0; s < u1 - 20; cell++) {
-    const e = Math.min(u1, s + cellBase * (0.8 + r() * 0.4));
+    const nextTree = treeAt[treesPlaced];
+    const isTreeSlice = nextTree != null && s + treeLen / 2 >= nextTree - cellBase / 2 && u1 - s >= treeLen * 0.8;
+    const e = isTreeSlice ? Math.min(u1, s + treeLen) : Math.min(u1, s + cellBase * (0.8 + r() * 0.4));
     const end = u1 - e < 60 ? u1 : e; // don't leave a sliver at the end
+    if (isTreeSlice) treesPlaced++;
     // Blocked short-axis intervals within this slice.
     const cuts: Interval[] = [];
     for (const b of blockers) {
@@ -241,23 +327,75 @@ export function generateIdea(area: Area, plantDb: Plant[], settings: Settings, o
     const free = subtract([v0, v1], cuts).filter(([a, b]) => b - a >= 35);
     for (const [a, b] of free) {
       const w = b - a;
-      const bands = w < 110 ? 1 : w < 220 ? 2 : 3;
       // Back = the side nearer a wall/fence; else the side away from a blocked strip (lawn, path).
       const touchesCutA = cuts.some(([, y]) => Math.abs(y - a) < gap + 1);
       const touchesCutB = cuts.some(([x]) => Math.abs(x - b) < gap + 1);
       const wallNearA = wallV.length ? Math.min(...wallV.map((c) => Math.abs(c - a))) : Infinity;
       const wallNearB = wallV.length ? Math.min(...wallV.map((c) => Math.abs(c - b))) : Infinity;
       const backAtA = wallNearA !== wallNearB ? wallNearA < wallNearB : touchesCutA !== touchesCutB ? touchesCutB : a <= v0 + 1;
-      // Tiers: tallest species at the back band, lowest at the front.
+      // v at a depth measured from the back edge.
+      const V = (depth: number) => (backAtA ? a + depth : b - depth);
+      let depth = 0;
+
+      // 1) Hedge: one row along the back edge.
+      if (hedge) {
+        const hw = Math.ceil(Math.max(0.65 * hedge.spacingCm, Math.min(hedge.spreadCm, 0.4 * w)));
+        const room = w - hw >= (species.length || shrubs.length ? 35 : 0);
+        // At the area's ends keep the whole canopy inside; between slices half a spacing is enough.
+        const endPad = Math.max(hedge.spacingCm, hedge.spreadCm) / 2;
+        const ua = s + (s <= u0 + 1 ? endPad : hedge.spacingCm / 2);
+        const ub = end - (end >= u1 - 1 ? endPad : hedge.spacingCm / 2);
+        if (room && ub >= ua && !(hedge.juglone !== 'tolerant' && walnuts.length && [U(ua, V(hw / 2)), U(ub, V(hw / 2))].some(inWalnut))) {
+          const path: Pt[] = ub - ua < 1 ? [U(ua, V(hw / 2))] : [U(ua, V(hw / 2)), U(ub, V(hw / 2))];
+          const ps = fillPath(path, hedge.spacingCm);
+          if (ps.every(inside)) {
+            add({ kind: 'row', id: uid(), plantId: hedge.code, path: path.map(([x, y]) => [Math.round(x), Math.round(y)] as Pt), spacingCm: hedge.spacingCm, count: ps.length, status: 'needed' });
+            depth = hw;
+          }
+        }
+      }
+
+      // 2) Tree slice: the tree alone (plus the hedge behind it), placed so it keeps its distance.
+      if (isTreeSlice) {
+        const needH = hedge && depth ? 0.3 * (tree.spacingCm + hedge.spacingCm) + hedge.spacingCm * 0.33 : 0;
+        const d = Math.max(depth + needH, depth + (w - depth) / 2);
+        const q = U((s + end) / 2, V(Math.min(d, w - 20)));
+        if (d <= w - 20 && inside(q) && !(tree.juglone !== 'tolerant' && inWalnut(q)))
+          add({ kind: 'plant', id: uid(), plantId: tree.code, x: Math.round(q[0]), y: Math.round(q[1]), status: 'needed' });
+        continue;
+      }
+
+      // 3) Shrubs: single plants in rhythm in a strip in front of the hedge.
+      if (shrubs.length) {
+        const sp = Math.max(...shrubs.map((p) => p.spacingCm));
+        const sw = Math.ceil(Math.max(0.65 * sp, Math.min(Math.max(...shrubs.map((p) => p.spreadCm)), 0.5 * (w - depth))));
+        if (w - depth - sw >= (species.length ? 35 : 0) && w - depth >= sw) {
+          let k = cell;
+          const pad = Math.max(sp, ...shrubs.map((p) => p.spreadCm)) / 2;
+          const from = s + (s <= u0 + 1 ? pad : sp / 2);
+          const to = end - (end >= u1 - 1 ? pad : sp / 2);
+          for (let u = from; u <= to + 1; u += sp, k++) {
+            const pl = shrubs[k % shrubs.length];
+            const q = U(u, V(depth + sw / 2));
+            if (!inside(q) || (pl.juglone !== 'tolerant' && inWalnut(q))) continue;
+            add({ kind: 'plant', id: uid(), plantId: pl.code, x: Math.round(q[0]), y: Math.round(q[1]), status: 'needed' });
+          }
+          depth += sw;
+        }
+      }
+
+      // 4) Drifts in the rest: tallest at the back, lowest at the front.
+      const rest = w - depth;
+      if (!species.length || rest < 35) continue;
+      const bands = rest < 110 ? 1 : rest < 220 ? 2 : 3;
       const tiers: Plant[][] = Array.from({ length: bands }, () => []);
       species.forEach((p, i) => tiers[Math.min(bands - 1, Math.floor((i * bands) / species.length))].push(p));
-      const bw = w / bands;
+      const bw = rest / bands;
       for (let k = 0; k < bands; k++) {
         const tier = tiers[k].length ? tiers[k] : species;
-        const bandIdx = backAtA ? k : bands - 1 - k;
-        const va = a + bandIdx * bw + (bandIdx ? gap / 2 : 0);
-        const vb = a + (bandIdx + 1) * bw - (bandIdx < bands - 1 ? gap / 2 : 0);
-        // Stagger band boundaries for a less rigid look: split the slice for the back band of wide beds.
+        const da = depth + k * bw + (k || depth ? gap / 2 : 0);
+        const db = depth + (k + 1) * bw - (k < bands - 1 ? gap / 2 : 0);
+        const [va, vb] = [Math.min(V(da), V(db)), Math.max(V(da), V(db))];
         const plant0 = tier[(cell + k) % tier.length];
         const rect = [U(s + (s > u0 ? gap / 2 : 0), va), U(end - (end < u1 ? gap / 2 : 0), vb)];
         const [x0, y0] = [Math.min(rect[0][0], rect[1][0]), Math.min(rect[0][1], rect[1][1])];
@@ -266,29 +404,37 @@ export function generateIdea(area: Area, plantDb: Plant[], settings: Settings, o
         if (outer.length < 3) continue;
         let plant = plant0;
         // Walnut zone: swap in a juglone-tolerant species of a similar height.
-        const inZone = walnuts.length > 0 && outer.some((q) => walnuts.some((f) => dist(q, [f.x, f.y]) <= settings.walnutRadiusCm));
-        if (plant.juglone !== 'tolerant' && inZone) {
-          const alt = [...tolerant].sort((x, y) => Math.abs(x.maxHeightCm - plant.maxHeightCm) - Math.abs(y.maxHeightCm - plant.maxHeightCm))[0];
+        if (plant.juglone !== 'tolerant' && walnuts.length && outer.some(inWalnut)) {
+          const alt = [...tolerantDrift].sort((x, y) => Math.abs(x.maxHeightCm - plant.maxHeightCm) - Math.abs(y.maxHeightCm - plant.maxHeightCm))[0];
           if (!alt) continue;
           plant = alt;
         }
         // Inset the inner edges so edge plants of neighbouring drifts keep the spacing rule happy.
         const i = Math.ceil(plant.spacingCm * 0.32);
-        const ins = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? 0 : i);
+        // At the area's edge keep the mature spread inside (ground covers spread wider than their spacing).
+        const edgeIns = Math.min(Math.ceil(Math.max(0, plant.spreadCm - plant.spacingCm) / 2), 40);
+        const ins = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? edgeIns : i);
         const poly = clipRect(pts, x0 + ins(x0, bb.minX), y0 + ins(y0, bb.minY), x1 - ins(x1, bb.maxX), y1 - ins(y1, bb.maxY));
         if (poly.length < 3) continue;
         const ps = fillPolygon(poly, plant.spacingCm, 'staggered');
-        if (!ps.length || ps.some((q) => !pointInPolygon(q, pts))) continue;
-        usedCodes.add(plant.code);
-        items.push({ kind: 'drift', id: uid(), plantId: plant.code, polygon: poly, pattern: 'staggered', spacingCm: plant.spacingCm, count: ps.length, status: 'needed' });
+        if (!ps.length || ps.some((q) => !inside(q))) continue;
+        add({ kind: 'drift', id: uid(), plantId: plant.code, polygon: poly, pattern: 'staggered', spacingCm: plant.spacingCm, count: ps.length, status: 'needed' });
       }
     }
     s = end;
   }
 
-  const used = species.filter((p) => usedCodes.has(p.code));
+  const ordered = [...(hedge ? [hedge] : []), ...trees, ...shrubs, ...species];
+  const used = ordered.filter((p) => usedCodes.has(p.code));
   notes.push(`Színvilág: ${PALETTES[palette].label}.`);
-  notes.push(`${used.length} faj ismétlődő foltokban, hátul a magasabbak (${used[0]?.nameHu ?? '–'}), elöl az alacsonyabbak.`);
+  const parts: string[] = [];
+  if (hedge && usedCodes.has(hedge.code)) parts.push(`hátul ${hedge.nameHu.toLowerCase()} sövény`);
+  if (tree && usedCodes.has(tree.code)) parts.push(`${treesPlaced > 1 ? 'kis fák' : 'kis fa'} (${tree.nameHu.toLowerCase()}) körülöttük szabad hellyel`);
+  const sh = shrubs.filter((p) => usedCodes.has(p.code));
+  if (sh.length) parts.push(`előtte cserjék ritmusban (${sh.map((p) => p.nameHu.toLowerCase()).join(', ')})`);
+  const dr = species.filter((p) => usedCodes.has(p.code));
+  if (dr.length) parts.push(`${dr.length} faj ismétlődő foltokban, elöl az alacsonyabbak`);
+  if (parts.length) notes.push(`${parts.join('; ')}.`.replace(/^./, (c) => c.toUpperCase()));
   const seasons = new Set(used.flatMap((p) => [...seasonsOf(p)]));
   const sName = ['tavasz', 'nyár', 'ősz'].filter((_, i) => seasons.has(i as 0 | 1 | 2));
   if (sName.length) notes.push(`Virágzás: ${sName.join(', ')}.`);

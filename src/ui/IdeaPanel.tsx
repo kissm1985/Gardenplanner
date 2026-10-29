@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { candidates, generateIdea, PALETTES, type Idea, type PaletteKey } from '../engine/generator';
+import { DEFAULT_KINDS, generateIdea, KIND_LABEL, PALETTES, poolsFor, type Idea, type PaletteKey, type PlantKind } from '../engine/generator';
 import { areaSunLevel, evaluate } from '../engine/rules';
 import { SUN_LABEL, SOIL_LABEL } from '../model/plants';
 import { AREA_KIND_LABEL } from '../model/types';
@@ -11,15 +11,22 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
   const [palette, setPalette] = useState<PaletteKey | ''>('');
+  const [kinds, setKinds] = useState<PlantKind[]>(DEFAULT_KINDS);
   const [idea, setIdea] = useState<{ variantId: string; idea: Idea } | null>(null);
   if (!area) return null;
-  const pool = candidates(area, project.plantDb);
+  const pools = poolsFor(area, project.plantDb, kinds);
+  const pool = [...new Set([...pools.drift, ...pools.hedge, ...pools.shrub, ...pools.tree])];
+  // Species available per type, to show next to each checkbox.
+  const per = (k: PlantKind) => {
+    const q = poolsFor(area, project.plantDb, [k]);
+    return new Set([...q.drift, ...q.hedge, ...q.shrub, ...q.tree]).size;
+  };
   const c = area.constraints;
   const variantAlive = idea && area.variants.some((v) => v.id === idea.variantId);
 
   const run = (again: boolean) => {
     const st = useProject.getState();
-    const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined });
+    const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined, kinds });
     const notes = next.notes.join(' ');
     if (again && idea && variantAlive) {
       st.setVariantItems(idea.variantId, next.items, notes);
@@ -44,7 +51,7 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
         {c.noThorns ? ', tüske nélkül' : ''}
         {area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}
         {area.kind ? `, ${AREA_KIND_LABEL[area.kind].toLowerCase()}` : ''}; {pool.length} faj jöhet szóba) véletlenszerű, de átgondolt összeállítás: egy színvilág, hátul a magasabbak, elöl
-        az alacsonyabbak, 3–5 faj ismétlődő foltokban. Mindegyik ötlet külön változatba kerül, a meglévő terv nem változik.
+        az alacsonyabbak, ismétlődő ritmusban. Mindegyik ötlet külön változatba kerül, a meglévő terv nem változik.
       </p>
       <label className="field">
         <span className="lbl">Színvilág</span>
@@ -57,8 +64,30 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
           ))}
         </select>
       </label>
+      <fieldset className="field-group">
+        <legend>Milyen növények kerüljenek a tervre?</legend>
+        <div className="seg kind-seg">
+          {(Object.keys(KIND_LABEL) as PlantKind[]).map((k) => {
+            const n = per(k);
+            return (
+              <label key={k} className="seg-item">
+                <input
+                  type="checkbox"
+                  checked={kinds.includes(k)}
+                  disabled={!n && !kinds.includes(k)}
+                  onChange={(e) => setKinds(e.target.checked ? [...kinds, k] : kinds.filter((x) => x !== k))}
+                />
+                <span>
+                  {KIND_LABEL[k]} · {n}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+        <p className="mono muted">Sövény a hátsó szélre kerül, a kis fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.</p>
+      </fieldset>
       <div className="form-actions form-actions-start">
-        <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={pool.length < 2}>
+        <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!kinds.length || pool.length < 1}>
           {shown ? 'Új ötlet új változatba' : 'Ötlet generálása'}
         </button>
         {shown && (
@@ -67,7 +96,7 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
           </button>
         )}
       </div>
-      {pool.length < 2 && <p className="form-error">Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.</p>}
+      {kinds.length > 0 && pool.length < 1 && <p className="form-error">Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.</p>}
 
       {shown && (
         <div className="idea-result" aria-live="polite">
