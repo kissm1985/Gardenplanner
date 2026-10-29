@@ -7,7 +7,7 @@ test('long sheets fit the visible screen: the × stays visible, the body scrolls
   await page.getByRole('button', { name: /Kezdés/ }).click();
   await page.getByRole('button', { name: /Projekt: mentés/ }).click();
   const dlg = page.locator('dialog[open]');
-  const close = dlg.locator('.sheet-head button');
+  const close = dlg.locator('.sheet-head button[aria-label="Bezárás"]');
   const box = (await close.boundingBox())!;
   expect(box.y).toBeGreaterThanOrEqual(0);
   expect(box.y + box.height).toBeLessThanOrEqual(560);

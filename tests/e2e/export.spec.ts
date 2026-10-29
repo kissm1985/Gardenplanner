@@ -23,7 +23,7 @@ test('acceptance: JSON backup restores the project exactly', async ({ page }) =>
   const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Teljes mentés (JSON)' }).click()]);
   const path = await dl.path();
   const saved = JSON.parse(readFileSync(path!, 'utf8'));
-  await page.locator('dialog[open] .sheet-head button').click();
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
 
   // Change the plan, then restore.
   await page.locator('g.group').first().click();

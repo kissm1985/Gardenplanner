@@ -24,14 +24,14 @@ test('shared plant filters in the palette and the database; area soil', async ({
   await expect(page.locator('.plant-row')).toHaveCount(names.length);
   await page.locator('dialog[open]').getByRole('button', { name: /Szűrők törlése/ }).click();
   await expect(page.locator('.plant-row')).toHaveCount(all);
-  await page.locator('dialog[open] .sheet-head button').click();
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
 
   // Area soil → soil warning for lavender on clay.
   await page.locator('.area-switch').click();
   await page.locator('dialog[open]').getByRole('button', { name: 'Szerkesztés' }).first().click();
   await page.locator('dialog[open]').getByLabel('Talaj').selectOption('clay');
   await page.locator('dialog[open]').getByRole('button', { name: 'Mentés', exact: true }).click();
-  await page.locator('dialog[open] .sheet-head button').click();
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
   await page.getByLabel('Növény keresése').fill('levendula');
   await page.locator('.palette-item').first().click();
   const b = (await page.locator('.area-outline').boundingBox())!;

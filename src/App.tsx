@@ -23,6 +23,7 @@ import { Sheet } from './ui/Sheet';
 import { VariantsPanel } from './ui/VariantsPanel';
 import { IdeaPanel } from './ui/IdeaPanel';
 import { ReplacePanel } from './ui/ReplacePanel';
+import { HelpPanel } from './ui/HelpPanel';
 import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
@@ -38,6 +39,16 @@ const TOOLS: { id: Tool; label: string; icon: string; ready: boolean }[] = [
   { id: 'list', label: 'Lista', icon: '☰', ready: true },
 ];
 
+/** Which chapter of the guide the help opens at, by the active tool. */
+const HELP_SECTION: Partial<Record<Tool, string>> = {
+  plant: '5-növények-elhelyezése',
+  drift: '5-növények-elhelyezése',
+  row: '5-növények-elhelyezése',
+  fixtures: '4-rögzített-elemek-gyep-burkolat-fal-fa',
+  season: '12-évszaknézet',
+  list: '13-növénylista-rendelés-költség',
+};
+
 const LAYER_LABELS: Record<keyof Layers, string> = {
   background: 'Háttérkép',
   warnings: 'Figyelmeztetések',
@@ -49,7 +60,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -83,6 +94,11 @@ export function App({ loading }: { loading: boolean }) {
   useEffect(() => {
     if (zoneDraft) setSheet('ideas');
   }, [zoneDraft]);
+  const [helpAt, setHelpAt] = useState<string | undefined>(undefined);
+  const openHelp = (section?: string) => {
+    setHelpAt(section);
+    setSheet('help');
+  };
   const openReplace = (code?: string) => {
     setReplaceFrom(code);
     setSheet('replace');
@@ -157,6 +173,9 @@ export function App({ loading }: { loading: boolean }) {
           </button>
           <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label="Nézet és rétegek">
             ◫
+          </button>
+          <button type="button" className="icon-btn help-btn" onClick={() => openHelp(HELP_SECTION[tool])} aria-label="Súgó: felhasználói útmutató">
+            ?
           </button>
           <button type="button" className="icon-btn" onClick={() => setSheet('project')} aria-label="Projekt: mentés, megosztás, nyomtatás">
             ⋯
@@ -271,16 +290,16 @@ export function App({ loading }: { loading: boolean }) {
         ))}
       </nav>
 
-      <Sheet open={sheet === 'areas'} title="Területek" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'areas'} onHelp={() => openHelp('3-területek')} title="Területek" onClose={() => setSheet(null)}>
         <AreasPanel onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'plantdb'} title="Növényadatbázis" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('9-növényadatbázis-és-szűrők')} title="Növényadatbázis" onClose={() => setSheet(null)}>
         <PlantDbPanel />
       </Sheet>
-      <Sheet open={sheet === 'props'} title="Tulajdonságok" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'props'} onHelp={() => openHelp('6-kijelölés-szerkesztés-csere')} title="Tulajdonságok" onClose={() => setSheet(null)}>
         <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
       </Sheet>
-      <Sheet open={sheet === 'project'} title="Projekt" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'project'} onHelp={() => openHelp('15-mentés-megosztás-nyomtatás-képek')} title="Projekt" onClose={() => setSheet(null)}>
         <ProjectPanel
           onPrint={startPrint}
           onIntro={() => {
@@ -292,7 +311,7 @@ export function App({ loading }: { loading: boolean }) {
       </Sheet>
       {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
       {print && <PrintView project={project} orientation={print} />}
-      <Sheet open={sheet === 'filters'} title="Növényszűrők" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'filters'} onHelp={() => openHelp('9-növényadatbázis-és-szűrők')} title="Növényszűrők" onClose={() => setSheet(null)}>
         <div className="form">
           <PlantFilterForm />
           <div className="form-actions">
@@ -302,22 +321,25 @@ export function App({ loading }: { loading: boolean }) {
           </div>
         </div>
       </Sheet>
-      <Sheet open={sheet === 'variants'} title="Változatok" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'variants'} onHelp={() => openHelp('10-változatok')} title="Változatok" onClose={() => setSheet(null)}>
         <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} />
       </Sheet>
-      <Sheet open={sheet === 'replace'} title="Növény cseréje" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'help'} title="Súgó" onClose={() => setSheet(null)} wide>
+        <HelpPanel section={helpAt} />
+      </Sheet>
+      <Sheet open={sheet === 'replace'} onHelp={() => openHelp('növény-cseréje-mindenhol')} title="Növény cseréje" onClose={() => setSheet(null)}>
         <ReplacePanel key={replaceFrom ?? ''} from={replaceFrom} onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'ideas'} title="Ötletgenerátor" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'ideas'} onHelp={() => openHelp('11-ötletgenerátor')} title="Ötletgenerátor" onClose={() => setSheet(null)}>
         <IdeaPanel onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'warnings'} title={`Figyelmeztetések (${warnings.length})`} onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'warnings'} onHelp={() => openHelp('8-figyelmeztetések')} title={`Figyelmeztetések (${warnings.length})`} onClose={() => setSheet(null)}>
         <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'fixtures'} title="Rögzített elemek" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'fixtures'} onHelp={() => openHelp('4-rögzített-elemek-gyep-burkolat-fal-fa')} title="Rögzített elemek" onClose={() => setSheet(null)}>
         <FixturesPanel onDone={() => setSheet(null)} />
       </Sheet>
-      <Sheet open={sheet === 'view'} title="Nézet" onClose={() => setSheet(null)}>
+      <Sheet open={sheet === 'view'} onHelp={() => openHelp('2-a-képernyő-részei')} title="Nézet" onClose={() => setSheet(null)}>
         <div className="form">
           <fieldset className="field-group">
             <legend>Rétegek</legend>

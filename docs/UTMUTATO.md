@@ -55,6 +55,7 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 - **A terület neve ▾**: itt váltasz a területek között, és itt hozol létre újat. Alatta látszik a terület mérete, a tövek száma, az égtáj és a napsütés.
 - **↶ / ↷**: visszavonás és újra (100 lépésig). Számítógépen **Ctrl+Z** és **Ctrl+Y** is működik.
 - **◫ Nézet**: rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes; innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
+- **? Súgó**: ez az útmutató, az alkalmazáson belül, internet nélkül is. Az éppen használt eszközhöz tartozó fejezetnél nyílik meg.
 - **⋯ Projekt**: mentés, betöltés, megosztás, képek, látványterv, nyomtatás.
 - **Kerek szám**: a figyelmeztetések száma. Zöld, ha nincs gond, piros, ha hiba van.
 
@@ -65,6 +66,8 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 - **Illesztés**: dupla koppintás vagy a **⤢** gomb, ez a teljes területet mutatja.
 - **Vonalzó**: a szélén méterben.
 - **Változatgomb**: jobb felül (pl. „A terv ★ ▾”), ez nyitja a változatokat.
+
+**Ablakok**: a beállítások ablakokban nyílnak meg. Bezárás: a fejléc **×** gombjával, a fejléc lehúzásával vagy a háttérre koppintva. A fejléc **?** gombja az ablakhoz tartozó súgófejezetet nyitja meg.
 
 **Alsó eszköztár**
 
@@ -182,11 +185,13 @@ A tövek egyenletes tőtávval kerülnek a vonalra, a darabszám automatikus.
 - **Lasszó**: kapcsold be, és húzd körbe a kijelölendő elemeket.
 - **Húzás**: a kijelölt elemek mozgatása.
 - **Folt vagy sor sarkai**: egy kijelölt folt vagy sor sarkpontjait húzva alakítod; a darabszám közben frissül.
+- **Kiterjedés**: egy kijelölt egyedi tő jobb szélén pötty jelenik meg. Húzással a tő koronáját nagyobbra vagy kisebbre veheted (pl. egy idősebb, nagyobb példánynál); közben a rajz kiírja az átmérőt. A méret az *Adatok* lapon cm-ben is megadható, a **Vissza az alapméretre** gomb pedig visszaállítja. Ez csak arra az egy tőre vonatkozik, a fajt nem változtatja; a tőtáv-szabály az új mérettel számol.
 
 A kijelölés alatt megjelenő sáv gombjai:
 
 - **Adatok**: faj, állapot (*kell, megrendelve, megvan, beültetve*), megjegyzés. Foltnál és sornál a **tőtáv** és a kívánt **darabszám** is itt állítható; a darabszámból a program kiszámolja a tőtávot.
 - **Másolás**: a kijelölt elemek másolata kissé eltolva.
+- **Bontás** (foltnál és sornál): a foltot vagy sort egyedi tövekre bontja. A tövek a helyükön maradnak, de ezután egyenként mozgathatók, törölhetők, cserélhetők. Alapból minden folt és sor egyben marad, bontani csak akkor kell, ha egyenként szeretnéd kezelni a töveket.
 - **Csere**: az összes ilyen faj cseréje egy másikra (lásd lent).
 - **Törlés**
 - **×**: kijelölés megszüntetése.
@@ -468,6 +473,9 @@ Használd a **Csere** funkciót ([6. fejezet](#növény-cseréje-mindenhol)); az
 
 **Miért jelez egy növényt, ha az szerintem jó oda?**
 A szabályok a megadott korlátokból és a növény adataiból dolgoznak. Ha a növény adata pontatlan, javítsd az adatbázisban; ha szándékos kivétel, használd az **Elnémítás** gombot.
+
+**Telefonon nem látom az ablak × gombját.**
+Az ablakok a ténylegesen látható képernyőrészhez igazodnak, így a Safari címsávja nem takarja el a fejlécet. Ha mégis, húzd lefelé az ablak fejlécét, vagy koppints az ablak fölötti sötét háttérre.
 
 **Elrontottam valamit.**
 **↶ Visszavonás**, akár 100 lépésig. A törölt terület, változat és csere is visszahozható.

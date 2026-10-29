@@ -25,7 +25,7 @@ test('draw a lawn strip in an area; plants on it are warned about; reshape it la
   await expect(page.locator('.warn-badge')).toHaveText('1');
   await page.locator('.warn-badge').click();
   await expect(page.locator('dialog[open]')).toContainText('„Gyepsáv” területére esik');
-  await page.locator('dialog[open] .sheet-head button').click();
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
 
   // The fixture list shows its size and lets me reshape it on the plan.
   await page.getByRole('button', { name: 'Nézet és rétegek' }).click();

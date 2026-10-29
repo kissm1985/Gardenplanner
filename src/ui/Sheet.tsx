@@ -3,7 +3,15 @@ import { useEffect, useRef, type ReactNode } from 'react';
 const SWIPE_CLOSE_PX = 80;
 
 /** Bottom sheet on phones, centred dialog on wider screens. Uses <dialog> for focus trapping and Esc. */
-export function Sheet({ open, title, onClose, children }: { open: boolean; title: string; onClose: () => void; children: ReactNode }) {
+export function Sheet({ open, title, onClose, children, wide, onHelp }: {
+  open: boolean;
+  title: string;
+  onClose: () => void;
+  children: ReactNode;
+  wide?: boolean;
+  /** Shows a "?" that opens the guide at this window's chapter. */
+  onHelp?: () => void;
+}) {
   const ref = useRef<HTMLDialogElement>(null);
   const drag = useRef<{ id: number; y: number } | null>(null);
   useEffect(() => {
@@ -15,7 +23,7 @@ export function Sheet({ open, title, onClose, children }: { open: boolean; title
   return (
     <dialog
       ref={ref}
-      className="sheet"
+      className={`sheet${wide ? ' sheet-wide' : ''}`}
       aria-label={title}
       onCancel={(e) => {
         e.preventDefault();
@@ -50,6 +58,11 @@ export function Sheet({ open, title, onClose, children }: { open: boolean; title
       >
         <span className="sheet-grip" aria-hidden="true" />
         <h2>{title}</h2>
+        {onHelp && (
+          <button type="button" className="icon-btn sheet-help" onClick={onHelp} aria-label={`Súgó: ${title}`}>
+            ?
+          </button>
+        )}
         <button type="button" className="icon-btn" onClick={onClose} aria-label="Bezárás">
           ×
         </button>
