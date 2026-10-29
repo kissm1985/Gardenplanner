@@ -11,6 +11,8 @@ export const STATUS_LABEL: Record<ItemStatus, string> = { needed: 'kell', ordere
 /** Floating action bar for the current selection. */
 export function SelectionBar({ onProps, onReplace }: { onProps: () => void; onReplace: (code: string) => void }) {
   const selected = useUi((s) => s.selected);
+  // Hooks before the early return (React needs the same hooks on every render).
+  const groups = useProject((s) => selectItems(s).filter((i) => selected.includes(i.id) && i.kind !== 'plant').length);
   if (!selected.length) return null;
   const dup = () => useUi.getState().select(useProject.getState().duplicateItems(selected, 20, 20));
   return (
@@ -24,6 +26,16 @@ export function SelectionBar({ onProps, onReplace }: { onProps: () => void; onRe
       <button type="button" className="btn btn-small" onClick={dup}>
         Másolás
       </button>
+      {groups > 0 && (
+        <button
+          type="button"
+          className="btn btn-small"
+          title="A folt vagy sor egyedi tövekre bontása (a helyükön maradnak)"
+          onClick={() => useUi.getState().select(useProject.getState().explodeItems(selected))}
+        >
+          Bontás
+        </button>
+      )}
       <button
         type="button"
         className="btn btn-small"

@@ -51,3 +51,31 @@ test('straight row by tapping both ends', async ({ page }) => {
   // 400 cm at 40 cm → 11 plants
   await expect(page.locator('.group-labels text')).toHaveText('LA × 11');
 });
+
+test('split a drift into single plants (Bontás); they stay in place; undo merges back', async ({ page }) => {
+  const errors: string[] = [];
+  page.on('pageerror', (e) => errors.push(e.message));
+  await page.goto('/');
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  await page.getByRole('button', { name: 'Sor', exact: true }).click();
+  await page.getByLabel('Növény keresése').fill('levendula');
+  await page.locator('.palette-item').first().click();
+  const b = (await page.locator('.area-outline').boundingBox())!;
+  const cm = b.width / 120;
+  await page.mouse.click(b.x + 60 * cm, b.y + 100 * cm);
+  await page.mouse.click(b.x + 60 * cm, b.y + 500 * cm); // 11 LA
+  await page.getByRole('button', { name: 'Kijelölés' }).click();
+  await page.locator('g.group').first().click();
+  const bar = page.getByRole('toolbar', { name: 'Kijelölés', exact: true });
+  await bar.getByRole('button', { name: 'Bontás' }).click();
+  await expect(page.locator('g.plant')).toHaveCount(11);
+  await expect(page.locator('g.group')).toHaveCount(0);
+  await expect(bar).toContainText('11 db');
+  await expect(bar.getByRole('button', { name: 'Bontás' })).toHaveCount(0);
+  await expect(page.locator('.meta-count')).toHaveText('11 tő');
+  for (const name of ['Tulajdonságok', 'Másolás', 'Csere', 'Törlés']) await expect(bar.getByRole('button', { name, exact: true })).toBeInViewport();
+  await page.getByRole('button', { name: 'Visszavonás' }).click();
+  await expect(page.locator('g.group')).toHaveCount(1);
+  await expect(bar).toHaveCount(0); // the split plants are gone, so is their selection
+  expect(errors).toEqual([]);
+});

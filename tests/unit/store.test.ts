@@ -263,3 +263,19 @@ describe('mixed replacement', () => {
     for (const it of items) if (it.kind === 'drift') expect(it.spacingCm).toBe(st().project!.plantDb.find((p) => p.code === it.plantId)!.spacingCm);
   });
 });
+
+describe('split groups', () => {
+  it('a drift becomes single plants at the same positions, with its status', () => {
+    useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
+    st().createProject(['house-strip']);
+    const id = st().addDrift('LA', [[0, 0], [120, 0], [120, 200], [0, 200]], 'staggered')!;
+    st().updateItems([id], { status: 'ordered' });
+    const drift = selectItems(st())[0];
+    const n = drift.kind === 'drift' ? drift.count : 0;
+    const ids = st().explodeItems([id]);
+    expect(ids).toHaveLength(n);
+    const items = selectItems(st());
+    expect(items.every((i) => i.kind === 'plant' && i.plantId === 'LA' && i.status === 'ordered')).toBe(true);
+    expect(items).toHaveLength(n);
+  });
+});

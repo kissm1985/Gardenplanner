@@ -65,6 +65,19 @@ export function App({ loading }: { loading: boolean }) {
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
   const [replaceFrom, setReplaceFrom] = useState<string | undefined>(undefined);
+  // Undo/redo (or a split) can remove selected items: keep only those that still exist.
+  useEffect(
+    () =>
+      useProject.subscribe((st) => {
+        const sel = useUi.getState().selected;
+        if (!sel.length) return;
+        const ids = new Set(selectItems(st).map((i) => i.id));
+        const live = sel.filter((id) => ids.has(id));
+        if (live.length !== sel.length) useUi.getState().select(live);
+      }),
+    [],
+  );
+
   // A zone drawn on the plan goes straight back to the idea panel, which fills it.
   const zoneDraft = useUi((s) => s.zoneDraft);
   useEffect(() => {

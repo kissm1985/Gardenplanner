@@ -719,7 +719,8 @@ html[data-save-error] .topbar {
   border: 1px solid var(--line);
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.16);
   border-radius: 4px;
-  overflow-x: auto;
+  /* Wrap instead of scrolling sideways, so every action stays visible on phones. */
+  flex-wrap: wrap;
 }
 .selbar-count {
   white-space: nowrap;

@@ -41,6 +41,8 @@ export interface ProjectState {
   moveItems: (ids: string[], dx: number, dy: number) => void;
   updateItems: (ids: string[], patch: ItemPatch) => void;
   deleteItems: (ids: string[]) => void;
+  /** Split drifts and rows into single plants at their positions; returns the ids of the new plants. */
+  explodeItems: (ids: string[]) => string[];
   /** Add plants (and remove some) in the edited variant as one undoable step (zone fill). */
   applyFill: (add: PlacedItem[], removeIds: string[]) => void;
   /**
@@ -354,6 +356,24 @@ export const useProject = create<ProjectState>()((set, get) => {
         }),
       }));
       return slots;
+    },
+
+    explodeItems: (ids) => {
+      const set_ = new Set(ids);
+      const created: string[] = [];
+      mapItems((items) =>
+        items.some((it) => set_.has(it.id) && it.kind !== 'plant')
+          ? items.flatMap((it): PlacedItem[] => {
+              if (!set_.has(it.id) || it.kind === 'plant') return [it];
+              return itemPositions(it).map(([x, y]) => {
+                const id = uid('i');
+                created.push(id);
+                return { kind: 'plant', id, plantId: it.plantId, x: round1(x), y: round1(y), status: it.status, ...(it.note ? { note: it.note } : {}) };
+              });
+            })
+          : items,
+      );
+      return created;
     },
 
     applyFill: (add, removeIds) => {
