@@ -1,6 +1,8 @@
 import { useRef, useState } from 'react';
 import { bomFromEntries } from '../engine/bom';
 import { exportJson, parseProject, shareUrl } from '../engine/io';
+import { SEASON_LABEL, SEASON_MONTH, type Season } from '../engine/season';
+import { buildVisualPrompt, type Lang, type Viewpoint } from '../engine/visualPrompt';
 import { activeVariant, migrate, selectCurrentArea, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
@@ -28,6 +30,9 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
   const [withLegend, setWithLegend] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
   const linkRef = useRef<HTMLTextAreaElement>(null);
+  const vizRef = useRef<HTMLTextAreaElement>(null);
+  const [viz, setViz] = useState<{ season: Season; viewpoint: Viewpoint; lang: Lang; mature: boolean }>({ season: 1, viewpoint: 'eye', lang: 'hu', mature: true });
+  const [vizText, setVizText] = useState('');
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
 
   const load = async (file: File) => {
@@ -41,10 +46,10 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
     }
   };
 
-  const image = async (kind: 'png' | 'svg') => {
+  const image = async (kind: 'png' | 'svg', opts: { month?: number | null; legend?: boolean; suffix?: string } = {}) => {
     if (!area) return;
     const v = activeVariant(area);
-    const legend: LegendRow[] = withLegend
+    const legend: LegendRow[] = (opts.legend ?? withLegend)
       ? bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
           code: r.plant.code,
           nameHu: r.plant.nameHu,
@@ -54,14 +59,23 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
           count: r.planted,
         }))
       : [];
-    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month, legend, caption: `${area.name} – ${v.name} · ${area.widthCm} × ${area.lengthCm} cm` });
-    const name = `${slug(area.name)}-${slug(v.name)}`;
+    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: opts.month !== undefined ? opts.month : month, legend, caption: `${area.name} – ${v.name} · ${area.widthCm} × ${area.lengthCm} cm` });
+    const name = `${slug(area.name)}-${slug(v.name)}${opts.suffix ?? ''}`;
     try {
       if (kind === 'svg') downloadText(`${name}.svg`, svg, 'image/svg+xml');
       else downloadBlob(`${name}.png`, await svgToPng(svg), 'image/png');
     } catch (e) {
       setMsg((e as Error).message);
     }
+  };
+
+  const vizPrompt = async () => {
+    if (!area) return;
+    const text = buildVisualPrompt(project, area, activeVariant(area).items, viz);
+    setVizText(text);
+    await new Promise((r) => setTimeout(r));
+    const ok = await copy(text, vizRef.current);
+    setMsg(ok ? 'A szöveg kimásolva. Illeszd be a ChatGPT-be, és csatold mellé a PNG-t.' : 'Jelöld ki és másold ki a szöveget a mezőből.');
   };
 
   const makeLink = async () => {
@@ -134,6 +148,58 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
           <span>Jelmagyarázattal (kód → növény, darabszám)</span>
         </label>
         <p className="mono muted">{month ? 'Az évszaknézet színeivel.' : 'A szerkesztett változat, alapszínekkel. Évszaknézetből az adott hónap színeit kapod.'}</p>
+      </fieldset>
+
+      <fieldset className="field-group">
+        <legend>Látványterv ChatGPT-nek{area ? ` – ${area.name}` : ''}</legend>
+        <p className="mono muted">Egy bemásolható leírás (méretek, égtáj, fal, gyep, a foltok helye méterben, minden faj színe, formája, magassága) és mellé a rajz jelmagyarázattal. A kettőt együtt add be a ChatGPT-nek.</p>
+        <div className="field-row">
+          <label className="field">
+            <span className="lbl">Évszak</span>
+            <select value={viz.season} onChange={(e) => setViz({ ...viz, season: +e.target.value as Season })}>
+              {SEASON_LABEL.map((l, i) => (
+                <option key={l} value={i}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field">
+            <span className="lbl">Nézőpont</span>
+            <select value={viz.viewpoint} onChange={(e) => setViz({ ...viz, viewpoint: e.target.value as Viewpoint })}>
+              <option value="eye">szemmagasságból</option>
+              <option value="aerial">madártávlatból</option>
+              <option value="both">mindkettő</option>
+            </select>
+          </label>
+        </div>
+        <div className="field-row">
+          <label className="field">
+            <span className="lbl">Nyelv</span>
+            <select value={viz.lang} onChange={(e) => setViz({ ...viz, lang: e.target.value as Lang })}>
+              <option value="hu">magyar</option>
+              <option value="en">angol</option>
+            </select>
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={viz.mature} onChange={(e) => setViz({ ...viz, mature: e.target.checked })} />
+            <span>Kifejlett állapot (2–3 év múlva)</span>
+          </label>
+        </div>
+        <div className="form-actions form-actions-start">
+          <button type="button" className="btn btn-small btn-primary" onClick={vizPrompt} disabled={!area}>
+            Leírás másolása
+          </button>
+          <button
+            type="button"
+            className="btn btn-small"
+            onClick={() => image('png', { month: SEASON_MONTH[viz.season], legend: true, suffix: '-latvanyterv' })}
+            disabled={!area}
+          >
+            Rajz PNG-ben
+          </button>
+        </div>
+        {vizText && <textarea ref={vizRef} className="sched-text" readOnly rows={8} value={vizText} onFocus={(e) => e.currentTarget.select()} aria-label="Leírás a látványtervhez" />}
       </fieldset>
 
       <fieldset className="field-group">

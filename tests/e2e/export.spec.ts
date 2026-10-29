@@ -96,3 +96,19 @@ test('background image: upload, then set the scale with two points', async ({ pa
   await expect.poll(async () => Number(await page.locator('.bg-image').getAttribute('width'))).toBeGreaterThan(440);
   expect(Number(await page.locator('.bg-image').getAttribute('width'))).toBeLessThan(540);
 });
+
+test('ChatGPT visualisation: brief is copied and the plan PNG downloads', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await setup(page);
+  await menu(page);
+  await page.locator('dialog[open]').getByLabel('Évszak').selectOption('2');
+  await page.getByRole('button', { name: 'Leírás másolása' }).click();
+  const text = await page.getByLabel('Leírás a látványtervhez').inputValue();
+  expect(text).toContain('fotórealisztikus');
+  expect(text).toContain('**LA – Levendula**');
+  expect(text).toContain('11 tő');
+  expect(text).toContain('ősz');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text);
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Rajz PNG-ben' }).click()]);
+  expect(dl.suggestedFilename()).toMatch(/latvanyterv\.png$/);
+});

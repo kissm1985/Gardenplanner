@@ -25,7 +25,8 @@ npm run build      # statikus build a dist/ mappába
 | Évszakok | Négy évszak és havi csúszka, négy évszak egymás mellett |
 | Változatok | A/B terv, választott változat, összehasonlítás |
 | Menetrend | Napokra bontott, pipálható ültetési lista; gondozási naptár Győrre; mulcsajánlás |
-| Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG, teljes JSON-mentés, csak olvasható link |
+| Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG jelmagyarázattal, teljes JSON-mentés, csak olvasható link |
+| Látványterv | Bemásolható leírás a ChatGPT-nek (méretek, égtáj, tereptárgyak, foltok helye méterben, fajok kinézete évszak szerint, nézőpont) + rajz PNG-ben |
 
 ## Elfogadási feltételek (SPEC §8)
 
