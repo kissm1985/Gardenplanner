@@ -26,6 +26,9 @@ export interface UiState {
   /** Season view month (1–12) and side-by-side mode. */
   month: number;
   fourUp: boolean;
+  /** Variant comparison view is open. */
+  compare: boolean;
+  setCompare: (v: boolean) => void;
   setMonth: (m: number) => void;
   setFourUp: (v: boolean) => void;
   setDriftPattern: (p: 'grid' | 'staggered') => void;
@@ -51,12 +54,14 @@ export const useUi = create<UiState>()((set) => ({
   rowMode: 'line',
   month: new Date().getMonth() + 1,
   fourUp: false,
+  compare: false,
+  setCompare: (compare) => set({ compare }),
   setMonth: (month) => set({ month }),
   setFourUp: (fourUp) => set({ fourUp }),
   setDriftPattern: (driftPattern) => set({ driftPattern }),
   setRowMode: (rowMode) => set({ rowMode }),
   layers: { warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
-  setTool: (tool) => set((s) => ({ tool, lasso: tool === 'select' ? s.lasso : false })),
+  setTool: (tool) => set((s) => ({ tool, lasso: tool === 'select' ? s.lasso : false, compare: false })),
   setActivePlant: (activePlant) => set({ activePlant }),
   select: (selected) => set((s) => ({ selected, selectedFixture: selected.length ? null : s.selectedFixture })),
   selectFixture: (selectedFixture) => set((s) => ({ selectedFixture, selected: selectedFixture ? [] : s.selected })),

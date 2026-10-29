@@ -47,6 +47,13 @@ export interface ProjectState {
   moveFixture: (id: string, dx: number, dy: number) => void;
   deleteFixture: (id: string) => void;
 
+  duplicateVariant: (variantId: string) => string | null;
+  addEmptyVariant: () => string | null;
+  renameVariant: (variantId: string, name: string) => void;
+  deleteVariant: (variantId: string) => void;
+  setActiveVariant: (variantId: string) => void;
+  setChosenVariant: (variantId: string) => void;
+
   undo: () => void;
   redo: () => void;
 }
@@ -67,7 +74,15 @@ export function migrate(p: Project): Project {
   return out;
 }
 
-export const activeVariant = (a: Area): Variant => a.variants.find((v) => v.id === a.chosenVariantId) ?? a.variants[0];
+export const activeVariant = (a: Area): Variant =>
+  a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0];
+
+/** Next free plan name: "A terv", "B terv", … */
+export function nextVariantName(vs: Variant[]): string {
+  const used = new Set(vs.map((v) => v.name));
+  for (const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') if (!used.has(`${c} terv`)) return `${c} terv`;
+  return `${vs.length + 1}. terv`;
+}
 
 function translateItem(it: PlacedItem, dx: number, dy: number): PlacedItem {
   switch (it.kind) {
@@ -333,6 +348,63 @@ export const useProject = create<ProjectState>()((set, get) => {
     },
 
     deleteFixture: (fid) => mapFixtures((fs) => fs.filter((f) => f.id !== fid)),
+
+    duplicateVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('v');
+      mapArea(areaId, (a) => {
+        const src = a.variants.find((v) => v.id === vid);
+        if (!src) return a;
+        const copy: Variant = {
+          id,
+          name: nextVariantName(a.variants),
+          notes: src.notes,
+          items: src.items.map((it) => ({ ...it, id: uid('i') })),
+          // Muted ids that refer to items no longer match; species-level ones carry over.
+          muted: src.muted?.filter((m) => !m.includes('i_')),
+        };
+        return { ...a, variants: [...a.variants, copy], activeVariantId: id };
+      });
+      return id;
+    },
+
+    addEmptyVariant: () => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('v');
+      mapArea(areaId, (a) => ({ ...a, variants: [...a.variants, { id, name: nextVariantName(a.variants), items: [], notes: '' }], activeVariantId: id }));
+      return id;
+    },
+
+    renameVariant: (vid, name) => {
+      const areaId = get().currentAreaId;
+      const n = name.trim();
+      if (!areaId || !n) return;
+      mapArea(areaId, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, name: n } : v)) }));
+    },
+
+    deleteVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return;
+      mapArea(areaId, (a) => {
+        if (a.variants.length <= 1 || !a.variants.some((v) => v.id === vid)) return a;
+        const variants = a.variants.filter((v) => v.id !== vid);
+        const chosen = a.chosenVariantId === vid ? variants[0].id : a.chosenVariantId;
+        const active = (a.activeVariantId ?? a.chosenVariantId) === vid ? chosen : a.activeVariantId;
+        return { ...a, variants, chosenVariantId: chosen, activeVariantId: active };
+      });
+    },
+
+    setActiveVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (areaId) mapArea(areaId, (a) => (a.activeVariantId === vid ? a : { ...a, activeVariantId: vid }));
+    },
+
+    setChosenVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (areaId) mapArea(areaId, (a) => (a.chosenVariantId === vid ? a : { ...a, chosenVariantId: vid }));
+    },
 
     undo: () => {
       const { past, project, future } = get();

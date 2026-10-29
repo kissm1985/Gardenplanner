@@ -655,6 +655,9 @@ html[data-save-error] .topbar {
   top: 30px;
   display: flex;
   gap: 6px;
+  max-width: calc(100% - 190px);
+  overflow-x: auto;
+  scrollbar-width: none;
 }
 .chip-btn {
   min-height: 36px;
@@ -1480,4 +1483,166 @@ table.bom {
   max-height: 70vh;
   background: var(--panel);
   border: 1px solid var(--line);
+}
+
+/* ---------- phase 7: variants ---------- */
+.stage-tools .chip-btn {
+  white-space: nowrap;
+}
+.variant-pill {
+  position: absolute;
+  right: max(10px, env(safe-area-inset-right, 0px));
+  top: 30px;
+  min-height: 36px;
+  max-width: 150px;
+  padding: 6px 12px;
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: color-mix(in srgb, var(--bg) 94%, transparent);
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+}
+.variant-pill .mono {
+  color: var(--mute);
+  font-size: 11px;
+}
+.variant-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+.variant-card {
+  border: 1px solid var(--line);
+  background: var(--panel);
+  padding: 10px 12px;
+  display: grid;
+  gap: 6px;
+}
+.variant-card.is-active {
+  border-left: 4px solid var(--accent);
+}
+.variant-top {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.variant-name {
+  font-size: 18px;
+}
+.variant-rename {
+  font-size: 16px;
+  min-height: 40px;
+  padding: 4px 8px;
+  border: 1px solid var(--accent);
+  background: var(--bg);
+}
+.variant-badges {
+  display: inline-flex;
+  gap: 6px;
+}
+.badge {
+  font-family: var(--mono);
+  font-size: 10.5px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: var(--chip);
+  color: var(--mute);
+}
+.badge-chosen {
+  background: color-mix(in srgb, var(--accent) 20%, var(--bg));
+  color: var(--fg);
+}
+.card-actions.wrap {
+  flex-wrap: wrap;
+}
+.compare {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 12px max(12px, env(safe-area-inset-right, 0px)) 24px max(12px, env(safe-area-inset-left, 0px));
+  display: grid;
+  gap: 12px;
+}
+.cmp-head {
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+}
+.cmp-head .seg {
+  align-items: center;
+}
+.cmp-cols {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+}
+.cmp-col {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  min-width: 0;
+}
+.cmp-pick {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.cmp-pick select {
+  flex: 1;
+  min-width: 0;
+  min-height: var(--tap);
+  border: 1px solid var(--line);
+  background: var(--panel);
+  font-size: 16px;
+  padding: 4px 8px;
+}
+.cmp-col .static-plan {
+  max-height: 55vh;
+}
+.cmp-stats {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 2px 10px;
+  margin: 0;
+  font-size: 14px;
+}
+.cmp-stats dt {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  color: var(--mute);
+  align-self: center;
+}
+.cmp-stats dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.cmp-stats small {
+  font-weight: 400;
+  color: var(--mute);
+  font-family: var(--mono);
+  font-size: 11px;
+}
+.cmp-warn {
+  margin: 0;
+  padding-left: 16px;
+  font-size: 12.5px;
+  line-height: 1.3;
+  display: grid;
+  gap: 4px;
+}
+.cmp-warn .sev-error {
+  color: var(--danger);
+}
+table.cmp-table {
+  min-width: 0;
+}
+.cmp-table tr.is-diff td {
+  background: color-mix(in srgb, var(--lav) 10%, var(--bg));
 }

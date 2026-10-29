@@ -32,6 +32,8 @@ type Gesture =
   | { mode: 'pinch'; view: View; start: Map<number, P2> };
 
 const DOUBLE_TAP_MS = 300;
+/** Height of the floating tool row over the top of the plan; fitting keeps the area below it. */
+const OVERLAY_TOP = 52;
 const TAP_SLOP_PX = 8;
 export const SNAP_CM = 10;
 
@@ -76,9 +78,9 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const fit = useCallback(
     (w = size.w, h = size.h) => {
       if (!w || !h) return;
-      // Leave room for the rulers on the top/left.
-      const v = fitView(area.widthCm, area.lengthCm, w - RULER, h - RULER, 24);
-      setView({ ...v, tx: v.tx + RULER, ty: v.ty + RULER });
+      // Leave room for the rulers (top/left) and the floating tool row.
+      const v = fitView(area.widthCm, area.lengthCm, w - RULER, h - RULER - OVERLAY_TOP - 12, 18);
+      setView({ ...v, tx: v.tx + RULER, ty: v.ty + RULER + OVERLAY_TOP });
     },
     [area.widthCm, area.lengthCm, size.w, size.h],
   );

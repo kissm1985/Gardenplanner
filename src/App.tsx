@@ -8,10 +8,12 @@ import { AreasPanel } from './ui/AreasPanel';
 import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
 import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantPalette } from './ui/PlantPalette';
+import { CompareView } from './ui/CompareView';
 import { ListView } from './ui/ListView';
 import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
+import { VariantsPanel } from './ui/VariantsPanel';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { Welcome } from './ui/Welcome';
 
@@ -35,7 +37,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = {
   dimensions: 'Méretvonalak',
 };
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures';
+type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -53,6 +55,7 @@ export function App({ loading }: { loading: boolean }) {
   const items = useProject(selectItems);
   const selectedFixture = useUi((s) => s.selectedFixture);
   const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
+  const compare = useUi((s) => s.compare);
 
   // Rule engine: re-runs after every change of the area, its items, plants or settings.
   const { active: warnings, muted } = useMemo(() => {
@@ -113,28 +116,35 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </header>
 
-      <main className={`stage${tool === 'list' || fourUp ? ' stage-scroll' : ''}`}>
+      <main className={`stage${tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
         {tool === 'list' ? (
           <ListView />
+        ) : compare && area ? (
+          <CompareView area={area} />
         ) : fourUp && area ? (
           <FourSeasons area={area} plantDb={project.plantDb} showMature={project.settings.showMatureSize} />
         ) : area ? (
           <>
             <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
+            <button type="button" className="variant-pill" onClick={() => setSheet('variants')} aria-label={`Változat: ${activeVariant(area).name}. Változatok kezelése`}>
+              {activeVariant(area).name}
+              {activeVariant(area).id === area.chosenVariantId ? ' ★' : ''}
+              {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
+            </button>
             {tool === 'select' && (
               <div className="stage-tools" role="toolbar" aria-label="Kijelölés módja">
                 <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
                   Lasszó
                 </button>
-                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
-                  Mágnes {SNAP_CM} cm
+                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)} title={`Igazítás ${SNAP_CM} cm-es rácsra`}>
+                  Mágnes
                 </button>
               </div>
             )}
             {tool === 'plant' && (
               <div className="stage-tools" role="toolbar" aria-label="Elhelyezés">
-                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
-                  Mágnes {SNAP_CM} cm
+                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)} title={`Igazítás ${SNAP_CM} cm-es rácsra`}>
+                  Mágnes
                 </button>
               </div>
             )}
@@ -209,6 +219,9 @@ export function App({ loading }: { loading: boolean }) {
       </Sheet>
       <Sheet open={sheet === 'props'} title="Tulajdonságok" onClose={() => setSheet(null)}>
         <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} />
+      </Sheet>
+      <Sheet open={sheet === 'variants'} title="Változatok" onClose={() => setSheet(null)}>
+        <VariantsPanel onDone={() => setSheet(null)} />
       </Sheet>
       <Sheet open={sheet === 'warnings'} title={`Figyelmeztetések (${warnings.length})`} onClose={() => setSheet(null)}>
         <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />

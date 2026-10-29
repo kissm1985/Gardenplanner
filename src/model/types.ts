@@ -123,7 +123,10 @@ export interface Area {
   constraints: Constraints;
   fixtures: Fixture[];
   variants: Variant[];
+  /** The variant the final list and print are made from. */
   chosenVariantId: string;
+  /** The variant being edited on the plan (defaults to the chosen one). */
+  activeVariantId?: string;
   background?: Background;
 }
 

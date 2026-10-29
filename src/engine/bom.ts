@@ -41,10 +41,21 @@ export const chosenItems = (a: Area): PlacedItem[] => (a.variants.find((v) => v.
  */
 export function buildBom(project: Project, areaIds?: string[], status?: ItemStatus | null): Bom {
   const areas = project.areas.filter((a) => !areaIds || areaIds.includes(a.id));
-  const plants = new Map(project.plantDb.map((p) => [p.code, p]));
+  return bomFromEntries(
+    areas.map((area) => ({ area, items: chosenItems(area) })),
+    project.plantDb,
+    project.settings.reservePct,
+    status,
+  );
+}
+
+/** BOM for explicit item lists (e.g. one variant of an area, for comparison). */
+export function bomFromEntries(entries: { area: Area; items: PlacedItem[] }[], plantDb: Plant[], reservePct: number, status?: ItemStatus | null): Bom {
+  const areas = entries.map((e) => e.area);
+  const plants = new Map(plantDb.map((p) => [p.code, p]));
   const rows = new Map<string, BomRow>();
-  for (const a of areas) {
-    for (const it of chosenItems(a)) {
+  for (const { area: a, items } of entries) {
+    for (const it of items) {
       if (status && it.status !== status) continue;
       const plant = plants.get(it.plantId);
       if (!plant) continue;
@@ -59,7 +70,6 @@ export function buildBom(project: Project, areaIds?: string[], status?: ItemStat
       r.planted += n;
     }
   }
-  const reservePct = project.settings.reservePct;
   const list = [...rows.values()]
     .map((r) => {
       const order = orderQty(r.planted, reservePct, r.plant.isTree);
