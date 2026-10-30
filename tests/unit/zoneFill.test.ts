@@ -51,4 +51,20 @@ describe('zone fill', () => {
     }
     expect(same / pts.length).toBeGreaterThan(0.6);
   });
+
+  it('no same neighbours: same species are never side by side; extra distance thins it out', () => {
+    for (let seed = 1; seed <= 5; seed++) {
+      const res = fillZone({ area: strip, polygon: zone, parts, plantDb: db, existing: [], mode: 'mix', seed, noSameNeighbour: true });
+      const ps = res.items.flatMap((it) => (it.kind === 'plant' ? [{ q: [it.x, it.y] as Pt, c: it.plantId }] : []));
+      const sp = new Map(db.map((p) => [p.code, p.spacingCm]));
+      // Two of the same species are never side by side: at least 1.6 × the planting gap apart.
+      for (const a of ps)
+        for (const b of ps)
+          if (a !== b && a.c === b.c) expect(Math.hypot(a.q[0] - b.q[0], a.q[1] - b.q[1])).toBeGreaterThanOrEqual(1.6 * 0.95 * sp.get(a.c)! - 1);
+      const sparse = fillZone({ area: strip, polygon: zone, parts, plantDb: db, existing: [], mode: 'mix', seed, extraGapCm: 30 });
+      expect(sparse.items.length).toBeLessThan(res.items.length * 0.7);
+      const pts = sparse.items.flatMap((it) => (it.kind === 'plant' ? [[it.x, it.y]] : []));
+      for (let i = 0; i < pts.length; i++) for (let j = i + 1; j < pts.length; j++) expect(Math.hypot(pts[i][0] - pts[j][0], pts[i][1] - pts[j][1])).toBeGreaterThan(30);
+    }
+  });
 });

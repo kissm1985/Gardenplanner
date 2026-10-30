@@ -240,8 +240,17 @@ export function generateIdea(
   area: Area,
   plantDb: Plant[],
   settings: Settings,
-  opts: { seed?: number; palette?: PaletteKey; kinds?: PlantKind[] } = {},
+  opts: {
+    seed?: number;
+    palette?: PaletteKey;
+    kinds?: PlantKind[];
+    /** Single plants instead of drifts, no two of the same species side by side. */
+    mixed?: boolean;
+    /** Extra distance between plants, cm (sparser planting). */
+    extraGapCm?: number;
+  } = {},
 ): Idea {
+  const extra = Math.max(0, Math.round(opts.extraGapCm ?? 0));
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const r = rng(seed);
   const kinds = opts.kinds?.length ? opts.kinds : DEFAULT_KINDS;
@@ -316,6 +325,8 @@ export function generateIdea(
   const items: PlacedItem[] = [];
   const cellBase = 150 + Math.round(r() * 80);
   const usedCodes = new Set<string>();
+  /** Single plants of the mixed planting, to keep neighbours different. */
+  const singles: { q: Pt; code: string }[] = [];
   const add = (it: PlacedItem) => {
     usedCodes.add(it.plantId);
     items.push(it);
@@ -390,7 +401,7 @@ export function generateIdea(
 
       // 3) Shrubs: single plants in rhythm in a strip in front of the hedge.
       if (shrubs.length) {
-        const sp = Math.max(...shrubs.map((p) => p.spacingCm));
+        const sp = Math.max(...shrubs.map((p) => p.spacingCm)) + extra;
         const sw = Math.ceil(Math.max(0.65 * sp, Math.min(Math.max(...shrubs.map((p) => p.spreadCm)), 0.5 * (w - depth))));
         if (w - depth - sw >= (species.length ? 35 : 0) && w - depth >= sw) {
           let k = cell;
@@ -439,9 +450,32 @@ export function generateIdea(
         const ins = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? edgeIns : i);
         const poly = clipRect(pts, x0 + ins(x0, bb.minX), y0 + ins(y0, bb.minY), x1 - ins(x1, bb.maxX), y1 - ins(y1, bb.maxY));
         if (poly.length < 3) continue;
-        const ps = fillPolygon(poly, plant.spacingCm, 'staggered');
+        if (opts.mixed) {
+          // Mixed planting: single plants on one grid, each species different from its neighbours.
+          const near = [...tier, ...(tiers[k - 1] ?? []), ...(tiers[k + 1] ?? [])];
+          const pick = [...new Set(tier.length >= 2 ? tier : near.length >= 2 ? near : species)].filter((p) => p.juglone === 'tolerant' || !walnuts.length || !outer.some(inWalnut));
+          if (!pick.length) continue;
+          const sp = Math.max(...pick.map((p) => p.spacingCm)) + extra;
+          const iM = Math.ceil(sp * 0.32);
+          const edgeM = Math.min(Math.ceil(Math.max(0, Math.max(...pick.map((p) => p.spreadCm)) - sp) / 2), 40);
+          const insM = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? edgeM : iM);
+          const polyM = clipRect(pts, x0 + insM(x0, bb.minX), y0 + insM(y0, bb.minY), x1 - insM(x1, bb.maxX), y1 - insM(y1, bb.maxY));
+          if (polyM.length < 3) continue;
+          for (const q of fillPolygon(polyM, sp, 'staggered')) {
+            if (!inside(q)) continue;
+            const taken = new Set(singles.filter((o) => dist(o.q, q) < sp * 1.6).map((o) => o.code));
+            const free = pick.filter((p) => !taken.has(p.code));
+            const pl = (free.length ? free : pick)[Math.floor(r() * (free.length ? free.length : pick.length))];
+            if (!free.length && pick.length > 1) continue; // every candidate already next door: leave a gap rather than pair them
+            singles.push({ q, code: pl.code });
+            add({ kind: 'plant', id: uid(), plantId: pl.code, x: Math.round(q[0]), y: Math.round(q[1]), status: 'needed' });
+          }
+          continue;
+        }
+        const dsp = plant.spacingCm + extra;
+        const ps = fillPolygon(poly, dsp, 'staggered');
         if (!ps.length || ps.some((q) => !inside(q))) continue;
-        add({ kind: 'drift', id: uid(), plantId: plant.code, polygon: poly, pattern: 'staggered', spacingCm: plant.spacingCm, count: ps.length, status: 'needed' });
+        add({ kind: 'drift', id: uid(), plantId: plant.code, polygon: poly, pattern: 'staggered', spacingCm: dsp, count: ps.length, status: 'needed' });
       }
     }
     s = end;
@@ -463,7 +497,13 @@ export function generateIdea(
   if (sh.length)
     parts.push(t(`előtte cserjék ritmusban (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`, `shrubs in rhythm in front (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`));
   const dr = species.filter((p) => usedCodes.has(p.code));
-  if (dr.length) parts.push(t(`${dr.length} faj ismétlődő foltokban, elöl az alacsonyabbak`, `${dr.length} species in repeated drifts, lower ones in front`));
+  if (dr.length)
+    parts.push(
+      opts.mixed
+        ? t(`${dr.length} faj vegyesen, tövenként váltakozva – azonos faj nem kerül egymás mellé`, `${dr.length} species mixed plant by plant – no two of the same side by side`)
+        : t(`${dr.length} faj ismétlődő foltokban, elöl az alacsonyabbak`, `${dr.length} species in repeated drifts, lower ones in front`),
+    );
+  if (extra) notes.push(t(`A tövek között ${extra} cm-rel nagyobb a távolság a javasoltnál (ritkább ültetés).`, `Plants are ${extra} cm further apart than recommended (sparser planting).`));
   if (parts.length) notes.push(`${parts.join('; ')}.`.replace(/^./, (c) => c.toUpperCase()));
   const seasons = new Set(used.flatMap((p) => [...seasonsOf(p)]));
   const sName = [t('tavasz', 'spring'), t('nyár', 'summer'), t('ősz', 'autumn')].filter((_, i) => seasons.has(i as 0 | 1 | 2));

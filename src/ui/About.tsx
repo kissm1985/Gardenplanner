@@ -1,4 +1,4 @@
-import { t } from '../i18n';
+import { locale, t } from '../i18n';
 import { LogoMark } from './Logo';
 
 export const AUTHOR = 'Kiss-Mihály István';
@@ -23,6 +23,9 @@ export function About() {
       </div>
       <p>
         {t('Készítette:', 'Created by')} <b>{AUTHOR}</b>
+      </p>
+      <p className="mono muted about-version">
+        {t('Verzió', 'Version')} {__APP_VERSION__} · {t('build', 'build')} {new Date(__BUILD_TIME__).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'short' })}
       </p>
       <p className="mono muted">
         {copyrightLine()}{' '}

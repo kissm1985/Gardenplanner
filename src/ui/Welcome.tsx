@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { AREA_TEMPLATES } from '../data/templates';
 import { getLang, setLang, t } from '../i18n';
 import { useProject } from '../store/projectStore';
+import { useUi } from '../store/uiStore';
 import { AUTHOR, copyrightLine } from './About';
 import { Logo } from './Logo';
 import { toggleTheme, useTheme } from './theme';
@@ -69,6 +70,25 @@ export function Welcome() {
           {picked.length ? t('Kezdés a kiválasztott sablonokkal', 'Start with the chosen templates') : t('Kezdés üres projekttel', 'Start with an empty project')}
         </button>
       </div>
+      <div className="welcome-or" aria-hidden="true">
+        <span>{t('vagy', 'or')}</span>
+      </div>
+      <button
+        type="button"
+        className="tpl tpl-own"
+        onClick={() => {
+          useUi.getState().setStartWithNewArea(true);
+          useProject.getState().createProject([]);
+        }}
+      >
+        <b>{t('+ Saját terület létrehozása', '+ Create my own area')}</b>
+        <small>
+          {t(
+            'Megadod a nevét, méretét, fekvését és napsütését; téglalap vagy a rajzon körberajzolt szabad alak. A sablonok később is hozzáadhatók.',
+            'Give its name, size, facing and sun; a rectangle or a free shape drawn on the plan. The templates can be added later too.',
+          )}
+        </small>
+      </button>
       <p className="welcome-quote">{t('Több mint egy kert. Szebb hétköznapok.', 'More than a garden. A better everyday.')}</p>
       <p className="welcome-credit mono muted">
         {t('Készítette', 'Created by')} {AUTHOR} · {copyrightLine()}

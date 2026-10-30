@@ -23,6 +23,10 @@ export interface ZoneFillInput {
   density?: number;
   /** Remove what is planted in the region first. */
   clear?: boolean;
+  /** Mixed mode: never put two plants of the same species side by side. */
+  noSameNeighbour?: boolean;
+  /** Extra distance between plants, cm (sparser planting). */
+  extraGapCm?: number;
   seed?: number;
 }
 
@@ -54,30 +58,43 @@ export function fillZone(inp: ZoneFillInput): ZoneFillResult {
 
   // Spatial hash of every plant that is already there (spacing-aware).
   const maxSp = Math.max(...parts.map((p) => byCode.get(p.code)!.spacingCm), ...inp.existing.map((it) => byCode.get(it.plantId)?.spacingCm ?? 0));
-  const cell = Math.max(10, maxSp * density);
-  const grid = new Map<string, { q: Pt; sp: number }[]>();
+  const extra = Math.max(0, inp.extraGapCm ?? 0);
+  // Cells big enough that "same species next door" (1.6 × the gap) is found in the 3 × 3 neighbourhood.
+  const cell = Math.max(10, (maxSp * density + extra) * (inp.noSameNeighbour ? 1.7 : 1));
+  const grid = new Map<string, { q: Pt; sp: number; code: string }[]>();
   const key = (x: number, y: number) => `${Math.floor(x / cell)},${Math.floor(y / cell)}`;
-  const put = (q: Pt, sp: number) => {
+  const put = (q: Pt, sp: number, code: string) => {
     const k = key(q[0], q[1]);
     const arr = grid.get(k);
-    if (arr) arr.push({ q, sp });
-    else grid.set(k, [{ q, sp }]);
+    if (arr) arr.push({ q, sp, code });
+    else grid.set(k, [{ q, sp, code }]);
   };
   for (const it of inp.existing) {
     if (removed.has(it.id)) continue;
     const sp = byCode.get(it.plantId)?.spacingCm ?? 30;
-    for (const q of itemPositions(it)) put(q, sp);
+    for (const q of itemPositions(it)) put(q, sp, it.plantId);
   }
-  const free = (q: Pt, sp: number) => {
+  const around = function* (q: Pt) {
     const cx = Math.floor(q[0] / cell);
     const cy = Math.floor(q[1] / cell);
-    for (let dx = -1; dx <= 1; dx++)
-      for (let dy = -1; dy <= 1; dy++)
-        for (const o of grid.get(`${cx + dx},${cy + dy}`) ?? []) {
-          const need = (density * (sp + o.sp)) / 2;
-          if ((q[0] - o.q[0]) ** 2 + (q[1] - o.q[1]) ** 2 < need * need) return false;
-        }
+    for (let dx = -1; dx <= 1; dx++) for (let dy = -1; dy <= 1; dy++) yield* grid.get(`${cx + dx},${cy + dy}`) ?? [];
+  };
+  const free = (q: Pt, sp: number) => {
+    for (const o of around(q)) {
+      const need = (density * (sp + o.sp)) / 2 + extra;
+      if ((q[0] - o.q[0]) ** 2 + (q[1] - o.q[1]) ** 2 < need * need) return false;
+    }
     return true;
+  };
+  /** A plant of this species is right next to q (within 1.6 × the gap between the two). */
+  const sameNextDoor = (q: Pt, code: string) => {
+    const sp = byCode.get(code)!.spacingCm;
+    for (const o of around(q)) {
+      if (o.code !== code) continue;
+      const reach = 1.6 * ((density * (sp + o.sp)) / 2 + extra);
+      if ((q[0] - o.q[0]) ** 2 + (q[1] - o.q[1]) ** 2 < reach * reach) return true;
+    }
+    return false;
   };
 
   const b = bbox(inp.polygon);
@@ -127,13 +144,21 @@ export function fillZone(inp: ZoneFillInput): ZoneFillResult {
     const [x, y] = rand().map(Math.round);
     const q: Pt = [x, y];
     if (!ok(q)) continue;
-    const code = pick(q);
+    let code = pick(q);
+    if (inp.noSameNeighbour && inp.mode === 'mix' && parts.length > 1) {
+      // Swap to a species that is not next door yet; if all are, leave this spot.
+      if (sameNextDoor(q, code)) {
+        const others = parts.filter((p) => p.code !== code && !sameNextDoor(q, p.code));
+        if (!others.length) continue;
+        code = others[Math.floor(r() * others.length)].code;
+      }
+    }
     const sp = byCode.get(code)!.spacingCm;
     // Half a spacing inside the area's edge, so the plant does not hang over the wall or path.
     const m = sp / 2;
     if (![[m, 0], [-m, 0], [0, m], [0, -m]].every(([dx, dy]) => pointInPolygon([x + dx, y + dy], areaPts))) continue;
     if (!free(q, sp)) continue;
-    put(q, sp);
+    put(q, sp, code);
     counts[code] = (counts[code] ?? 0) + 1;
     items.push({ kind: 'plant', id: uid('i'), plantId: code, x, y, status: 'needed' });
   }

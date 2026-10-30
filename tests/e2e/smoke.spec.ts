@@ -38,3 +38,16 @@ test('first launch → templates → canvas → new area persists after reload',
   await expect(list.getByRole('button', { name: /Teszt ágyás/ })).toBeVisible();
   await expect(list.getByRole('button', { name: /Gyepsávos kert/ })).toBeVisible();
 });
+
+test('start screen: create my own area instead of the templates', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Saját terület létrehozása/ }).click();
+  const dlg = page.locator('dialog[open]');
+  await expect(dlg.locator('.sheet-head')).toContainText('Területek');
+  await dlg.getByLabel('Név').fill('Előkert');
+  await dlg.getByRole('button', { name: 'Terület létrehozása' }).click();
+  await expect(page.locator('.area-name')).toHaveText('Előkert');
+  // Only the new area exists; the templates are still offered to add later.
+  await page.locator('.area-switch').click();
+  await expect(page.locator('dialog[open]')).toContainText(/Előkert200 × 400 cm[^]*Sablonból[^]*Házoldali sáv/);
+});

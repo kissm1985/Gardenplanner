@@ -81,7 +81,20 @@ function ReadOnlyRoot({ code }: { code: string }) {
   return <ReadOnlyView key={lang} code={code} />;
 }
 
-registerSW({ immediate: true });
+// Look for a new version on start, whenever the app comes back to the foreground and every half hour;
+// with autoUpdate the page reloads itself once the new version is ready (installed phone apps keep
+// the old one for a long time otherwise).
+registerSW({
+  immediate: true,
+  onRegisteredSW(_url, reg) {
+    if (!reg) return;
+    const check = () => {
+      if (navigator.onLine !== false) reg.update().catch(() => {});
+    };
+    window.setInterval(check, 30 * 60 * 1000);
+    document.addEventListener('visibilitychange', () => document.visibilityState === 'visible' && check());
+  },
+});
 
 // A share link (#view=…) opens the read-only page and never touches the local plan.
 const share = location.hash.startsWith(SHARE_PREFIX) ? location.hash.slice(SHARE_PREFIX.length) : null;

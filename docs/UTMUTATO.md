@@ -40,9 +40,10 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
 2. A kezdőképernyőn válaszd ki, melyik kész sablonnal indulsz:
    - **Házoldali sáv**: 120 × 1200 cm-es kavicsos sáv a ház fala és a járda között, legfeljebb 50 cm magas növényekkel;
    - **Gyepsávos kert**: 500 × 1200 cm, ívelt gyepsáv a közepén, ágyások két oldalt, diófával a szomszédban.
-3. Nyomd meg a **Kezdés** gombot. Ha egy sablont sem választasz, üres projekttel indulsz, és a területet magad hozod létre (lásd [3. fejezet](#3-területek)).
+3. Nyomd meg a **Kezdés** gombot.
+4. Vagy válaszd alatta a **+ Saját terület létrehozása** lehetőséget: azonnal megnyílik az új terület űrlapja (név, méret, fekvés, napsütés; téglalap vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)). A sablonok később is hozzáadhatók.
 
-A kezdőképernyő jobb felső sarkában átválthatsz angol nyelvre (később: *Nézet → Nyelv*). Az alkalmazás alapból a böngésző nyelvét követi.
+A kezdőképernyő jobb felső sarkában átválthatsz angol nyelvre és sötét módra; később a felső sáv **EN / HU** és **☾ / ☀** gombjával. Az alkalmazás alapból a böngésző nyelvét követi.
 
 Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosabb gombokat. Később a **⋯ → Bevezető újra** gombbal újra megnézheted.
 
@@ -328,7 +329,11 @@ Ha nem tudod, hol kezdd, kérj ötletet. Megnyitása: változatok → **✦ Ötl
 ### Egész terület → új változat
 
 1. **Színvilág**: *Meglepetés*, vagy lila–ezüst, meleg sárga–bordó, fehér–kék–zöld, rózsaszín–lila.
-2. **Milyen növények kerüljenek a tervre**:
+2. **Milyen növények kerüljenek a tervre** (lásd a táblázatot), és a **Változatosság és sűrűség** rész:
+   - **Vegyes ültetés**: foltok helyett tövenként váltakoznak a fajok, és azonos növény nem kerül egymás mellé;
+   - **Plusz távolság a tövek között (cm)**: a javasolt tőtávhoz ennyit ad hozzá, így ritkábban ülteti a töveket (0 = a javasolt tőtáv).
+
+   Típusok:
 
    | Típus | Hová kerül |
    |---|---|
@@ -362,6 +367,8 @@ Az eredményt a szabálymotor rögtön ellenőrzi. Ezután a változatot ugyanú
    - **vegyesen**: a fajok tövenként, véletlenszerűen keverednek, mint egy természetes ágyásban vagy réten;
    - **kisebb csoportokban**: egy-egy fajból 5–9 tő kerül egymás mellé, a csoportok véletlenszerűen váltakoznak.
 4. **Sűrűség**: *sűrűbb*, *tőtáv szerint* vagy *lazább*.
+   - **Azonos növény ne kerüljön egymás mellé** (csak vegyes elrendezésnél): ha a sorsolt faj már ott van a szomszédban, másikat választ.
+   - **Plusz távolság a tövek között (cm)**: ritkább ültetéshez.
 5. **A kijelölt részen lévő növényeket előtte eltávolítja**: ha bejelölöd, a régi tövek helyére kerül az új kitöltés; ha nem, a program kikerüli a már ültetett töveket.
 6. **Rész kijelölése a rajzon**: koppints a rész sarkaira, majd **Kész**. A program azonnal kitölti.
 
@@ -467,6 +474,8 @@ Az alkalmazás telepíthető a kezdőképernyőre, mint egy mobilalkalmazás:
 - **Számítógép (Chrome, Edge)**: a címsor végén a telepítés ikon.
 
 Első megnyitás után **internet nélkül is működik**, és a munka a készüléken mentődik. Internet csak a fotók első letöltéséhez kell.
+
+**Frissítés:** az alkalmazás indításkor, előtérbe kerüléskor és félóránként megnézi, van-e új változata, és ha igen, magától újratölt. Hogy melyik változat fut, a **⋯ Projekt → Névjegy** alatt látod (verzió és build ideje). Ha a telefonon mégis a régi látszik, zárd be teljesen az alkalmazást (vagy a böngészőlapot), és nyisd meg újra.
 
 **Fontos:** az adatok a böngészőben tárolódnak. Ha törlöd a böngésző adatait, vagy másik készülékre váltasz, a terv nem jön magától. Ezért időnként készíts **Teljes mentést (JSON)**.
 

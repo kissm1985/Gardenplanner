@@ -11,6 +11,10 @@ export interface ZoneConfig {
   mode: ZoneMode;
   density: number;
   clear: boolean;
+  /** Mixed mode: no two plants of the same species side by side. */
+  noSameNeighbour?: boolean;
+  /** Extra distance between plants, cm. */
+  extraGapCm?: number;
 }
 
 export type Tool = 'select' | 'plant' | 'drift' | 'row' | 'fixtures' | 'season' | 'list';
@@ -49,6 +53,9 @@ export interface UiState {
   /** Options of the visualisation brief (kept while the app is open). */
   vizOptions: PromptOptions;
   setVizOptions: (o: PromptOptions) => void;
+  /** The start screen asked for an own area: App opens the new-area form once. */
+  startWithNewArea: boolean;
+  setStartWithNewArea: (v: boolean) => void;
   /** Placing the visualisation viewpoint on the plan. */
   cameraEdit: boolean;
   setCameraEdit: (v: boolean) => void;
@@ -110,6 +117,8 @@ export const useUi = create<UiState>()((set) => ({
   page: null,
   calibrate: null,
   cameraEdit: false,
+  startWithNewArea: false,
+  setStartWithNewArea: (startWithNewArea) => set({ startWithNewArea }),
   vizOptions: { season: 1, viewpoint: 'camera', lang: getLang(), mature: true, style: 'photo', time: 'afternoon', weather: 'sunny' },
   setVizOptions: (vizOptions) => set({ vizOptions }),
   setCameraEdit: (cameraEdit) => set({ cameraEdit, selected: [], selectedFixture: null }),

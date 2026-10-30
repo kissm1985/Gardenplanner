@@ -2851,3 +2851,28 @@ polyline.shape-line {
     display: none;
   }
 }
+.welcome-or {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mute);
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.welcome-or::before,
+.welcome-or::after {
+  content: '';
+  flex: 1;
+  border-top: 1px solid var(--line);
+}
+.tpl-own {
+  border-style: dashed;
+  border-color: var(--accent);
+  color: inherit;
+  font: inherit;
+}
+.tpl-own b {
+  color: var(--accent);
+}

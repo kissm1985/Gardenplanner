@@ -21,4 +21,5 @@ test('one-tap language and dark mode in the top bar; author and rights notice', 
   const about = page.locator('dialog[open] .about');
   await expect(about).toContainText('Készítette: Kiss-Mihály István');
   await expect(about).toContainText('Minden jog fenntartva');
+  await expect(about).toContainText(/Verzió \d+\.\d+\.\d+ · build/);
 });

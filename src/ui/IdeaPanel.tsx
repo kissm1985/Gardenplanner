@@ -31,6 +31,28 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
   );
 }
 
+/** Extra distance between plants (sparser planting), cm. */
+function GapField({ value, onChange }: { value: number; onChange: (v: number) => void }) {
+  return (
+    <label className="field">
+      <span className="lbl">{t('Plusz távolság a tövek között (cm)', 'Extra distance between plants (cm)')}</span>
+      <input
+        type="number"
+        inputMode="numeric"
+        min={0}
+        max={150}
+        step={5}
+        value={value}
+        onChange={(e) => onChange(Math.max(0, Math.min(150, Math.round(+e.target.value || 0))))}
+        aria-describedby="gap-hint"
+      />
+      <span id="gap-hint" className="mono muted">
+        {t('0 = a javasolt tőtáv; nagyobb érték ritkább ültetést ad.', '0 = the recommended spacing; a larger value gives sparser planting.')}
+      </span>
+    </label>
+  );
+}
+
 const DENSITY_LABEL = labels({ dense: ['sűrűbb', 'denser'], normal: ['tőtáv szerint', 'by spacing'], loose: ['lazább', 'looser'] });
 const DENSITY: { v: number; key: keyof typeof DENSITY_LABEL }[] = [
   { v: 0.8, key: 'dense' },
@@ -50,7 +72,18 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
   const run = (points: [number, number][], drop: string[] = []) => {
     if (!area) return;
     const items = activeVariant(area).items.filter((it) => !drop.includes(it.id));
-    const res = fillZone({ area, polygon: points, parts: cfg.parts, plantDb: project.plantDb, existing: items, mode: cfg.mode, density: cfg.density, clear: cfg.clear });
+    const res = fillZone({
+      area,
+      polygon: points,
+      parts: cfg.parts,
+      plantDb: project.plantDb,
+      existing: items,
+      mode: cfg.mode,
+      density: cfg.density,
+      clear: cfg.clear,
+      noSameNeighbour: cfg.noSameNeighbour,
+      extraGapCm: cfg.extraGapCm,
+    });
     useProject.getState().applyFill(res.items, [...drop, ...res.removeIds]);
     ui.setLastZone({ areaId: area.id, points, ids: res.items.map((i) => i.id), counts: res.counts });
   };
@@ -103,6 +136,11 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
             ))}
           </select>
         </label>
+        <label className="check">
+          <input type="checkbox" checked={!!cfg.noSameNeighbour && cfg.mode === 'mix'} disabled={cfg.mode !== 'mix'} onChange={(e) => set({ noSameNeighbour: e.target.checked })} />
+          <span>{t('Azonos növény ne kerüljön egymás mellé (csak vegyes elrendezésnél)', 'No two of the same plant side by side (mixed layout only)')}</span>
+        </label>
+        <GapField value={cfg.extraGapCm ?? 0} onChange={(extraGapCm) => set({ extraGapCm })} />
         <label className="check">
           <input type="checkbox" checked={cfg.clear} onChange={(e) => set({ clear: e.target.checked })} />
           <span>{t('A kijelölt részen lévő növényeket előtte eltávolítja', 'Remove the plants in the region first')}</span>
@@ -158,6 +196,8 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
   const area = useProject(selectCurrentArea);
   const [palette, setPalette] = useState<PaletteKey | ''>('');
   const [kinds, setKinds] = useState<PlantKind[]>(DEFAULT_KINDS);
+  const [mixed, setMixed] = useState(false);
+  const [gap, setGap] = useState(0);
   const [idea, setIdea] = useState<{ variantId: string; idea: Idea } | null>(null);
   if (!area) return null;
   const pools = poolsFor(area, project.plantDb, kinds);
@@ -172,7 +212,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
 
   const run = (again: boolean) => {
     const st = useProject.getState();
-    const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined, kinds });
+    const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined, kinds, mixed, extraGapCm: gap });
     const notes = next.notes.join(' ');
     if (again && idea && variantAlive) {
       st.setVariantItems(idea.variantId, next.items, notes);
@@ -239,6 +279,14 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
             'A hedge goes along the back edge, trees evenly spread with room around them; shrubs in rhythm in front of them, perennials in drifts at the front.',
           )}
         </p>
+      </fieldset>
+      <fieldset className="field-group">
+        <legend>{t('Változatosság és sűrűség', 'Variety and density')}</legend>
+        <label className="check">
+          <input type="checkbox" checked={mixed} onChange={(e) => setMixed(e.target.checked)} />
+          <span>{t('Vegyes ültetés: azonos növény ne kerüljön egymás mellé (foltok helyett tövenként váltakozva)', 'Mixed planting: no two of the same plant side by side (alternating plant by plant instead of drifts)')}</span>
+        </label>
+        <GapField value={gap} onChange={setGap} />
       </fieldset>
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!kinds.length || pool.length < 1}>

@@ -121,3 +121,23 @@ test('idea generator: plant types to use; impossible ones are disabled', async (
   await expect(dlg.locator('.idea-result')).toContainText('Ötlet 1');
   await expect(dlg.locator('.idea-result')).toContainText('nincs figyelmeztetés');
 });
+
+test('idea generator: mixed planting without same neighbours, extra distance', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  await page.locator('.variant-pill').click();
+  await page.getByRole('button', { name: '✦ Ötlet generálása' }).click();
+  const dlg = page.locator('dialog[open]');
+  await dlg.getByLabel(/Vegyes ültetés/).check();
+  await dlg.getByLabel('Plusz távolság a tövek között (cm)').fill('10');
+  await dlg.getByRole('button', { name: 'Ötlet generálása' }).click();
+  await expect(dlg.locator('.idea-result')).toContainText('azonos faj nem kerül egymás mellé');
+  await expect(dlg.locator('.idea-result')).toContainText('10 cm-rel nagyobb');
+  await expect(dlg.locator('.idea-result')).toContainText('nincs figyelmeztetés');
+  // The zone fill tab has the same two options.
+  await dlg.getByRole('tab', { name: /Kijelölt rész/ }).click();
+  await expect(dlg.getByLabel(/Azonos növény ne kerüljön egymás mellé/)).toBeEnabled();
+  await expect(dlg.getByLabel('Plusz távolság a tövek között (cm)')).toHaveValue('0');
+  await dlg.getByLabel(/kisebb csoportokban/).check();
+  await expect(dlg.getByLabel(/Azonos növény ne kerüljön egymás mellé/)).toBeDisabled();
+});

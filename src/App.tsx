@@ -89,6 +89,16 @@ export function App({ loading }: { loading: boolean }) {
   const rowMode = useUi((s) => s.rowMode);
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
+  // Started from "My own area" on the start screen: open the new-area form at once.
+  const [newArea, setNewArea] = useState(false);
+  const startNew = useUi((s) => s.startWithNewArea);
+  const hasProject = useProject((s) => !!s.project);
+  useEffect(() => {
+    if (!startNew || !hasProject) return;
+    useUi.getState().setStartWithNewArea(false);
+    setNewArea(true);
+    setSheet('areas');
+  }, [startNew, hasProject]);
   const [replaceFrom, setReplaceFrom] = useState<string | undefined>(undefined);
   // Undo/redo (or a split) can remove selected items: keep only those that still exist.
   useEffect(
@@ -310,8 +320,23 @@ export function App({ loading }: { loading: boolean }) {
         ))}
       </nav>
 
-      <Sheet open={sheet === 'areas'} onHelp={() => openHelp('areas')} title={t('Területek', 'Areas')} onClose={() => setSheet(null)}>
-        <AreasPanel onDone={() => setSheet(null)} />
+      <Sheet
+        open={sheet === 'areas'}
+        onHelp={() => openHelp('areas')}
+        title={t('Területek', 'Areas')}
+        onClose={() => {
+          setNewArea(false);
+          setSheet(null);
+        }}
+      >
+        <AreasPanel
+          key={newArea ? 'new' : 'list'}
+          startNew={newArea}
+          onDone={() => {
+            setNewArea(false);
+            setSheet(null);
+          }}
+        />
       </Sheet>
       <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('db')} title={t('Növényadatbázis', 'Plant database')} onClose={() => setSheet(null)}>
         <PlantDbPanel />

@@ -11,11 +11,11 @@ import { t } from '../i18n';
 type Mode = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; id: string };
 
 /** Area list with add / edit / delete, shown inside a sheet. */
-export function AreasPanel({ onDone }: { onDone: () => void }) {
+export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; startNew?: boolean }) {
   const project = useProject((s) => s.project)!;
   const currentAreaId = useProject((s) => s.currentAreaId);
   const { addArea, updateArea, deleteArea, selectArea } = useProject.getState();
-  const [mode, setMode] = useState<Mode>({ kind: 'list' });
+  const [mode, setMode] = useState<Mode>(startNew ? { kind: 'new' } : { kind: 'list' });
 
   if (mode.kind === 'new') {
     return (

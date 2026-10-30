@@ -1,10 +1,16 @@
 import { defineConfig } from 'vitest/config';
 import react from '@vitejs/plugin-react';
 import { VitePWA } from 'vite-plugin-pwa';
+import pkg from './package.json' with { type: 'json' };
 
 // Relative base so the build works on GitHub Pages sub-paths as well as Netlify/Vercel roots.
 export default defineConfig({
   base: './',
+  // Version and build time, shown under About so you can tell which build a phone runs.
+  define: {
+    __APP_VERSION__: JSON.stringify(pkg.version),
+    __BUILD_TIME__: JSON.stringify(new Date().toISOString()),
+  },
   // Listen on the local network too, so a phone on the same Wi-Fi can open the dev/preview server.
   server: { host: true },
   preview: { host: true },

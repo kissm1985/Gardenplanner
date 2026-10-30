@@ -40,9 +40,10 @@ All data stays on your own device, there is no sign-up, and after the first visi
 2. On the start screen, choose which ready-made templates to start with:
    - **House-side strip**: a 120 × 1200 cm gravel strip between the house wall and the pavement, for plants up to 50 cm;
    - **Garden with lawn strip**: 500 × 1200 cm, a curved lawn strip in the middle, beds on both sides, a walnut tree next door.
-3. Tap **Start**. If you choose no template, you start with an empty project and create the area yourself (see [chapter 3](#3-areas)).
+3. Tap **Start**.
+4. Or choose **+ Create my own area** below: the new-area form opens at once (name, size, facing, sun; a rectangle or a free shape drawn on the plan, see [chapter 3](#3-areas)). The templates can be added later too.
 
-At the top right of the start screen you can switch to Hungarian (later: *View → Language*). By default the app follows the browser language.
+At the top right of the start screen you can switch to Hungarian and to dark mode; later with the **EN / HU** and **☾ / ☀** buttons in the top bar. By default the app follows the browser language.
 
 The first time, a short three-step introduction shows the most important buttons. You can see it again with **⋯ → Show the intro again**.
 
@@ -328,7 +329,11 @@ Not sure where to begin? Ask for an idea. Open it from the variants with **✦ G
 ### Whole area → new variant
 
 1. **Colour scheme**: *Surprise me*, or purple–silver, warm yellow–burgundy, white–blue–green, pink–purple.
-2. **Which kinds of plants**:
+2. **Which kinds of plants** (see the table), and the **Variety and density** part:
+   - **Mixed planting**: species alternate plant by plant instead of drifts, and no two of the same plant go side by side;
+   - **Extra distance between plants (cm)**: added to the recommended spacing, so plants go further apart (0 = the recommended spacing).
+
+   Kinds:
 
    | Kind | Where it goes |
    |---|---|
@@ -362,6 +367,8 @@ The rule engine checks the result straight away. After that you can edit the var
    - **mixed**: species mix plant by plant at random, like a natural bed or meadow;
    - **in small groups**: 5–9 plants of one species together, groups alternating at random.
 4. **Density**: *denser*, *by spacing* or *looser*.
+   - **No two of the same plant side by side** (mixed layout only): if the species drawn is already next door, another one is used.
+   - **Extra distance between plants (cm)**: for sparser planting.
 5. **Remove the plants in the region first**: if ticked, the new filling replaces the old plants; otherwise the app avoids what is already planted.
 6. **Mark the region on the plan**: tap its corners, then **Done**. The app fills it right away.
 
@@ -467,6 +474,8 @@ The app can be installed on the home screen like a mobile app:
 - **Computer (Chrome, Edge)**: the install icon at the end of the address bar.
 
 After the first visit it **works offline**, and your work is saved on the device. Internet is only needed for the first download of photos.
+
+**Updates:** the app looks for a new version on start, when it comes back to the foreground and every half hour, and reloads itself when there is one. **⋯ Project → About** shows which version runs (version and build time). If the phone still shows the old one, close the app (or the browser tab) completely and open it again.
 
 **Important:** the data is stored in the browser. If you clear the browser data or switch device, the plan does not follow by itself. Make a **Full backup (JSON)** now and then.
 

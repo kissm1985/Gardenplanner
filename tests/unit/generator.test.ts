@@ -112,4 +112,28 @@ describe('idea generator: plant types', () => {
     expect(idea.notes.join(' ')).toContain('Sövény (hátsó sor): ehhez a területhez');
     expect(idea.items.length).toBeGreaterThan(0);
   });
+
+  it('mixed: single plants, no two of the same species next to each other, no spacing warnings', () => {
+    for (let seed = 1; seed <= 6; seed++) {
+      const idea = generateIdea(lawn, db, proj.settings, { seed, kinds: ['perennial', 'grass', 'groundcover'], mixed: true });
+      const singles = idea.items.flatMap((it) => (it.kind === 'plant' ? [it] : []));
+      expect(idea.items.some((it) => it.kind === 'drift')).toBe(false);
+      expect(singles.length).toBeGreaterThan(20);
+      const sp = new Map(db.map((p) => [p.code, p.spacingCm]));
+      for (const a of singles)
+        for (const b of singles)
+          if (a !== b && a.plantId === b.plantId) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(sp.get(a.plantId)! * 1.05);
+      const bad = evaluate(lawn, idea.items, db, proj.settings).filter((w) => w.rule === 'spacing' || w.rule === 'outside');
+      expect(bad).toEqual([]);
+    }
+  });
+
+  it('extra distance: drifts get a wider spacing and fewer plants', () => {
+    const base = generateIdea(lawn, db, proj.settings, { seed: 7, kinds: ['perennial'] });
+    const sparse = generateIdea(lawn, db, proj.settings, { seed: 7, kinds: ['perennial'], extraGapCm: 20 });
+    const n = (i: typeof base) => i.items.reduce((s, it) => s + (it.kind === 'plant' ? 1 : it.count), 0);
+    expect(n(sparse)).toBeLessThan(n(base) * 0.8);
+    for (const it of sparse.items) if (it.kind === 'drift') expect(it.spacingCm).toBe(db.find((p) => p.code === it.plantId)!.spacingCm + 20);
+    expect(sparse.notes.join(' ')).toContain('20 cm-rel nagyobb');
+  });
 });
