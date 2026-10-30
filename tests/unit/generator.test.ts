@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import { SEED_PLANTS } from '../../src/data/plants.seed';
 import { candidates, clipRect, colourFamilies, generateIdea, plantKinds, type PlantKind } from '../../src/engine/generator';
 import { evaluate } from '../../src/engine/rules';
+import { itemPositions } from '../../src/engine/fill';
+import { bedAreaM2 } from '../../src/engine/schedule';
 import { newProject } from '../../src/store/projectStore';
 
 const proj = newProject(['house-strip', 'lawn-garden']);
@@ -135,5 +137,23 @@ describe('idea generator: plant types', () => {
     expect(n(sparse)).toBeLessThan(n(base) * 0.8);
     for (const it of sparse.items) if (it.kind === 'drift') expect(it.spacingCm).toBe(db.find((p) => p.code === it.plantId)!.spacingCm + 20);
     expect(sparse.notes.join(' ')).toContain('20 cm-rel nagyobb');
+  });
+
+  it('fills the bed densely by default; only an extra distance makes it sparse', () => {
+    const sp = new Map(db.map((p) => [p.code, p.spacingCm]));
+    /** Share of the bed covered, counting each plant's own spacing cell (hexagonal). */
+    const cover = (area: typeof strip, opts: Parameters<typeof generateIdea>[3]) => {
+      const idea = generateIdea(area, db, proj.settings, opts);
+      const bad = evaluate(area, idea.items, db, proj.settings).filter((w) => w.rule === 'spacing' || w.rule === 'outside');
+      expect(bad).toEqual([]);
+      const cells = idea.items.reduce((a, it) => a + itemPositions(it).length * ((sp.get(it.plantId)! ** 2 * Math.sqrt(3)) / 2), 0);
+      return cells / (bedAreaM2(area) * 1e4);
+    };
+    for (const area of [strip, lawn])
+      for (let seed = 1; seed <= 3; seed++) {
+        expect(cover(area, { seed })).toBeGreaterThan(0.6);
+        expect(cover(area, { seed, mixed: true })).toBeGreaterThan(0.5);
+        expect(cover(area, { seed, extraGapCm: 20 })).toBeLessThan(cover(area, { seed }) * 0.6);
+      }
   });
 });

@@ -326,7 +326,7 @@ export function generateIdea(
   const cellBase = 150 + Math.round(r() * 80);
   const usedCodes = new Set<string>();
   /** Single plants of the mixed planting, to keep neighbours different. */
-  const singles: { q: Pt; code: string }[] = [];
+  const singles: { q: Pt; code: string; sp: number }[] = [];
   const add = (it: PlacedItem) => {
     usedCodes.add(it.plantId);
     items.push(it);
@@ -419,63 +419,91 @@ export function generateIdea(
       }
 
       // 4) Drifts in the rest: tallest at the back, lowest at the front.
+      // Drifts tile the strip without gaps; a square grid keeps half a spacing inside every edge,
+      // so plants of neighbouring drifts are a full spacing apart without any extra margin.
       const rest = w - depth;
-      if (!species.length || rest < 35) continue;
-      const bands = rest < 110 ? 1 : rest < 220 ? 2 : 3;
+      if (!species.length || rest < 30) continue;
+      const bands = Math.max(1, Math.min(3, species.length, Math.round(rest / 100)));
       const tiers: Plant[][] = Array.from({ length: bands }, () => []);
       species.forEach((p, i) => tiers[Math.min(bands - 1, Math.floor((i * bands) / species.length))].push(p));
       const bw = rest / bands;
+      const len = end - s;
+      /** Fits the band and the slice: at least one plant across, two along. */
+      const fits = (p: Plant) => p.spacingCm + extra <= bw + 1 && 2 * (p.spacingCm + extra) <= len + 1;
+      const backV = V(depth);
       for (let k = 0; k < bands; k++) {
         const tier = tiers[k].length ? tiers[k] : species;
-        const da = depth + k * bw + (k || depth ? gap / 2 : 0);
-        const db = depth + (k + 1) * bw - (k < bands - 1 ? gap / 2 : 0);
+        const da = depth + k * bw;
+        const db = depth + (k + 1) * bw;
         const [va, vb] = [Math.min(V(da), V(db)), Math.max(V(da), V(db))];
-        const plant0 = tier[(cell + k) % tier.length];
-        const rect = [U(s + (s > u0 ? gap / 2 : 0), va), U(end - (end < u1 ? gap / 2 : 0), vb)];
+        const rect = [U(s, va), U(end, vb)];
         const [x0, y0] = [Math.min(rect[0][0], rect[1][0]), Math.min(rect[0][1], rect[1][1])];
         const [x1, y1] = [Math.max(rect[0][0], rect[1][0]), Math.max(rect[0][1], rect[1][1])];
         const outer = clipRect(pts, x0, y0, x1, y1);
         if (outer.length < 3) continue;
-        let plant = plant0;
-        // Walnut zone: swap in a juglone-tolerant species of a similar height.
-        if (plant.juglone !== 'tolerant' && walnuts.length && outer.some(inWalnut)) {
-          const alt = [...tolerantDrift].sort((x, y) => Math.abs(x.maxHeightCm - plant.maxHeightCm) - Math.abs(y.maxHeightCm - plant.maxHeightCm))[0];
-          if (!alt) continue;
-          plant = alt;
-        }
-        // Inset the inner edges so edge plants of neighbouring drifts keep the spacing rule happy.
-        const i = Math.ceil(plant.spacingCm * 0.32);
-        // At the area's edge keep the mature spread inside (ground covers spread wider than their spacing).
+        const walnutHere = walnuts.length > 0 && outer.some(inWalnut);
+        const ok = (p: Plant) => fits(p) && (!walnutHere || p.juglone === 'tolerant');
+        // The tier's own species if it fits; else the closest in height that does.
+        const own = tier.filter(ok);
+        const byHeight = (h: number) => [...species, ...tolerantDrift].filter(ok).sort((x, y) => Math.abs(x.maxHeightCm - h) - Math.abs(y.maxHeightCm - h));
+        const cands = own.length ? [...own.slice((cell + k) % own.length), ...own.slice(0, (cell + k) % own.length)] : byHeight(tier[0].maxHeightCm).slice(0, 3);
+        if (!cands.length) continue;
+        // Rows run along x; a staggered layout is safe where no other drift sits beside the rows (one band along a long-in-y strip).
+        const pattern: 'grid' | 'staggered' = alongY && bands === 1 ? 'staggered' : 'grid';
+        /** How much of its strip a species would fill here (narrow beds suit small spacings). */
+        const fill = (p: Plant) => {
+          const sp = p.spacingCm + extra;
+          const n = fillPolygon(clipRect(pts, x0, y0, x1, y1), sp, pattern).length;
+          return (n * sp * sp) / Math.max(1, (x1 - x0) * (y1 - y0));
+        };
+        const best = Math.max(...cands.map(fill));
+        // Keep the rhythm (first candidate) unless it would leave the strip clearly emptier than another one.
+        const plant = cands.find((p) => fill(p) >= best * 0.75) ?? cands[0];
+        // At the area's edge keep the mature spread inside (ground covers spread wider than their spacing);
+        // next to the shrub / hedge strip leave a quarter spacing.
         const edgeIns = Math.min(Math.ceil(Math.max(0, plant.spreadCm - plant.spacingCm) / 2), 40);
-        const ins = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? edgeIns : i);
+        const back = k === 0 && depth > 0 ? Math.ceil(plant.spacingCm * 0.25) : 0;
+        const ins = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? edgeIns : Math.abs(v - backV) < 1 ? back : 0);
         const poly = clipRect(pts, x0 + ins(x0, bb.minX), y0 + ins(y0, bb.minY), x1 - ins(x1, bb.maxX), y1 - ins(y1, bb.maxY));
         if (poly.length < 3) continue;
         if (opts.mixed) {
-          // Mixed planting: single plants on one grid, each species different from its neighbours.
+          // Mixed planting: single plants on one tight grid; each spot gets a species that is not next door
+          // and keeps its spacing to everything already planted.
           const near = [...tier, ...(tiers[k - 1] ?? []), ...(tiers[k + 1] ?? [])];
-          const pick = [...new Set(tier.length >= 2 ? tier : near.length >= 2 ? near : species)].filter((p) => p.juglone === 'tolerant' || !walnuts.length || !outer.some(inWalnut));
+          let pick = [...new Set(tier.length >= 2 ? tier : near)].filter(ok);
+          // Fewer than two fit this strip: widen to every species that fits, so neighbours can still differ.
+          if (pick.length < 2) pick = [...new Set([...pick, ...species.filter(ok)])];
           if (!pick.length) continue;
-          const sp = Math.max(...pick.map((p) => p.spacingCm)) + extra;
-          const iM = Math.ceil(sp * 0.32);
-          const edgeM = Math.min(Math.ceil(Math.max(0, Math.max(...pick.map((p) => p.spreadCm)) - sp) / 2), 40);
-          const insM = (v: number, edge: number) => (Math.abs(v - edge) < 1 ? edgeM : iM);
-          const polyM = clipRect(pts, x0 + insM(x0, bb.minX), y0 + insM(y0, bb.minY), x1 - insM(x1, bb.maxX), y1 - insM(y1, bb.maxY));
-          if (polyM.length < 3) continue;
-          for (const q of fillPolygon(polyM, sp, 'staggered')) {
+          const grid = (0.95 * pick.reduce((a, p) => a + p.spacingCm, 0)) / pick.length + extra;
+          for (const q of fillPolygon(poly, grid, 'staggered')) {
             if (!inside(q)) continue;
-            const taken = new Set(singles.filter((o) => dist(o.q, q) < sp * 1.6).map((o) => o.code));
-            const free = pick.filter((p) => !taken.has(p.code));
-            const pl = (free.length ? free : pick)[Math.floor(r() * (free.length ? free.length : pick.length))];
-            if (!free.length && pick.length > 1) continue; // every candidate already next door: leave a gap rather than pair them
-            singles.push({ q, code: pl.code });
+            const around = singles.filter((o) => dist(o.q, q) < 2.2 * (grid + extra));
+            const free = pick.filter(
+              (p) =>
+                around.every((o) => dist(o.q, q) >= 0.88 * ((p.spacingCm + o.sp) / 2 + extra)) &&
+                (pick.length < 2 || !around.some((o) => o.code === p.code && dist(o.q, q) < 1.6 * ((p.spacingCm + o.sp) / 2 + extra))),
+            );
+            if (!free.length) continue;
+            const pl = free[Math.floor(r() * free.length)];
+            singles.push({ q, code: pl.code, sp: pl.spacingCm });
             add({ kind: 'plant', id: uid(), plantId: pl.code, x: Math.round(q[0]), y: Math.round(q[1]), status: 'needed' });
           }
           continue;
         }
-        const dsp = plant.spacingCm + extra;
-        const ps = fillPolygon(poly, dsp, 'staggered');
+        // Without extra distance, the spacing may tighten by up to 12 % when that fits one more row or column.
+        let dsp = plant.spacingCm + extra;
+        let ps = fillPolygon(poly, dsp, pattern);
+        if (!extra) {
+          const pb = bbox(poly);
+          const [pw, ph] = [pb.maxX - pb.minX, pb.maxY - pb.minY];
+          for (const c of [pw / (Math.floor(pw / dsp) + 1), ph / (Math.floor(ph / dsp) + 1)]) {
+            if (c < dsp * 0.88) continue;
+            const alt = fillPolygon(poly, Math.ceil(c), pattern);
+            if (alt.length > ps.length) [dsp, ps] = [Math.ceil(c), alt];
+          }
+        }
         if (!ps.length || ps.some((q) => !inside(q))) continue;
-        add({ kind: 'drift', id: uid(), plantId: plant.code, polygon: poly, pattern: 'staggered', spacingCm: dsp, count: ps.length, status: 'needed' });
+        add({ kind: 'drift', id: uid(), plantId: plant.code, polygon: poly, pattern, spacingCm: dsp, count: ps.length, status: 'needed' });
       }
     }
     s = end;
