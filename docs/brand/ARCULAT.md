@@ -30,9 +30,9 @@ Sötét módban krém tető és világosabb zöldek (`--accent: #8cc47a`) a `#0f
 
 ## Betűk
 
-- **Outfit** (változó súlyú) – felület, címek, logófelirat (700, szűk betűköz); a szlogen nagybetűs, ritkított.
-- **Fraunces** dőlt – idézetszerű kiemelés (mottó).
-- **JetBrains Mono** – csak a rajz műszaki feliratai (vonalzó, kódok).
+- **Fraunces** – szövegek és címek (a mottó dőlten).
+- **JetBrains Mono** – gombok, címkék, feliratok (nagybetűs, ritkított), a szlogen és a rajz műszaki feliratai.
+- **Outfit** (700, szűk betűköz) – csak a „Gardenly” logófelirat.
 
 Mindhárom a buildbe csomagolva, offline is működik.
 

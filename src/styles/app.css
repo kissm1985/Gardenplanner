@@ -10,9 +10,8 @@ body {
   margin: 0;
   background: var(--bg);
   color: var(--fg);
-  font-family: var(--sans);
+  font-family: var(--serif);
   font-size: 16px;
-  font-variant-numeric: tabular-nums;
   line-height: 1.45;
   -webkit-tap-highlight-color: transparent;
 }
@@ -20,7 +19,6 @@ h1,
 h2,
 h3 {
   font-weight: 600;
-  letter-spacing: -0.01em;
   margin: 0;
   text-wrap: balance;
 }
@@ -33,14 +31,12 @@ textarea {
 }
 .mono,
 .eyebrow {
-  font-family: var(--sans);
-  font-size: 13px;
-  letter-spacing: 0.01em;
+  font-family: var(--mono);
+  font-size: 12px;
+  letter-spacing: 0.03em;
 }
 .eyebrow {
   text-transform: uppercase;
-  letter-spacing: 0.16em;
-  font-weight: 500;
   color: var(--mute);
 }
 :focus-visible {
@@ -52,9 +48,10 @@ textarea {
 .btn {
   min-height: var(--tap);
   padding: 10px 14px;
-  font-family: var(--sans);
-  font-size: 14px;
-  font-weight: 500;
+  font-family: var(--mono);
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   border: 1px solid var(--line);
   background: var(--panel);
   border-radius: var(--radius);
@@ -158,7 +155,7 @@ html[data-save-error] .topbar {
   display: inline-grid;
   place-items: center;
   border-radius: 14px;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 12px;
   background: var(--warn);
   color: var(--bg);
@@ -211,9 +208,10 @@ html[data-save-error] .topbar {
   line-height: 1;
 }
 .tool-label {
-  font-family: var(--sans);
-  font-size: 11px;
-  font-weight: 500;
+  font-family: var(--mono);
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
 }
 .tool[aria-pressed='true'] {
   color: var(--accent);
@@ -444,9 +442,10 @@ html[data-save-error] .topbar {
 }
 .field > span,
 .field-group legend {
-  font-family: var(--sans);
-  font-size: 12.5px;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
   color: var(--mute);
 }
 .field input,
@@ -541,7 +540,7 @@ html[data-save-error] .topbar {
   gap: 6px;
 }
 .chips li {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
   background: var(--chip);
   padding: 3px 8px;
@@ -570,7 +569,7 @@ html[data-save-error] .topbar {
   border-radius: var(--radius-sm);
 }
 .tpl small {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
   color: var(--mute);
 }
@@ -604,7 +603,7 @@ html[data-save-error] .topbar {
   gap: 12px;
 }
 .welcome h1 {
-  font-size: clamp(24px, 6.5vw, 32px);
+  font-size: clamp(30px, 8vw, 42px);
   line-height: 1.1;
 }
 .lead {
@@ -615,7 +614,7 @@ html[data-save-error] .topbar {
   display: grid;
   place-items: center;
   color: var(--mute);
-  font-family: var(--sans);
+  font-family: var(--mono);
 }
 
 /* ---------- phase 2: plants ---------- */
@@ -696,9 +695,10 @@ html[data-save-error] .topbar {
   border: 1px solid var(--line);
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   border-radius: 18px;
-  font-family: var(--sans);
-  font-size: 13px;
-  font-weight: 500;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   cursor: pointer;
 }
 .chip-btn[aria-pressed='true'] {
@@ -839,7 +839,7 @@ html[data-save-error] .topbar {
   display: flex;
   align-items: center;
   cursor: pointer;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -899,7 +899,7 @@ html[data-save-error] .topbar {
   border-radius: 50%;
   background: var(--warn);
   color: var(--bg);
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-weight: 600;
   font-size: 12px;
 }
@@ -908,7 +908,7 @@ html[data-save-error] .topbar {
   flex-wrap: wrap;
   align-items: center;
   gap: 6px;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -925,7 +925,7 @@ html[data-save-error] .topbar {
   border: 1px solid var(--warn);
   color: var(--warn);
   background: transparent;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 10px;
   text-transform: none;
   letter-spacing: 0;
@@ -999,7 +999,7 @@ html[data-save-error] .topbar {
   min-height: 40px;
   border: 1px solid var(--line);
   background: var(--panel);
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
 }
 .month input:checked + span {
@@ -1023,7 +1023,7 @@ html[data-save-error] .topbar {
   display: block;
 }
 .toast {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 12px;
   color: var(--accent);
   margin: 0;
@@ -1061,7 +1061,7 @@ html[data-save-error] .topbar {
   opacity: 0.94;
 }
 .count-text {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-weight: 500;
   fill: var(--fg);
 }
@@ -1289,7 +1289,7 @@ button.warn-badge {
   }
 }
 .lv-sum .k {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -1305,7 +1305,7 @@ button.warn-badge {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 12px;
   color: var(--mute);
 }
@@ -1341,7 +1341,7 @@ table.bom {
   vertical-align: middle;
 }
 .bom th {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 10.5px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -1385,7 +1385,7 @@ table.bom {
 }
 .tag {
   margin-left: 6px;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 9.5px;
   padding: 1px 5px;
   border-radius: var(--radius-sm);
@@ -1637,7 +1637,7 @@ table.bom {
   gap: 6px;
 }
 .badge {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 10.5px;
   padding: 2px 7px;
   border-radius: 10px;
@@ -1702,7 +1702,7 @@ table.bom {
   font-size: 14px;
 }
 .cmp-stats dt {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
   text-transform: uppercase;
   color: var(--mute);
@@ -1716,7 +1716,7 @@ table.bom {
 .cmp-stats small {
   font-weight: 400;
   color: var(--mute);
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
 }
 .cmp-warn {
@@ -1853,7 +1853,7 @@ table.cmp-table {
 }
 .sched-text {
   width: 100%;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 12px;
   background: var(--panel);
   border: 1px solid var(--line);
@@ -2097,7 +2097,7 @@ a.btn-primary {
   margin: 0;
 }
 .plant-tip dt {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 10px;
   text-transform: uppercase;
   color: var(--mute);
@@ -2110,7 +2110,7 @@ a.btn-primary {
   margin: 6px 0 0;
   font-size: 11px;
   color: var(--warn);
-  font-family: var(--sans);
+  font-family: var(--mono);
 }
 .palette-searchrow {
   display: flex;
@@ -2134,7 +2134,7 @@ a.btn-primary {
   align-items: center;
 }
 .range legend {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
@@ -2255,7 +2255,7 @@ polyline.shape-line {
   object-fit: cover;
 }
 .plant-tip-photo figcaption {
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 9.5px;
   color: var(--mute);
   padding: 3px 8px;
@@ -2267,7 +2267,7 @@ polyline.shape-line {
   height: 44px;
   display: grid;
   place-items: center;
-  font-family: var(--sans);
+  font-family: var(--mono);
   font-size: 10.5px;
   color: var(--mute);
 }
@@ -2551,10 +2551,10 @@ polyline.shape-line {
   letter-spacing: -0.03em;
 }
 .logo-tagline {
-  margin-top: 0.45em;
-  font-size: max(10px, 0.28em);
-  font-weight: 500;
-  letter-spacing: 0.32em;
+  margin-top: 0.5em;
+  font-family: var(--mono);
+  font-size: max(10px, 0.24em);
+  letter-spacing: 0.3em;
   color: var(--fg);
 }
 .topbar-brand {
@@ -2573,9 +2573,7 @@ polyline.shape-line {
 }
 .welcome-slogan {
   margin: 0;
-  font-weight: 300;
   font-size: clamp(19px, 5vw, 23px);
-  letter-spacing: 0.02em;
   color: var(--fg);
 }
 .welcome-steps {
@@ -2592,8 +2590,10 @@ polyline.shape-line {
   gap: 4px;
   padding: 10px 4px;
   border-radius: var(--radius);
-  font-size: 13px;
-  font-weight: 600;
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
   text-align: center;
 }
 .welcome-steps li:nth-child(1) {
