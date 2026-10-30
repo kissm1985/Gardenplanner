@@ -1,15 +1,38 @@
-import { get, set } from 'idb-keyval';
+import { del, get, set } from 'idb-keyval';
+import { validateProject } from '../engine/validate';
 import type { Project } from '../model/types';
 
 const KEY = 'kerttervezo:project:v1';
 
+/** The saved plan cannot be used; `raw` is what was stored, so it can still be downloaded. */
+export class StoredProjectError extends Error {
+  constructor(
+    message: string,
+    readonly raw: unknown,
+  ) {
+    super(message);
+  }
+}
+
 export async function loadProject(): Promise<Project | null> {
+  let p: unknown;
   try {
-    const p = (await get(KEY)) as Project | undefined;
-    return p && p.schemaVersion === 1 ? p : null;
+    p = await get(KEY);
   } catch {
     return null;
   }
+  if (!p || (p as Project).schemaVersion !== 1) return null;
+  try {
+    validateProject(p);
+  } catch (e) {
+    throw new StoredProjectError((e as Error).message, p);
+  }
+  return p as Project;
+}
+
+/** Forget the saved plan (after the user downloaded it or chose to start over). */
+export async function clearProject(): Promise<void> {
+  await del(KEY);
 }
 
 export async function saveProject(p: Project): Promise<void> {

@@ -41,7 +41,24 @@ describe('JSON backup', () => {
   it('rejects foreign or broken files with a Hungarian message', () => {
     expect(() => parseProject('nem json')).toThrow('nem érvényes JSON');
     expect(() => parseProject('{"a":1}')).toThrow('Gardenly');
-    expect(() => parseProject(JSON.stringify({ schemaVersion: 1, areas: [{ id: 'x' }], plantDb: [] }))).toThrow('Hibás terület');
+    expect(() => parseProject(JSON.stringify({ schemaVersion: 1, areas: [{ id: 'x' }], plantDb: [] }))).toThrow('Hibás adat a mentésben');
+  });
+
+  it('refuses crafted data that would crash the app, and names where it is', () => {
+    const p = JSON.parse(exportJson(st().project!));
+    const bad = (mutate: (q: typeof p) => void) => {
+      const q = structuredClone(p);
+      mutate(q);
+      return () => parseProject(JSON.stringify(q));
+    };
+    expect(bad((q) => (q.areas[0].widthCm = 'széles'))).toThrow('1. terület');
+    expect(bad((q) => (q.areas[0].variants[0].items = [{ kind: 'drift', id: 'a', plantId: 'LA', polygon: [[0, 0]], spacingCm: 30 }]))).toThrow('hibás pontlista');
+    expect(bad((q) => (q.areas[0].variants[0].items = [{ kind: 'row', id: 'a', plantId: 'LA', path: [[0, 0], [9, 9]], spacingCm: 0 }]))).toThrow('túl kicsi tőtáv');
+    expect(bad((q) => (q.areas[0].variants[0].items = [{ kind: 'bomb', id: 'a' }]))).toThrow('ismeretlen elemtípus');
+    expect(bad((q) => (q.plantDb[0].photoUrl = 'javascript:alert(1)'))).toThrow('1. növény');
+    expect(bad((q) => (q.areas[0].background = { dataUrl: 'https://evil.example/x.svg' }))).toThrow('hibás háttérkép');
+    expect(() => parseProject('x'.repeat(61 * 1024 * 1024))).toThrow('túl nagy');
+    expect(() => parseProject(exportJson(st().project!))).not.toThrow();
   });
 });
 

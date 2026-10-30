@@ -10,7 +10,7 @@ export function copyrightLine() {
 }
 
 /** About box: the app, its author and the rights notice. */
-export function About() {
+export function About({ onLegal }: { onLegal?: () => void }) {
   return (
     <fieldset className="field-group about">
       <legend>{t('Névjegy', 'About')}</legend>
@@ -34,6 +34,16 @@ export function About() {
           'All copyright in the app belongs to its author; the program, its designs, texts and identity may not be copied, distributed or modified without the author’s permission.',
         )}
       </p>
+      <div className="form-actions form-actions-start">
+        {onLegal && (
+          <button type="button" className="btn btn-small" onClick={onLegal}>
+            {t('Jogi információk és adatvédelem', 'Legal information and privacy')}
+          </button>
+        )}
+        <a className="btn btn-small" href="third-party-licenses.txt" target="_blank" rel="noopener">
+          {t('Nyílt forrású licencek', 'Open-source licences')}
+        </a>
+      </div>
     </fieldset>
   );
 }

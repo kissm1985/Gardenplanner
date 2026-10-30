@@ -8,6 +8,7 @@ import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
 import { PlantChip } from './PlantChip';
 import { locale, t } from '../i18n';
+import { gardenLocation } from '../model/location';
 import { plantName } from '../model/plants';
 
 type Tab = 'plant' | 'care' | 'mulch';
@@ -167,8 +168,8 @@ function CareTab() {
     <section className="sched-tab">
       <p className="mono muted">
         {t(
-          'Győri éghajlat: utolsó fagy április közepe, első fagy október vége. Csak a tervben szereplő fajok jelennek meg.',
-          'Győr climate: last frost mid-April, first frost end of October. Only species in the plan are shown.',
+          `Magyarországi éghajlatra írt naptár (${gardenLocation(project.settings).name}); a helyszín a Projekt ablakban állítható. Csak a tervben szereplő fajok jelennek meg.`,
+          `Calendar written for the Hungarian climate (${gardenLocation(project.settings).name}); set the location in the Project window. Only species in the plan are shown.`,
         )}
       </p>
       <ol className="months-cal">

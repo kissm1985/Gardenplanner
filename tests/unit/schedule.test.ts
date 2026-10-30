@@ -51,6 +51,11 @@ describe('planting schedule', () => {
     expect(buildSchedule(st().project!, '2026-10-20', '2026-11-03').notes.join(' ')).toContain('Még nincs növény');
     st().placePlant('LA', 60, 100);
     expect(buildSchedule(st().project!, '2026-10-20', '2026-11-03').notes.join(' ')).toContain('első fagy');
+    expect(buildSchedule(st().project!, '2026-10-20', '2026-11-03').notes.join(' ')).toContain('Győr: az első fagy kb. október 25.');
+    // Another place, other frost dates: Miskolc's first frost comes earlier, so an early-October window already warns.
+    st().updateSettings({ location: { name: 'Miskolc', lastFrost: { month: 4, day: 25 }, firstFrost: { month: 10, day: 15 } } });
+    const n = buildSchedule(st().project!, '2026-10-05', '2026-10-20').notes.join(' ');
+    expect(n).toContain('Miskolc: az első fagy kb. október 15.');
   });
 
   it('ticks are stored by stable task id', () => {

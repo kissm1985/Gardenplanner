@@ -64,6 +64,8 @@ The first time, a short three-step introduction shows the most important buttons
 - **⋯ Project**: save, load, share, images, visualisation, print.
 - **Round number**: the number of warnings. Green when all is fine, red when there is an error.
 
+**Quick actions (⚡)**: on the right of the plan, above the zoom buttons. A searchable list of every feature (e.g. “replace”, “image”, “backup”), and the **steps of a first plan** checklist: area, fixed elements, plants, fixing errors, a variant, the list, a backup. Done steps tick themselves. On a computer **Ctrl+K** opens it too.
+
 **The plan**
 
 - **Zoom**: pinch with two fingers; on a computer use the mouse wheel or the **+ / −** buttons at the bottom right.
@@ -284,7 +286,9 @@ The database has 146 species: perennials, grasses, ground covers, shrubs, hedge 
 
 - **Edit**: tap a plant to change any of its data: name, code, size, spacing, needs, flowering, colours, price, pot size, photo, notes. Tap the “to check ✓” label to mark that you have checked it. Each plant has an English and a Hungarian name and texts; the other language is in the box at the bottom.
 - **+ New plant**: add your own plant; the code is suggested from the name.
-- **Import and export**: JSON and CSV. The CSV can be edited in Excel or Google Sheets and loaded back.
+- **Data check**: on a plant’s form you can give the **data source** and the **last checked** date; *All checked* clears every “to check” mark. **List of values to check (CSV)** collects the values still to check, per species and field, with an empty “correct value” column for an expert review.
+- **Toxicity**: for information only, not medical or veterinary advice; check it in a reliable source before planting near children or pets. The filter, the info card and the area’s “Non-toxic only” limit say so too.
+- **Import and export**: JSON and CSV. Texts starting with `=`, `+`, `-` or `@` get a leading apostrophe so Excel does not run them as formulas; it is removed again on import. The CSV can be edited in Excel or Google Sheets and loaded back.
 
 **Filters** (shared by the palette and the database):
 
@@ -432,7 +436,10 @@ Open it with **Planting schedule and care →** at the top of the *List* (or *Vi
 The **⋯** button in the top bar opens the **Project** menu:
 
 - **Project name**
-- **Full backup (JSON)**: the whole project in one file. Use it to move to another device; it is also your backup. **Load from JSON** restores it (it replaces the current plan).
+- **Full backup (JSON)**: the whole project in one file. Use it to move to another device; it is also your backup. On a computer (Chrome, Edge) you can pick the folder too. Above it you see when you last backed up and whether the browser keeps the plan permanently. **Load from JSON** restores it (it replaces the current plan); the file is checked first, and a broken or oversized backup is refused.
+- **Backup reminder**: once there is something to lose and you have not backed up for a week (or ever), a bar below the top bar says so. **Save to file** or **Later** (quiet for 3 days).
+- **Location and climate**: which town the garden is near (or your own frost dates). The schedule’s frost notes and the visualisation brief use it.
+- **About**: version, author, **Legal information and privacy** (terms of use, privacy notice, data sources) and the **open-source licences**.
 - **Read-only link**: the plan travels encoded at the end of the link, no server. Whoever opens it sees the plan and the list but can’t change them.
 - **Image of the plan**: **PNG** or **SVG**, optionally **with a legend** (code → plant name, Latin name, count).
 - **Visualisation with ChatGPT**: see the next chapter.
@@ -476,6 +483,8 @@ The app can be installed on the home screen like a mobile app:
 After the first visit it **works offline**, and your work is saved on the device. Internet is only needed for the first download of photos.
 
 **Updates:** the app looks for a new version on start, when it comes back to the foreground and every half hour, and reloads itself when there is one. **⋯ Project → About** shows which version runs (version and build time). If the phone still shows the old one, close the app (or the browser tab) completely and open it again.
+
+**If something breaks:** if the saved plan is damaged or the app hits an error, the “Something went wrong” screen appears. First **download the plan (JSON)**, then try **Reload**, and only if needed **Start over** (this removes the broken plan from the device).
 
 **Important:** the data is stored in the browser. If you clear the browser data or switch device, the plan does not follow by itself. Make a **Full backup (JSON)** now and then.
 

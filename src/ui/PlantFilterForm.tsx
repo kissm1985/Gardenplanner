@@ -2,6 +2,7 @@ import { JUGLONE_LABEL, SOIL_LABEL, SOILS } from '../model/plants';
 import { activeFilterCount, NO_FILTER, type PlantFilter } from '../model/plantFilter';
 import type { JugloneTolerance, SunNeed } from '../model/types';
 import { useUi } from '../store/uiStore';
+import { ToxicNotice } from './Disclaimer';
 import { t } from '../i18n';
 
 /** Shared plant filters (database list and palette). */
@@ -19,6 +20,7 @@ export function PlantFilterForm() {
           <option value="yes">{t('mérgező', 'toxic')}</option>
           <option value="unknown">{t('nem ismert', 'unknown')}</option>
         </select>
+        {f.toxic && <ToxicNotice compact />}
       </label>
       <label className="field">
         <span>{t('Fény', 'Light')}</span>

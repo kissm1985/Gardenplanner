@@ -1,4 +1,5 @@
 import type { JugloneTolerance, PlacedItem, Plant, Soil, SunNeed, Toxicity, WaterNeed } from './types';
+import { safeCell, unsafeCell } from '../engine/csvSafe';
 import { getLang, labelList, labels, t } from '../i18n';
 
 export const SUN_LABEL: Record<SunNeed, string> = labels({ sun: ['nap', 'sun'], part: ['félárnyék', 'part shade'], shade: ['árnyék', 'shade'] });
@@ -151,9 +152,14 @@ const CSV_COLS: { key: keyof Plant; head: string }[] = [
   { key: 'photoUrl', head: 'foto_url' },
   { key: 'photoCredit', head: 'foto_forras' },
   { key: 'verify', head: 'ellenorizendo' },
+  { key: 'dataSource', head: 'adat_forras' },
+  { key: 'checkedAt', head: 'ellenorizve' },
 ];
 
-const esc = (s: string) => (/[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s);
+const esc = (raw: string) => {
+  const s = safeCell(raw);
+  return /[;"\n\r]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
 
 /** English texts, nested under `en` in the model, as flat columns. */
 const EN_COLS: { key: 'bloomColor' | 'foliageColor' | 'notes'; head: string }[] = [
@@ -161,6 +167,37 @@ const EN_COLS: { key: 'bloomColor' | 'foliageColor' | 'notes'; head: string }[] 
   { key: 'foliageColor', head: 'angol_lombszin' },
   { key: 'notes', head: 'angol_megjegyzes' },
 ];
+
+/** Readable names of the plant fields that can be marked "to check". */
+export const FIELD_LABEL: Partial<Record<keyof Plant, string>> = labels({
+  maxHeightCm: ['Magasság', 'Height'],
+  spreadCm: ['Szélesség', 'Spread'],
+  spacingCm: ['Tőtáv', 'Spacing'],
+  sun: ['Fényigény', 'Light'],
+  water: ['Vízigény', 'Water'],
+  soil: ['Talaj', 'Soil'],
+  toxic: ['Mérgezőség', 'Toxicity'],
+  thorny: ['Tüskés', 'Thorny'],
+  juglone: ['Juglone-tűrés', 'Juglone tolerance'],
+  bloomMonths: ['Virágzás', 'Bloom months'],
+  bloomColor: ['Virágszín', 'Bloom colour'],
+  foliageColor: ['Lombszín', 'Foliage colour'],
+  pot: ['Kiszerelés', 'Pot size'],
+  unitPriceHuf: ['Ár', 'Price'],
+  winterInterest: ['Téli dísz', 'Winter interest'],
+});
+
+/** The plants that still have values to check, as a CSV worksheet for an expert review. */
+export function reviewCsv(db: Plant[]): string {
+  const head = [t('Kód', 'Code'), t('Név', 'Name'), t('Latin név', 'Latin name'), t('Ellenőrizendő adat', 'Field to check'), t('Jelenlegi érték', 'Current value'), t('Forrás', 'Source'), t('Utolsó ellenőrzés', 'Last checked'), t('Helyes érték / megjegyzés', 'Correct value / note')];
+  const rows: string[][] = [head];
+  for (const p of db)
+    for (const k of p.verify ?? []) {
+      const v = p[k];
+      rows.push([p.code, plantName(p), p.nameLat, FIELD_LABEL[k] ?? String(k), Array.isArray(v) ? v.join(', ') : v == null ? '' : String(v), p.dataSource ?? '', p.checkedAt ?? '', '']);
+    }
+  return rows.map((r) => r.map(esc).join(';')).join('\r\n');
+}
 
 export function plantsToCsv(db: Plant[]): string {
   const rows = [[...CSV_COLS, ...EN_COLS].map((c) => c.head).join(';')];
@@ -210,7 +247,7 @@ export function parseCsv(text: string, sep = ';'): string[][] {
     row.push(cell);
     out.push(row);
   }
-  return out.filter((r) => r.some((c) => c.trim() !== ''));
+  return out.filter((r) => r.some((c) => c.trim() !== '')).map((r) => r.map(unsafeCell));
 }
 
 const enumOf = <T extends string>(v: string, allowed: readonly T[], fallback: T): T =>
@@ -263,7 +300,11 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       photoUrl: get('foto_url') || undefined,
       photoCredit: get('foto_forras') || undefined,
       verify: list('ellenorizendo') as (keyof Plant)[],
+      dataSource: get('adat_forras') || undefined,
+      checkedAt: /^\d{4}-\d{2}-\d{2}$/.test(get('ellenorizve')) ? get('ellenorizve') : undefined,
     };
+    if (p.dataSource === undefined) delete p.dataSource;
+    if (p.checkedAt === undefined) delete p.checkedAt;
     if (!p.sun.length) p.sun = ['sun'];
     if (p.seasonColors === undefined) delete p.seasonColors;
     if (p.isTree === undefined) delete p.isTree;

@@ -1,5 +1,5 @@
-// Monthly care calendar for the species in the plan (SPEC §4.7), written for Győr:
-// last frost around mid-April, first frost around the end of October.
+// Monthly care calendar for the species in the plan (SPEC §4.7), written for a Hungarian climate
+// (last frost around mid-April, first frost around the end of October); the project's location shifts the frost notes in the schedule.
 import type { Plant, Project } from '../model/types';
 import { t } from '../i18n';
 import { plantName } from '../model/plants';

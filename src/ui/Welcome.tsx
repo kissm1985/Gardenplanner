@@ -5,6 +5,7 @@ import { useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { AUTHOR, copyrightLine } from './About';
 import { Logo } from './Logo';
+import { LegalPanel } from './LegalPanel';
 import { toggleTheme, useTheme } from './theme';
 
 /** Line icons for the four steps (24 × 24, stroked). */
@@ -93,6 +94,10 @@ export function Welcome() {
       <p className="welcome-credit mono muted">
         {t('Készítette', 'Created by')} {AUTHOR} · {copyrightLine()}
       </p>
+      <details className="welcome-legal">
+        <summary>{t('Felhasználási feltételek és adatvédelem', 'Terms of use and privacy')}</summary>
+        <LegalPanel />
+      </details>
     </main>
   );
 }

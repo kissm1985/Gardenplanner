@@ -24,7 +24,11 @@ describe('plant photos', () => {
                   imageinfo: [
                     {
                       thumburl: 'https://upload.wikimedia.org/thumb/Lavender.jpg/480px-Lavender.jpg',
-                      extmetadata: { Artist: { value: '<a href="x">Jane Doe</a>' }, LicenseShortName: { value: 'CC BY-SA 4.0' } },
+                      extmetadata: {
+                        Artist: { value: '<a href="x">Jane Doe</a>' },
+                        LicenseShortName: { value: 'CC BY-SA 4.0' },
+                        LicenseUrl: { value: 'https://creativecommons.org/licenses/by-sa/4.0' },
+                      },
                     },
                   ],
                 },
@@ -37,6 +41,9 @@ describe('plant photos', () => {
     expect(p).toEqual({
       src: 'https://upload.wikimedia.org/thumb/Lavender.jpg/480px-Lavender.jpg',
       credit: 'Jane Doe, CC BY-SA 4.0',
+      license: 'CC BY-SA 4.0',
+      licenseUrl: 'https://creativecommons.org/licenses/by-sa/4.0',
+      filePage: 'https://commons.wikimedia.org/wiki/File:Lavender.jpg',
       pageUrl: 'https://en.wikipedia.org/wiki/Lavandula_angustifolia',
     });
     expect(calls[1]).toContain('commons.wikimedia.org');

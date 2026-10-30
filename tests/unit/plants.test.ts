@@ -1,7 +1,8 @@
 import { describe, expect, it } from 'vitest';
 import { SEED_PLANTS } from '../../src/data/plants.seed';
-import { parseCsv, plantsFromCsv, plantsFromJson, plantsToCsv, suggestCode, validatePlant } from '../../src/model/plants';
+import { parseCsv, plantsFromCsv, plantsFromJson, plantsToCsv, reviewCsv, suggestCode, validatePlant } from '../../src/model/plants';
 import { pointInPolygon } from '../../src/model/geometry';
+import { toCsv } from '../../src/engine/bom';
 
 describe('seed plant list', () => {
   it('has about 60 species with unique 2-letter codes, soil data and valid values', () => {
@@ -76,5 +77,29 @@ describe('geometry', () => {
     const sq: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10]];
     expect(pointInPolygon([5, 5], sq)).toBe(true);
     expect(pointInPolygon([15, 5], sq)).toBe(false);
+  });
+
+  it('CSV export guards against spreadsheet formulas and still round-trips', () => {
+    const evil = { ...SEED_PLANTS[0], code: 'ZZ', nameHu: '=HYPERLINK("http://x","katt")', notes: '+1 tipp', bloomColor: '-' };
+    const csv = plantsToCsv([evil]);
+    expect(csv).toContain(`"'=HYPERLINK(""http://x"",""katt"")"`);
+    expect(csv).toContain("'+1 tipp");
+    const back = parseCsv(csv);
+    expect(back[1]).toContain('=HYPERLINK("http://x","katt")');
+    expect(back[1]).toContain('+1 tipp');
+    expect(toCsv([['=1+1', -5, '-3']])).toBe("'=1+1;-5;-3");
+  });
+
+  it('review list: one row per field to check, with the current value; source and check date round-trip in CSV', () => {
+    const la = { ...SEED_PLANTS.find((p) => p.code === 'LA')!, verify: ['toxic', 'bloomMonths'] as const, dataSource: 'faiskolai katalógus', checkedAt: '2026-10-01' };
+    const csv = reviewCsv([la as never, { ...SEED_PLANTS[1], verify: [] }]);
+    const rows = parseCsv(csv);
+    expect(rows).toHaveLength(3);
+    expect(rows[1].slice(0, 4)).toEqual(['LA', 'Levendula', "Lavandula angustifolia 'Munstead'", 'Mérgezőség']);
+    expect(rows[2][3]).toBe('Virágzás');
+    expect(rows[2][5]).toBe('faiskolai katalógus');
+    const back = plantsFromCsv(plantsToCsv([la as never])).plants[0];
+    expect(back.dataSource).toBe('faiskolai katalógus');
+    expect(back.checkedAt).toBe('2026-10-01');
   });
 });

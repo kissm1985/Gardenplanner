@@ -5,6 +5,7 @@ import { bbox, centroid } from '../model/geometry';
 import { SOIL_LABEL } from '../model/plants';
 import { AREA_KIND_LABEL, ORIENTATION_LABEL, type Area, type Camera, type PlacedItem, type Plant, type Project, type Pt } from '../model/types';
 import { CAMERA_FOV } from '../model/camera';
+import { gardenLocation } from '../model/location';
 import { fillPath, fillPolygon } from './fill';
 import { areaSunLevel } from './rules';
 import { mulchAdvice } from './schedule';
@@ -245,8 +246,8 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
   L.push(hu ? '## Terület' : '## Site');
   L.push(
     hu
-      ? `${area.name}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ? AREA_KIND_LABEL[area.kind] : 'évelőágyás'}, ${ORIENTATION_LABEL[area.orientation]}i fekvés, ${sun === 'sun' ? 'napos' : sun === 'part' ? 'félárnyékos' : 'árnyékos'}${area.sunUntil ? ` (közvetlen nap ${area.sunUntil})` : ''}${area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}. Hely: Győr környéki kertes ház.`
-      : `${area.name}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ?? 'bed'}, facing ${ORIENT_EN[area.orientation]}, ${sun === 'sun' ? 'sunny' : sun === 'part' ? 'half shade' : 'shade'}${area.sunUntil ? ` (direct sun ${area.sunUntil})` : ''}${area.soil ? `, ${area.soil} soil` : ''}. Setting: a family house garden near Győr, Hungary.`,
+      ? `${area.name}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ? AREA_KIND_LABEL[area.kind] : 'évelőágyás'}, ${ORIENTATION_LABEL[area.orientation]}i fekvés, ${sun === 'sun' ? 'napos' : sun === 'part' ? 'félárnyékos' : 'árnyékos'}${area.sunUntil ? ` (közvetlen nap ${area.sunUntil})` : ''}${area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}. Hely: ${gardenLocation(project.settings).name} környéki kertes ház (Magyarország).`
+      : `${area.name}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ?? 'bed'}, facing ${ORIENT_EN[area.orientation]}, ${sun === 'sun' ? 'sunny' : sun === 'part' ? 'half shade' : 'shade'}${area.sunUntil ? ` (direct sun ${area.sunUntil})` : ''}${area.soil ? `, ${area.soil} soil` : ''}. Setting: a family house garden near ${gardenLocation(project.settings).name}, Hungary.`,
   );
   L.push(
     hu

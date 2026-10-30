@@ -1,5 +1,5 @@
 import { useRef, useState, type FormEvent, type ReactNode } from 'react';
-import { JUGLONE_LABEL, MONTHS, plantName, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL } from '../model/plants';
+import { JUGLONE_LABEL, MONTHS, plantName, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL, FIELD_LABEL } from '../model/plants';
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
 import { usePlantPhoto } from './plantPhoto';
 import { getLang, t, type Lang } from '../i18n';
@@ -214,6 +214,32 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
 
       <PhotoField p={p} set={set} />
 
+      <fieldset className="field-group">
+        <legend>{t('Adatok ellenőrzése', 'Data check')}</legend>
+        <label className="field">
+          <span className="lbl">{t('Adatforrás', 'Data source')}</span>
+          <input
+            value={p.dataSource ?? ''}
+            onChange={(e) => set('dataSource', e.target.value || undefined)}
+            placeholder={t('pl. faiskolai katalógus, szakkönyv, saját tapasztalat', 'e.g. nursery catalogue, reference book, own experience')}
+          />
+        </label>
+        <label className="field">
+          <span className="lbl">{t('Utolsó ellenőrzés', 'Last checked')}</span>
+          <input type="date" value={p.checkedAt ?? ''} onChange={(e) => set('checkedAt', e.target.value || undefined)} />
+        </label>
+        <p className="mono muted">
+          {p.verify?.length
+            ? t(`Ellenőrizendő: ${p.verify.map((k) => FIELD_LABEL[k] ?? k).join(', ')}.`, `To check: ${p.verify.map((k) => FIELD_LABEL[k] ?? k).join(', ')}.`)
+            : t('Nincs ellenőrizendő adat.', 'Nothing left to check.')}
+        </p>
+        {!!p.verify?.length && (
+          <button type="button" className="btn btn-small" onClick={() => setP((x) => ({ ...x, verify: [], checkedAt: new Date().toISOString().slice(0, 10) }))}>
+            {t('Mindent ellenőriztem (mai dátummal)', 'All checked (with today’s date)')}
+          </button>
+        )}
+      </fieldset>
+
       {errors.length > 0 && (
         <div className="form-error" role="alert">
           {errors.map((e) => (
@@ -305,7 +331,27 @@ function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v
         {photo.state === 'ok' ? (
           <figure className="plant-tip-photo">
             <img src={photo.src} alt={plantName(p)} />
-            <figcaption>{photo.own ? t(`Saját fotó: ${photo.credit}`, `Own photo: ${photo.credit}`) : t(`Wikipédia · ${photo.credit}`, `Wikipedia · ${photo.credit}`)}</figcaption>
+            <figcaption>
+              {photo.own ? (
+                t(`Saját fotó: ${photo.credit}`, `Own photo: ${photo.credit}`)
+              ) : (
+                <>
+                  {t(`Wikipédia · ${photo.credit}`, `Wikipedia · ${photo.credit}`)}
+                  {photo.licenseUrl && (
+                    <>
+                      {' · '}
+                      <a href={photo.licenseUrl} target="_blank" rel="noopener">
+                        {t('licenc', 'licence')}
+                      </a>
+                    </>
+                  )}
+                  {' · '}
+                  <a href={photo.filePage ?? photo.pageUrl} target="_blank" rel="noopener">
+                    {t('forrás', 'source')}
+                  </a>
+                </>
+              )}
+            </figcaption>
           </figure>
         ) : (
           <p className="mono muted">

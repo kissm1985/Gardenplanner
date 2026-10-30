@@ -6,6 +6,7 @@ import { plantName } from '../model/plants';
 import type { Area, Plant, Project } from '../model/types';
 import { chosenItems } from './bom';
 import { itemCount } from './fill';
+import { gardenLocation, type MonthDay } from '../model/location';
 import { locale, t } from '../i18n';
 
 export interface Task {
@@ -22,9 +23,6 @@ export interface Day {
   tasks: Task[];
 }
 
-// Győr: average last frost mid-April, first frost end of October.
-export const LAST_FROST = { month: 4, day: 15 };
-export const FIRST_FROST = { month: 10, day: 25 };
 
 const PLANTS_PER_HOUR = 12; // P9 / 1 l pots into prepared, fabric-covered soil
 
@@ -188,13 +186,22 @@ export function buildSchedule(project: Project, start: string, end: string): { d
 
   const s = fromIso(start);
   const e = fromIso(end);
-  const lastFrost = new Date(s.getFullYear(), LAST_FROST.month - 1, LAST_FROST.day);
-  const firstFrost = new Date(e.getFullYear(), FIRST_FROST.month - 1, FIRST_FROST.day);
-  if (s < lastFrost && s.getMonth() >= 1) notes.push(t('Győrben április közepéig lehet fagy: a kezdés előtt figyeld az előrejelzést, a friss ültetést takard.', 'Frost is possible in Győr until mid-April: watch the forecast and cover fresh plantings.'));
-  if (e > firstFrost && e.getMonth() >= 9) notes.push(
+  const loc = gardenLocation(project.settings);
+  const lastFrost = new Date(s.getFullYear(), loc.lastFrost.month - 1, loc.lastFrost.day);
+  const firstFrost = new Date(e.getFullYear(), loc.firstFrost.month - 1, loc.firstFrost.day);
+  const fmtMd = (d: MonthDay) => new Date(2000, d.month - 1, d.day).toLocaleDateString(locale(), { month: 'long', day: 'numeric' });
+  if (s < lastFrost && s.getMonth() >= 1)
+    notes.push(
       t(
-        'Az első fagy Győrben október vége körül várható: a fagy előtt öntözz be alaposan, a mulcs védi a gyökereket. Fát és évelőt november elejéig még lehet ültetni.',
-        'The first frost in Győr usually comes around the end of October: water in well before it; mulch protects the roots. Trees and perennials can still go in until early November.',
+        `${loc.name}: kb. ${fmtMd(loc.lastFrost)}-ig lehet fagy. A kezdés előtt figyeld az előrejelzést, a friss ültetést takard.`,
+        `${loc.name}: frost is possible until about ${fmtMd(loc.lastFrost)}. Watch the forecast and cover fresh plantings.`,
+      ),
+    );
+  if (e > firstFrost && e.getMonth() >= 8)
+    notes.push(
+      t(
+        `${loc.name}: az első fagy kb. ${fmtMd(loc.firstFrost)} körül várható. A fagy előtt öntözz be alaposan, a mulcs védi a gyökereket. Fát és évelőt még 1–2 hétig lehet ültetni, amíg a talaj nem fagy.`,
+        `${loc.name}: the first frost is expected around ${fmtMd(loc.firstFrost)}. Water in well before it; mulch protects the roots. Trees and perennials can still go in for 1–2 weeks while the soil is not frozen.`,
       ),
     );
   if (e.getMonth() >= 5 && e.getMonth() <= 7) notes.push(t('Nyári ültetésnél az első hetekben naponta öntözz, és árnyékold a délutáni napon.', 'When planting in summer, water daily for the first weeks and shade from the afternoon sun.'));

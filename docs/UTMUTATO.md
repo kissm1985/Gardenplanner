@@ -64,6 +64,8 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 - **⋯ Projekt**: mentés, betöltés, megosztás, képek, látványterv, nyomtatás.
 - **Kerek szám**: a figyelmeztetések száma. Zöld, ha nincs gond, piros, ha hiba van.
 
+**Gyors műveletek (⚡)**: a rajz jobb oldalán, a nagyítógombok fölött. Kereshető lista minden funkcióról (pl. „csere”, „kép”, „mentés”), és az **első terv lépései** ellenőrzőlista: terület, rögzített elemek, növények, hibák javítása, változat, lista, mentés. A kész lépések maguktól kipipálódnak. Számítógépen **Ctrl+K** is megnyitja.
+
 **A rajz**
 
 - **Nagyítás**: két ujjal széthúzva vagy összecsípve; számítógépen egérgörgővel vagy a jobb alsó **+ / −** gombokkal.
@@ -284,7 +286,9 @@ Az adatbázisban 146 faj van: évelők, díszfüvek, talajtakarók, cserjék, s�
 
 - **Szerkesztés**: egy növényre koppintva minden adata módosítható: név, kód, méret, tőtáv, igények, virágzás, színek, ár, kiszerelés, fotó, megjegyzés. Az „ellenőrizendő ✓” címkére koppintva jelölöd, hogy utánanéztél.
 - **+ Új növény**: saját növény felvétele; a kódot a név alapján javasolja.
-- **Import és export**: JSON és CSV. A CSV Excelben, Google Táblázatban szerkeszthető, és visszatölthető.
+- **Import és export**: JSON és CSV. A CSV Excelben, Google Táblázatban szerkeszthető, és visszatölthető. Az `=`, `+`, `-` vagy `@` jellel kezdődő szövegek elé aposztróf kerül, hogy az Excel ne futtassa őket képletként; visszatöltéskor ez eltűnik.
+- **Adatok ellenőrzése**: a növény űrlapján megadhatod az **adatforrást** és az **utolsó ellenőrzés** dátumát; a *Mindent ellenőriztem* gomb levesz minden „ellenőrizendő” jelölést. Az **Ellenőrizendők listája (CSV)** gomb fajonként és adatonként kigyűjti a még ellenőrizendő értékeket egy üres „helyes érték” oszloppal, szakértői átnézéshez.
+- **Mérgezőség**: tájékoztató adat, nem orvosi vagy állatorvosi tanács; gyerek vagy háziállat mellé ültetés előtt ellenőrizd megbízható forrásban. A szűrő, az infókártya és a terület „Nem mérgező legyen” korlátja ezt jelzi is.
 
 **Szűrők** (a palettán és az adatbázisban közösek):
 
@@ -432,7 +436,10 @@ A *Lista* tetején az **Ültetési menetrend és gondozás →** gomb nyitja meg
 A felső sáv **⋯** gombja nyitja a **Projekt** menüt:
 
 - **Projekt neve**
-- **Teljes mentés (JSON)**: a teljes projekt egy fájlban. Ezzel viheted át másik eszközre, és ez a biztonsági mentés is. **Betöltés JSON-ból**: visszatölti (a mostani terv helyére kerül).
+- **Teljes mentés (JSON)**: a teljes projekt egy fájlban. Ezzel viheted át másik eszközre, és ez a biztonsági mentés is. Számítógépen (Chrome, Edge) kiválaszthatod a mappát is. Fölötte látszik, mikor mentettél utoljára, és hogy a böngésző tartósan tárolja-e a tervet. **Betöltés JSON-ból**: visszatölti (a mostani terv helyére kerül); a program előbb ellenőrzi a fájlt, és a hibás vagy túl nagy mentést nem tölti be.
+- **Mentés-emlékeztető**: ha már van mit elveszíteni, és egy hete (vagy még soha) nem mentettél, a felső sáv alatt egy sáv szól. **Mentés fájlba** vagy **Később** (3 napig csendben marad).
+- **Helyszín és éghajlat**: a kert melyik város közelében van (vagy saját fagydátumok). A menetrend fagyfigyelmeztetései és a látványterv-leírás ezt használják.
+- **Névjegy**: verzió, készítő, **Jogi információk és adatvédelem** (felhasználási feltételek, adatvédelmi tájékoztató, adatforrások) és a **nyílt forrású licencek**.
 - **Csak olvasható link**: a terv a link végében, kódolva utazik, szerver nélkül. Aki megnyitja, látja a rajzot és a listát, de nem tudja módosítani.
 - **Kép a rajzról**: **PNG** vagy **SVG**, kérésre **jelmagyarázattal** (kód → növény neve, latin neve, darabszám).
 - **Látványterv ChatGPT-nek**: lásd a következő fejezetet.
@@ -476,6 +483,8 @@ Az alkalmazás telepíthető a kezdőképernyőre, mint egy mobilalkalmazás:
 Első megnyitás után **internet nélkül is működik**, és a munka a készüléken mentődik. Internet csak a fotók első letöltéséhez kell.
 
 **Frissítés:** az alkalmazás indításkor, előtérbe kerüléskor és félóránként megnézi, van-e új változata, és ha igen, magától újratölt. Hogy melyik változat fut, a **⋯ Projekt → Névjegy** alatt látod (verzió és build ideje). Ha a telefonon mégis a régi látszik, zárd be teljesen az alkalmazást (vagy a böngészőlapot), és nyisd meg újra.
+
+**Ha valami elromlik:** ha a mentett terv sérült, vagy a program hibába fut, a „Valami elromlott” képernyő jelenik meg. Itt először **töltsd le a tervet (JSON)**, aztán próbáld az **Újratöltést**, végül szükség esetén a **Tiszta lap** gombot (ez törli a hibás tervet a készülékről).
 
 **Fontos:** az adatok a böngészőben tárolódnak. Ha törlöd a böngésző adatait, vagy másik készülékre váltasz, a terv nem jön magától. Ezért időnként készíts **Teljes mentést (JSON)**.
 

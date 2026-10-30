@@ -51,3 +51,73 @@ test('start screen: create my own area instead of the templates', async ({ page 
   await page.locator('.area-switch').click();
   await expect(page.locator('dialog[open]')).toContainText(/Előkert200 × 400 cm[^]*Sablonból[^]*Házoldali sáv/);
 });
+
+test('the built app runs under its Content Security Policy without violations', async ({ page }) => {
+  await page.addInitScript(() => {
+    (window as unknown as { cspViolations: string[] }).cspViolations = [];
+    document.addEventListener('securitypolicyviolation', (e) => (window as unknown as { cspViolations: string[] }).cspViolations.push(`${e.violatedDirective} ${e.blockedURI}`));
+  });
+  await page.goto('/');
+  await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  // Touch the parts that use blobs, data URLs and the service worker: a PNG export and the help.
+  await page.getByRole('button', { name: /Projekt: mentés/ }).click();
+  await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'PNG', exact: true }).click()]);
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
+  await page.getByRole('button', { name: /Súgó/ }).click();
+  await expect(page.locator('dialog[open] .guide img').first()).toBeVisible();
+  expect(await page.evaluate(() => (window as unknown as { cspViolations: string[] }).cspViolations)).toEqual([]);
+});
+
+test('a broken saved plan opens the recovery screen: download it, then start over', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  await expect(page.locator('.area-outline')).toBeVisible();
+  // Corrupt the saved plan the way a bad import or a bug could.
+  await page.evaluate(
+    () =>
+      new Promise<void>((done) => {
+        const req = indexedDB.open('keyval-store');
+        req.onsuccess = () => {
+          const db = req.result;
+          const tx = db.transaction('keyval', 'readwrite');
+          const store = tx.objectStore('keyval');
+          const get = store.get('kerttervezo:project:v1');
+          get.onsuccess = () => {
+            const p = get.result;
+            p.areas[0].variants[0].items = [{ kind: 'drift', id: 'x', plantId: 'LA', polygon: 'oops', spacingCm: 30 }];
+            store.put(p, 'kerttervezo:project:v1');
+          };
+          tx.oncomplete = () => done();
+        };
+      }),
+  );
+  await page.reload();
+  await expect(page.getByRole('heading', { name: 'Valami elromlott' })).toBeVisible();
+  await expect(page.locator('.recovery-msg')).toContainText('hibás pontlista');
+  const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Terv letöltése (JSON)' }).click()]);
+  expect(dl.suggestedFilename()).toMatch(/^gardenly-mentes-.*\.json$/);
+  page.once('dialog', (d) => d.accept());
+  await page.getByRole('button', { name: /Tiszta lap/ }).click();
+  await expect(page.getByRole('heading', { name: 'Tervezzük meg a kertet' })).toBeVisible();
+});
+
+test('quick actions: search every feature; the first-plan checklist ticks itself', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: /Kezdés/ }).click();
+  await page.getByRole('button', { name: 'Gyors műveletek' }).click();
+  const dlg = page.locator('dialog[open]');
+  await expect(dlg.locator('.quick-steps li.is-done')).toHaveCount(2); // area and fixtures come with the templates
+  await expect(dlg).toContainText('Az első terv lépései · 2/7');
+  await dlg.getByLabel('Művelet keresése').fill('csere');
+  await expect(dlg.locator('.quick-item')).toHaveCount(1);
+  await dlg.getByLabel('Művelet keresése').fill('kép kamera');
+  await dlg.locator('.quick-item').first().click();
+  await expect(page.locator('dialog[open] .sheet-head')).toContainText('Látványterv');
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
+  // Opening the list ticks its step.
+  await page.getByRole('button', { name: 'Lista', exact: true }).click();
+  await page.getByRole('button', { name: 'Kijelölés', exact: true }).click();
+  await page.keyboard.press('Control+k');
+  await expect(page.locator('dialog[open]')).toContainText('3/7');
+});

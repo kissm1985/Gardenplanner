@@ -1,7 +1,9 @@
 import { useRef, useState } from 'react';
 import { About } from './About';
+import { LocationField } from './LocationField';
+import { backupNow, isInstalled, useBackupState } from './backup';
 import { bomFromEntries } from '../engine/bom';
-import { exportJson, parseProject, shareUrl } from '../engine/io';
+import { parseProject, shareUrl } from '../engine/io';
 import { activeVariant, migrate, selectCurrentArea, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
@@ -12,7 +14,6 @@ import { plantName } from '../model/plants';
 
 export type Orientation = 'portrait' | 'landscape';
 
-const today = () => new Date().toISOString().slice(0, 10);
 const slug = (s: string) =>
   s
     .normalize('NFD')
@@ -22,7 +23,7 @@ const slug = (s: string) =>
     .replace(/^-|-$/g, '');
 
 /** Project menu: name, backup/restore, share link, images, print, intro. */
-export function ProjectPanel({ onPrint, onIntro, onDone, onVisual }: { onPrint: (o: Orientation) => void; onIntro: () => void; onDone: () => void; onVisual: () => void }) {
+export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { onPrint: (o: Orientation) => void; onIntro: () => void; onDone: () => void; onVisual: () => void; onLegal: () => void }) {
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
   const [msg, setMsg] = useState('');
@@ -103,8 +104,9 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual }: { onPrint: 
 
       <fieldset className="field-group">
         <legend>{t('Mentés és visszatöltés', 'Save and restore')}</legend>
+        <BackupStatus />
         <div className="form-actions form-actions-start">
-          <button type="button" className="btn btn-small" onClick={() => downloadText(`gardenly-${slug(project.name)}-${today()}.json`, exportJson(project), 'application/json')}>
+          <button type="button" className="btn btn-small btn-primary" onClick={() => backupNow(project)}>
             {t('Teljes mentés (JSON)', 'Full backup (JSON)')}
           </button>
           <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>
@@ -158,6 +160,8 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual }: { onPrint: 
         </p>
       </fieldset>
 
+      <LocationField />
+
       <fieldset className="field-group">
         <legend>{t('Látványterv ChatGPT-nek', 'Visualisation with ChatGPT')}</legend>
         <p className="mono muted">{t('Leírás és rajz a ChatGPT-nek egy lépésben, nézőponttal, stílussal; a kész képek a változat mellett maradnak.', 'Description and plan for ChatGPT in one step, with a viewpoint and style; the finished images stay with the variant.')}</p>
@@ -194,7 +198,30 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual }: { onPrint: 
           {msg}
         </p>
       )}
-      <About />
+      <About onLegal={onLegal} />
     </div>
+  );
+}
+
+/** Where the plan lives and when it was last backed up. */
+function BackupStatus() {
+  const { last, persisted } = useBackupState();
+  const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+  return (
+    <p className="mono muted backup-status">
+      {last
+        ? days === 0
+          ? t('Utolsó mentés: ma.', 'Last backup: today.')
+          : t(`Utolsó mentés: ${days} napja.`, `Last backup: ${days} days ago.`)
+        : t('Még nem készült mentés.', 'No backup yet.')}{' '}
+      {persisted
+        ? t('A böngésző tartósan tárolja a tervet.', 'The browser keeps the plan permanently.')
+        : isInstalled()
+          ? t('A terv csak ezen a készüléken van; a fájlmentés véd az elvesztés ellen.', 'The plan is only on this device; a file backup protects against losing it.')
+          : t(
+              'A böngésző idővel törölheti a tervet (iPhone-on kb. 7 nap használaton kívül), ezért telepítsd a kezdőképernyőre, és ments rendszeresen.',
+              'The browser may clear the plan over time (on iPhone after about 7 days unused), so install it to the home screen and back up regularly.',
+            )}
+    </p>
   );
 }

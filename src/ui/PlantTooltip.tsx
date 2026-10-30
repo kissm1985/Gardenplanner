@@ -1,6 +1,7 @@
 import { effectivePlant, JUGLONE_LABEL, plantBloom, plantFoliage, plantName, MONTHS, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { PlacedItem, Plant } from '../model/types';
 import { PlantChip } from './PlantChip';
+import { ToxicNotice } from './Disclaimer';
 import { STATUS_LABEL } from './Selection';
 import { usePlantPhoto } from './plantPhoto';
 import { labels, t } from '../i18n';
@@ -43,8 +44,27 @@ export function PlantCard({ plant, item }: { plant: Plant; item?: PlacedItem }) 
         <figure className="plant-tip-photo">
           <img src={photo.src} alt={`${plantName(plant)} (${plant.nameLat})`} loading="lazy" />
           <figcaption>
-            {t('Fotó', 'Photo')}: {photo.credit}
-            {photo.own ? '' : ' · Wikimedia Commons'}
+            {t('Fotó', 'Photo')}: {photo.own ? photo.credit : photo.credit.replace(photo.license ? `, ${photo.license}` : '', '')}
+            {!photo.own && photo.license && (
+              <>
+                {' · '}
+                {photo.licenseUrl ? (
+                  <a href={photo.licenseUrl} target="_blank" rel="noopener">
+                    {photo.license}
+                  </a>
+                ) : (
+                  photo.license
+                )}
+              </>
+            )}
+            {!photo.own && (
+              <>
+                {' · '}
+                <a href={photo.filePage ?? photo.pageUrl} target="_blank" rel="noopener">
+                  {t('forrás: Wikimedia Commons', 'source: Wikimedia Commons')}
+                </a>
+              </>
+            )}
           </figcaption>
         </figure>
       )}
@@ -81,6 +101,7 @@ export function PlantCard({ plant, item }: { plant: Plant; item?: PlacedItem }) 
         <dd>
           {TOXIC_LABEL[plant.toxic]}
           {plant.thorny ? t(' · tüskés', ' · thorny') : ''} · juglone: {JUGLONE_LABEL[plant.juglone]}
+          {(plant.toxic === 'no' || plant.toxic === 'unknown') && <ToxicNotice compact />}
         </dd>
         {item && (
           <>

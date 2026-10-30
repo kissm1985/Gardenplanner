@@ -13,7 +13,7 @@ async function mockWiki(page: Page) {
   await page.route(/commons\.wikimedia\.org\/w\/api\.php/, (r) =>
     r.fulfill({
       json: {
-        query: { pages: { '2': { imageinfo: [{ thumburl: 'https://upload.wikimedia.org/lavender-480.png', extmetadata: { Artist: { value: 'Jane Doe' }, LicenseShortName: { value: 'CC BY-SA 4.0' } } }] } } },
+        query: { pages: { '2': { imageinfo: [{ thumburl: 'https://upload.wikimedia.org/lavender-480.png', extmetadata: { Artist: { value: 'Jane Doe' }, LicenseShortName: { value: 'CC BY-SA 4.0' }, LicenseUrl: { value: 'https://creativecommons.org/licenses/by-sa/4.0' } } }] } } },
       },
     }),
   );
@@ -31,7 +31,9 @@ test('photo in the palette card (hover) and in the plan card; cached after the f
   await item.hover();
   const tip = page.getByRole('tooltip');
   await expect(tip.locator('img')).toBeVisible();
-  await expect(tip).toContainText('Jane Doe, CC BY-SA 4.0');
+  await expect(tip).toContainText('Jane Doe · CC BY-SA 4.0 · forrás: Wikimedia Commons');
+  await expect(tip.getByRole('link', { name: 'CC BY-SA 4.0' })).toHaveAttribute('href', 'https://creativecommons.org/licenses/by-sa/4.0');
+  await expect(tip.getByRole('link', { name: /forrás/ })).toHaveAttribute('href', 'https://commons.wikimedia.org/wiki/File:Lavender.jpg');
   await expect.poll(() => tip.locator('img').evaluate((i: HTMLImageElement) => i.naturalWidth)).toBe(48);
   await page.mouse.move(5, 5);
   await expect(tip).toHaveCount(0);

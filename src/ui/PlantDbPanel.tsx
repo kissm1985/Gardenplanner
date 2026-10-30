@@ -1,6 +1,6 @@
 import { useMemo, useRef, useState } from 'react';
 import { activeFilterCount, filterPlants } from '../model/plantFilter';
-import { blankPlant, byPlantName, JUGLONE_LABEL, plantName, plantsFromCsv, plantsFromJson, plantsToCsv, SOIL_LABEL, suggestCode, SUN_LABEL, TOXIC_LABEL } from '../model/plants';
+import { blankPlant, byPlantName, JUGLONE_LABEL, plantName, plantsFromCsv, plantsFromJson, plantsToCsv, reviewCsv, SOIL_LABEL, suggestCode, SUN_LABEL, TOXIC_LABEL } from '../model/plants';
 import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
@@ -123,6 +123,15 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
         </button>
         <button type="button" className="btn btn-small" onClick={() => downloadText(t('novenyek.csv', 'plants.csv'), plantsToCsv(db), 'text/csv;charset=utf-8')}>
           Export CSV
+        </button>
+        <button
+          type="button"
+          className="btn btn-small"
+          disabled={!unchecked}
+          onClick={() => downloadText(t('ellenorizendo-adatok.csv', 'data-to-check.csv'), '\ufeff' + reviewCsv(db), 'text/csv;charset=utf-8')}
+          title={t('Szakértői átnézéshez: fajonként és adatonként, a jelenlegi értékkel és egy üres „helyes érték” oszloppal.', 'For an expert review: per species and field, with the current value and an empty “correct value” column.')}
+        >
+          {t('Ellenőrizendők listája (CSV)', 'List of values to check (CSV)')}
         </button>
         <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>
           {t('Import (JSON / CSV)', 'Import (JSON / CSV)')}

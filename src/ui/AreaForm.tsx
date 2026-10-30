@@ -12,6 +12,7 @@ import {
   type SunNeed,
   AREA_KIND_LABEL,
 } from "../model/types";
+import { ToxicNotice } from './Disclaimer';
 import { t } from '../i18n';
 
 type Draft = AreaInput & {
@@ -310,6 +311,7 @@ export function AreaForm({
           v={d.constraints.nonToxic}
           on={(v) => setC("nonToxic", v)}
         />
+        {d.constraints.nonToxic && <ToxicNotice />}
         <Check
           label={t("Csepegtető öntözés van", "Has drip irrigation")}
           v={d.constraints.drip}

@@ -10,7 +10,7 @@ import { t } from '../i18n';
 export type PhotoState =
   | { state: 'none' }
   | { state: 'loading' }
-  | { state: 'ok'; src: string; credit: string; pageUrl?: string; own: boolean }
+  | { state: 'ok'; src: string; credit: string; pageUrl?: string; filePage?: string; license?: string; licenseUrl?: string; own: boolean }
   | { state: 'offline' };
 
 interface Cached {
@@ -20,6 +20,9 @@ interface Cached {
   src?: string;
   credit?: string;
   pageUrl?: string;
+  filePage?: string;
+  license?: string;
+  licenseUrl?: string;
 }
 
 const RETRY_MS = 7 * 24 * 3600 * 1000; // look again for plants without a photo after a week
@@ -28,7 +31,7 @@ const key = (nameLat: string) => `photo:${nameLat.trim().toLowerCase()}`;
 
 function fromCache(c: Cached): PhotoState {
   if (!c.found || !c.src) return { state: 'none' };
-  return { state: 'ok', src: c.blob ? URL.createObjectURL(c.blob) : c.src, credit: c.credit ?? '', pageUrl: c.pageUrl, own: false };
+  return { state: 'ok', src: c.blob ? URL.createObjectURL(c.blob) : c.src, credit: c.credit ?? '', pageUrl: c.pageUrl, filePage: c.filePage, license: c.license, licenseUrl: c.licenseUrl, own: false };
 }
 
 async function load(nameLat: string): Promise<PhotoState> {
@@ -38,7 +41,9 @@ async function load(nameLat: string): Promise<PhotoState> {
   } catch {
     /* no IndexedDB (private mode): just fetch */
   }
-  if (cached && (cached.found || Date.now() - cached.at < RETRY_MS)) return fromCache(cached);
+  // Photos cached before the licence links were kept are looked up again once (when online).
+  const stale = cached?.found && !cached.filePage && navigator.onLine !== false;
+  if (cached && !stale && (cached.found || Date.now() - cached.at < RETRY_MS)) return fromCache(cached);
   if (typeof navigator !== 'undefined' && navigator.onLine === false) return cached ? fromCache(cached) : { state: 'offline' };
   try {
     const info = await lookupPhoto(nameLat);

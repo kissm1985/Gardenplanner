@@ -170,3 +170,15 @@ test('Látványterv: camera on the plan, style and mood, send in one step, finis
   await page.getByRole('button', { name: /Változat: A terv/ }).click();
   await expect(page.locator('dialog[open] .variant-tree')).toContainText('🖼 1');
 });
+
+test('backup reminder: shows once there is a plan worth saving, goes quiet after a backup', async ({ page }) => {
+  await page.addInitScript(() => localStorage.removeItem('kerttervezo:backup-snooze'));
+  await setup(page); // 11 lavender
+  const bar = page.locator('.backup-reminder');
+  await expect(bar).toContainText('még nincs mentésed');
+  const [dl] = await Promise.all([page.waitForEvent('download'), bar.getByRole('button', { name: 'Mentés fájlba' }).click()]);
+  expect(dl.suggestedFilename()).toMatch(/^gardenly-.*\.json$/);
+  await expect(bar).toHaveCount(0);
+  await menu(page);
+  await expect(page.locator('dialog[open] .backup-status')).toContainText('Utolsó mentés: ma.');
+});

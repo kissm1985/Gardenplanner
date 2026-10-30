@@ -1,6 +1,7 @@
 // Data model (SPEC §6). All coordinates are in cm, origin = top-left corner of the area,
 // x along the width, y along the length. Derived values (counts, cost, warnings) are never stored.
 import { labels } from '../i18n';
+import type { GardenLocation } from './location';
 
 export type Pt = [number, number];
 
@@ -50,6 +51,10 @@ export interface Plant {
   photoCredit?: string;
   /** Field names whose values still need checking ("ellenőrizendő"). */
   verify?: (keyof Plant)[];
+  /** Where the data comes from (book, nursery catalogue, own observation…). */
+  dataSource?: string;
+  /** Date of the last check of this plant's data (YYYY-MM-DD). */
+  checkedAt?: string;
 }
 
 export interface Constraints {
@@ -208,6 +213,8 @@ export interface Settings {
   wikiPhotos?: boolean;
   /** Version of the built-in plant list last merged into this project. */
   seedVersion?: number;
+  /** Where the garden is (frost dates, brief); Győr when missing. */
+  location?: GardenLocation;
 }
 
 /** Planting window and ticked checklist tasks; the task list itself is derived. */

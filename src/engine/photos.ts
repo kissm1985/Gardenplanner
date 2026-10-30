@@ -9,6 +9,12 @@ export interface PhotoInfo {
   credit: string;
   /** Page to open for details (Wikipedia article or Commons file page). */
   pageUrl: string;
+  /** Commons page of the image file: source, full author and licence details. */
+  filePage?: string;
+  /** Licence short name, e.g. "CC BY-SA 4.0". */
+  license?: string;
+  /** Link to the licence text. */
+  licenseUrl?: string;
 }
 
 type Fetch = (url: string) => Promise<{ ok: boolean; json: () => Promise<unknown> }>;
@@ -50,7 +56,7 @@ async function pageImage(fetchFn: Fetch, lang: string, title: string): Promise<{
   return { file: page.pageimage, pageUrl: page.fullurl ?? `https://${lang}.wikipedia.org/wiki/${encodeURIComponent(title)}` };
 }
 
-async function commonsInfo(fetchFn: Fetch, file: string): Promise<{ src: string; credit: string } | null> {
+async function commonsInfo(fetchFn: Fetch, file: string): Promise<Omit<PhotoInfo, 'pageUrl'> | null> {
   const url = `https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=480&titles=${encodeURIComponent(`File:${file}`)}`;
   const res = await fetchFn(url);
   if (!res.ok) return null;
@@ -63,7 +69,14 @@ async function commonsInfo(fetchFn: Fetch, file: string): Promise<{ src: string;
   const meta = info?.extmetadata ?? {};
   const artist = stripHtml(meta.Artist?.value ?? '') || t('ismeretlen szerző', 'unknown author');
   const lic = stripHtml(meta.LicenseShortName?.value ?? '');
-  return { src, credit: `${artist}${lic ? `, ${lic}` : ''}` };
+  const licUrl = stripHtml(meta.LicenseUrl?.value ?? '');
+  return {
+    src,
+    credit: `${artist}${lic ? `, ${lic}` : ''}`,
+    license: lic || undefined,
+    licenseUrl: /^https?:\/\//.test(licUrl) ? licUrl : undefined,
+    filePage: `https://commons.wikimedia.org/wiki/File:${encodeURIComponent(file.replace(/ /g, '_'))}`,
+  };
 }
 
 /** First free photo found for the plant, or null. Network errors propagate (the caller may retry later). */

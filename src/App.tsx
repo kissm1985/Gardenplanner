@@ -30,6 +30,10 @@ import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { LogoMark } from './ui/Logo';
 import { VisualPanel } from './ui/VisualPanel';
+import { LegalPanel } from './ui/LegalPanel';
+import { backupNow, lastBackupAt, needsReminder, requestPersistence, snoozeReminder, useBackupState } from './ui/backup';
+import { QuickPanel, type QuickAction, type Step } from './ui/QuickPanel';
+import { markSeen, seen } from './ui/seen';
 import { setTheme, toggleTheme, useTheme, type Theme } from './ui/theme';
 import { Welcome } from './ui/Welcome';
 
@@ -75,7 +79,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = labels({
   camera: ['Látványterv nézőpontja (kamera)', 'Visualisation viewpoint (camera)'],
 });
 
-type SheetId = null | 'visual' | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
+type SheetId = null | 'quick' | 'legal' | 'visual' | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -90,6 +94,11 @@ export function App({ loading }: { loading: boolean }) {
   const rowMode = useUi((s) => s.rowMode);
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
+  // Ask the browser to keep the plan once there is one (no effect where it is not supported).
+  const hasPlan = useProject((s) => !!s.project);
+  useEffect(() => {
+    if (hasPlan) requestPersistence();
+  }, [hasPlan]);
   useEffect(() => useUi.getState().setVisualOpen(sheet === 'visual'), [sheet]);
   // Started from "My own area" on the start screen: open the new-area form at once.
   const [newArea, setNewArea] = useState(false);
@@ -167,6 +176,7 @@ export function App({ loading }: { loading: boolean }) {
       const k = e.key.toLowerCase();
       if (k === 'z' && !e.shiftKey) useProject.getState().undo();
       else if (k === 'y' || (k === 'z' && e.shiftKey)) useProject.getState().redo();
+      else if (k === 'k') setSheet('quick');
       else return;
       e.preventDefault();
     };
@@ -174,10 +184,57 @@ export function App({ loading }: { loading: boolean }) {
     return () => window.removeEventListener('keydown', onKey);
   }, []);
 
+  // The first-plan checklist counts the list as seen once it was opened.
+  const tool0 = useUi((s) => s.tool);
+  useEffect(() => {
+    if (tool0 === 'list') markSeen('list');
+  }, [tool0]);
+
   if (loading) return <div className="splash">{t('Betöltés…', 'Loading…')}</div>;
   if (!project) return <Welcome />;
 
   const ui = useUi.getState();
+  const go = (f: () => void) => () => {
+    setSheet(null);
+    f();
+  };
+  const tool_ = (tl: Tool) => go(() => ui.setTool(tl));
+  const quickActions: QuickAction[] = [
+    { id: 'plant', label: t('Növény ültetése', 'Place a plant'), hint: t('Egyedi tő a palettáról', 'Single plant from the palette'), words: 'tő palettá', run: tool_('plant') },
+    { id: 'drift', label: t('Folt ültetése', 'Plant a drift'), hint: t('Egy rész kitöltése egy fajjal', 'Fill a patch with one species'), run: tool_('drift') },
+    { id: 'row', label: t('Sor vagy ív', 'Row or curve'), hint: t('Ültetés vonal mentén', 'Planting along a line'), words: 'sövény hedge', run: tool_('row') },
+    { id: 'fixtures', label: t('Rögzített elemek rajzolása', 'Draw fixed elements'), hint: t('Gyep, burkolat, fal, kerítés, tó, tároló, fa…', 'Lawn, paving, wall, fence, pond, shed, tree…'), words: 'elemek gyepsáv kavics kút pad', run: tool_('fixtures') },
+    { id: 'areas', label: t('Területek', 'Areas'), hint: t('Váltás, új terület, méret, alak, sablonok', 'Switch, new area, size, shape, templates'), words: 'terület sablon alak', run: () => setSheet('areas') },
+    { id: 'ideas', label: t('Ötletgenerátor', 'Idea generator'), hint: t('Kész összeállítás új változatba, vagy kijelölt rész kitöltése', 'A ready composition in a new variant, or fill a region'), words: 'generál random véletlen', run: () => setSheet('ideas') },
+    { id: 'replace', label: t('Növény cseréje', 'Replace plants'), hint: t('Egy faj cseréje egy vagy több másikra', 'Swap a species for one or more others'), words: 'csere', run: () => openReplace() },
+    { id: 'variants', label: t('Változatok', 'Variants'), hint: t('Másolás, mappák, választott változat', 'Copy, folders, chosen variant'), words: 'terv másolat', run: () => setSheet('variants') },
+    ...(area && area.variants.length > 1 ? [{ id: 'compare', label: t('Változatok összehasonlítása', 'Compare variants'), hint: t('Két változat egymás mellett', 'Two variants side by side'), run: go(() => { ui.setTool('select'); ui.setCompare(true); }) }] : []),
+    { id: 'visual', label: t('Látványterv (ChatGPT)', 'Visualisation (ChatGPT)'), hint: t('Kamera a rajzon, leírás és kép küldése, kész képek', 'Camera on the plan, send brief and image, finished images'), words: 'kép kamera chatgpt ai mi', run: () => setSheet('visual') },
+    { id: 'season', label: t('Évszaknézet', 'Season view'), hint: t('Színek hónapról hónapra, négy évszak', 'Colours month by month, four seasons'), run: tool_('season') },
+    { id: 'list', label: t('Növénylista, rendelés, költség', 'Plant list, order, cost'), hint: t('Lista, tartalék, CSV, XLSX', 'List, spare, CSV, XLSX'), words: 'bevásárló ár excel', run: tool_('list') },
+    { id: 'schedule', label: t('Ültetési menetrend és gondozás', 'Planting schedule and care'), hint: t('Napi lista, gondozási naptár', 'Daily list, care calendar'), words: 'naptár', run: go(() => ui.setPage('schedule')) },
+    { id: 'warnings', label: t('Figyelmeztetések', 'Warnings'), hint: t(`${warnings.length} figyelmeztetés ezen a területen`, `${warnings.length} warnings in this area`), words: 'hiba szabály', run: () => setSheet('warnings') },
+    { id: 'plantdb', label: t('Növényadatbázis', 'Plant database'), hint: t('Fajok, szűrők, saját növény, import, ellenőrizendők', 'Species, filters, own plant, import, values to check'), words: 'faj növény', run: () => setSheet('plantdb') },
+    { id: 'backup', label: t('Mentés fájlba', 'Save to file'), hint: t('Teljes mentés JSON-ban', 'Full backup as JSON'), words: 'backup json mentés', run: go(() => backupNow(project)) },
+    { id: 'project', label: t('Projekt: betöltés, megosztás, nyomtatás, képek', 'Project: load, share, print, images'), hint: t('Link, PNG, SVG, PDF, helyszín, névjegy', 'Link, PNG, SVG, PDF, location, about'), words: 'pdf png link helyszín éghajlat', run: () => setSheet('project') },
+    { id: 'view', label: t('Nézet és rétegek', 'View and layers'), hint: t('Rétegek, méret, fotók, megjelenés, nyelv', 'Layers, size, photos, appearance, language'), run: () => setSheet('view') },
+    { id: 'theme', label: t('Sötét / világos mód', 'Dark / light mode'), hint: t('Váltás egy koppintással', 'Switch with one tap'), words: 'dark light téma', run: go(toggleTheme) },
+    { id: 'lang', label: getLang() === 'hu' ? 'English' : 'Magyar', hint: getLang() === 'hu' ? 'Switch to English' : 'Váltás magyarra', words: 'nyelv language', run: go(() => setLang(getLang() === 'hu' ? 'en' : 'hu')) },
+    { id: 'help', label: t('Súgó', 'Help'), hint: t('Felhasználói útmutató', 'User guide'), words: 'útmutató', run: () => openHelp() },
+    { id: 'legal', label: t('Jogi információk és adatvédelem', 'Legal information and privacy'), hint: t('Feltételek, adatvédelem, adatforrások, licencek', 'Terms, privacy, data sources, licences'), run: () => setSheet('legal') },
+    { id: 'intro', label: t('Bevezető újra', 'Show the intro again'), hint: t('A három lépéses bemutató', 'The three-step tour'), run: go(() => setCoach(true)) },
+  ];
+  const anyFixtures = project.areas.some((a) => a.fixtures.length > 0);
+  const anyItems = project.areas.some((a) => a.variants.some((v) => v.items.length > 0));
+  const steps: Step[] = [
+    { id: 'area', label: t('Terület megadása (méret, fekvés, napsütés)', 'Set up an area (size, facing, sun)'), done: project.areas.length > 0, run: () => setSheet('areas') },
+    { id: 'fixtures', label: t('Rögzített elemek (fal, gyep, fa…)', 'Fixed elements (wall, lawn, tree…)'), done: anyFixtures, run: tool_('fixtures') },
+    { id: 'plants', label: t('Növények elhelyezése', 'Place plants'), done: anyItems, run: tool_('plant') },
+    { id: 'warnings', label: t('Hibák javítása a figyelmeztetések alapján', 'Fix errors from the warnings'), done: anyItems && errors === 0, run: () => setSheet('warnings') },
+    { id: 'variants', label: t('Változat vagy ötlet kipróbálása', 'Try a variant or an idea'), done: project.areas.some((a) => a.variants.length > 1), run: () => setSheet('variants') },
+    { id: 'list', label: t('Növénylista és költség megnézése', 'Check the plant list and cost'), done: seen('list'), run: tool_('list') },
+    { id: 'backup', label: t('Mentés fájlba', 'Save to file'), done: lastBackupAt() != null, run: go(() => backupNow(project)) },
+  ];
 
   return (
     <div className="app">
@@ -222,6 +279,7 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </header>
 
+      <BackupReminder />
       <main className={`stage${page || tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
         {page === 'schedule' ? (
           <SchedulePage />
@@ -241,6 +299,11 @@ export function App({ loading }: { loading: boolean }) {
             </button>
             {shapeEditing && <ShapeEditBar />}
             {cameraEdit && <CameraBar onDone={() => setSheet('visual')} />}
+            {!cameraEdit && !shapeEditing && (
+              <button type="button" className="quick-fab" onClick={() => setSheet('quick')} aria-label={t('Gyors műveletek', 'Quick actions')} title={t('Gyors műveletek (Ctrl+K)', 'Quick actions (Ctrl+K)')}>
+                ⚡
+              </button>
+            )}
             {tool === 'select' && !shapeEditing && (
               <div className="stage-tools" role="toolbar" aria-label={t('Kijelölés módja', 'Selection mode')}>
                 <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
@@ -355,7 +418,14 @@ export function App({ loading }: { loading: boolean }) {
           }}
           onDone={() => setSheet(null)}
           onVisual={() => setSheet('visual')}
+          onLegal={() => setSheet('legal')}
         />
+      </Sheet>
+      <Sheet open={sheet === 'quick'} title={t('Gyors műveletek', 'Quick actions')} onClose={() => setSheet(null)}>
+        <QuickPanel actions={quickActions} steps={steps} />
+      </Sheet>
+      <Sheet open={sheet === 'legal'} title={t('Jogi információk', 'Legal information')} onClose={() => setSheet(null)} wide>
+        <LegalPanel />
       </Sheet>
       <Sheet open={sheet === 'visual'} onHelp={() => openHelp('visual')} title={t('Látványterv', 'Visualisation')} onClose={() => setSheet(null)}>
         <VisualPanel
@@ -480,6 +550,28 @@ export function App({ loading }: { loading: boolean }) {
           </fieldset>
         </div>
       </Sheet>
+    </div>
+  );
+}
+
+/** Gentle reminder to back the plan up to a file (it only lives on this device). */
+function BackupReminder() {
+  const project = useProject((s) => s.project);
+  const { last, persisted } = useBackupState();
+  if (!needsReminder(project)) return null;
+  const days = last ? Math.floor((Date.now() - last) / 86400000) : null;
+  return (
+    <div className="backup-reminder" role="status">
+      <span>
+        {days == null ? t('A tervről még nincs mentésed.', 'You have no backup of the plan yet.') : t(`Az utolsó mentés ${days} napja készült.`, `The last backup was ${days} days ago.`)}{' '}
+        {persisted ? '' : t('A böngésző idővel törölheti az adatokat.', 'The browser may clear the data over time.')}
+      </span>
+      <button type="button" className="btn btn-small btn-primary" onClick={() => backupNow(project!)}>
+        {t('Mentés fájlba', 'Save to file')}
+      </button>
+      <button type="button" className="btn btn-small" onClick={() => snoozeReminder()}>
+        {t('Később', 'Later')}
+      </button>
     </div>
   );
 }

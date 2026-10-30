@@ -2,6 +2,7 @@
 import { byPlantName, JUGLONE_LABEL, plantName, WATER_LABEL } from '../model/plants';
 import type { Area, ItemStatus, PlacedItem, Plant, Project } from '../model/types';
 import { itemCount } from './fill';
+import { safeCell } from './csvSafe';
 import { locale, t } from '../i18n';
 
 export const STATUSES: ItemStatus[] = ['needed', 'ordered', 'owned', 'planted'];
@@ -143,11 +144,21 @@ export function bomTable(b: Bom): Cell[][] {
 }
 
 /** Tab-separated: pasting into Excel / Sheets splits it into the right columns. */
-export const toTsv = (t: Cell[][]) => t.map((r) => r.map((c) => String(c).replace(/[\t\r\n]+/g, ' ')).join('\t')).join('\r\n');
+export const toTsv = (t: Cell[][]) => t.map((r) => r.map((c) => (typeof c === 'number' ? String(c) : safeCell(c.replace(/[\t\r\n]+/g, ' ')))).join('\t')).join('\r\n');
 
 /** Semicolon CSV (Hungarian Excel default), quoted where needed. */
 export const toCsv = (t: Cell[][]) =>
-  t.map((r) => r.map((c) => (typeof c === 'number' ? String(c) : /[;"\r\n]/.test(c) ? `"${c.replace(/"/g, '""')}"` : c)).join(';')).join('\r\n');
+  t
+    .map((r) =>
+      r
+        .map((c) => {
+          if (typeof c === 'number') return String(c);
+          const s = safeCell(c);
+          return /[;"\r\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+        })
+        .join(';'),
+    )
+    .join('\r\n');
 
 const escHtml = (s: string) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
 export const toHtmlTable = (t: Cell[][]) =>
