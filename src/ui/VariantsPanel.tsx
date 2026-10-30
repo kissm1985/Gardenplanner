@@ -23,10 +23,12 @@ export function VariantsPanel({
   onDone,
   onIdeas,
   onReplace,
+  onVisual,
 }: {
   onDone: () => void;
   onIdeas: () => void;
   onReplace: () => void;
+  onVisual: () => void;
 }) {
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
@@ -81,6 +83,9 @@ export function VariantsPanel({
         </button>
         <button type="button" className="btn" onClick={onReplace}>
           {t("⇄ Növény cseréje", "⇄ Replace plants")}
+        </button>
+        <button type="button" className="btn" onClick={onVisual}>
+          {t("🖼 Látványterv", "🖼 Visualisation")}
         </button>
         <button
           type="button"
@@ -278,6 +283,7 @@ function Node({
             {t(`${s.bom.planted} tő`, `${s.bom.planted} plants`)} · {fmtFt(s.bom.total)} ·{" "}
             {t(`${s.warnings.length} figyelmeztetés`, `${s.warnings.length} warnings`)}
             {s.errors ? t(` (${s.errors} hiba)`, ` (${s.errors} errors)`) : ""}
+            {v.renders?.length ? ` · 🖼 ${v.renders.length}` : ""}
             {hidden && <> · </>}
             {hidden}
           </span>

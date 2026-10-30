@@ -106,6 +106,13 @@ function Column({ stats, other, area, month, picker, chosen }: {
         {chosen && <span className="badge badge-chosen">{t('választott', 'chosen')}</span>}
       </div>
       <StaticPlan area={area} items={stats.variant.items} plantDb={project.plantDb} month={month} showMature={project.settings.showMatureSize} labelPx={170} title={stats.variant.name} />
+      {(stats.variant.renders?.length ?? 0) > 0 && (
+        <div className="cmp-renders" aria-label={t('Látványképek', 'Visualisations')}>
+          {stats.variant.renders!.map((r) => (
+            <img key={r.id} src={r.dataUrl} alt={t(`${stats.variant.name} látványképe`, `${stats.variant.name} visualisation`)} loading="lazy" />
+          ))}
+        </div>
+      )}
       <dl className="cmp-stats">
         <dt>{t('Tövek', 'Plants')}</dt>
         <dd>

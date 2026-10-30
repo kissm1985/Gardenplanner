@@ -44,4 +44,27 @@ describe('visualisation prompt for ChatGPT', () => {
     expect(prompt({ mature: true })).toContain('kb. 45 cm magas');
     expect(prompt({ mature: false })).toContain('kb. 18 cm magas');
   });
+
+  it('camera viewpoint: position, direction and what is seen near to far; style, time and weather', () => {
+    st().setCamera({ x: 60, y: 700, dir: -90 }); // looking up the plan, at the lavender drift
+    const t = prompt({ viewpoint: 'camera', style: 'sketch', time: 'morning', weather: 'sunny' });
+    expect(t).toContain('a (0,6; 7,0) m pontban állva');
+    expect(t).toContain('felfelé (y csökkenő irányába)');
+    expect(t).toMatch(/Középtér: [^\n]*LA levendula \(középen/);
+    expect(t).toMatch(/Háttér: [^\n]*AC törpe japán juhar \(jobbra/); // at the right edge of the view, far
+    expect(t).toContain('tervezői vázlat');
+    expect(t).toContain('reggel');
+    expect(t).toContain('derült');
+    // Without a camera the camera choice falls back to the generic eye-level view.
+    st().setCamera(null);
+    expect(prompt({ viewpoint: 'camera' })).toContain('Szemmagasságból');
+  });
+
+  it('both: the camera view and a bird’s-eye view', () => {
+    st().setCamera({ x: 250, y: 1150, dir: 270 });
+    const t = prompt({ viewpoint: 'both', lang: 'en' });
+    expect(t).toContain('Two images:');
+    expect(t).toContain('1) The image is taken from the viewpoint marked on the plan');
+    expect(t).toContain('2) Bird’s-eye view');
+  });
 });

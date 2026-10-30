@@ -3,7 +3,9 @@ import { fillPath, fillPolygon } from '../engine/fill';
 import { bbox, centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
 import { effectivePlant, plantMap } from '../model/plants';
 import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, MOVE_WHEN_SELECTED, newFixture } from '../model/fixtures';
-import type { Area, Fixture, FixtureType, Plant, Pt, Settings } from '../model/types';
+import type { Area, Camera, Fixture, FixtureType, Plant, Pt, Settings } from '../model/types';
+import { dirTowardsCentre } from '../model/camera';
+import { CameraMark } from './layers/Camera';
 import { selectItems, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import type { Warning } from '../engine/rules';
@@ -37,7 +39,8 @@ type Gesture =
   | { mode: 'pinch'; view: View; start: Map<number, P2> }
   | { mode: 'fxrect'; type: FixtureType; a: Pt; startPx: P2; moved: boolean }
   | { mode: 'resize'; id: string; center: Pt; plant: Plant; start: P2; moved: boolean }
-  | { mode: 'fxresize'; f: Fixture; start: P2; moved: boolean };
+  | { mode: 'fxresize'; f: Fixture; start: P2; moved: boolean }
+  | { mode: 'camera'; at: Pt; start: P2; moved: boolean };
 
 const DOUBLE_TAP_MS = 300;
 /** Height of the floating tool row over the top of the plan; fitting keeps the area below it. */
@@ -69,6 +72,8 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const layers = useUi((s) => s.layers);
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
   const calibrate = useUi((s) => s.calibrate);
+  const cameraEdit = useUi((s) => s.cameraEdit);
+  const [camDraft, setCamDraft] = useState<Camera | null>(null);
   const shapeEditAll = useUi((s) => s.shapeEdit);
   const shapeEdit = shapeEditAll?.areaId === area.id ? shapeEditAll : null;
   const setShapePts = (points: [number, number][], selected: number | null = shapeEdit?.selected ?? null) =>
@@ -220,7 +225,14 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const editing = editable();
     const sv = target.getAttribute?.('data-shape-vertex');
     const sm = target.getAttribute?.('data-shape-mid');
-    if (shapeEdit && sv != null) {
+    if (cameraEdit) {
+      // Viewpoint: press where you stand, drag towards where you look.
+      const at = toWorld(p);
+      const dir = area.camera && dist(at, [area.camera.x, area.camera.y]) * viewRef.current!.s < 24 ? area.camera.dir : dirTowardsCentre(area, at[0], at[1]);
+      const c = area.camera && dist(at, [area.camera.x, area.camera.y]) * viewRef.current!.s < 24 ? area.camera : { x: at[0], y: at[1], dir };
+      setCamDraft(c);
+      gesture.current = { mode: 'camera', at: [c.x, c.y], start: p, moved: false };
+    } else if (shapeEdit && sv != null) {
       setShapePts(shapeEdit.points, +sv);
       gesture.current = { mode: 'shapeVertex', index: +sv, start: p, moved: false };
     } else if (shapeEdit && sm != null) {
@@ -340,6 +352,11 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < TAP_SLOP_PX) return;
       g.moved = true;
       setFxDrag({ id: g.id, ...fixtureDelta(g, p) });
+    } else if (g.mode === 'camera') {
+      if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < TAP_SLOP_PX) return;
+      g.moved = true;
+      const w = toWorld(p);
+      setCamDraft({ x: g.at[0], y: g.at[1], dir: (Math.atan2(w[1] - g.at[1], w[0] - g.at[0]) * 180) / Math.PI });
     } else if (g.mode === 'fxresize') {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
       g.moved = true;
@@ -419,6 +436,11 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       setFxDraft(null);
       const w = snapPt(toWorld(p));
       addFixtureAt(g.moved ? dragFixture(g.type, g.a, w) : newFixture(g.type, Math.round(w[0]), Math.round(w[1])));
+      return;
+    }
+    if (g.mode === 'camera') {
+      if (camDraft) useProject.getState().setCamera(camDraft);
+      setCamDraft(null);
       return;
     }
     if (g.mode === 'fxresize') {
@@ -729,6 +751,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             {layers.dimensions && !shapeEdit && <Dimensions area={area} s={view.s} />}
             {shapeEdit && <ShapeEditor points={shapeEdit.points} mode={shapeEdit.mode} selected={shapeEdit.selected} s={view.s} lawn={shapeEdit.target?.kind === 'lawn'} zone={shapeEdit.target?.kind === 'zone'} />}
             {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
+            {(camDraft ?? area.camera) && <CameraMark cam={(camDraft ?? area.camera)!} area={area} scale={view.s} editing={cameraEdit} />}
             {calibrate?.map(([x, y], i) => <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />)}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>
@@ -745,6 +768,11 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       {toast && (
         <p className="canvas-toast" role="status">
           {toast}
+        </p>
+      )}
+      {cameraEdit && !toast && (
+        <p className="canvas-toast" role="status">
+          {t('Nézőpont: nyomd meg ott, ahol állsz (pl. a teraszon), és húzd a nézés irányába.', 'Viewpoint: press where you stand (e.g. on the terrace) and drag towards where you look.')}
         </p>
       )}
       {calibrate && !toast && (

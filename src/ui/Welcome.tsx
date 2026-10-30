@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { AREA_TEMPLATES } from '../data/templates';
 import { getLang, setLang, t } from '../i18n';
 import { useProject } from '../store/projectStore';
+import { AUTHOR, copyrightLine } from './About';
 import { Logo } from './Logo';
+import { toggleTheme, useTheme } from './theme';
 
 /** Line icons for the four steps (24 × 24, stroked). */
 const STEPS: { hu: string; en: string; d: string }[] = [
@@ -17,13 +19,19 @@ export function Welcome() {
   const [picked, setPicked] = useState<string[]>(AREA_TEMPLATES.map((tp) => tp.key));
   const toggle = (k: string) => setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
   const other = getLang() === 'hu' ? 'en' : 'hu';
+  const { dark } = useTheme();
   return (
     <main className="welcome">
       <div className="welcome-top">
         <span />
-        <button type="button" className="btn btn-small" onClick={() => setLang(other)} lang={other}>
-          {other === 'en' ? 'English' : 'Magyar'}
-        </button>
+        <span className="welcome-switches">
+          <button type="button" className="btn btn-small" onClick={toggleTheme} aria-label={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}>
+            {dark ? '☀' : '☾'}
+          </button>
+          <button type="button" className="btn btn-small" onClick={() => setLang(other)} lang={other}>
+            {other === 'en' ? 'English' : 'Magyar'}
+          </button>
+        </span>
       </div>
       <div className="welcome-brand">
         <Logo size={92} stacked tagline={t('TERVEZZ · ÜLTESS · ÉLVEZD', 'DESIGN · PLANT · ENJOY')} />
@@ -62,6 +70,9 @@ export function Welcome() {
         </button>
       </div>
       <p className="welcome-quote">{t('Több mint egy kert. Szebb hétköznapok.', 'More than a garden. A better everyday.')}</p>
+      <p className="welcome-credit mono muted">
+        {t('Készítette', 'Created by')} {AUTHOR} · {copyrightLine()}
+      </p>
     </main>
   );
 }

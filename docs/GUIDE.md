@@ -56,7 +56,9 @@ The first time, a short three-step introduction shows the most important buttons
 
 - **Area name ▾**: switch between areas and create new ones here. Below it: the size of the area, the number of plants, the facing and the sun.
 - **↶ / ↷**: undo and redo (up to 100 steps). On a computer **Ctrl+Z** and **Ctrl+Y** work too.
-- **◫ View**: layers, plant size (mature or at planting), photos, snap, **language** (Hungarian / English); the plant database, fixed elements, idea generator and schedule open from here as well.
+- **EN / HU**: switches to English or Hungarian with one tap.
+- **☾ / ☀**: dark or light mode with one tap.
+- **◫ View**: layers, plant size (mature or at planting), photos, snap, **appearance** (automatic, light, dark), **language**; the plant database, fixed elements, idea generator and schedule open from here as well.
 - **? Help**: this guide, inside the app, offline too. It opens at the chapter for the tool in use.
 - **⋯ Project**: save, load, share, images, visualisation, print.
 - **Round number**: the number of warnings. Green when all is fine, red when there is an error.
@@ -436,17 +438,21 @@ The **⋯** button in the top bar opens the **Project** menu:
 
 <img src="img/en/17-chatgpt.png" width="280" align="right" alt="Visualisation with ChatGPT">
 
-The app writes a detailed description from which an image AI (e.g. ChatGPT) can draw a realistic visualisation.
+The app writes a detailed description and a plan from which an image AI (e.g. ChatGPT) can draw a realistic visualisation.
 
-1. **⋯ → Visualisation with ChatGPT.**
-2. Choose:
-   - the **season**;
-   - the **viewpoint** (eye level, bird’s-eye, both);
-   - the **language** (English or Hungarian);
-   - mature (2–3 years) or freshly planted.
-3. **Copy description**: puts the text on the clipboard. It has the sizes, facing, wall, pavement and lawn, every drift’s position in metres, and each species’ colour, form and height in that season.
-4. **Plan as PNG**: downloads the plan view with a legend.
-5. In ChatGPT paste the text and **attach the PNG**.
+**Opening it**: the **🖼 Visualisation** button in the **Variants** window, or **⋯ Project → Open visualisation**. It is made for the variant being edited on the plan.
+
+1. **Viewpoint on the plan**: place the camera with **📷 Viewpoint on the plan**. Press where you stand (e.g. on the terrace) and drag towards where you look. The orange view cone shows what will be in the picture. It can be moved or removed later.
+2. **Image**: from the camera (eye level), bird’s-eye, both (two images), or a generic view from the bottom edge.
+3. **Style and mood**: photorealistic, watercolour or design sketch; season; time of day (morning, afternoon, sunset); weather (sunny, overcast); language of the brief; mature or freshly planted.
+4. **Send to ChatGPT**:
+   - **on a phone** the share sheet opens: pick ChatGPT and the description arrives with the plan (the description also goes to the clipboard, in case the app only takes the picture);
+   - **on a computer** the description goes to the clipboard, the plan downloads and chatgpt.com opens in a new tab: paste the text and drop the image next to it.
+5. **Copy description** and **Plan as PNG** do the two steps separately too.
+
+The description has the sizes, the elements, every drift’s position in metres, each species’ colour, form and height in that season, and what the camera sees as foreground, middle ground and background (left, centre, right). The PNG shows the camera and its view cone too.
+
+**Keeping the finished image**: save the image ChatGPT made, then use **Upload image** under **Finished images** to put it next to the variant. Images stay on the device (they are in the backup, not in a shared link). In the **Variants** window the 🖼 number shows how many images a variant has, and **Compare** shows the images side by side.
 
 The description asks the AI not to add any other plants or objects. The result is still an illustration; the exact plan is the drawing and the list.
 
@@ -500,3 +506,7 @@ Yes: *View → Language → Magyar*. The interface, warnings, lists and exports 
 
 **Is the plant data accurate?**
 The starting list is built from general horticultural data. Uncertain data (especially toxicity, juglone tolerance and estimated prices) is marked **to check**; look it up before buying and correct it in the database.
+
+---
+
+*Gardenly · Created by Kiss-Mihály István · © 2026 Kiss-Mihály István. All rights reserved.*

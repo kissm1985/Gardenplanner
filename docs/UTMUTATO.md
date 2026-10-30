@@ -56,7 +56,9 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 
 - **A terület neve ▾**: itt váltasz a területek között, és itt hozol létre újat. Alatta látszik a terület mérete, a tövek száma, az égtáj és a napsütés.
 - **↶ / ↷**: visszavonás és újra (100 lépésig). Számítógépen **Ctrl+Z** és **Ctrl+Y** is működik.
-- **◫ Nézet**: rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes, **nyelv** (magyar / angol); innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
+- **EN / HU**: egy koppintással vált angolra, illetve magyarra.
+- **☾ / ☀**: sötét, illetve világos mód egy koppintással.
+- **◫ Nézet**: rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes, **megjelenés** (automatikus, világos, sötét), **nyelv**; innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
 - **? Súgó**: ez az útmutató, az alkalmazáson belül, internet nélkül is. Az éppen használt eszközhöz tartozó fejezetnél nyílik meg.
 - **⋯ Projekt**: mentés, betöltés, megosztás, képek, látványterv, nyomtatás.
 - **Kerek szám**: a figyelmeztetések száma. Zöld, ha nincs gond, piros, ha hiba van.
@@ -436,17 +438,21 @@ A felső sáv **⋯** gombja nyitja a **Projekt** menüt:
 
 <img src="img/17-chatgpt.png" width="280" align="right" alt="Látványterv ChatGPT-nek">
 
-A program elkészít egy részletes leírást, amiből egy képgeneráló mesterséges intelligencia (pl. ChatGPT) valósághű látványtervet tud rajzolni.
+A program elkészít egy részletes leírást és egy rajzot, amiből egy képgeneráló mesterséges intelligencia (pl. ChatGPT) valósághű látványtervet tud rajzolni.
 
-1. **⋯ → Látványterv ChatGPT-nek.**
-2. Állítsd be:
-   - az **évszakot**;
-   - a **nézőpontot** (szemmagasságból, madártávlatból, mindkettő);
-   - a **nyelvet** (magyar vagy angol);
-   - hogy kifejlett, 2–3 éves vagy frissen ültetett állapotot mutasson.
-3. **Leírás másolása**: vágólapra teszi a szöveget. Benne vannak a méretek, az égtáj, a fal, járda és gyep, minden folt helye méterben, és minden faj színe, formája, magassága az adott évszakban.
-4. **Rajz PNG-ben**: letölti a felülnézetet jelmagyarázattal.
-5. A ChatGPT-ben illeszd be a szöveget, és **csatold mellé a PNG-t**.
+**Megnyitás**: a **Változatok** ablak **🖼 Látványterv** gombjával, vagy a **⋯ Projekt → Látványterv megnyitása** gombbal. A rajzon éppen szerkesztett változatról készül.
+
+1. **Nézőpont a rajzon**: a **📷 Nézőpont a rajzon** gombbal tedd le a kamerát. Nyomd meg ott, ahol állsz (pl. a teraszon), és húzd a nézés irányába. A narancssárga látómező mutatja, mi lesz a képen. Később áthelyezheted vagy törölheted.
+2. **Kép**: a kamerából (szemmagasság), madártávlatból, mindkettő (két kép), vagy általános nézet az alsó szélről.
+3. **Stílus és hangulat**: fotórealisztikus, akvarell vagy tervezői vázlat; évszak; napszak (reggel, délután, naplemente); időjárás (napos, borús); a leírás nyelve; kifejlett vagy frissen ültetett állapot.
+4. **Küldés a ChatGPT-nek**:
+   - **telefonon** megnyílik a megosztó menü: válaszd a ChatGPT-t, és a leírás a rajzzal együtt érkezik (a leírás a vágólapra is kerül, ha az app csak a képet venné át);
+   - **számítógépen** a leírás a vágólapra kerül, a rajz letöltődik, és új lapon megnyílik a chatgpt.com: illeszd be a szöveget, és húzd mellé a képet.
+5. A **Leírás másolása** és a **Rajz PNG-ben** gomb külön is elvégzi a két lépést.
+
+A leírásban benne vannak a méretek, az elemek, minden folt helye méterben, minden faj színe, formája, magassága az adott évszakban, és a kamerából látható növények és elemek előtér, középtér és háttér szerint (balra, középen, jobbra). A PNG-n a kamera és a látómező is látszik.
+
+**A kész kép visszamentése**: a ChatGPT-ben mentsd le a kapott képet, majd a **Kész látványképek** résznél a **Kép feltöltése** gombbal tedd a változat mellé. A képek a készüléken maradnak (a mentésben is benne vannak, a megosztott linkben nem). A **Változatok** ablakban a 🖼 szám mutatja, hány kép tartozik egy változathoz, az **Összehasonlításban** pedig a látványképek is egymás mellett látszanak.
 
 A leírás arra kéri az MI-t, hogy ne tegyen a képre más növényt vagy tárgyat. Az eredmény mégis csak illusztráció; a pontos tervet a rajz és a lista adja.
 
@@ -500,3 +506,7 @@ Igen: *Nézet → Nyelv → English*. A felület, a figyelmeztetések, a listák
 
 **Pontosak a növényadatok?**
 A kezdőlista kertészeti alapadatokból készült. A bizonytalan adatok (különösen a mérgezőség, a juglone-tűrés és a becsült ár) **ellenőrizendőként** vannak jelölve; vásárlás előtt nézz utána, és javítsd az adatbázisban.
+
+---
+
+*Gardenly · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István. Minden jog fenntartva.*

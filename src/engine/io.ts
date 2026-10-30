@@ -45,7 +45,8 @@ export function shareSnapshot(p: Project): Project {
   const areas = p.areas.map((a) => {
     const v = a.variants.find((x) => x.id === a.chosenVariantId) ?? a.variants[0];
     const { activeVariantId: _a, background: _b, ...rest } = a;
-    return { ...rest, variants: [v] };
+    const { renders: _r, ...plain } = v;
+    return { ...rest, variants: [plain] };
   });
   const used = new Set(p.areas.flatMap((a) => chosenItems(a).map((i) => i.plantId)));
   return { schemaVersion: 1, id: p.id, name: p.name, areas, plantDb: p.plantDb.filter((x) => used.has(x.code)), settings: p.settings };

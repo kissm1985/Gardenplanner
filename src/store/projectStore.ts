@@ -5,7 +5,7 @@ import { SEED_PLANTS, SEED_SINCE } from '../data/plants.seed';
 import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
 import { isAncestor } from '../model/variantTree';
-import { DEFAULT_SETTINGS, type Area, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Settings, type Variant } from '../model/types';
+import { DEFAULT_SETTINGS, type Area, type Camera, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Render, type Settings, type Variant } from '../model/types';
 import { t } from '../i18n';
 
 export const HISTORY_LIMIT = 100;
@@ -68,6 +68,10 @@ export interface ProjectState {
   /** Replace the outline with a free polygon; everything is shifted so the outline starts at 0,0. */
   setAreaShape: (areaId: string, points: Pt[]) => void;
   setBackground: (bg: Area['background'] | null) => void;
+  /** Viewpoint of the current area for the visualisation (null removes it). */
+  setCamera: (cam: Camera | null) => void;
+  addRender: (variantId: string, r: Omit<Render, 'id'>) => void;
+  deleteRender: (variantId: string, renderId: string) => void;
   setScheduleWindow: (start: string, end: string) => void;
   toggleTask: (taskId: string) => void;
 
@@ -473,6 +477,30 @@ export const useProject = create<ProjectState>()((set, get) => {
     },
 
     deleteFixture: (fid) => mapFixtures((fs) => fs.filter((f) => f.id !== fid)),
+
+    setCamera: (cam) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => {
+        if (!cam) {
+          const { camera: _drop, ...rest } = a;
+          return rest;
+        }
+        return { ...a, camera: { x: Math.round(cam.x), y: Math.round(cam.y), dir: Math.round(((cam.dir % 360) + 360) % 360) } };
+      });
+    },
+
+    addRender: (vid, r) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, renders: [...(v.renders ?? []), { ...r, id: uid('r') }] } : v)) }));
+    },
+
+    deleteRender: (vid, rid) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, renders: (v.renders ?? []).filter((x) => x.id !== rid) } : v)) }));
+    },
 
     setBackground: (bg) => {
       const id = get().currentAreaId;

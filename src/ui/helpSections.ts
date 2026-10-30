@@ -15,6 +15,7 @@ const IDS = {
   season: ['12-évszaknézet', '12-season-view'],
   list: ['13-növénylista-rendelés-költség', '13-plant-list-ordering-cost'],
   project: ['15-mentés-megosztás-nyomtatás-képek', '15-saving-sharing-printing-images'],
+  visual: ['16-látványterv-chatgpt-vel', '16-visualisation-with-chatgpt'],
 } as const;
 
 export type HelpKey = keyof typeof IDS;

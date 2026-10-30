@@ -2,7 +2,7 @@ import { createElement } from 'react';
 import { flushSync } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { StaticPlan } from '../canvas/StaticPlan';
-import type { Area, PlacedItem, Plant } from '../model/types';
+import type { Area, Camera, PlacedItem, Plant } from '../model/types';
 import { t } from '../i18n';
 
 const STYLE_PROPS = [
@@ -36,14 +36,14 @@ const esc = (t: string) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;').replac
 const clip = (t: string, n: number) => (t.length > n ? `${t.slice(0, n - 1)}…` : t);
 
 /** Inline computed styles so the drawing looks the same outside the app. */
-function renderPlan(opts: { area: Area; items: PlacedItem[]; plantDb: Plant[]; month?: number | null }): { inner: string; viewBox: number[] } {
+function renderPlan(opts: { area: Area; items: PlacedItem[]; plantDb: Plant[]; month?: number | null; camera?: Camera }): { inner: string; viewBox: number[] } {
   const host = document.createElement('div');
   host.style.cssText = 'position:fixed;left:-10000px;top:0;width:800px;visibility:hidden;pointer-events:none';
   document.body.appendChild(host);
   const root = createRoot(host);
   try {
     flushSync(() =>
-      root.render(createElement(StaticPlan, { area: opts.area, items: opts.items, plantDb: opts.plantDb, month: opts.month ?? null, labelPx: 800 })),
+      root.render(createElement(StaticPlan, { area: opts.area, items: opts.items, plantDb: opts.plantDb, month: opts.month ?? null, labelPx: 800, camera: opts.camera })),
     );
     const live = host.querySelector('svg')!;
     const clone = live.cloneNode(true) as SVGSVGElement;
@@ -78,6 +78,7 @@ export function planSvg(opts: {
   caption: string;
   legend?: LegendRow[];
   widthPx?: number;
+  camera?: Camera;
 }): string {
   const { inner, viewBox } = renderPlan(opts);
   const [vx, vy, vw, vh] = viewBox;

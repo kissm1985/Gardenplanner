@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import type { MixPart } from '../engine/mix';
 import type { ZoneMode } from '../engine/zoneFill';
+import type { PromptOptions } from '../engine/visualPrompt';
+import { getLang } from '../i18n';
 import type { FixtureType, Pt } from '../model/types';
 import { NO_FILTER, type PlantFilter } from '../model/plantFilter';
 
@@ -44,6 +46,12 @@ export interface UiState {
   page: 'schedule' | null;
   /** Background scale calibration: points tapped so far (cm), or null when off. */
   calibrate: [number, number][] | null;
+  /** Options of the visualisation brief (kept while the app is open). */
+  vizOptions: PromptOptions;
+  setVizOptions: (o: PromptOptions) => void;
+  /** Placing the visualisation viewpoint on the plan. */
+  cameraEdit: boolean;
+  setCameraEdit: (v: boolean) => void;
   /** Plant filters shared by the database list and the palette. */
   plantFilter: PlantFilter;
   /** Fixture type armed in the Elemek tool (tap or drag on the plan to add one). */
@@ -101,6 +109,10 @@ export const useUi = create<UiState>()((set) => ({
   compare: false,
   page: null,
   calibrate: null,
+  cameraEdit: false,
+  vizOptions: { season: 1, viewpoint: 'camera', lang: getLang(), mature: true, style: 'photo', time: 'afternoon', weather: 'sunny' },
+  setVizOptions: (vizOptions) => set({ vizOptions }),
+  setCameraEdit: (cameraEdit) => set({ cameraEdit, selected: [], selectedFixture: null }),
   plantFilter: NO_FILTER,
   fixtureTool: null,
   setFixtureTool: (fixtureTool) => set({ fixtureTool }),

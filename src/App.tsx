@@ -29,6 +29,8 @@ import { getLang, labels, setLang, t, type Lang } from './i18n';
 import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { LogoMark } from './ui/Logo';
+import { VisualPanel } from './ui/VisualPanel';
+import { setTheme, toggleTheme, useTheme, type Theme } from './ui/theme';
 import { Welcome } from './ui/Welcome';
 
 // Tools arrive phase by phase (SPEC §7); unavailable ones are shown but disabled.
@@ -72,7 +74,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = labels({
   dimensions: ['Méretvonalak', 'Dimensions'],
 });
 
-type SheetId = null | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
+type SheetId = null | 'visual' | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -121,6 +123,7 @@ export function App({ loading }: { loading: boolean }) {
   const compare = useUi((s) => s.compare);
   const page = useUi((s) => s.page);
   const shapeEditing = useUi((s) => !!s.shapeEdit);
+  const cameraEdit = useUi((s) => s.cameraEdit);
   const [print, setPrint] = useState<Orientation | null>(null);
   const [coach, setCoach] = useState(() => !introDone());
 
@@ -189,6 +192,7 @@ export function App({ loading }: { loading: boolean }) {
           <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label={t('Nézet és rétegek', 'View and layers')}>
             ◫
           </button>
+          <QuickToggles />
           <button type="button" className="icon-btn help-btn" onClick={() => openHelp(HELP_SECTION[tool])} aria-label={t('Súgó: felhasználói útmutató', 'Help: user guide')}>
             ?
           </button>
@@ -224,6 +228,7 @@ export function App({ loading }: { loading: boolean }) {
               {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
             </button>
             {shapeEditing && <ShapeEditBar />}
+            {cameraEdit && <CameraBar onDone={() => setSheet('visual')} />}
             {tool === 'select' && !shapeEditing && (
               <div className="stage-tools" role="toolbar" aria-label={t('Kijelölés módja', 'Selection mode')}>
                 <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
@@ -322,6 +327,16 @@ export function App({ loading }: { loading: boolean }) {
             setCoach(true);
           }}
           onDone={() => setSheet(null)}
+          onVisual={() => setSheet('visual')}
+        />
+      </Sheet>
+      <Sheet open={sheet === 'visual'} onHelp={() => openHelp('visual')} title={t('Látványterv', 'Visualisation')} onClose={() => setSheet(null)}>
+        <VisualPanel
+          onPickCamera={() => {
+            setSheet(null);
+            ui.setTool('select');
+            ui.setCameraEdit(true);
+          }}
         />
       </Sheet>
       {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
@@ -337,7 +352,7 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </Sheet>
       <Sheet open={sheet === 'variants'} onHelp={() => openHelp('variants')} title={t('Változatok', 'Variants')} onClose={() => setSheet(null)}>
-        <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} />
+        <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} onVisual={() => setSheet('visual')} />
       </Sheet>
       <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
         <HelpPanel section={helpAt} />
@@ -422,6 +437,10 @@ export function App({ loading }: { loading: boolean }) {
             </button>
           </div>
           <fieldset className="field-group">
+            <legend>{t('Megjelenés', 'Appearance')}</legend>
+            <ThemeChoice />
+          </fieldset>
+          <fieldset className="field-group">
             <legend>{t('Nyelv', 'Language')}</legend>
             <div className="seg">
               {(['hu', 'en'] as Lang[]).map((l) => (
@@ -434,6 +453,78 @@ export function App({ loading }: { loading: boolean }) {
           </fieldset>
         </div>
       </Sheet>
+    </div>
+  );
+}
+
+/** Floating controls while placing the visualisation viewpoint. */
+function CameraBar({ onDone }: { onDone: () => void }) {
+  const area = useProject(selectCurrentArea);
+  const done = () => {
+    useUi.getState().setCameraEdit(false);
+    onDone();
+  };
+  return (
+    <div className="shape-bar camera-bar" role="toolbar" aria-label={t('Nézőpont', 'Viewpoint')}>
+      <p className="shape-hint">
+        <b>{t('Nézőpont: ', 'Viewpoint: ')}</b>
+        {area?.camera
+          ? t('Húzd a kamerát a nézés irányába, vagy nyomj máshová az áthelyezéshez.', 'Drag from the camera towards where you look, or press elsewhere to move it.')
+          : t('Nyomd meg ott, ahol állsz, és húzd a nézés irányába.', 'Press where you stand and drag towards where you look.')}
+      </p>
+      <div className="form-actions form-actions-start">
+        {area?.camera && (
+          <button type="button" className="btn btn-small btn-danger" onClick={() => useProject.getState().setCamera(null)}>
+            {t('Törlés', 'Remove')}
+          </button>
+        )}
+        <span className="spacer" />
+        <button type="button" className="btn btn-small btn-primary" onClick={done}>
+          {t('Kész', 'Done')}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/** One-tap language and light/dark switches in the top bar. */
+function QuickToggles() {
+  const { dark } = useTheme();
+  const other: Lang = getLang() === 'hu' ? 'en' : 'hu';
+  return (
+    <>
+      <button type="button" className="icon-btn quick-btn" lang={other} onClick={() => setLang(other)} aria-label={other === 'en' ? 'Switch to English' : 'Váltás magyarra'} title={other === 'en' ? 'English' : 'Magyar'}>
+        {other.toUpperCase()}
+      </button>
+      <button
+        type="button"
+        className="icon-btn quick-btn"
+        onClick={toggleTheme}
+        aria-label={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
+        title={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
+      >
+        {dark ? '☀' : '☾'}
+      </button>
+    </>
+  );
+}
+
+/** Automatic (system) / light / dark, in the View sheet. */
+export function ThemeChoice() {
+  const { theme } = useTheme();
+  const opts: [Theme, string][] = [
+    ['auto', t('Automatikus (rendszer)', 'Automatic (system)')],
+    ['light', t('Világos', 'Light')],
+    ['dark', t('Sötét', 'Dark')],
+  ];
+  return (
+    <div className="seg">
+      {opts.map(([v, label]) => (
+        <label key={v} className="seg-item">
+          <input type="radio" name="theme" checked={theme === v} onChange={() => setTheme(v)} />
+          <span>{label}</span>
+        </label>
+      ))}
     </div>
   );
 }

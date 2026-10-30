@@ -131,6 +131,24 @@ export interface Variant {
   muted?: string[];
   /** Parent variant or folder in the variant tree; missing = top level. */
   parentId?: string;
+  /** Visualisations made for this variant (e.g. by ChatGPT), kept as downscaled JPEGs. */
+  renders?: Render[];
+}
+
+export interface Render {
+  id: string;
+  /** data:image/jpeg URL. */
+  dataUrl: string;
+  /** ISO date-time. */
+  addedAt: string;
+  note?: string;
+}
+
+/** Where the visualisation is seen from: a point on the plan (cm) and the viewing direction (degrees, 0 = towards +x, 90 = towards +y). */
+export interface Camera {
+  x: number;
+  y: number;
+  dir: number;
 }
 
 /** A folder that only groups variants in the tree (no plants of its own). */
@@ -178,6 +196,8 @@ export interface Area {
   /** The variant being edited on the plan (defaults to the chosen one). */
   activeVariantId?: string;
   background?: Background;
+  /** Viewpoint for the visualisation brief. */
+  camera?: Camera;
 }
 
 export interface Settings {

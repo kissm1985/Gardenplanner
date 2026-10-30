@@ -4,6 +4,8 @@
 
 **Tervezz · Ültess · Élvezd** – *Álmaid kertje egy tervnyire van.*
 
+Készítette: **Kiss-Mihály István** · © 2026 Kiss-Mihály István. Minden jog fenntartva (lásd [LICENSE](LICENSE)).
+
 Mobilbarát, offline is működő ültetéstervező (PWA), magyarul és angolul. **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md)** · English guide: [docs/GUIDE.md](docs/GUIDE.md). A specifikáció: [SPEC.md](SPEC.md). Arculat: [docs/brand/ARCULAT.md](docs/brand/ARCULAT.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
 
 ```bash
@@ -32,10 +34,10 @@ npm run build      # statikus build a dist/ mappába
 | Változatok | Fába rendezve: a másolat az eredeti alá kerül, mappák, áthelyezés, összecsukás; választott változat, összehasonlítás |
 | Ötletgenerátor | Véletlenszerű, a terület feltételeihez illő összeállítás külön változatba; választható növénytípusok (évelők, díszfüvek, talajtakarók, cserjék, sövény a hátsó szélen, kis fák szabad hellyel); színvilág, hátul magas – elöl alacsony, diófa-zóna; „Újra” gomb |
 | Menetrend | Napokra bontott, pipálható ültetési lista; gondozási naptár Győrre; mulcsajánlás |
-| Nyelv | Magyar és angol felület (Nézet → Nyelv, alapból a böngésző nyelve); angol növénynevek, figyelmeztetések, listák, exportok, útmutató |
+| Nyelv, megjelenés | Magyar és angol felület egy koppintással a felső sávban (EN / HU), alapból a böngésző nyelve; sötét és világos mód (☾ / ☀, vagy Nézet → Megjelenés: automatikus); angol növénynevek, figyelmeztetések, listák, exportok, útmutató |
 | Súgó | ? gomb: a felhasználói útmutató az alkalmazáson belül, offline is; minden ablakból a saját fejezeténél |
 | Export | A4 nyomtatás/PDF (álló, fekvő), PNG, SVG jelmagyarázattal, teljes JSON-mentés, csak olvasható link |
-| Látványterv | Bemásolható leírás a ChatGPT-nek (méretek, égtáj, tereptárgyak, foltok helye méterben, fajok kinézete évszak szerint, nézőpont) + rajz PNG-ben |
+| Látványterv | Külön ablak (Változatok → 🖼 Látványterv): kamera és látómező a rajzon, stílus (fotó, akvarell, vázlat), napszak, időjárás; „Küldés a ChatGPT-nek” egy lépésben (telefonon megosztó menü, gépen vágólap + letöltés + chatgpt.com); a kész képek a változat mellett, az összehasonlításban is |
 
 ## Elfogadási feltételek (SPEC §8)
 

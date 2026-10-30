@@ -101,6 +101,7 @@ test('ChatGPT visualisation: brief is copied and the plan PNG downloads', async 
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await setup(page);
   await menu(page);
+  await page.getByRole('button', { name: 'Látványterv megnyitása' }).click();
   await page.locator('dialog[open]').getByLabel('Évszak').selectOption('2');
   await page.getByRole('button', { name: 'Leírás másolása' }).click();
   const text = await page.getByLabel('Leírás a látványtervhez').inputValue();
@@ -111,4 +112,54 @@ test('ChatGPT visualisation: brief is copied and the plan PNG downloads', async 
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(text);
   const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Rajz PNG-ben' }).click()]);
   expect(dl.suggestedFilename()).toMatch(/latvanyterv\.png$/);
+});
+
+test('Látványterv: camera on the plan, style and mood, send in one step, finished image kept with the variant', async ({ page, context }) => {
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await context.route(/chatgpt\.com/, (r) => r.fulfill({ body: '<title>ChatGPT</title>', contentType: 'text/html' }));
+  await setup(page);
+  // From the variants window.
+  await page.getByRole('button', { name: /Változat: A terv/ }).click();
+  await page.getByRole('button', { name: '🖼 Látványterv' }).click();
+  const dlg = page.locator('dialog[open]');
+  await expect(dlg.locator('.sheet-head')).toContainText('Látványterv');
+
+  // Place the camera: press on the strip, drag up along it.
+  await dlg.getByRole('button', { name: '📷 Nézőpont a rajzon' }).click();
+  await expect(page.locator('.camera-bar')).toBeVisible();
+  const b = (await page.locator('.area-outline').boundingBox())!;
+  const cm = b.width / 120;
+  await page.mouse.move(b.x + 60 * cm, b.y + 700 * cm);
+  await page.mouse.down();
+  await page.mouse.move(b.x + 60 * cm, b.y + 400 * cm, { steps: 6 });
+  await page.mouse.up();
+  await expect(page.locator('.camera .camera-cone')).toHaveCount(1);
+  await page.locator('.camera-bar').getByRole('button', { name: 'Kész' }).click();
+  await expect(dlg.locator('.sheet-head')).toContainText('Látványterv');
+  await expect(dlg).toContainText('Kamera a rajzon');
+
+  await dlg.getByLabel('Stílus').selectOption('watercolor');
+  await dlg.getByLabel('Napszak').selectOption('sunset');
+  await dlg.getByLabel('Időjárás').selectOption('overcast');
+
+  // Send: on this (share-less) browser it copies, downloads and opens ChatGPT.
+  const [dl, tab] = await Promise.all([page.waitForEvent('download'), context.waitForEvent('page'), dlg.getByRole('button', { name: 'Küldés a ChatGPT-nek' }).click()]);
+  expect(dl.suggestedFilename()).toMatch(/latvanyterv\.png$/);
+  await tab.waitForLoadState();
+  expect(tab.url()).toContain('chatgpt.com');
+  const text = await page.evaluate(() => navigator.clipboard.readText());
+  expect(text).toContain('akvarell');
+  expect(text).toContain('alkonyat');
+  expect(text).toContain('borult');
+  expect(text).toContain('rajzon jelölt nézőpontból');
+  expect(text).toMatch(/felfelé/);
+  expect(text).toMatch(/Előtér: [^\n]*LA levendula/);
+
+  // Upload the finished image: it stays with the variant.
+  const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==', 'base64');
+  await dlg.getByLabel('Látványkép feltöltése').setInputFiles({ name: 'kert.png', mimeType: 'image/png', buffer: png });
+  await expect(dlg.locator('.render-grid img')).toHaveCount(1);
+  await dlg.locator('.sheet-head button[aria-label="Bezárás"]').click();
+  await page.getByRole('button', { name: /Változat: A terv/ }).click();
+  await expect(page.locator('dialog[open] .variant-tree')).toContainText('🖼 1');
 });

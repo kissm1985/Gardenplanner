@@ -2740,3 +2740,114 @@ polyline.shape-line {
 .welcome .tpl {
   border-radius: var(--radius);
 }
+
+/* ---------- quick language and theme switches ---------- */
+.quick-btn {
+  font-family: var(--mono);
+  font-size: 13px;
+  letter-spacing: 0.04em;
+}
+@media (max-width: 480px) {
+  .top-actions .icon-btn {
+    min-width: 36px;
+  }
+  .top-actions {
+    gap: 0;
+  }
+}
+.welcome-switches {
+  display: inline-flex;
+  gap: 6px;
+}
+.welcome-credit {
+  margin: 4px 0 0;
+  text-align: center;
+  font-size: 11px;
+}
+.about-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.about-name {
+  font-size: 18px;
+}
+.about p {
+  margin: 6px 0 0;
+}
+
+/* ---------- visualisation viewpoint ---------- */
+.camera-cone {
+  fill: color-mix(in srgb, #e0a020 16%, transparent);
+  stroke: #c98a1b;
+  stroke-width: 1.2;
+  stroke-dasharray: 6 4;
+}
+.camera-dir {
+  stroke: #c98a1b;
+  stroke-width: 2.5;
+}
+.camera-body,
+.camera-lens {
+  fill: #c98a1b;
+  stroke: var(--bg);
+  stroke-width: 1.5;
+}
+.camera.is-editing .camera-cone {
+  fill: color-mix(in srgb, #e0a020 26%, transparent);
+}
+
+/* ---------- Látványterv ---------- */
+.render-grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(96px, 1fr));
+  gap: 6px;
+}
+.render-grid button {
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  background: var(--chip);
+  cursor: zoom-in;
+  aspect-ratio: 4 / 3;
+}
+.render-grid img,
+.cmp-renders img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.render-view {
+  margin: 0;
+  display: grid;
+  gap: 6px;
+}
+.render-view img {
+  width: 100%;
+  border-radius: var(--radius-sm);
+}
+.cmp-renders {
+  display: grid;
+  gap: 4px;
+  margin-top: 6px;
+}
+.cmp-renders img {
+  height: auto;
+  border-radius: var(--radius-sm);
+}
+.camera-bar {
+  border-color: #c98a1b;
+}
+@media (max-width: 420px) {
+  /* Narrow phones: the area name needs the room more than the logo. */
+  .topbar-brand {
+    display: none;
+  }
+}
