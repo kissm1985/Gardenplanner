@@ -22,7 +22,7 @@ test('switch to English and back: interface, plant names, warnings, help', async
 
   // Help in English.
   await page.getByRole('button', { name: 'Help: user guide' }).click();
-  await expect(page.locator('dialog[open] .guide h1')).toHaveText('Garden planner – user guide');
+  await expect(page.locator('dialog[open] .guide h1')).toHaveText('Gardenly – user guide');
   await page.locator('dialog[open] .sheet-head button[aria-label="Close"]').click();
 
   // Back to Hungarian from the View menu; the choice is remembered.

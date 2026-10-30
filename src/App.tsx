@@ -28,6 +28,7 @@ import { helpId, type HelpKey } from './ui/helpSections';
 import { getLang, labels, setLang, t, type Lang } from './i18n';
 import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
+import { LogoMark } from './ui/Logo';
 import { Welcome } from './ui/Welcome';
 
 // Tools arrive phase by phase (SPEC §7); unavailable ones are shown but disabled.
@@ -166,6 +167,9 @@ export function App({ loading }: { loading: boolean }) {
   return (
     <div className="app">
       <header className="topbar">
+        <span className="topbar-brand" title="Gardenly">
+          <LogoMark size={26} />
+        </span>
         <button type="button" className="area-switch" onClick={() => setSheet('areas')} aria-haspopup="dialog">
           <span className="area-name">{area ? area.name : t('Nincs terület', 'No area')}</span>
           {area && (

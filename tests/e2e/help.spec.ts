@@ -5,7 +5,7 @@ test('help: ? opens the guide offline, table of contents jumps, windows open the
   await page.getByRole('button', { name: /Kezdés/ }).click();
   await page.getByRole('button', { name: 'Súgó: felhasználói útmutató' }).click();
   const dlg = page.locator('dialog[open]');
-  await expect(dlg.locator('.guide h1')).toHaveText('Kerttervező – felhasználói útmutató');
+  await expect(dlg.locator('.guide h1')).toHaveText('Gardenly – felhasználói útmutató');
   // Pictures are bundled.
   const img = dlg.locator('.guide img').first();
   await img.scrollIntoViewIfNeeded();

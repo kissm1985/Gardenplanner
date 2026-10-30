@@ -7,7 +7,7 @@ import { t } from '../i18n';
 
 export const exportJson = (p: Project) => JSON.stringify(p, null, 2);
 
-const NOT_A_BACKUP = () => t('Ez nem Kerttervező projektmentés (hiányzó vagy ismeretlen verzió).', 'This is not a Garden planner backup (missing or unknown version).');
+const NOT_A_BACKUP = () => t('Ez nem Gardenly-projektmentés (hiányzó vagy ismeretlen verzió).', 'This is not a Gardenly backup (missing or unknown version).');
 
 /** Parse and sanity-check a project backup; throws a readable message on failure. */
 export function parseProject(text: string): Project {

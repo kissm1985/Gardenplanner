@@ -121,7 +121,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone }: { onPrint: (o: Orient
       <fieldset className="field-group">
         <legend>{t('Mentés és visszatöltés', 'Save and restore')}</legend>
         <div className="form-actions form-actions-start">
-          <button type="button" className="btn btn-small" onClick={() => downloadText(`${t('kerttervezo', 'garden-planner')}-${slug(project.name)}-${today()}.json`, exportJson(project), 'application/json')}>
+          <button type="button" className="btn btn-small" onClick={() => downloadText(`gardenly-${slug(project.name)}-${today()}.json`, exportJson(project), 'application/json')}>
             {t('Teljes mentés (JSON)', 'Full backup (JSON)')}
           </button>
           <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>

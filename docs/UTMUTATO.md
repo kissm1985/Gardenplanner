@@ -1,6 +1,6 @@
-# Kerttervező – felhasználói útmutató
+# Gardenly – felhasználói útmutató
 
-A Kerttervező egy telefonon és számítógépen is használható ültetéstervező. Felülnézetben, centiméterre pontosan rajzolod meg a kertet. Az alkalmazás közben:
+A Gardenly egy telefonon és számítógépen is használható ültetéstervező. Felülnézetben, centiméterre pontosan rajzolod meg a kertet. Az alkalmazás közben:
 
 - figyeli a terület szabályait (magasság, mérgező növény, diófa-zóna, tőtáv stb.);
 - kiszámolja, hány tő kell és mennyibe kerül;

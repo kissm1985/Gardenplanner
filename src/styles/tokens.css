@@ -1,11 +1,11 @@
-/* Colour and type tokens carried over from the K-07 / K-08 artifacts. */
+/* Gardenly identity: forest, leaf and sage greens on warm cream; Outfit for the interface, Fraunces for accents. */
 :root {
-  --bg: #eceee9;
-  --panel: #f6f7f3;
-  --fg: #1c261f;
-  --mute: #5d6b60;
-  --line: #cdd4ca;
-  --accent: #2d6a4f;
+  --bg: #fbf8f2;
+  --panel: #fffdf8;
+  --fg: #173a28;
+  --mute: #5f6f62;
+  --line: #e2dccd;
+  --accent: #31632e;
   --accent-fg: #ffffff;
   --lav: #6b4fa0;
   --soil: #cfc3ae;
@@ -15,26 +15,37 @@
   --edge: #7b8577;
   --wall: #4a524d;
   --drip: #2f7ea6;
-  --ring: rgba(20, 30, 20, 0.35);
-  --chip: #e1e6dd;
-  --grid-minor: rgba(28, 38, 31, 0.1);
-  --grid-major: rgba(28, 38, 31, 0.24);
+  --ring: rgba(23, 58, 40, 0.35);
+  --chip: #eef0e2;
+  --grid-minor: rgba(23, 58, 40, 0.09);
+  --grid-major: rgba(23, 58, 40, 0.22);
   --juglone: #8a5a2b;
+  --brand-roof: #173a28;
+  --brand-leaf: #3a8f3c;
+  --brand-leaf-2: #6c904a;
+  --forest: #133726;
+  --sage: #adbca2;
+  --cream: #f1e5d0;
+  --sand: #e1cba8;
+  --sans: 'Outfit Variable', 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
   --serif: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
   --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --tile: 35%;
+  --radius: 12px;
+  --radius-sm: 8px;
   --tap: 44px;
   color-scheme: light;
 }
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) {
-    --bg: #121813;
-    --panel: #1a221c;
-    --fg: #e3e9df;
-    --mute: #93a396;
-    --line: #2b362d;
-    --accent: #7fc29a;
-    --accent-fg: #0f1a13;
+    --bg: #0f1c14;
+    --panel: #16261c;
+    --fg: #eef0e6;
+    --mute: #9fb2a2;
+    --line: #27392d;
+    --accent: #8cc47a;
+    --accent-fg: #0f1c14;
     --lav: #b9a2e6;
     --soil: #2f2920;
     --warn: #e0a458;
@@ -44,21 +55,25 @@
     --wall: #8d998f;
     --drip: #6fb4d6;
     --ring: rgba(255, 255, 255, 0.3);
-    --chip: #232d25;
+    --chip: #1c2f23;
     --grid-minor: rgba(227, 233, 223, 0.08);
     --grid-major: rgba(227, 233, 223, 0.2);
     --juglone: #d6a46a;
+    --brand-roof: #ece4d2;
+    --brand-leaf: #6fbf5c;
+    --brand-leaf-2: #a3c27f;
+    --tile: 14%;
     color-scheme: dark;
   }
 }
 :root[data-theme='dark'] {
-  --bg: #121813;
-  --panel: #1a221c;
-  --fg: #e3e9df;
-  --mute: #93a396;
-  --line: #2b362d;
-  --accent: #7fc29a;
-  --accent-fg: #0f1a13;
+  --bg: #0f1c14;
+  --panel: #16261c;
+  --fg: #eef0e6;
+  --mute: #9fb2a2;
+  --line: #27392d;
+  --accent: #8cc47a;
+  --accent-fg: #0f1c14;
   --lav: #b9a2e6;
   --soil: #2f2920;
   --warn: #e0a458;
@@ -68,9 +83,13 @@
   --wall: #8d998f;
   --drip: #6fb4d6;
   --ring: rgba(255, 255, 255, 0.3);
-  --chip: #232d25;
+  --chip: #1c2f23;
   --grid-minor: rgba(227, 233, 223, 0.08);
   --grid-major: rgba(227, 233, 223, 0.2);
   --juglone: #d6a46a;
+  --brand-roof: #ece4d2;
+  --brand-leaf: #6fbf5c;
+  --brand-leaf-2: #a3c27f;
+  --tile: 14%;
   color-scheme: dark;
 }

@@ -1,6 +1,6 @@
-# Garden planner – user guide
+# Gardenly – user guide
 
-Garden planner is a planting planner for phones and computers. You draw the garden from above, to the centimetre, and the app:
+Gardenly is a planting planner for phones and computers. You draw the garden from above, to the centimetre, and the app:
 
 - checks the rules of the area (height, toxic plants, walnut zone, spacing and so on);
 - works out how many plants you need and what they cost;

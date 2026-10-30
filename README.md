@@ -1,6 +1,10 @@
-# Kerttervező
+<p align="center"><img src="docs/brand/gardenly-mark.svg" width="88" alt=""></p>
 
-Mobilbarát, offline is működő ültetéstervező (PWA), magyarul és angolul. **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md)** · English guide: [docs/GUIDE.md](docs/GUIDE.md). A specifikáció: [SPEC.md](SPEC.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
+# Gardenly
+
+**Tervezz · Ültess · Élvezd** – *Álmaid kertje egy tervnyire van.*
+
+Mobilbarát, offline is működő ültetéstervező (PWA), magyarul és angolul. **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md)** · English guide: [docs/GUIDE.md](docs/GUIDE.md). A specifikáció: [SPEC.md](SPEC.md). Arculat: [docs/brand/ARCULAT.md](docs/brand/ARCULAT.md). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
 
 ```bash
 npm install

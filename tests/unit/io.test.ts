@@ -40,7 +40,7 @@ describe('JSON backup', () => {
 
   it('rejects foreign or broken files with a Hungarian message', () => {
     expect(() => parseProject('nem json')).toThrow('nem érvényes JSON');
-    expect(() => parseProject('{"a":1}')).toThrow('Kerttervező');
+    expect(() => parseProject('{"a":1}')).toThrow('Gardenly');
     expect(() => parseProject(JSON.stringify({ schemaVersion: 1, areas: [{ id: 'x' }], plantDb: [] }))).toThrow('Hibás terület');
   });
 });
