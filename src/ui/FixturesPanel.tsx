@@ -1,6 +1,6 @@
 import { useRef, useState } from 'react';
 import { polygonArea } from '../model/geometry';
-import { FIXTURE_LABEL, newFixture } from '../model/fixtures';
+import { FIXTURE_LABEL, newFixture, retype } from '../model/fixtures';
 import type { Area, Fixture, FixtureType } from '../model/types';
 import { startLawnEdit } from './ShapeEditBar';
 import { selectCurrentArea, useProject } from '../store/projectStore';
@@ -9,7 +9,7 @@ import { locale, t } from '../i18n';
 
 export { FIXTURE_LABEL };
 
-const ADDABLE: FixtureType[] = ['walnut', 'tree', 'window', 'tap', 'manhole', 'paving', 'fence', 'other'];
+const ADDABLE: FixtureType[] = ['walnut', 'tree', 'window', 'tap', 'manhole', 'paving', 'wall', 'fence', 'gravel', 'path', 'pond', 'well', 'shed', 'compost', 'rainBarrel', 'bench', 'raisedBed', 'other'];
 
 /** List, add and edit fixed elements; walnut juglone radius setting. */
 export function FixturesPanel({ onDone }: { onDone: () => void }) {
@@ -45,7 +45,12 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
 
   return (
     <div className="form">
-      <p className="mono muted">{t('A diófa, fa, ablak, csap és akna a rajzon Kijelölés módban húzható.', 'Walnut, tree, window, tap and manhole can be dragged on the plan with the Select tool.')}</p>
+      <p className="mono muted">
+        {t(
+          'Minden elem kijelölhető a rajzon egy koppintással (Kijelölés vagy Elemek eszköz): utána húzható, a sarkánál méretezhető. A nagy elemek (fal, kerítés, burkolat, gyep, tó…) csak kijelölés után mozdulnak.',
+          'Every element can be selected on the plan with a tap (Select or Elements tool): then drag it or resize it at its corner. Large elements (wall, fence, paving, lawn, pond…) only move once selected.',
+        )}
+      </p>
       <ul className="fx-list">
         {area.fixtures.map((x) => (
           <li key={x.id}>
@@ -120,6 +125,7 @@ function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void;
       <input
         type="number"
         inputMode="decimal"
+        key={String(f[k])}
         defaultValue={f[k] ?? ''}
         onBlur={(e) => {
           const v = parseFloat(e.target.value);
@@ -130,9 +136,21 @@ function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void;
   );
   return (
     <div className="form">
+      {!f.polygon && (
+        <label className="field">
+          <span>{t('Típus', 'Type')}</span>
+          <select value={f.type} onChange={(e) => upd(retype(f, e.target.value as FixtureType))}>
+            {ADDABLE.map((ty) => (
+              <option key={ty} value={ty}>
+                {FIXTURE_LABEL[ty]}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="field">
         <span>{t('Felirat', 'Label')}</span>
-        <input defaultValue={f.label ?? ''} onBlur={(e) => e.target.value !== (f.label ?? '') && upd({ label: e.target.value })} />
+        <input key={f.label} defaultValue={f.label ?? ''} onBlur={(e) => e.target.value !== (f.label ?? '') && upd({ label: e.target.value })} />
       </label>
       {!f.polygon && (
         <div className="field-row">

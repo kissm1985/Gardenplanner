@@ -15,6 +15,15 @@ const ITEMS: { type: FixtureType | 'lawn-draw'; icon: string }[] = [
   { type: 'manhole', icon: '◍' },
   { type: 'tree', icon: '◯' },
   { type: 'walnut', icon: '⬤' },
+  { type: 'gravel', icon: '⁘' },
+  { type: 'path', icon: '⋮' },
+  { type: 'pond', icon: '◒' },
+  { type: 'well', icon: '◎' },
+  { type: 'shed', icon: '⌂' },
+  { type: 'compost', icon: '▤' },
+  { type: 'rainBarrel', icon: '◙' },
+  { type: 'bench', icon: '▬' },
+  { type: 'raisedBed', icon: '▣' },
   { type: 'other', icon: '□' },
 ];
 
@@ -24,7 +33,7 @@ export function FixtureTools({ onList }: { onList: () => void }) {
   const area = useProject(selectCurrentArea);
   const ui = useUi.getState();
   const hint = !armed
-    ? t('Válassz elemet, majd koppints vagy húzz a rajzon. A meglévő elemeket itt is húzhatod.', 'Pick an element, then tap or drag on the plan. Existing elements can be dragged here too.')
+    ? t('Válassz elemet, majd koppints vagy húzz a rajzon. Egy meglévő elemre koppintva kijelölöd: húzd, a sarkánál méretezd, az Adatok gombbal szerkeszd.', 'Pick an element, then tap or drag on the plan. Tap an existing element to select it: drag it, resize it at its corner, edit it with Details.')
     : DRAG_DRAWN.has(armed)
       ? t(`${FIXTURE_LABEL[armed]}: húzd végig a rajzon (koppintásra alapméretű lesz).`, `${FIXTURE_LABEL[armed]}: drag it out on the plan (a tap gives the default size).`)
       : t(`${FIXTURE_LABEL[armed]}: koppints a rajzra, ahová kerüljön.`, `${FIXTURE_LABEL[armed]}: tap the plan where it should go.`);

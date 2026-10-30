@@ -44,7 +44,7 @@ test('fixtures: add a tap, drag it under a plant, get a warning', async ({ page 
   await page.getByRole('button', { name: '+ Csap' }).click();
   await expect(page.locator('.selbar-count')).toHaveText('Csap');
 
-  const tap = page.locator('.fx-tap.is-selected rect');
+  const tap = page.locator('.fx-tap.is-selected .fx-body');
   const tb = (await tap.boundingBox())!;
   await page.mouse.move(tb.x + tb.width / 2, tb.y + tb.height / 2);
   await page.mouse.down();

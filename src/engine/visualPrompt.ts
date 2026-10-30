@@ -85,8 +85,42 @@ function fixtureLines(area: Area, lang: Lang): string[] {
       const where = `x ${fmt(f.x)}–${fmt(f.x + (f.w ?? 0))} m, y ${fmt(f.y)}–${fmt(f.y + (f.h ?? 0))} m`;
       const what =
         lang === 'hu'
-          ? { wall: 'a ház fala (vakolt, világos)', fence: 'kerítés', paving: 'burkolat / járda', tap: 'kerti csap / akna', manhole: 'akna fedlap', window: 'ablak', other: label }[f.type as string] ?? label
-          : { wall: 'house wall (light rendered)', fence: 'garden fence', paving: 'paving / pavement', tap: 'garden tap / manhole', manhole: 'manhole cover', window: 'window', other: label }[f.type as string] ?? label;
+          ? ({
+              wall: 'a ház fala (vakolt, világos)',
+              fence: 'kerítés',
+              paving: 'burkolat / járda',
+              tap: 'kerti csap / akna',
+              manhole: 'akna fedlap',
+              window: 'ablak',
+              gravel: 'kavicságy (világos zúzottkő, köztük ültetett növények)',
+              path: 'kerti ösvény (lépőkő vagy kavics)',
+              pond: 'kerti tó (víztükör, természetes kőszegély)',
+              well: 'kút (kőkáva)',
+              shed: 'kerti tároló (fa szerszámoskamra)',
+              compost: 'komposztáló (fa láda)',
+              rainBarrel: 'esővízgyűjtő hordó',
+              bench: 'kerti pad (fa)',
+              raisedBed: 'magaságyás (fa keret)',
+              other: label,
+            }[f.type as string] ?? label)
+          : ({
+              wall: 'house wall (light rendered)',
+              fence: 'garden fence',
+              paving: 'paving / pavement',
+              tap: 'garden tap / manhole',
+              manhole: 'manhole cover',
+              window: 'window',
+              gravel: 'gravel bed (light crushed stone, plants set into it)',
+              path: 'garden path (stepping stones or gravel)',
+              pond: 'garden pond (water surface, natural stone edge)',
+              well: 'well (stone surround)',
+              shed: 'garden shed (wooden tool shed)',
+              compost: 'compost bin (wooden crate)',
+              rainBarrel: 'rain barrel',
+              bench: 'garden bench (wooden)',
+              raisedBed: 'raised bed (timber frame)',
+              other: label,
+            }[f.type as string] ?? label);
       out.push(`${what[0].toUpperCase() + what.slice(1)}${f.label && !what.toLowerCase().includes(f.label.toLowerCase()) ? ` („${f.label}”)` : ''}: ${where}.`);
     }
   }

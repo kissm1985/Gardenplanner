@@ -1,6 +1,7 @@
 // Random but reasoned planting ideas for one area: species that fit the site, a colour scheme,
 // tall plants at the back and low ones at the front, a few species repeated in a rhythm.
 import { areaPoints } from '../model/area';
+import { KEEP_CLEAR } from '../model/fixtures';
 import { bbox, dist, pointInPolygon } from '../model/geometry';
 import { uid } from '../model/ids';
 import { plantName } from '../model/plants';
@@ -211,11 +212,9 @@ export function clipRect(poly: Pt[], x0: number, y0: number, x1: number, y1: num
   return out.map(([x, y]) => [Math.round(x), Math.round(y)] as Pt);
 }
 
-const BLOCKING = new Set(['lawn', 'paving', 'tap', 'manhole']);
-
-/** Polygon of a blocking fixture (lawn, paving, tap, manhole), padded for small ones. */
+/** Polygon of a blocking fixture (lawn and the KEEP_CLEAR ones: paving, tap, pond, shed…), padded for taps and manholes. */
 export function fixturePoly(f: Fixture): Pt[] | null {
-  if (!BLOCKING.has(f.type)) return null;
+  if (f.type !== 'lawn' && !KEEP_CLEAR.has(f.type)) return null;
   if (f.polygon?.length) return f.polygon;
   const pad = f.type === 'tap' || f.type === 'manhole' ? 25 : 0;
   const w = f.w ?? 0;

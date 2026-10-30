@@ -4,6 +4,7 @@ import { centroid, dist, pointInPolygon } from '../model/geometry';
 import { effectivePlant, JUGLONE_LABEL, plantName, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings, SunNeed, WaterNeed } from '../model/types';
 import { itemPositions } from './fill';
+import { KEEP_CLEAR } from '../model/fixtures';
 import { labels, t } from '../i18n';
 
 export type Severity = 'error' | 'warn' | 'info';
@@ -318,7 +319,7 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
             hint: t('A gyepre nem kerül növény; húzd az ágyásba, vagy igazítsd a gyep alakját.', 'No plants go on the lawn; drag it into the bed, or reshape the lawn.'),
           });
       }
-      if (f.type === 'tap' || f.type === 'manhole' || f.type === 'paving') {
+      if (KEEP_CLEAR.has(f.type)) {
         const hit = ps.filter((q) => inRect(f, q));
         if (hit.length)
           out.push({
@@ -331,7 +332,7 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
               `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label ?? 'elem'}” helyére esik.`,
               `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${f.label ?? 'element'}”.`,
             ),
-            hint: t('A csapot, aknát és burkolatot hagyd szabadon.', 'Keep taps, manholes and paving clear.'),
+            hint: t('Ezt az elemet (csap, akna, burkolat, ösvény, tó, kút, tároló…) hagyd szabadon.', 'Keep this element (tap, manhole, paving, path, pond, well, shed…) clear.'),
           });
       }
       if (f.type === 'window' && p.maxHeightCm > WINDOW_MAX_HEIGHT_CM) {

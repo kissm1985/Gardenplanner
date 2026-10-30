@@ -73,6 +73,15 @@ export type FixtureType =
   | 'tree'
   | 'lawn'
   | 'wall'
+  | 'gravel'
+  | 'path'
+  | 'pond'
+  | 'well'
+  | 'shed'
+  | 'compost'
+  | 'rainBarrel'
+  | 'bench'
+  | 'raisedBed'
   | 'other';
 
 export interface Fixture {

@@ -128,13 +128,23 @@ A rögzített elemek nem növények, de a terv része: a szabályok és az ötle
 | Elem | Hogyan rajzolod |
 |---|---|
 | **Gyepsáv** | Koppints a sarkaira, majd *Kész*. Ide nem kerül növény: ha mégis oda tennél, figyelmeztet. |
-| **Burkolat** | Húzd végig a téglalapot; egy koppintás 1 × 1 m-es elemet tesz le. |
-| **Fal, Kerítés** | Húzd végig a vonalat; a hosszabb irányba áll be. |
-| **Ablak, Csap, Akna, Fa, Diófa, Egyéb** | Koppints a rajzra, ahová kerüljön. |
+| **Burkolat, Kavicságy, Kerti tó, Tároló, Magaságyás** | Húzd végig a téglalapot (a tó ovális lesz); egy koppintás alapméretű elemet tesz le. |
+| **Fal, Kerítés, Ösvény** | Húzd végig a vonalat; a hosszabb irányba áll be. |
+| **Ablak, Csap, Akna, Kút, Komposztáló, Esővízgyűjtő, Pad, Fa, Diófa, Egyéb** | Koppints a rajzra, ahová kerüljön. |
+
+A **kavicságyba** és a **magaságyásba** ültethetsz. A burkolatra, ösvényre, tóra, kútra, tárolóra, komposztálóra, esővízgyűjtőre, padra, csapra és aknára tett növényre a program figyelmeztet, az ötletgenerátor és a kitöltés pedig szabadon hagyja őket.
+
+**Kijelölés és módosítás**
+
+- Bármely elemre koppintva kijelölöd (a **Kijelölés** eszközzel, vagy az **Elemek** eszközzel, ha éppen nincs elem kiválasztva). Alul megjelenik a neve, az **Adatok** és a **Törlés** gomb.
+- A pontszerű elemek (csap, akna, kút, pad, fa…) azonnal húzhatók. A nagy elemek (fal, kerítés, burkolat, gyep, tó, tároló, ösvény…) **csak kijelölés után** mozdulnak, így a rajz görgetésekor nem tolod el őket véletlenül.
+- A kijelölt elem sarkán lévő **fogantyúval** átméretezed (fánál a korona sugarát).
+- Az **Adatok** ablakban a típus, a felirat, a hely és a méret centiméterre megadható.
+- A fáknak csak a törzsére koppintva jelölhetők ki, így a lombkorona alatti elemek is elérhetők.
 
 **Lerakás után**
 
-- Az új elem kijelölve marad. Húzással mozgathatod, a **Tulajdonságok** gombbal pontos helyet és méretet adhatsz neki.
+- Az új elem kijelölve marad: húzhatod, méretezheted, az **Adatok** gombbal szerkesztheted.
 - A gyep alakja később is módosítható: *Lista → gyepsáv → Alak szerkesztése a rajzon*.
 - A **Lista** gomb az összes elemet felsorolja; a gyepnél a területét is m²-ben, ami a fűmag vagy a gyepszőnyeg mennyiségéhez jól jön.
 

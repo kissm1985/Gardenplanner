@@ -2,13 +2,13 @@ import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, typ
 import { fillPath, fillPolygon } from '../engine/fill';
 import { bbox, centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
 import { effectivePlant, plantMap } from '../model/plants';
-import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, newFixture } from '../model/fixtures';
+import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, MOVE_WHEN_SELECTED, newFixture } from '../model/fixtures';
 import type { Area, Fixture, FixtureType, Plant, Pt, Settings } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import type { Warning } from '../engine/rules';
 import { AreaClip, AreaShapeEl } from './AreaShape';
-import { FixturesLayer, FixtureZonesLayer, type FixtureDrag } from './layers/Fixtures';
+import { FixturesLayer, FixtureZonesLayer, RESIZE_OFFSET_PX, type FixtureDrag } from './layers/Fixtures';
 import { GridLayer } from './layers/Grid';
 import { CountLabel, GroupLabels, PlantsLayer, plantRadius, VertexHandles, type DragOffset, type ShapeOverride } from './layers/Plants';
 import { Rulers, RULER } from './layers/Rulers';
@@ -27,7 +27,7 @@ interface Props {
 type P2 = { x: number; y: number };
 
 type Gesture =
-  | { mode: 'pan'; view: View; start: P2; moved: boolean; onEmpty: boolean; additive: boolean }
+  | { mode: 'pan'; view: View; start: P2; moved: boolean; onEmpty: boolean; additive: boolean; fx?: string }
   | { mode: 'move'; start: P2; ids: string[]; anchor: Pt; moved: boolean; tappedId: string; additive: boolean; wasSelected: boolean }
   | { mode: 'lasso'; points: Pt[] }
   | { mode: 'draw'; kind: 'drift' | 'curve' | 'line'; points: Pt[]; startPx: P2; moved: boolean }
@@ -36,7 +36,8 @@ type Gesture =
   | { mode: 'vertex'; id: string; index: number; points: Pt[]; start: P2; moved: boolean }
   | { mode: 'pinch'; view: View; start: Map<number, P2> }
   | { mode: 'fxrect'; type: FixtureType; a: Pt; startPx: P2; moved: boolean }
-  | { mode: 'resize'; id: string; center: Pt; plant: Plant; start: P2; moved: boolean };
+  | { mode: 'resize'; id: string; center: Pt; plant: Plant; start: P2; moved: boolean }
+  | { mode: 'fxresize'; f: Fixture; start: P2; moved: boolean };
 
 const DOUBLE_TAP_MS = 300;
 /** Height of the floating tool row over the top of the plan; fitting keeps the area below it. */
@@ -212,7 +213,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const target = e.target as Element;
     const hitId = target.closest?.('[data-id]')?.getAttribute('data-id') ?? null;
     const handle = target.getAttribute?.('data-handle');
-    const fxId = hitId ? null : (target.closest?.('[data-fixture]')?.getAttribute('data-fixture') ?? null);
+    // An armed Elemek tool draws or places over existing elements instead of grabbing them.
+    const armedFx = tool === 'fixtures' ? fixtureTool : null;
+    const fxId = hitId || armedFx ? null : (target.closest?.('[data-fixture]')?.getAttribute('data-fixture') ?? null);
+    const fxResize = armedFx ? null : (target.getAttribute?.('data-fx-resize') ?? null);
     const editing = editable();
     const sv = target.getAttribute?.('data-shape-vertex');
     const sm = target.getAttribute?.('data-shape-mid');
@@ -236,6 +240,9 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       const it = items.find((i) => i.id === target.getAttribute('data-resize'));
       const pl = it && plants.get(it.plantId);
       if (it?.kind === 'plant' && pl) gesture.current = { mode: 'resize', id: it.id, center: [it.x, it.y], plant: pl, start: p, moved: false };
+    } else if ((tool === 'select' || tool === 'fixtures') && fxResize) {
+      const f = area.fixtures.find((x) => x.id === fxResize);
+      if (f) gesture.current = { mode: 'fxresize', f, start: p, moved: false };
     } else if (tool === 'select' && handle != null && editing) {
       gesture.current = { mode: 'vertex', id: editing.id, index: +handle, points: editing.points, start: p, moved: false };
     } else if ((tool === 'drift' || tool === 'row') && activePlant) {
@@ -251,15 +258,20 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
         ui.select(ids);
       }
       gesture.current = { mode: 'move', start: p, ids, anchor: itemPos(hitId), moved: false, tappedId: hitId, additive, wasSelected };
-    } else if (tool === 'fixtures' && fixtureTool && DRAG_DRAWN.has(fixtureTool) && !fxId) {
-      gesture.current = { mode: 'fxrect', type: fixtureTool, a: snapPt(toWorld(p)), startPx: p, moved: false };
-    } else if ((tool === 'select' || tool === 'fixtures') && fxId) {
-      const f = area.fixtures.find((x) => x.id === fxId);
-      useUi.getState().selectFixture(fxId);
-      gesture.current = { mode: 'fixture', id: fxId, start: p, anchor: f ? [f.x, f.y] : [0, 0], moved: false };
+    } else if (armedFx && DRAG_DRAWN.has(armedFx)) {
+      gesture.current = { mode: 'fxrect', type: armedFx, a: snapPt(toWorld(p)), startPx: p, moved: false };
     } else if (tool === 'select' && lasso) {
       gesture.current = { mode: 'lasso', points: [toWorld(p)] };
       setLassoPts([toWorld(p)]);
+    } else if ((tool === 'select' || tool === 'fixtures') && fxId) {
+      const f = area.fixtures.find((x) => x.id === fxId);
+      if (f && MOVE_WHEN_SELECTED.has(f.type) && useUi.getState().selectedFixture !== fxId) {
+        // Large elements: a tap selects, a drag pans the plan; once selected they can be dragged.
+        gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: false, additive: false, fx: fxId };
+      } else {
+        useUi.getState().selectFixture(fxId);
+        gesture.current = { mode: 'fixture', id: fxId, start: p, anchor: f ? [f.x, f.y] : [0, 0], moved: false };
+      }
     } else {
       gesture.current = { mode: 'pan', view, start: p, moved: false, onEmpty: !hitId, additive };
     }
@@ -328,6 +340,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < TAP_SLOP_PX) return;
       g.moved = true;
       setFxDrag({ id: g.id, ...fixtureDelta(g, p) });
+    } else if (g.mode === 'fxresize') {
+      if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
+      g.moved = true;
+      setFxDrag({ id: g.f.id, dx: 0, dy: 0, ...fixtureSize(g.f, p) });
     } else if (g.mode === 'vertex') {
       if (!g.moved && Math.hypot(p.x - g.start.x, p.y - g.start.y) < 3) return;
       g.moved = true;
@@ -350,6 +366,15 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const [ax, ay] = g.anchor;
     const [nx, ny] = snapPt([ax + (p.x - g.start.x) / s, ay + (p.y - g.start.y) / s]);
     return { dx: nx - ax, dy: ny - ay };
+  };
+
+  /** New size of a fixture whose corner (or crown edge) is dragged to p. */
+  const fixtureSize = (f: Fixture, p: P2): { w: number; h: number } | { radius: number } => {
+    const o = RESIZE_OFFSET_PX / viewRef.current!.s;
+    const w = toWorld(p);
+    if (f.radius != null) return { radius: Math.max(20, Math.round(dist(w, [f.x, f.y]) - o)) };
+    const [cx, cy] = snapPt([w[0] - o, w[1] - o]);
+    return { w: Math.max(5, Math.round(cx - f.x)), h: Math.max(5, Math.round(cy - f.y)) };
   };
 
   const onPointerUp = (e: PointerEvent) => {
@@ -396,6 +421,11 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       addFixtureAt(g.moved ? dragFixture(g.type, g.a, w) : newFixture(g.type, Math.round(w[0]), Math.round(w[1])));
       return;
     }
+    if (g.mode === 'fxresize') {
+      setFxDrag(null);
+      if (g.moved) useProject.getState().updateFixture(g.f.id, fixtureSize(g.f, p));
+      return;
+    }
     if (g.mode === 'fixture') {
       setFxDrag(null);
       if (g.moved) {
@@ -428,6 +458,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       }
       return;
     }
+    if (g.mode === 'pan' && !g.moved && g.fx) return useUi.getState().selectFixture(g.fx);
     if (g.mode === 'pan' && !g.moved) onTap(p, g);
   };
 
@@ -521,7 +552,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const id = useProject.getState().addFixture(f);
     if (id) {
       useUi.getState().selectFixture(id);
-      hint(t(`${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod; a Tulajdonságoknál pontos méret.`, `${FIXTURE_LABEL[f.type]} added. Drag to move it; exact size in its details.`));
+      hint(t(`${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod, a sarkánál méretezheted; pontos adatok az Adatok gombbal.`, `${FIXTURE_LABEL[f.type]} added. Drag to move it, resize it at its corner; exact values under Details.`));
     }
   };
 

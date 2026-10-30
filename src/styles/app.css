@@ -1196,14 +1196,115 @@ button.warn-badge {
 .fx.is-interactive {
   cursor: move;
 }
-.fx.is-interactive rect {
+.fx.is-interactive.is-fixed {
+  cursor: pointer;
+}
+.fx.is-interactive:is(.fx-tap, .fx-manhole, .fx-window, .fx-other) rect {
   fill: color-mix(in srgb, var(--panel) 40%, transparent);
 }
-.fx.is-selected rect,
+.fx.is-selected .fx-body,
+.fx.is-selected .fx-lawn,
 .fx.is-selected .fx-crown {
   stroke: var(--accent);
   stroke-width: 3;
   stroke-dasharray: none;
+  opacity: 1;
+}
+.fx .fx-hit.fx-hit {
+  fill: transparent;
+  stroke: transparent;
+  stroke-width: 14px;
+  stroke-dasharray: none;
+}
+.fx .fx-lawn {
+  stroke-width: 1.6;
+}
+.fx-trunk-hit {
+  fill: transparent;
+}
+.fx text {
+  pointer-events: none;
+}
+.fx-resize circle {
+  fill: var(--panel);
+  stroke: var(--accent);
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+.fx-resize .fx-resize-hit {
+  fill: transparent;
+  stroke: none;
+  cursor: nwse-resize;
+}
+/* New elements: gravel, path, pond, well, shed, compost, rain barrel, bench, raised bed. */
+.fx-gravel .fx-body {
+  fill: #d8d1c2;
+  stroke: #9b917f;
+  stroke-dasharray: 2 3;
+}
+.fx-path .fx-body {
+  fill: #cfc4b1;
+  stroke: #a39782;
+}
+.fx-pond .fx-body {
+  fill: #a9cfe0;
+  stroke: #4f8db0;
+  stroke-width: 2;
+}
+.fx-well .fx-body {
+  fill: #c4bdb1;
+  stroke: #6f675c;
+  stroke-width: 4;
+}
+.fx-shed .fx-body {
+  fill: #a58a6a;
+  stroke: #6b5640;
+  stroke-width: 2;
+}
+.fx-compost .fx-body {
+  fill: #7c5f43;
+  stroke: #57412d;
+}
+.fx-rainBarrel .fx-body {
+  fill: #7ea9bf;
+  stroke: #4c7488;
+  stroke-width: 2;
+}
+.fx-bench .fx-body {
+  fill: #c39a6b;
+  stroke: #8a6a45;
+}
+.fx-raisedBed .fx-body {
+  fill: color-mix(in srgb, var(--soil) 80%, #6b4f33);
+  stroke: #8a6a45;
+  stroke-width: 4;
+}
+:is(.fx-shed, .fx-compost, .fx-rainBarrel) .fx-label {
+  fill: #fff;
+}
+.fx-dot-gravel,
+.fx-dot-path {
+  background: #d8d1c2;
+  border-style: solid;
+  border-radius: var(--radius-sm);
+}
+.fx-dot-pond,
+.fx-dot-rainBarrel {
+  background: #a9cfe0;
+  border-color: #4f8db0;
+  border-style: solid;
+}
+.fx-dot-well {
+  border: 4px solid #6f675c;
+}
+.fx-dot-shed,
+.fx-dot-compost,
+.fx-dot-bench,
+.fx-dot-raisedBed {
+  background: #a58a6a;
+  border-color: #6b5640;
+  border-style: solid;
+  border-radius: var(--radius-sm);
 }
 .fx-window rect {
   stroke: var(--drip);
@@ -2328,6 +2429,17 @@ polyline.shape-line {
 .fx-tool-walnut,
 .fx-tool-tree {
   color: #4f7a40;
+}
+.fx-tool-pond,
+.fx-tool-well,
+.fx-tool-rainBarrel {
+  color: #3f7fa3;
+}
+.fx-tool-shed,
+.fx-tool-compost,
+.fx-tool-bench,
+.fx-tool-raisedBed {
+  color: #7a5c3c;
 }
 
 /* ---------- species replacement ---------- */

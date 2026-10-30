@@ -128,13 +128,23 @@ Fixed elements are not plants but part of the plan: the rules and the idea gener
 | Element | How you draw it |
 |---|---|
 | **Lawn strip** | Tap its corners, then *Done*. No plants go there: you get a warning if one does. |
-| **Paving** | Drag out the rectangle; a tap places a 1 × 1 m piece. |
-| **Wall, Fence** | Drag along the line; it follows the longer direction. |
-| **Window, Tap, Manhole, Tree, Walnut, Other** | Tap the plan where it should go. |
+| **Paving, Gravel bed, Pond, Shed, Raised bed** | Drag out the rectangle (the pond becomes an oval); a tap places one of the default size. |
+| **Wall, Fence, Path** | Drag along the line; it follows the longer direction. |
+| **Window, Tap, Manhole, Well, Compost bin, Rain barrel, Bench, Tree, Walnut, Other** | Tap the plan where it should go. |
+
+**Gravel beds** and **raised beds** can be planted. A plant on paving, a path, pond, well, shed, compost bin, rain barrel, bench, tap or manhole gets a warning, and the idea generator and zone fill leave them free.
+
+**Selecting and changing elements**
+
+- Tap any element to select it (with the **Select** tool, or with the **Elements** tool when no element is picked). Its name, **Details** and **Delete** appear at the bottom.
+- Small elements (tap, manhole, well, bench, tree…) can be dragged straight away. Large ones (wall, fence, paving, lawn, pond, shed, path…) **only move once selected**, so scrolling the plan does not shift them by accident.
+- Drag the **handle** at the selected element’s corner to resize it (for a tree, its crown radius).
+- **Details** sets the type, label, position and size to the centimetre.
+- Trees are selected by their trunk, so elements under the crown stay reachable.
 
 **After placing**
 
-- The new element stays selected. Drag it to move it; **Details** sets its exact position and size.
+- The new element stays selected: drag it, resize it, or edit it with **Details**.
 - A lawn’s shape can be changed later: *List → lawn strip → Edit the shape on the plan*.
 - **List** shows all elements; for a lawn also its area in m², handy for seed or turf.
 
