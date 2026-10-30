@@ -45,6 +45,17 @@ describe('bill of materials', () => {
     expect(buildBom(st().project!, [areaId(strip)]).planted).toBe(12);
   });
 
+  it('counts the chosen variant by default, or the one shown on the plan', () => {
+    st().selectArea(areaId(strip));
+    st().addRow('LA', [[60, 0], [60, 400]]); // 11 in A (chosen)
+    const area = () => st().project!.areas[strip];
+    const vb = st().duplicateVariant(area().variants[0].id)!;
+    st().setActiveVariant(vb);
+    st().placePlant('TH', 20, 20); // B: 12
+    expect(buildBom(st().project!, [areaId(strip)]).planted).toBe(11);
+    expect(buildBom(st().project!, [areaId(strip)], null, 'shown').planted).toBe(12);
+  });
+
   it('filters by status and bulk-sets a species status', () => {
     st().selectArea(areaId(strip));
     st().addRow('LA', [[60, 0], [60, 400]]);

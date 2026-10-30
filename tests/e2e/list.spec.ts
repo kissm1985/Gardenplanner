@@ -20,6 +20,7 @@ test('plant list: counts, reserve, copy as table, CSV and XLSX download', async 
   await expect(page.locator('.lv-sum')).toContainText('11 tő');
   await expect(page.locator('.lv-sum')).toContainText('13 db');
 
+  await page.getByRole('button', { name: 'Összesítve' }).click();
   await page.getByLabel('Rendelési tartalék százalékban').fill('20');
   await expect(page.locator('.lv-sum')).toContainText('14 db');
 

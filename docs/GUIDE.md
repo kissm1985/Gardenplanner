@@ -376,12 +376,12 @@ An image (PNG/SVG) made from the season view uses that month’s colours.
 
 <img src="img/en/07-lista.png" width="280" align="right" alt="Plant list">
 
-The **List** tool totals the plants of the **chosen** variants:
+By default the **List** tool totals **the plan currently on screen** (the edited variant of the current area; the header shows its name). **★ Chosen variants** switches to the list made from the chosen variants – the printout uses those too.
 
 - **Planting**: how many plants go in the ground.
 - **Order**: how many to order, with a **spare**. The spare % can be set; trees get none.
 - **Estimated cost**: prices marked “est.” are estimates, those marked “shop” come from real offers. Prices are in HUF.
-- **Filter**: *Combined* or per area; by status (*needed, ordered, have it, planted*).
+- **Filter**: *Plan on screen* or *★ Chosen variants*; *Combined* or per area; by status (*needed, ordered, have it, planted*).
 - **Status**: can be set for a whole species at once in the table.
 - **Copy as text**: for messages and e-mail.
 - **Copy as table (Excel)**: pastes into the right columns.

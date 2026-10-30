@@ -376,12 +376,12 @@ Az **Évszak** eszközzel a rajz a növények valódi színeit mutatja:
 
 <img src="img/07-lista.png" width="280" align="right" alt="Növénylista">
 
-A **Lista** eszköz összesíti a **választott** változatok növényeit:
+A **Lista** eszköz alapból azt a tervet összesíti, **amelyik éppen a rajzon látszik** (az aktuális terület szerkesztett változatát; a fejléc ki is írja a nevét). A **★ Választott változatok** gombbal a választott változatokból készült listára váltasz – ebből készül a nyomtatás is.
 
 - **Ültetés**: hány tő kerül a földbe.
 - **Rendelés**: hány darabot rendelj, **tartalékkal**. A tartalék %-a állítható; a fák nem kapnak tartalékot.
 - **Becsült költség**: a „becsl.” jelölésű árak becslések, a „bolt” jelölésűek valós ajánlatból származnak.
-- **Szűrés**: *Összesítve* vagy területenként; állapot szerint (*kell, megrendelve, megvan, beültetve*).
+- **Szűrés**: *Látható terv* vagy *★ Választott változatok*; *Összesítve* vagy területenként; állapot szerint (*kell, megrendelve, megvan, beültetve*).
 - **Állapot**: a táblázatban fajonként egyszerre állítható.
 - **Másolás szövegként**: üzenetbe, e-mailbe.
 - **Másolás táblázatként (Excel)**: beillesztve helyes oszlopokat ad.

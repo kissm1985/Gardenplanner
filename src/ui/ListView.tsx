@@ -3,7 +3,7 @@ import { bomTable, buildBom, fmtFt, fmtInt, STATUSES, toCsv, toHtmlTable, toText
 import { buildXlsx } from '../engine/xlsx';
 import { JUGLONE_LABEL, plantName, WATER_LABEL } from '../model/plants';
 import type { ItemStatus } from '../model/types';
-import { useProject } from '../store/projectStore';
+import { activeVariant, selectCurrentArea, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { downloadBlob, downloadText } from './download';
 import { PlantChip } from './PlantChip';
@@ -12,18 +12,22 @@ import { copy } from './clipboard';
 import { t } from '../i18n';
 
 type Scope = 'all' | string;
+type Source = 'shown' | 'chosen';
 
 /** Plant list and shopping (SPEC §4.6). */
 export function ListView() {
   const project = useProject((s) => s.project)!;
-  const [scope, setScope] = useState<Scope>('all');
+  const current = useProject(selectCurrentArea);
+  // Default: the plan on screen – the current area's shown variant.
+  const [scope, setScope] = useState<Scope>(current?.id ?? 'all');
+  const [source, setSource] = useState<Source>('shown');
   const [status, setStatus] = useState<ItemStatus | null>(null);
   const [toast, setToast] = useState('');
   const [fallback, setFallback] = useState('');
   const taRef = useRef<HTMLTextAreaElement>(null);
 
   const areaIds = scope === 'all' ? project.areas.map((a) => a.id) : [scope];
-  const bom = useMemo(() => buildBom(project, areaIds, status), [project, scope, status]);
+  const bom = useMemo(() => buildBom(project, areaIds, status, source), [project, scope, status, source]);
   const table = useMemo(() => bomTable(bom), [bom]);
   const title = scope === 'all' ? project.name : (project.areas.find((a) => a.id === scope)?.name ?? '');
   const fileBase = `${t('novenylista', 'plant-list')}-${title.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}`;
@@ -41,7 +45,7 @@ export function ListView() {
   const xlsx = () => {
     const sheets = [{ name: scope === 'all' ? t('Összesen', 'Total') : title, rows: table }];
     if (scope === 'all' && project.areas.length > 1)
-      for (const a of project.areas) sheets.push({ name: a.name, rows: bomTable(buildBom(project, [a.id], status)) });
+      for (const a of project.areas) sheets.push({ name: a.name, rows: bomTable(buildBom(project, [a.id], status, source)) });
     downloadBlob(`${fileBase}.xlsx`, buildXlsx(sheets), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   };
 
@@ -58,14 +62,29 @@ export function ListView() {
   };
 
   const perArea = bom.areas.length > 1;
+  const scoped = scope === 'all' ? null : project.areas.find((a) => a.id === scope);
+  const eyebrow =
+    source === 'shown'
+      ? scoped
+        ? t(`Növénylista · látható terv: ${activeVariant(scoped).name}`, `Plant list · plan on screen: ${activeVariant(scoped).name}`)
+        : t('Növénylista · a látható tervekből', 'Plant list · from the plans on screen')
+      : t('Növénylista · a választott változatokból', 'Plant list · from the chosen variants');
 
   return (
     <div className="listview">
       <header className="lv-head">
-        <div className="eyebrow">{t('Növénylista · a választott változatokból', 'Plant list · from the chosen variants')}</div>
+        <div className="eyebrow">{eyebrow}</div>
         <button type="button" className="btn btn-small" onClick={() => useUi.getState().setPage('schedule')}>
           {t('Ültetési menetrend és gondozás →', 'Planting schedule and care →')}
         </button>
+        <div className="seg" role="group" aria-label={t('Melyik változat', 'Which variant')}>
+          <ScopeChip on={source === 'shown'} onClick={() => setSource('shown')}>
+            {t('Látható terv', 'Plan on screen')}
+          </ScopeChip>
+          <ScopeChip on={source === 'chosen'} onClick={() => setSource('chosen')}>
+            {t('★ Választott változatok', '★ Chosen variants')}
+          </ScopeChip>
+        </div>
         <div className="seg" role="group" aria-label={t('Terület', 'Area')}>
           <ScopeChip on={scope === 'all'} onClick={() => setScope('all')}>
             {t('Összesítve', 'Combined')}

@@ -36,14 +36,20 @@ export const orderQty = (planted: number, reservePct: number, isTree?: boolean) 
 /** Items of the chosen variant of an area – the plan the list and print are made from. */
 export const chosenItems = (a: Area): PlacedItem[] => (a.variants.find((v) => v.id === a.chosenVariantId) ?? a.variants[0])?.items ?? [];
 
+/** Items of the variant shown on the plan (the edited one). */
+export const shownItems = (a: Area): PlacedItem[] =>
+  (a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0])?.items ?? [];
+
 /**
  * @param areaIds areas in scope (all when omitted)
  * @param status only count items with this status
+ * @param source 'chosen' variants (default, for print and orders) or the 'shown' ones on the plan
  */
-export function buildBom(project: Project, areaIds?: string[], status?: ItemStatus | null): Bom {
+export function buildBom(project: Project, areaIds?: string[], status?: ItemStatus | null, source: 'chosen' | 'shown' = 'chosen'): Bom {
   const areas = project.areas.filter((a) => !areaIds || areaIds.includes(a.id));
+  const pick = source === 'shown' ? shownItems : chosenItems;
   return bomFromEntries(
-    areas.map((area) => ({ area, items: chosenItems(area) })),
+    areas.map((area) => ({ area, items: pick(area) })),
     project.plantDb,
     project.settings.reservePct,
     status,

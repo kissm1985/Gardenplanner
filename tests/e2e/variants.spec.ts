@@ -28,9 +28,11 @@ test('variants: copy, edit B, choose, compare', async ({ page }) => {
   await page.mouse.click(b.x + 60 * cm, b.y + 700 * cm);
   await expect(page.locator('.warn-badge')).toHaveText('1');
 
-  // List still shows A (chosen): 11 plants.
+  // The list shows the plan on screen (B, 12 plants); the chosen variants give A (11).
   await page.getByRole('button', { name: 'Lista', exact: true }).click();
-  await page.getByRole('button', { name: 'Házoldali sáv', exact: true }).click();
+  await expect(page.locator('.lv-head .eyebrow')).toContainText('látható terv: B terv');
+  await expect(page.locator('.lv-sum')).toContainText('12 tő');
+  await page.getByRole('button', { name: '★ Választott változatok' }).click();
   await expect(page.locator('.lv-sum')).toContainText('11 tő');
 
   await page.getByRole('button', { name: 'Kijelölés' }).click();
@@ -51,6 +53,7 @@ test('variants: copy, edit B, choose, compare', async ({ page }) => {
   await page.getByRole('button', { name: 'Bezárás' }).last().click();
   await expect(pill).toContainText('B terv ★');
   await page.getByRole('button', { name: 'Lista', exact: true }).click();
+  await page.getByRole('button', { name: '★ Választott változatok' }).click();
   await page.getByRole('button', { name: 'Házoldali sáv', exact: true }).click();
   await expect(page.locator('.lv-sum')).toContainText('12 tő');
 });
