@@ -159,7 +159,14 @@ test('Látványterv: camera on the plan, style and mood, send in one step, finis
   const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFklEQVR4nGP8z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==', 'base64');
   await dlg.getByLabel('Látványkép feltöltése').setInputFiles({ name: 'kert.png', mimeType: 'image/png', buffer: png });
   await expect(dlg.locator('.render-grid img')).toHaveCount(1);
+  await expect(page.locator('.camera')).toHaveCount(1); // shown while the window is open
   await dlg.locator('.sheet-head button[aria-label="Bezárás"]').click();
+  // Back on the plan the camera is hidden; the View layer can show it.
+  await expect(page.locator('.camera')).toHaveCount(0);
+  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await page.locator('dialog[open]').getByLabel(/Látványterv nézőpontja/).check();
+  await expect(page.locator('.camera')).toHaveCount(1);
+  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
   await page.getByRole('button', { name: /Változat: A terv/ }).click();
   await expect(page.locator('dialog[open] .variant-tree')).toContainText('🖼 1');
 });

@@ -28,6 +28,8 @@ export interface Layers {
   fixtures: boolean;
   zones: boolean;
   dimensions: boolean;
+  /** Visualisation viewpoint; it also shows while placing it or while the Látványterv window is open. */
+  camera: boolean;
 }
 
 /** Transient UI state: never saved, never part of undo history. */
@@ -56,6 +58,9 @@ export interface UiState {
   /** The start screen asked for an own area: App opens the new-area form once. */
   startWithNewArea: boolean;
   setStartWithNewArea: (v: boolean) => void;
+  /** The Látványterv window is open (the viewpoint shows on the plan meanwhile). */
+  visualOpen: boolean;
+  setVisualOpen: (v: boolean) => void;
   /** Placing the visualisation viewpoint on the plan. */
   cameraEdit: boolean;
   setCameraEdit: (v: boolean) => void;
@@ -117,6 +122,8 @@ export const useUi = create<UiState>()((set) => ({
   page: null,
   calibrate: null,
   cameraEdit: false,
+  visualOpen: false,
+  setVisualOpen: (visualOpen) => set({ visualOpen }),
   startWithNewArea: false,
   setStartWithNewArea: (startWithNewArea) => set({ startWithNewArea }),
   vizOptions: { season: 1, viewpoint: 'camera', lang: getLang(), mature: true, style: 'photo', time: 'afternoon', weather: 'sunny' },
@@ -143,7 +150,7 @@ export const useUi = create<UiState>()((set) => ({
   setFourUp: (fourUp) => set({ fourUp }),
   setDriftPattern: (driftPattern) => set({ driftPattern }),
   setRowMode: (rowMode) => set({ rowMode }),
-  layers: { background: true, warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true },
+  layers: { background: true, warnings: true, plants: true, spacing: false, grid: true, fixtures: true, zones: true, dimensions: true, camera: false },
   setTool: (tool) => set((s) => ({ tool, lasso: tool === 'select' ? s.lasso : false, compare: false, page: null })),
   setActivePlant: (activePlant) => set({ activePlant }),
   select: (selected) => set((s) => ({ selected, selectedFixture: selected.length ? null : s.selectedFixture })),

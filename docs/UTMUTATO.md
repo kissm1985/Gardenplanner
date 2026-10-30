@@ -449,7 +449,7 @@ A program elkészít egy részletes leírást és egy rajzot, amiből egy képge
 
 **Megnyitás**: a **Változatok** ablak **🖼 Látványterv** gombjával, vagy a **⋯ Projekt → Látványterv megnyitása** gombbal. A rajzon éppen szerkesztett változatról készül.
 
-1. **Nézőpont a rajzon**: a **📷 Nézőpont a rajzon** gombbal tedd le a kamerát. Nyomd meg ott, ahol állsz (pl. a teraszon), és húzd a nézés irányába. A narancssárga látómező mutatja, mi lesz a képen. Később áthelyezheted vagy törölheted.
+1. **Nézőpont a rajzon**: a **📷 Nézőpont a rajzon** gombbal tedd le a kamerát. Nyomd meg ott, ahol állsz (pl. a teraszon), és húzd a nézés irányába. A narancssárga látómező mutatja, mi lesz a képen. Később áthelyezheted vagy törölheted. A rajzon a kamera csak a nézőpont kijelölése közben és a Látványterv ablak nyitva tartásakor látszik; máskor a *Nézet → Rétegek → Látványterv nézőpontja (kamera)* kapcsolóval jelenítheted meg.
 2. **Kép**: a kamerából (szemmagasság), madártávlatból, mindkettő (két kép), vagy általános nézet az alsó szélről.
 3. **Stílus és hangulat**: fotórealisztikus, akvarell vagy tervezői vázlat; évszak; napszak (reggel, délután, naplemente); időjárás (napos, borús); a leírás nyelve; kifejlett vagy frissen ültetett állapot.
 4. **Küldés a ChatGPT-nek**:

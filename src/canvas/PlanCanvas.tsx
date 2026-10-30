@@ -73,6 +73,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const month = useUi((s) => (s.tool === 'season' ? s.month : null));
   const calibrate = useUi((s) => s.calibrate);
   const cameraEdit = useUi((s) => s.cameraEdit);
+  const visualOpen = useUi((s) => s.visualOpen);
   const [camDraft, setCamDraft] = useState<Camera | null>(null);
   const shapeEditAll = useUi((s) => s.shapeEdit);
   const shapeEdit = shapeEditAll?.areaId === area.id ? shapeEditAll : null;
@@ -751,7 +752,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             {layers.dimensions && !shapeEdit && <Dimensions area={area} s={view.s} />}
             {shapeEdit && <ShapeEditor points={shapeEdit.points} mode={shapeEdit.mode} selected={shapeEdit.selected} s={view.s} lawn={shapeEdit.target?.kind === 'lawn'} zone={shapeEdit.target?.kind === 'zone'} />}
             {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
-            {(camDraft ?? area.camera) && <CameraMark cam={(camDraft ?? area.camera)!} area={area} scale={view.s} editing={cameraEdit} />}
+            {(cameraEdit || visualOpen || layers.camera) && (camDraft ?? area.camera) && <CameraMark cam={(camDraft ?? area.camera)!} area={area} scale={view.s} editing={cameraEdit} />}
             {calibrate?.map(([x, y], i) => <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />)}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>

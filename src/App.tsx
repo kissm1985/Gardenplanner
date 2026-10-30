@@ -72,6 +72,7 @@ const LAYER_LABELS: Record<keyof Layers, string> = labels({
   fixtures: ['Rögzített elemek', 'Fixed elements'],
   zones: ['Juglone-zóna', 'Juglone zone'],
   dimensions: ['Méretvonalak', 'Dimensions'],
+  camera: ['Látványterv nézőpontja (kamera)', 'Visualisation viewpoint (camera)'],
 });
 
 type SheetId = null | 'visual' | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
@@ -89,6 +90,7 @@ export function App({ loading }: { loading: boolean }) {
   const rowMode = useUi((s) => s.rowMode);
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
+  useEffect(() => useUi.getState().setVisualOpen(sheet === 'visual'), [sheet]);
   // Started from "My own area" on the start screen: open the new-area form at once.
   const [newArea, setNewArea] = useState(false);
   const startNew = useUi((s) => s.startWithNewArea);

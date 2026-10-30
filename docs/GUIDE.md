@@ -449,7 +449,7 @@ The app writes a detailed description and a plan from which an image AI (e.g. Ch
 
 **Opening it**: the **🖼 Visualisation** button in the **Variants** window, or **⋯ Project → Open visualisation**. It is made for the variant being edited on the plan.
 
-1. **Viewpoint on the plan**: place the camera with **📷 Viewpoint on the plan**. Press where you stand (e.g. on the terrace) and drag towards where you look. The orange view cone shows what will be in the picture. It can be moved or removed later.
+1. **Viewpoint on the plan**: place the camera with **📷 Viewpoint on the plan**. Press where you stand (e.g. on the terrace) and drag towards where you look. The orange view cone shows what will be in the picture. It can be moved or removed later. On the plan the camera only shows while you place it and while the Visualisation window is open; otherwise turn it on with *View → Layers → Visualisation viewpoint (camera)*.
 2. **Image**: from the camera (eye level), bird’s-eye, both (two images), or a generic view from the bottom edge.
 3. **Style and mood**: photorealistic, watercolour or design sketch; season; time of day (morning, afternoon, sunset); weather (sunny, overcast); language of the brief; mature or freshly planted.
 4. **Send to ChatGPT**:
