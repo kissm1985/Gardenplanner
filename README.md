@@ -6,7 +6,7 @@
 
 Készítette: **Kiss-Mihály István** · © 2026 Kiss-Mihály István. Minden jog fenntartva (lásd [LICENSE](LICENSE)).
 
-Mobilbarát, offline is működő ültetéstervező (PWA), magyarul és angolul. **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md)** · English guide: [docs/GUIDE.md](docs/GUIDE.md). A specifikáció: [SPEC.md](SPEC.md). Arculat: [docs/brand/ARCULAT.md](docs/brand/ARCULAT.md). Jogi információk, adatvédelem: [docs/legal/JOGI.md](docs/legal/JOGI.md) · névkutatás: [docs/legal/NEVKUTATAS.md](docs/legal/NEVKUTATAS.md) · nyílt forrású licencek: `public/third-party-licenses.txt` (buildkor generálva). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
+Mobilbarát, offline is működő ültetéstervező (PWA), magyarul és angolul. **Használati útmutató: [docs/UTMUTATO.md](docs/UTMUTATO.md)** · English guide: [docs/GUIDE.md](docs/GUIDE.md). A specifikáció: [SPEC.md](SPEC.md). Arculat: [docs/brand/ARCULAT.md](docs/brand/ARCULAT.md). Jogi információk, adatvédelem: [docs/legal/JOGI.md](docs/legal/JOGI.md) · névkutatás: [docs/legal/NEVKUTATAS.md](docs/legal/NEVKUTATAS.md) · nyílt forrású licencek: `public/third-party-licenses.txt` (buildkor és a fejlesztői szerver indításakor generálva, nincs a tárolóban). Mintája a K-07 „Oldalkert és előkert” lap; a növényadatok a K-07, az árak a K-08 lapból jönnek.
 
 ```bash
 npm install
