@@ -11,6 +11,7 @@ test('acceptance: after the first visit the app opens and saves without internet
 
   await context.setOffline(true);
   await page.reload();
+  await page.locator('.home-area', { hasText: 'Házoldali sáv' }).click();
   await expect(page.locator('.area-name')).toHaveText('Házoldali sáv');
 
   // Edit offline and reload offline: still there.
@@ -22,6 +23,7 @@ test('acceptance: after the first visit the app opens and saves without internet
   await expect(page.locator('.meta-count')).toHaveText('1 tő');
   await page.waitForTimeout(600);
   await page.reload();
+  await page.locator('.home-area', { hasText: 'Házoldali sáv' }).click();
   await expect(page.locator('.meta-count')).toHaveText('1 tő');
   // Fonts are bundled, not from a CDN.
   expect(await page.evaluate(() => document.fonts.check('16px "Fraunces Variable"'))).toBe(true);

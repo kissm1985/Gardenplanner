@@ -8,6 +8,7 @@ import { activeVariant, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { PlantChip } from './PlantChip';
 import { t } from '../i18n';
+import { localName } from '../i18n/names';
 import { plantName } from '../model/plants';
 
 /** Two variants of the area side by side: plan, count, cost, warnings, per-species difference. */
@@ -27,7 +28,7 @@ export function CompareView({ area }: { area: Area }) {
     <select value={v} onChange={(e) => set(e.target.value)} aria-label={label}>
       {vs.map((x) => (
         <option key={x.id} value={x.id}>
-          {x.name}
+          {localName(x.name)}
         </option>
       ))}
     </select>
@@ -36,7 +37,7 @@ export function CompareView({ area }: { area: Area }) {
   return (
     <div className="compare">
       <header className="cmp-head">
-        <div className="eyebrow">{t('Változatok összehasonlítása', 'Comparing variants')} · {area.name}</div>
+        <div className="eyebrow">{t('Változatok összehasonlítása', 'Comparing variants')} · {localName(area.name)}</div>
         <div className="seg" role="group" aria-label={t('Évszak', 'Season')}>
           {([0, 1, 2, 3] as Season[]).map((s) => (
             <button key={s} type="button" className="chip-btn" aria-pressed={seasonOf(month) === s} onClick={() => ui.setMonth(SEASON_MONTH[s])}>
@@ -60,7 +61,7 @@ export function CompareView({ area }: { area: Area }) {
           <thead>
             <tr>
               <th>{t('Növény', 'Plant')}</th>
-              <th className="m">{a.name}</th>
+              <th className="m">{localName(a.name)}</th>
               <th className="m">{b.name}</th>
               <th className="m">{t('Eltérés', 'Difference')}</th>
             </tr>
@@ -105,11 +106,11 @@ function Column({ stats, other, area, month, picker, chosen }: {
         {picker}
         {chosen && <span className="badge badge-chosen">{t('választott', 'chosen')}</span>}
       </div>
-      <StaticPlan area={area} items={stats.variant.items} plantDb={project.plantDb} month={month} showMature={project.settings.showMatureSize} labelPx={170} title={stats.variant.name} />
+      <StaticPlan area={area} items={stats.variant.items} plantDb={project.plantDb} month={month} showMature={project.settings.showMatureSize} labelPx={170} title={localName(stats.variant.name)} />
       {(stats.variant.renders?.length ?? 0) > 0 && (
         <div className="cmp-renders" aria-label={t('Látványképek', 'Visualisations')}>
           {stats.variant.renders!.map((r) => (
-            <img key={r.id} src={r.dataUrl} alt={t(`${stats.variant.name} látványképe`, `${stats.variant.name} visualisation`)} loading="lazy" />
+            <img key={r.id} src={r.dataUrl} alt={t(`${localName(stats.variant.name)} látványképe`, `${localName(stats.variant.name)} visualisation`)} loading="lazy" />
           ))}
         </div>
       )}

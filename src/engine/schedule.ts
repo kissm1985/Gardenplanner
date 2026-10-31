@@ -7,6 +7,7 @@ import type { Area, Plant, Project } from '../model/types';
 import { chosenItems } from './bom';
 import { itemCount } from './fill';
 import { gardenLocation, type MonthDay } from '../model/location';
+import { localName } from '../i18n/names';
 import { locale, t } from '../i18n';
 
 export interface Task {
@@ -73,7 +74,7 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
 
   out.push({
     id: id('soil'),
-    title: t(`Talaj-előkészítés – ${a.name}`, `Soil preparation – ${a.name}`),
+    title: t(`Talaj-előkészítés – ${localName(a.name)}`, `Soil preparation – ${localName(a.name)}`),
     detail: t(
       `Gyomlálás, lazítás ~${hu(m2)} m²-en.${dry.length ? ` A szárazságtűrők (${dry.join(', ')}) helyére 20–30% durva homok vagy apró kavics, trágya és komposzt nélkül.` : ''}`,
       `Weeding and loosening on ~${hu(m2)} m².${dry.length ? ` Where the drought-tolerant plants go (${dry.join(', ')}), mix in 20–30% coarse sand or fine gravel, no manure or compost.` : ''}`,
@@ -84,7 +85,7 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
   if (c.drip)
     out.push({
       id: id('drip'),
-      title: t(`Csepegtető cső lefektetése – ${a.name}`, `Laying the drip line – ${a.name}`),
+      title: t(`Csepegtető cső lefektetése – ${localName(a.name)}`, `Laying the drip line – ${localName(a.name)}`),
       detail: t('A sorok mentén, a meglévő körre csatlakoztatva; próbaöntözés.', 'Along the rows, connected to the existing circuit; test run.'),
       areaId: a.id,
       hours: Math.max(1, m2 * 0.08),
@@ -92,7 +93,7 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
   if (c.mulchCover)
     out.push({
       id: id('fabric'),
-      title: t(`Agrotextil terítése – ${a.name}`, `Laying weed fabric – ${a.name}`),
+      title: t(`Agrotextil terítése – ${localName(a.name)}`, `Laying weed fabric – ${localName(a.name)}`),
       detail: t(
         `~${hu(m2 * 1.15)} m² (15% átfedéssel), csapokkal rögzítve.${trees.length ? ' A fák törzse körül 60 cm átmérőben hagyd szabadon.' : ''}`,
         `~${hu(m2 * 1.15)} m² (15% overlap), pinned down.${trees.length ? ' Leave 60 cm around tree trunks free.' : ''}`,
@@ -103,7 +104,7 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
   for (const tr of trees)
     out.push({
       id: id(`tree:${tr.p.code}`),
-      title: t(`Fa ültetése: ${plantName(tr.p)} (${tr.n} db) – ${a.name}`, `Planting tree: ${plantName(tr.p)} (${tr.n}) – ${a.name}`),
+      title: t(`Fa ültetése: ${plantName(tr.p)} (${tr.n} db) – ${localName(a.name)}`, `Planting tree: ${plantName(tr.p)} (${tr.n}) – ${localName(a.name)}`),
       detail: t('Elsőként; karó és kötöző, alapos beöntözés.', 'First; stake and tie, water in well.'),
       areaId: a.id,
       hours: tr.n * 1,
@@ -118,8 +119,8 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
       out.push({
         id: id(`plant:${x.p.code}:${i}`),
         title: t(
-          `Ültetés: ${plantName(x.p)} ${n} tő${parts > 1 ? ` (${i + 1}/${parts})` : ''} – ${a.name}`,
-          `Planting: ${plantName(x.p)} ${n} plants${parts > 1 ? ` (${i + 1}/${parts})` : ''} – ${a.name}`,
+          `Ültetés: ${plantName(x.p)} ${n} tő${parts > 1 ? ` (${i + 1}/${parts})` : ''} – ${localName(a.name)}`,
+          `Planting: ${plantName(x.p)} ${n} plants${parts > 1 ? ` (${i + 1}/${parts})` : ''} – ${localName(a.name)}`,
         ),
         detail: i === 0 ? t(`Tőtáv ${x.p.spacingCm} cm, a terv szerint; az agrotextilen kereszt alakú vágás.`, `Spacing ${x.p.spacingCm} cm as planned; cross-shaped cut in the fabric.`) : undefined,
         areaId: a.id,
@@ -131,7 +132,7 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
     const m = mulchAdvice(species.map((x) => x.p));
     out.push({
       id: id('mulch'),
-      title: t(`Mulcsozás – ${a.name}`, `Mulching – ${a.name}`),
+      title: t(`Mulcsozás – ${localName(a.name)}`, `Mulching – ${localName(a.name)}`),
       detail: a.kind === 'gravel'
         ? t('Világos 4–8 mm-es kavics az egész kőkertre, ~4–5 cm vastagon, agrotextilen.', 'Light 4–8 mm gravel over the whole rock garden, ~4–5 cm deep, on fabric.')
         : m.gravel.length
@@ -146,7 +147,7 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
   }
   out.push({
     id: id('water'),
-    title: t(`Beöntözés és ellenőrzés – ${a.name}`, `Watering in and check – ${a.name}`),
+    title: t(`Beöntözés és ellenőrzés – ${localName(a.name)}`, `Watering in and check – ${localName(a.name)}`),
     detail: t('Tövenként alaposan; csepegtető működésének ellenőrzése.', 'Each plant thoroughly; check the drip line works.'),
     areaId: a.id,
     hours: 0.5,

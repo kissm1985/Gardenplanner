@@ -2638,12 +2638,12 @@ polyline.shape-line {
   gap: 8px;
 }
 
-/* ---------- Gardenly identity ---------- */
+/* ---------- Planterra identity ---------- */
 .logo {
   display: inline-flex;
   align-items: center;
   gap: 0.35em;
-  color: var(--brand-roof);
+  color: var(--brand-stem);
 }
 .logo-mark {
   flex: 0 0 auto;
@@ -2659,8 +2659,8 @@ polyline.shape-line {
 }
 .logo-word {
   font-family: var(--sans);
-  font-weight: 700;
-  letter-spacing: -0.03em;
+  font-weight: 500;
+  letter-spacing: -0.025em;
 }
 .logo-tagline {
   margin-top: 0.5em;
@@ -2846,9 +2846,9 @@ polyline.shape-line {
   border-color: #c98a1b;
 }
 @media (max-width: 420px) {
-  /* Narrow phones: the area name needs the room more than the logo. */
+  /* Narrow phones: a slimmer logo button, so the area name keeps some room. */
   .topbar-brand {
-    display: none;
+    width: 26px;
   }
 }
 .welcome-or {
@@ -2993,4 +2993,36 @@ polyline.shape-line {
 .quick-steps li.is-done .quick-check {
   background: var(--accent);
   color: var(--accent-fg);
+}
+.home-areas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.home-area {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+}
+button.topbar-brand {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+}
+.home-areas {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.home-area {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+}
+button.topbar-brand {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
 }

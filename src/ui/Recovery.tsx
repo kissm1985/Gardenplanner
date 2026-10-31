@@ -11,7 +11,7 @@ const stamp = () => new Date().toISOString().slice(0, 10);
  * The plan can always be downloaded first; starting over is a separate, confirmed step.
  */
 export function RecoveryScreen({ message, data, onRetry }: { message: string; data: unknown; onRetry?: () => void }) {
-  const save = () => downloadText(`gardenly-mentes-${stamp()}.json`, JSON.stringify(data ?? null, null, 2), 'application/json');
+  const save = () => downloadText(`planterra-mentes-${stamp()}.json`, JSON.stringify(data ?? null, null, 2), 'application/json');
   return (
     <main className="welcome recovery" role="alert">
       <h1>{t('Valami elromlott', 'Something went wrong')}</h1>

@@ -5,6 +5,7 @@ import { effectivePlant, JUGLONE_LABEL, plantName, SOIL_LABEL, SUN_LABEL, TOXIC_
 import type { Area, Fixture, PlacedItem, Plant, Pt, Settings, SunNeed, WaterNeed } from '../model/types';
 import { itemPositions } from './fill';
 import { KEEP_CLEAR } from '../model/fixtures';
+import { localName } from '../i18n/names';
 import { labels, t } from '../i18n';
 
 export type Severity = 'error' | 'warn' | 'info';
@@ -313,8 +314,8 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
             itemIds: [it.id],
             at: hit[0],
             message: t(
-              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label || 'gyep'}” területére esik.`,
-              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${f.label || 'lawn'}”.`,
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${localName(f.label) || 'gyep'}” területére esik.`,
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${localName(f.label) || 'lawn'}”.`,
             ),
             hint: t('A gyepre nem kerül növény; húzd az ágyásba, vagy igazítsd a gyep alakját.', 'No plants go on the lawn; drag it into the bed, or reshape the lawn.'),
           });
@@ -329,8 +330,8 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
             itemIds: [it.id],
             at: hit[0],
             message: t(
-              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${f.label ?? 'elem'}” helyére esik.`,
-              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${f.label ?? 'element'}”.`,
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${localName(f.label) || 'elem'}” helyére esik.`,
+              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${localName(f.label) || 'element'}”.`,
             ),
             hint: t('Ezt az elemet (csap, akna, burkolat, ösvény, tó, kút, tároló…) hagyd szabadon.', 'Keep this element (tap, manhole, paving, path, pond, well, shed…) clear.'),
           });

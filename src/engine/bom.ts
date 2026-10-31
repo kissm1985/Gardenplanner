@@ -3,6 +3,7 @@ import { byPlantName, JUGLONE_LABEL, plantName, WATER_LABEL } from '../model/pla
 import type { Area, ItemStatus, PlacedItem, Plant, Project } from '../model/types';
 import { itemCount } from './fill';
 import { safeCell } from './csvSafe';
+import { localName } from '../i18n/names';
 import { locale, t } from '../i18n';
 
 export const STATUSES: ItemStatus[] = ['needed', 'ordered', 'owned', 'planted'];
@@ -111,7 +112,7 @@ export function bomTable(b: Bom): Cell[][] {
     t('Kód', 'Code'),
     t('Magyar név', 'Name'),
     t('Latin név', 'Latin name'),
-    ...(perArea ? b.areas.map((a) => t(`${a.name} (db)`, `${a.name} (pcs)`)) : []),
+    ...(perArea ? b.areas.map((a) => t(`${localName(a.name)} (db)`, `${localName(a.name)} (pcs)`)) : []),
     t('Ültetett (db)', 'Planted (pcs)'),
     t(`Rendelendő (db, +${b.reservePct}%)`, `To order (pcs, +${b.reservePct}%)`),
     t('Kiszerelés', 'Pot size'),

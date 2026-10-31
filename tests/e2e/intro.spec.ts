@@ -17,6 +17,7 @@ test('first start shows the 3-step intro once', async ({ page }) => {
   await coach.getByRole('button', { name: 'Kezdjük' }).click();
   await expect(coach).toHaveCount(0);
   await page.reload();
+  await page.locator('.home-area').first().click();
   await expect(page.locator('.area-switch')).toBeVisible();
   await expect(page.getByRole('dialog', { name: 'Bevezető' })).toHaveCount(0);
 });

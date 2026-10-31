@@ -9,6 +9,7 @@ test('one-tap language and dark mode in the top bar; author and rights notice', 
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await page.locator('.home-area').first().click();
   await page.getByRole('button', { name: 'Világos mód' }).click();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 

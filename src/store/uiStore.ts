@@ -55,6 +55,9 @@ export interface UiState {
   /** Options of the visualisation brief (kept while the app is open). */
   vizOptions: PromptOptions;
   setVizOptions: (o: PromptOptions) => void;
+  /** The start page is showing (on every launch, and from the logo). */
+  home: boolean;
+  setHome: (v: boolean) => void;
   /** The start screen asked for an own area: App opens the new-area form once. */
   startWithNewArea: boolean;
   setStartWithNewArea: (v: boolean) => void;
@@ -125,6 +128,8 @@ export const useUi = create<UiState>()((set) => ({
   visualOpen: false,
   setVisualOpen: (visualOpen) => set({ visualOpen }),
   startWithNewArea: false,
+  home: true,
+  setHome: (home) => set({ home, compare: false, page: null }),
   setStartWithNewArea: (startWithNewArea) => set({ startWithNewArea }),
   vizOptions: { season: 1, viewpoint: 'camera', lang: getLang(), mature: true, style: 'photo', time: 'afternoon', weather: 'sunny' },
   setVizOptions: (vizOptions) => set({ vizOptions }),

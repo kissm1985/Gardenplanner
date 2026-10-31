@@ -1,8 +1,8 @@
-<p align="center"><img src="docs/brand/gardenly-mark.svg" width="88" alt=""></p>
+<p align="center"><img src="docs/brand/planterra-mark.svg" width="88" alt=""></p>
 
-# Gardenly
+# Planterra
 
-**Tervezz · Ültess · Élvezd** – *Álmaid kertje egy tervnyire van.*
+**Kerttervező szoftver** – *Formáld az élő tereket.*
 
 Készítette: **Kiss-Mihály István** · © 2026 Kiss-Mihály István. Minden jog fenntartva (lásd [LICENSE](LICENSE)).
 

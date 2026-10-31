@@ -45,15 +45,19 @@ describe('bill of materials', () => {
     expect(buildBom(st().project!, [areaId(strip)]).planted).toBe(12);
   });
 
-  it('counts the chosen variant by default, or the one shown on the plan', () => {
+  it('the plan on screen is the chosen one: opening a variant chooses it', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]); // 11 in A (chosen)
+    st().addRow('LA', [[60, 0], [60, 400]]); // 11 in A
     const area = () => st().project!.areas[strip];
-    const vb = st().duplicateVariant(area().variants[0].id)!;
-    st().setActiveVariant(vb);
+    const va = area().variants[0].id;
+    const vb = st().duplicateVariant(va)!; // the copy opens, and so becomes the chosen one
     st().placePlant('TH', 20, 20); // B: 12
-    expect(buildBom(st().project!, [areaId(strip)]).planted).toBe(11);
+    expect(area().chosenVariantId).toBe(vb);
+    expect(buildBom(st().project!, [areaId(strip)]).planted).toBe(12);
     expect(buildBom(st().project!, [areaId(strip)], null, 'shown').planted).toBe(12);
+    st().setActiveVariant(va);
+    expect(area().chosenVariantId).toBe(va);
+    expect(buildBom(st().project!, [areaId(strip)]).planted).toBe(11);
   });
 
   it('filters by status and bulk-sets a species status', () => {

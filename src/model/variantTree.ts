@@ -1,4 +1,5 @@
 // Variants and folders of one area as a tree (parentId links). Unknown parents fall back to the top level.
+import { localName } from '../i18n/names';
 import type { Area, Variant, VariantFolder } from './types';
 import { t } from '../i18n';
 
@@ -48,7 +49,7 @@ export function moveTargets(area: Area, id: string): { id: string | null; label:
   const walk = (ns: TreeNode[], depth: number) => {
     for (const n of ns) {
       if (n.id === id) continue;
-      out.push({ id: n.id, label: `${'  '.repeat(depth)}${n.kind === 'folder' ? '📁 ' : ''}${n.name}` });
+      out.push({ id: n.id, label: `${'  '.repeat(depth)}${n.kind === 'folder' ? '📁 ' : ''}${localName(n.name)}` });
       walk(n.children, depth + 1);
     }
   };

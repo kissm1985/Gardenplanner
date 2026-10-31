@@ -17,6 +17,7 @@ import { Rulers, RULER } from './layers/Rulers';
 import { WarningsLayer } from './layers/Warnings';
 import { PlantTooltip } from '../ui/PlantTooltip';
 import { fitView, niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
+import { localName } from '../i18n/names';
 import { locale, t } from '../i18n';
 
 interface Props {
@@ -689,8 +690,8 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
           height={size.h}
           role="application"
           aria-label={t(
-            `${area.name} felülnézet, ${area.widthCm} × ${area.lengthCm} cm. Nagyítás: plusz és mínusz, illesztés: 0, mozgatás: nyilak, törlés: Delete.`,
-            `${area.name} plan view, ${area.widthCm} × ${area.lengthCm} cm. Zoom: plus and minus, fit: 0, move: arrows, delete: Delete.`,
+            `${localName(area.name)} felülnézet, ${area.widthCm} × ${area.lengthCm} cm. Nagyítás: plusz és mínusz, illesztés: 0, mozgatás: nyilak, törlés: Delete.`,
+            `${localName(area.name)} plan view, ${area.widthCm} × ${area.lengthCm} cm. Zoom: plus and minus, fit: 0, move: arrows, delete: Delete.`,
           )}
           tabIndex={0}
           onPointerDown={onPointerDown}

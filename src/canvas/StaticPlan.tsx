@@ -4,6 +4,7 @@ import type { Area, Camera, PlacedItem, Plant } from '../model/types';
 import { CameraMark } from './layers/Camera';
 import { AreaShapeEl } from './AreaShape';
 import { FixturesLayer } from './layers/Fixtures';
+import { localName } from '../i18n/names';
 import { PlantsLayer } from './layers/Plants';
 
 const NO_SELECTION = new Set<string>();
@@ -36,7 +37,7 @@ export function StaticPlan({ area, items, plantDb, month, showMature = true, lab
   const w = maxX - minX;
   const h = maxY - minY;
   return (
-    <svg className="static-plan" viewBox={`${minX} ${minY} ${w} ${h}`} style={{ aspectRatio: `${w} / ${h}` }} role="img" aria-label={title ?? area.name} preserveAspectRatio="xMidYMid meet">
+    <svg className="static-plan" viewBox={`${minX} ${minY} ${w} ${h}`} style={{ aspectRatio: `${w} / ${h}` }} role="img" aria-label={title ?? localName(area.name)} preserveAspectRatio="xMidYMid meet">
       <AreaShapeEl area={area} className={`area-bed kind-${area.kind ?? 'bed'}`} />
       <FixturesLayer area={area} scale={labelPx / w} drag={null} selected={null} interactive={false} />
       <AreaShapeEl area={area} className="area-outline" />

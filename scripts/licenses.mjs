@@ -23,9 +23,9 @@ const SHIPPED = [
 ];
 
 const out = [
-  'Gardenly – third-party software and fonts / harmadik féltől származó szoftverek és betűtípusok',
+  'Planterra – third-party software and fonts / harmadik féltől származó szoftverek és betűtípusok',
   '',
-  'Gardenly itself: © 2026 Kiss-Mihály István, all rights reserved (see LICENSE).',
+  'Planterra itself: © 2026 Kiss-Mihály István, all rights reserved (see LICENSE).',
   'The components below are included under their own licences, reproduced in full.',
   'Az alábbi összetevők a saját licencük alatt szerepelnek; a licencszövegek teljes terjedelmükben.',
   '',

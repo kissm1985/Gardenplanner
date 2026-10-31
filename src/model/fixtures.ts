@@ -2,7 +2,8 @@
 import type { Fixture, FixtureType } from './types';
 import { labels } from '../i18n';
 
-export const FIXTURE_LABEL: Record<FixtureType, string> = labels({
+/** Default element names in both languages (also used to translate stored default labels). */
+export const FIXTURE_LABEL_PAIRS: Record<FixtureType, [hu: string, en: string]> = {
   walnut: ['Diófa', 'Walnut'],
   tree: ['Fa', 'Tree'],
   window: ['Ablak', 'Window'],
@@ -22,7 +23,9 @@ export const FIXTURE_LABEL: Record<FixtureType, string> = labels({
   bench: ['Pad', 'Bench'],
   raisedBed: ['Magaságyás', 'Raised bed'],
   other: ['Egyéb', 'Other'],
-});
+};
+
+export const FIXTURE_LABEL: Record<FixtureType, string> = labels(FIXTURE_LABEL_PAIRS);
 
 /** Round (drawn as an ellipse in their box). */
 export const ROUND = new Set<FixtureType>(['pond', 'well', 'rainBarrel']);

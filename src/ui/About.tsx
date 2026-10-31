@@ -17,7 +17,7 @@ export function About({ onLegal }: { onLegal?: () => void }) {
       <div className="about-head">
         <LogoMark size={40} />
         <div>
-          <b className="about-name">Gardenly</b>
+          <b className="about-name">Planterra</b>
           <div className="mono muted">{t('Kerttervező alkalmazás', 'Garden planning app')}</div>
         </div>
       </div>

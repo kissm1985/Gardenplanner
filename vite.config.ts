@@ -24,7 +24,7 @@ export const CSP = [
 ].join('; ');
 
 const csp = (): Plugin => ({
-  name: 'gardenly-csp',
+  name: 'planterra-csp',
   apply: 'build',
   transformIndexHtml: (html) => html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />`),
 });
@@ -49,16 +49,16 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Gardenly – kerttervező',
-        short_name: 'Gardenly',
-        description: 'Tervezz, ültess, élvezd: mobilbarát kerttervező – terület, növények, lista, évszakok.',
+        name: 'Planterra – kerttervező',
+        short_name: 'Planterra',
+        description: 'Planterra – kerttervező szoftver: terület, növények, lista, évszakok, látványterv.',
         lang: 'hu',
         start_url: './',
         scope: './',
         display: 'standalone',
         orientation: 'any',
-        background_color: '#fbf8f2',
-        theme_color: '#133726',
+        background_color: '#f7f4ec',
+        theme_color: '#244b3c',
         icons: [
           { src: 'icon-192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icon-512.png', sizes: '512x512', type: 'image/png' },

@@ -22,7 +22,7 @@ export function SchedulePage() {
   return (
     <div className="schedule">
       <header className="cmp-head">
-        <div className="eyebrow">{t('Menetrend és gondozás · a választott változatokból', 'Schedule and care · from the chosen variants')}</div>
+        <div className="eyebrow">{t('Menetrend és gondozás · a rajzon lévő tervekből', 'Schedule and care · from the plans on screen')}</div>
         <div className="seg" role="tablist" aria-label={t('Nézet', 'View')}>
           {(
             [
@@ -210,7 +210,7 @@ function MulchTab() {
       ))}
     </ul>
   );
-  if (!m.gravel.length && !m.bark.length && !m.trees.length) return <p className="empty">{t('Még nincs növény a választott változatokban.', 'No plants in the chosen variants yet.')}</p>;
+  if (!m.gravel.length && !m.bark.length && !m.trees.length) return <p className="empty">{t('Még nincs növény a tervekben.', 'No plants in the plans yet.')}</p>;
   return (
     <section className="sched-tab mulch">
       {m.gravel.length > 0 && (

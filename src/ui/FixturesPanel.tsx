@@ -6,6 +6,7 @@ import { startLawnEdit } from './ShapeEditBar';
 import { selectCurrentArea, useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
 import { locale, t } from '../i18n';
+import { localName } from '../i18n/names';
 import { loadImage } from './imageFile';
 
 export { FIXTURE_LABEL };
@@ -58,7 +59,7 @@ export function FixturesPanel({ onDone }: { onDone: () => void }) {
             <button type="button" className="plant-row" onClick={() => setEditing(x.id)}>
               <span className={`fx-dot fx-dot-${x.type}`} aria-hidden="true" />
               <span className="plant-row-text">
-                <b>{x.label || FIXTURE_LABEL[x.type]}</b>
+                <b>{localName(x.label) || FIXTURE_LABEL[x.type]}</b>
                 <span className="mono muted">
                   {FIXTURE_LABEL[x.type]} · x {x.x} · y {x.y}
                   {x.polygon ? ` · ${m2(x.polygon)} m²` : x.radius ? t(` · sugár ${x.radius} cm`, ` · radius ${x.radius} cm`) : x.w ? ` · ${x.w} × ${x.h} cm` : ''}
@@ -151,7 +152,7 @@ function FixtureForm({ f, onBack, onReshape }: { f: Fixture; onBack: () => void;
       )}
       <label className="field">
         <span>{t('Felirat', 'Label')}</span>
-        <input key={f.label} defaultValue={f.label ?? ''} onBlur={(e) => e.target.value !== (f.label ?? '') && upd({ label: e.target.value })} />
+        <input key={f.label} defaultValue={localName(f.label)} onBlur={(e) => e.target.value !== localName(f.label) && upd({ label: e.target.value })} />
       </label>
       {!f.polygon && (
         <div className="field-row">

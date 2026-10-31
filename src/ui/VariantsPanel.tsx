@@ -14,6 +14,7 @@ import {
   useProject,
 } from "../store/projectStore";
 import { useUi } from "../store/uiStore";
+import { localName } from '../i18n/names';
 import { t } from '../i18n';
 
 type Stats = ReturnType<typeof variantStats>;
@@ -51,8 +52,8 @@ export function VariantsPanel({
     <div className="form">
       <p className="mono muted">
         {t(
-          "A „választott” változatból készül a növénylista és a nyomtatás. A rajzon mindig a „szerkesztett” változatot látod. A másolat az eredeti alá kerül; mappákkal és áthelyezéssel rendezheted a fát.",
-          "The plant list and the printout come from the “chosen” variant. The plan always shows the “edited” variant. A copy goes under its original; arrange the tree with folders and moves.",
+          "A rajzon lévő változat a választott: ebből készül a növénylista, a nyomtatás és a megosztott link. Egy másik változat megnyitásával azt választod. A másolat az eredeti alá kerül; mappákkal és áthelyezéssel rendezheted a fát.",
+          "The variant on the plan is the chosen one: the plant list, the printout and the shared link are made from it. Opening another variant chooses it. A copy goes under its original; arrange the tree with folders and moves.",
         )}
       </p>
       <ul className="variant-tree" role="tree" aria-label={t("Változatok", "Variants")}>
@@ -124,7 +125,7 @@ function Node({
       type="button"
       className="tree-more"
       onClick={() => setMenu(!menu)}
-      aria-label={t(`${n.name}: műveletek`, `${n.name}: actions`)}
+      aria-label={t(`${localName(n.name)}: műveletek`, `${localName(n.name)}: actions`)}
       aria-expanded={menu}
     >
       ⋯
@@ -140,7 +141,7 @@ function Node({
       type="button"
       className="tree-caret"
       onClick={() => toggle(n.id)}
-      aria-label={collapsed ? t(`${n.name} kinyitása`, `Expand ${n.name}`) : t(`${n.name} becsukása`, `Collapse ${n.name}`)}
+      aria-label={collapsed ? t(`${localName(n.name)} kinyitása`, `Expand ${localName(n.name)}`) : t(`${localName(n.name)} becsukása`, `Collapse ${localName(n.name)}`)}
       aria-expanded={!collapsed}
     >
       {collapsed ? "▸" : "▾"}
@@ -154,7 +155,7 @@ function Node({
     ) : null;
   const rename = mode === "rename" && (
     <RenameField
-      name={n.name}
+      name={localName(n.name)}
       label={n.kind === "folder" ? t("Mappa neve", "Folder name") : t("Változat neve", "Variant name")}
       onSave={(name) =>
         n.kind === "folder"
@@ -204,7 +205,7 @@ function Node({
         <div className="variant-card variant-folder">
           <div className="variant-top">
             {caret}
-            {rename || <b className="variant-name">📁 {n.name}</b>}
+            {rename || <b className="variant-name">📁 {localName(n.name)}</b>}
             {hidden}
             {more}
           </div>
@@ -231,8 +232,8 @@ function Node({
                 onClick={() =>
                   confirm(
                     t(
-                      `Törlöd a(z) „${n.name}” mappát? A benne lévő változatok megmaradnak, egy szinttel feljebb kerülnek.`,
-                      `Delete the folder “${n.name}”? Its variants stay and move up one level.`,
+                      `Törlöd a(z) „${localName(n.name)}” mappát? A benne lévő változatok megmaradnak, egy szinttel feljebb kerülnek.`,
+                      `Delete the folder “${localName(n.name)}”? Its variants stay and move up one level.`,
                     ),
                   ) && st.deleteVariantFolder(n.id)
                 }
@@ -257,12 +258,9 @@ function Node({
       <div className={`variant-card${v.id === active ? " is-active" : ""}`}>
         <div className="variant-top">
           {caret}
-          {rename || <b className="variant-name">{v.name}</b>}
+          {rename || <b className="variant-name">{localName(v.name)}</b>}
           <span className="variant-badges">
-            {v.id === area.chosenVariantId && (
-              <span className="badge badge-chosen">{t("★ választott", "★ chosen")}</span>
-            )}
-            {v.id === active && <span className="badge">{t("szerkesztett", "edited")}</span>}
+            {v.id === active && <span className="badge badge-chosen">{t("★ a rajzon", "★ on the plan")}</span>}
           </span>
           {v.id !== active && (
             <button
@@ -291,15 +289,6 @@ function Node({
         {move}
         {menu && (
           <div className="card-actions wrap">
-            {v.id !== area.chosenVariantId && (
-              <button
-                type="button"
-                className="btn btn-small"
-                onClick={() => st.setChosenVariant(v.id)}
-              >
-                {t("Legyen a választott", "Make it the chosen one")}
-              </button>
-            )}
             <button
               type="button"
               className="btn btn-small"
@@ -328,8 +317,8 @@ function Node({
                 onClick={() =>
                   confirm(
                     t(
-                      `Törlöd a(z) „${v.name}” változatot?${kids ? " Az alatta lévők egy szinttel feljebb kerülnek." : ""} Visszavonással visszahozható.`,
-                      `Delete the variant “${v.name}”?${kids ? " The ones below it move up one level." : ""} Undo brings it back.`,
+                      `Törlöd a(z) „${localName(v.name)}” változatot?${kids ? " Az alatta lévők egy szinttel feljebb kerülnek." : ""} Visszavonással visszahozható.`,
+                      `Delete the variant “${localName(v.name)}”?${kids ? " The ones below it move up one level." : ""} Undo brings it back.`,
                     ),
                   ) && st.deleteVariant(v.id)
                 }

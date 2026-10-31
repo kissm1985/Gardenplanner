@@ -8,11 +8,11 @@ import { t } from '../i18n';
 
 export const exportJson = (p: Project) => JSON.stringify(p, null, 2);
 
-const NOT_A_BACKUP = () => t('Ez nem Gardenly-projektmentés (hiányzó vagy ismeretlen verzió).', 'This is not a Gardenly backup (missing or unknown version).');
+const NOT_A_BACKUP = () => t('Ez nem Planterra-projektmentés (hiányzó vagy ismeretlen verzió).', 'This is not a Planterra backup (missing or unknown version).');
 
 /** Parse and sanity-check a project backup; throws a readable message on failure. */
 export function parseProject(text: string): Project {
-  if (text.length > LIMITS.textBytes) throw new Error(t('A fájl túl nagy ahhoz, hogy Gardenly-mentés legyen.', 'The file is too large to be a Gardenly backup.'));
+  if (text.length > LIMITS.textBytes) throw new Error(t('A fájl túl nagy ahhoz, hogy Planterra-mentés legyen.', 'The file is too large to be a Planterra backup.'));
   let data: unknown;
   try {
     data = JSON.parse(text);

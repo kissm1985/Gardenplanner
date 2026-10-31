@@ -9,10 +9,10 @@ import { downloadBlob, downloadText } from './download';
 import { PlantChip } from './PlantChip';
 import { STATUS_LABEL } from './Selection';
 import { copy } from './clipboard';
+import { localName } from '../i18n/names';
 import { t } from '../i18n';
 
 type Scope = 'all' | string;
-type Source = 'shown' | 'chosen';
 
 /** Plant list and shopping (SPEC §4.6). */
 export function ListView() {
@@ -20,16 +20,15 @@ export function ListView() {
   const current = useProject(selectCurrentArea);
   // Default: the plan on screen – the current area's shown variant.
   const [scope, setScope] = useState<Scope>(current?.id ?? 'all');
-  const [source, setSource] = useState<Source>('shown');
   const [status, setStatus] = useState<ItemStatus | null>(null);
   const [toast, setToast] = useState('');
   const [fallback, setFallback] = useState('');
   const taRef = useRef<HTMLTextAreaElement>(null);
 
   const areaIds = scope === 'all' ? project.areas.map((a) => a.id) : [scope];
-  const bom = useMemo(() => buildBom(project, areaIds, status, source), [project, scope, status, source]);
+  const bom = useMemo(() => buildBom(project, areaIds, status), [project, scope, status]);
   const table = useMemo(() => bomTable(bom), [bom]);
-  const title = scope === 'all' ? project.name : (project.areas.find((a) => a.id === scope)?.name ?? '');
+  const title = scope === 'all' ? localName(project.name) : localName(project.areas.find((a) => a.id === scope)?.name);
   const fileBase = `${t('novenylista', 'plant-list')}-${title.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}`;
 
   const say = (msg: string) => {
@@ -45,7 +44,7 @@ export function ListView() {
   const xlsx = () => {
     const sheets = [{ name: scope === 'all' ? t('Összesen', 'Total') : title, rows: table }];
     if (scope === 'all' && project.areas.length > 1)
-      for (const a of project.areas) sheets.push({ name: a.name, rows: bomTable(buildBom(project, [a.id], status, source)) });
+      for (const a of project.areas) sheets.push({ name: localName(a.name), rows: bomTable(buildBom(project, [a.id], status)) });
     downloadBlob(`${fileBase}.xlsx`, buildXlsx(sheets), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   };
 
@@ -63,12 +62,9 @@ export function ListView() {
 
   const perArea = bom.areas.length > 1;
   const scoped = scope === 'all' ? null : project.areas.find((a) => a.id === scope);
-  const eyebrow =
-    source === 'shown'
-      ? scoped
-        ? t(`Növénylista · látható terv: ${activeVariant(scoped).name}`, `Plant list · plan on screen: ${activeVariant(scoped).name}`)
-        : t('Növénylista · a látható tervekből', 'Plant list · from the plans on screen')
-      : t('Növénylista · a választott változatokból', 'Plant list · from the chosen variants');
+  const eyebrow = scoped
+    ? t(`Növénylista · látható terv: ${localName(activeVariant(scoped).name)}`, `Plant list · plan on screen: ${localName(activeVariant(scoped).name)}`)
+    : t('Növénylista · a látható tervekből', 'Plant list · from the plans on screen');
 
   return (
     <div className="listview">
@@ -77,21 +73,13 @@ export function ListView() {
         <button type="button" className="btn btn-small" onClick={() => useUi.getState().setPage('schedule')}>
           {t('Ültetési menetrend és gondozás →', 'Planting schedule and care →')}
         </button>
-        <div className="seg" role="group" aria-label={t('Melyik változat', 'Which variant')}>
-          <ScopeChip on={source === 'shown'} onClick={() => setSource('shown')}>
-            {t('Látható terv', 'Plan on screen')}
-          </ScopeChip>
-          <ScopeChip on={source === 'chosen'} onClick={() => setSource('chosen')}>
-            {t('★ Választott változatok', '★ Chosen variants')}
-          </ScopeChip>
-        </div>
         <div className="seg" role="group" aria-label={t('Terület', 'Area')}>
           <ScopeChip on={scope === 'all'} onClick={() => setScope('all')}>
             {t('Összesítve', 'Combined')}
           </ScopeChip>
           {project.areas.map((a) => (
             <ScopeChip key={a.id} on={scope === a.id} onClick={() => setScope(a.id)}>
-              {a.name}
+              {localName(a.name)}
             </ScopeChip>
           ))}
         </div>
@@ -175,7 +163,7 @@ export function ListView() {
             <thead>
               <tr>
                 <th>{t('Növény', 'Plant')}</th>
-                {perArea && bom.areas.map((a) => <th key={a.id} className="m">{a.name}</th>)}
+                {perArea && bom.areas.map((a) => <th key={a.id} className="m">{localName(a.name)}</th>)}
                 <th className="m">{t('Ültetés', 'Plant')}</th>
                 <th className="m">{t('Rendelés', 'Order')}</th>
                 <th>{t('Kiszerelés', 'Pot size')}</th>

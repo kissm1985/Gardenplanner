@@ -1,35 +1,35 @@
-# „Gardenly” név – előzetes kutatás
+# „Planterra” név – előzetes kutatás
 
-*Készült: 2026. október 30. Gyors, nyilvános webes keresés, nem hivatalos védjegykutatás és nem jogi vélemény.*
+*Készült: 2026. október 31. Gyors, nyilvános webes keresés, nem hivatalos védjegykutatás és nem jogi vélemény. A korábbi „Gardenly” névről szóló kutatás a git-előzményekben megtalálható.*
 
-## Talált azonos nevek
+## Talált azonos vagy hasonló nevek
 
 | Mi | Hol | Mennyire közeli |
 |---|---|---|
-| **GARDENLY** bejegyzett védjegy (USA, reg. sz. 6629458, bejelentés: 87900019, 35. osztály: online kiskereskedelem – kerti bútor, élő növények, ültetőedények), jogosult: Katie Williams | [Justia](https://trademark.justia.com/879/00/gardenly-87900019.html), [Markinton](https://markinton.com/trademark/gardenly-87900019) | Kertészeti terület, de kereskedelmi szolgáltatás, USA-ban; él (harmadik fél szerint) |
-| **Gardenly – AI Garden Design** (gardenly.app, iOS app: fotóból MI-s kertáttervezés, előfizetéses) | [App Store](https://apps.apple.com/app/id6747178697), [AlternativeTo](https://alternativeto.net/software/gardenly/), [SaaSHub](https://www.saashub.com/gardenly), [Product Hunt](https://www.producthunt.com/products/gardenly/makers) | **Nagyon közeli**: ugyanaz a név, ugyanaz a terület (kerttervezés, MI-s látványkép) |
-| **Gardenly AI: Plant ID & Care** (iOS app: növényazonosítás, gondozás, fagyriasztás) | [App Store](https://apps.apple.com/us/app/id6751413313) | Közeli: kertészeti app, gondozási naptár jellegű funkciókkal |
-
-Az EU-s (EUIPO) nyilvántartásban ez a gyors keresés nem talált „Gardenly” védjegyet, de ez nem helyettesíti a hivatalos adatbázis átnézését.
+| **PLANTERRA** védjegyek, jogosult: Planterra Corporation (Michigan, USA) – beltéri terráriumok, kaspók (USA, 2017-es bejelentés, élőnek jelölve); Kanadában más áruosztályokban (TMA706585) | [Justia](https://trademarks.justia.com/877/11/planterra-87711444.html), [Trademarkdir](https://trademarkdir.com/owner/planterra-corporation), [CIPO 1197344](https://ised-isde.canada.ca/cipo/trademark-search/1197344) | Növényes terület (beltéri növénydekoráció), de nem szoftver |
+| **PLANTERRA** (35. osztály), jogosult: Planterra Foods Company (Colorado, USA), reg. sz. 6181652 | [Markinton](https://markinton.com/trademark/planterra-88779521) | Élelmiszer, távoli |
+| **PLANTERRA** függő bejelentés (5. osztály, Newtonic Ltd, Izrael, 2025) | [Markinton](https://markinton.com/trademark/planterra-99534658) | Távoli |
+| „Planterra Gardens, Inc.” | [Trademarkdir](https://trademarkdir.com/owner/planterra-gardens-inc) | Kertészeti cégnév, részletek nem ismertek |
+| Alkalmazás „Planterra” néven | gyors keresésben nem találtunk az app store-okban; hasonló nevek: Planter, Plantura, Plotera | [Planter (App Store)](https://apps.apple.com/app/id1542642210), [Plantura (App Store)](https://apps.apple.com/DE/app/id1555067486) |
 
 ## Mit jelent ez
 
-- Ugyanazon a néven már legalább két kerttervező/kertészeti alkalmazás fut az App Store-ban, az egyik kifejezetten MI-s kerttervező. Nyilvános megjelenésnél (app store, weboldal) valós a **összetéveszthetőség** és a **névütközés** kockázata, akkor is, ha az EU-ban nincs bejegyzett védjegy.
-- Saját védjegy bejelentése „Gardenly” névre nehezebb lehet, és egy korábbi használó felszólalhat.
+- Szoftverre (9. és 42. osztály) a gyors keresés nem talált „Planterra” védjegyet és azonos nevű kerttervező appot – ez kedvezőbb, mint a „Gardenly” név helyzete volt.
+- Az USA-ban és Kanadában létezik „Planterra” védjegy növényekhez kapcsolódó termékekre (terráriumok, kaspók) és egy kertészeti cégnév; az EU-ban és Magyarországon a gyors keresés nem talált adatot, ez azonban nem helyettesíti a hivatalos kutatást.
 
 ## Javaslat
 
-1. Hivatalos keresés: [EUIPO eSearch plus](https://euipo.europa.eu/eSearch/), [TMview](https://www.tmdn.org/tmview/) (EU + tagállamok, köztük Magyarország), [SZTNH E-kutatás](https://epub.hipo.gov.hu/) a 9. (szoftver) és a 42. (szoftverszolgáltatás) osztályban, valamint az app store-ok.
-2. Ha az alkalmazás nyilvános lesz, érdemes **megkülönböztető nevet** választani vagy a nevet kiegészíteni (pl. egy saját, jellegzetes szóval), és erre védjegyet bejelenteni.
-3. Amíg csak saját használatra fut, a név maradhat; a név és a logó később cserélhető (a felület egy helyen, `src/ui/Logo.tsx` és az `index.html`/manifest).
-4. Nyilvános közzététel előtt szellemitulajdon-jogi szakértő véleménye ajánlott.
+1. Hivatalos keresés: [EUIPO eSearch plus](https://euipo.europa.eu/eSearch/), [TMview](https://www.tmdn.org/tmview/), [SZTNH E-kutatás](https://epub.hipo.gov.hu/) a 9., 42. (és ha van kapcsolódó szolgáltatás, a 44.) osztályban, valamint az app store-ok.
+2. Nyilvános megjelenés előtt érdemes saját védjegyet bejelenteni a 9. és 42. osztályban, ha a keresés tiszta.
+3. Szellemitulajdon-jogi szakértő véleménye ajánlott.
 
 ## Források
 
-- [GARDENLY – Trademark Details (Justia)](https://trademark.justia.com/879/00/gardenly-87900019.html)
-- [gardenly 87900019 (Markinton)](https://markinton.com/trademark/gardenly-87900019)
-- [AI Garden Design – Gardenly (App Store)](https://apps.apple.com/app/id6747178697)
-- [Gardenly AI: Plant ID & Care (App Store)](https://apps.apple.com/us/app/id6751413313)
-- [Gardenly (AlternativeTo)](https://alternativeto.net/software/gardenly/)
-- [Gardenly (SaaSHub)](https://www.saashub.com/gardenly)
-- [Gardenly makers (Product Hunt)](https://www.producthunt.com/products/gardenly/makers)
+- [PLANTERRA – Trademark Details (Justia)](https://trademarks.justia.com/877/11/planterra-87711444.html)
+- [Planterra Corporation – Trademark Portfolio (Trademarkdir)](https://trademarkdir.com/owner/planterra-corporation)
+- [PLANTERRA — 1197344 (CIPO)](https://ised-isde.canada.ca/cipo/trademark-search/1197344)
+- [planterra 88779521 (Markinton)](https://markinton.com/trademark/planterra-88779521)
+- [planterra 99534658 (Markinton)](https://markinton.com/trademark/planterra-99534658)
+- [Planterra Gardens, Inc. (Trademarkdir)](https://trademarkdir.com/owner/planterra-gardens-inc)
+- [Planter: Garden Planner (App Store)](https://apps.apple.com/app/id1542642210)
+- [Plantura: Pflanzen & Garten (App Store)](https://apps.apple.com/DE/app/id1555067486)

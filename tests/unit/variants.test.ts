@@ -22,18 +22,19 @@ describe('variants', () => {
     expect(b.items).toHaveLength(1);
     expect(b.items[0].id).not.toBe(a.items[0].id);
     expect(activeVariant(area()).id).toBe(bId);
-    expect(area().chosenVariantId).toBe(a.id); // chosen stays
+    expect(area().chosenVariantId).toBe(bId); // the plan on screen is the chosen one
   });
 
-  it('editing affects only the active variant; the list uses the chosen one', () => {
+  it('editing affects only the open variant, which is also the chosen one', () => {
     st().placePlant('LA', 60, 100);
     const a = area().variants[0].id;
     st().duplicateVariant(a);
     st().placePlant('TH', 60, 300); // into B
     expect(selectItems(st())).toHaveLength(2);
-    expect(buildBom(st().project!).planted).toBe(1); // A is chosen
-    st().setChosenVariant(activeVariant(area()).id);
-    expect(buildBom(st().project!).planted).toBe(2);
+    expect(buildBom(st().project!).planted).toBe(2); // B is open and chosen
+    st().setActiveVariant(a);
+    expect(buildBom(st().project!).planted).toBe(1);
+    expect(area().variants.find((v) => v.id !== a)!.items).toHaveLength(2); // B kept its plants
   });
 
   it('rename, delete (never the last), chosen falls back', () => {

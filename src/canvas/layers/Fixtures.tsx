@@ -1,6 +1,7 @@
 import { useUi } from '../../store/uiStore';
 import { memo } from 'react';
 import { MOVE_WHEN_SELECTED, ROUND } from '../../model/fixtures';
+import { localName } from '../../i18n/names';
 import type { Area, Fixture, FixtureType, Pt, Settings } from '../../model/types';
 
 const pts = (p: [number, number][]) => p.map(([x, y]) => `${x},${y}`).join(' ');
@@ -76,7 +77,7 @@ function ResizeHandle({ f, scale }: { f: Fixture; scale: number }) {
 }
 
 function FixtureShape({ f, fs, selected, interactive }: { f: Fixture; fs: number; selected: boolean; interactive: boolean }) {
-  const label = f.label ?? '';
+  const label = localName(f.label);
   const cls = `fx fx-${f.type}${selected ? ' is-selected' : ''}${interactive ? ' is-interactive' : ''}${MOVE_WHEN_SELECTED.has(f.type) && !selected ? ' is-fixed' : ''}`;
   const hit = interactive ? { 'data-fixture': f.id } : { pointerEvents: 'none' as const };
   if (f.polygon) {

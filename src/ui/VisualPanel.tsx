@@ -10,6 +10,7 @@ import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
 import { downloadBlob } from './download';
 import { planSvg, svgToPng, type LegendRow } from './exportImage';
+import { localName } from '../i18n/names';
 import { loadImage } from './imageFile';
 
 const CHATGPT_URL = 'https://chatgpt.com/';
@@ -38,7 +39,7 @@ export async function vizPng(project: Project, area: Area, v: Variant, season: S
   root.dataset.theme = 'light';
   let svg: string;
   try {
-    svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: SEASON_MONTH[season], legend, camera: area.camera, caption: `${area.name} – ${v.name} · ${area.widthCm} × ${area.lengthCm} cm` });
+    svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: SEASON_MONTH[season], legend, camera: area.camera, caption: `${localName(area.name)} – ${localName(v.name)} · ${area.widthCm} × ${area.lengthCm} cm` });
   } finally {
     if (theme) root.dataset.theme = theme;
     else delete root.dataset.theme;
@@ -79,7 +80,7 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
 
   if (!area || !v) return <p className="mono muted">{t('Nincs kiválasztott terület.', 'No area selected.')}</p>;
 
-  const fileName = `${slug(area.name)}-${slug(v.name)}${t('-latvanyterv', '-visualisation')}.png`;
+  const fileName = `${slug(localName(area.name))}-${slug(localName(v.name))}${t('-latvanyterv', '-visualisation')}.png`;
   const brief = () => {
     const s = buildVisualPrompt(project, area, v.items, opt);
     setText(s);
@@ -130,7 +131,7 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
         const { dataUrl } = await loadImage(f, 1600);
         useProject.getState().addRender(v.id, { dataUrl, addedAt: new Date().toISOString() });
       }
-      setMsg(t(`Kép mentve a(z) „${v.name}” változathoz.`, `Image saved with the variant “${v.name}”.`));
+      setMsg(t(`Kép mentve a(z) „${localName(v.name)}” változathoz.`, `Image saved with the variant “${localName(v.name)}”.`));
     } catch (e) {
       setMsg((e as Error).message);
     }
@@ -155,8 +156,8 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
     <div className="form visual-panel">
       <p className="mono muted">
         {t(
-          `A(z) „${area.name}” terület „${v.name}” változatáról készül leírás és rajz a ChatGPT-nek. A kész képet töltsd vissza ide: a változat mellett marad, és az összehasonlításban is látszik.`,
-          `A description and plan of the “${v.name}” variant of “${area.name}” for ChatGPT. Upload the finished image here: it stays with the variant and shows in the comparison.`,
+          `A(z) „${localName(area.name)}” terület „${localName(v.name)}” változatáról készül leírás és rajz a ChatGPT-nek. A kész képet töltsd vissza ide: a változat mellett marad, és az összehasonlításban is látszik.`,
+          `A description and plan of the “${localName(v.name)}” variant of “${localName(area.name)}” for ChatGPT. Upload the finished image here: it stays with the variant and shows in the comparison.`,
         )}
       </p>
 
@@ -243,7 +244,7 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
       {text && <textarea ref={taRef} className="sched-text" readOnly rows={8} value={text} onFocus={(e) => e.currentTarget.select()} aria-label={t('Leírás a látványtervhez', 'Visualisation description')} />}
 
       <fieldset className="field-group">
-        <legend>{t(`Kész látványképek – ${v.name}`, `Finished images – ${v.name}`)}</legend>
+        <legend>{t(`Kész látványképek – ${localName(v.name)}`, `Finished images – ${localName(v.name)}`)}</legend>
         {viewing ? (
           <figure className="render-view">
             <img src={viewing.dataUrl} alt={t('Látványkép', 'Visualisation')} />
@@ -252,7 +253,7 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
               <button type="button" className="btn btn-small" onClick={() => setViewing(null)}>
                 {t('Vissza', 'Back')}
               </button>
-              <a className="btn btn-small" href={viewing.dataUrl} download={`${slug(area.name)}-${slug(v.name)}-${viewing.id}.jpg`}>
+              <a className="btn btn-small" href={viewing.dataUrl} download={`${slug(localName(area.name))}-${slug(localName(v.name))}-${viewing.id}.jpg`}>
                 {t('Letöltés', 'Download')}
               </a>
               <button

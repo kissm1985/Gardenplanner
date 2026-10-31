@@ -5,6 +5,7 @@ import type { Area, Plant } from '../model/types';
 import { StaticPlan } from '../canvas/StaticPlan';
 import { useUi } from '../store/uiStore';
 import { t } from '../i18n';
+import { localName } from '../i18n/names';
 import { plantName } from '../model/plants';
 
 /** Species of the area, for the hint line. */
@@ -73,7 +74,7 @@ export function FourSeasons({ area, plantDb, showMature }: { area: Area; plantDb
             <figcaption>
               <b>{SEASON_LABEL[s]}</b> <span className="mono muted">{MONTH_LABEL[m - 1]}</span>
             </figcaption>
-            <StaticPlan area={area} items={items} plantDb={plantDb} month={m} showMature={showMature} title={`${area.name}, ${SEASON_LABEL[s].toLowerCase()}`} />
+            <StaticPlan area={area} items={items} plantDb={plantDb} month={m} showMature={showMature} title={`${localName(area.name)}, ${SEASON_LABEL[s].toLowerCase()}`} />
             <p className="four-hint">{hint(ps, m)}</p>
           </figure>
         );

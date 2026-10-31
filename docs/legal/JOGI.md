@@ -1,22 +1,22 @@
 # Jogi információk
 
-Gardenly · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István. Minden jog fenntartva.
+Planterra · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István. Minden jog fenntartva.
 
 *Hatályos: 2026. október 30-tól. Ez a szöveg tájékoztató jellegű tervezet; nyilvános közzététel előtt érdemes jogásszal átnézetni.*
 
 ## Felhasználási feltételek
 
-1. **Az alkalmazás.** A Gardenly kerttervező alkalmazás, amely a böngészőben, a felhasználó saját készülékén fut. Regisztráció nincs, a használat ingyenes.
+1. **Az alkalmazás.** A Planterra kerttervező alkalmazás, amely a böngészőben, a felhasználó saját készülékén fut. Regisztráció nincs, a használat ingyenes.
 2. **Szerzői jog.** Az alkalmazás (program, felület, szövegek, arculat, növényadatbázis összeállítása) a készítő szellemi tulajdona. A készítő előzetes írásbeli engedélye nélkül nem másolható, nem terjeszthető, nem módosítható és nem tehető nyilvánosan elérhetővé. A beépített harmadik féltől származó összetevők a saját licencük alatt állnak (lásd lent).
 3. **A te terveid.** Az általad készített tervek, jegyzetek, feltöltött fotók és látványképek a tieid. Az alkalmazás ezeket nem küldi el a készítőnek.
 4. **Tájékoztató adatok.** A növényadatok (méret, tőtáv, fény- és vízigény, mérgezőség, juglone-tűrés, talaj, virágzás) és az árak tájékoztató jellegűek; egy részük „ellenőrizendő” jelölésű. A mérgezőségi adatok nem orvosi vagy állatorvosi tanácsok. Ültetés előtt, különösen gyerekek és háziállatok közelében, ellenőrizd őket megbízható forrásban.
-5. **Mesterséges intelligencia.** A „Látványterv” funkció leírást és rajzot készít, amelyet *te* küldesz el egy külső szolgáltatásnak (pl. ChatGPT). Az ott készülő kép illusztráció, nem pontos terv. A külső szolgáltatás használatára annak saját feltételei vonatkoznak. A Gardenly nem kapcsolódik az OpenAI-hoz; a ChatGPT név az OpenAI védjegye.
+5. **Mesterséges intelligencia.** A „Látványterv” funkció leírást és rajzot készít, amelyet *te* küldesz el egy külső szolgáltatásnak (pl. ChatGPT). Az ott készülő kép illusztráció, nem pontos terv. A külső szolgáltatás használatára annak saját feltételei vonatkoznak. A Planterra nem kapcsolódik az OpenAI-hoz; a ChatGPT név az OpenAI védjegye.
 6. **Felelősség.** Az alkalmazást „ahogy van” állapotban adjuk. A készítő a jogszabályok által megengedett mértékben nem felel a tervek alapján végzett ültetésből, vásárlásból, a növények mérgezőségéből vagy az adatok elvesztéséből eredő károkért. Készíts rendszeresen mentést (⋯ → Teljes mentés).
 7. **Változások.** A feltételek változhatnak; a mindenkori változat az alkalmazásban olvasható.
 
 ## Adatvédelmi tájékoztató
 
-**Röviden: a Gardenly nem gyűjt rólad személyes adatot, és nincs szervere, amely a terveidet tárolná.**
+**Röviden: a Planterra nem gyűjt rólad személyes adatot, és nincs szervere, amely a terveidet tárolná.**
 
 - **Mit tárol, és hol?** A terveid, beállításaid, a feltöltött fotók és látványképek kizárólag a saját készülékeden, a böngésző tárhelyén (IndexedDB, localStorage) maradnak. Innen akkor kerülnek ki, ha te mented ki őket fájlba, vagy te osztod meg őket.
 - **Megosztott link.** A „csak olvasható link” a választott változatokat (területnevek, növények, jegyzetek) a link végén, tömörítve tartalmazza. Aki megkapja a linket, látja ezeket. A link tartalma nem kerül szerverre, de bárhová továbbítható, ezért csak annak küldd el, akivel meg szeretnéd osztani.
@@ -36,4 +36,4 @@ Gardenly · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István. 
 
 ## Harmadik féltől származó összetevők
 
-A Gardenly a következő nyílt forrású összetevőket tartalmazza: React, React DOM, Scheduler, Zustand, fflate, Workbox (MIT licenc), idb-keyval (Apache 2.0 licenc), valamint a Fraunces, Outfit és JetBrains Mono betűtípusok (SIL Open Font License 1.1). A teljes licencszövegek: [third-party-licenses.txt](third-party-licenses.txt).
+A Planterra a következő nyílt forrású összetevőket tartalmazza: React, React DOM, Scheduler, Zustand, fflate, Workbox (MIT licenc), idb-keyval (Apache 2.0 licenc), valamint a Fraunces, Outfit és JetBrains Mono betűtípusok (SIL Open Font License 1.1). A teljes licencszövegek: [third-party-licenses.txt](third-party-licenses.txt).

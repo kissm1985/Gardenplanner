@@ -27,6 +27,7 @@ test('planting schedule: window, checklist ticks persist; care calendar and mulc
 
   await page.waitForTimeout(600);
   await page.reload();
+  await page.locator('.home-area').first().click();
   await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
   await page.getByRole('button', { name: 'Menetrend és gondozás' }).click();
   await expect(page.locator('.task').first().locator('input')).toBeChecked();

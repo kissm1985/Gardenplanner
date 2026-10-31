@@ -104,8 +104,11 @@ export function newProject(templateKeys: string[]): Project {
 const seedPlants = () => SEED_PLANTS.map((p) => ({ ...p }));
 
 /** Upgrade projects saved by earlier builds. */
+/** The plan on the canvas is always the chosen one: opening a variant chooses it. */
+export const onePlan = (a: Area): Area => (a.activeVariantId && a.activeVariantId !== a.chosenVariantId ? { ...a, chosenVariantId: a.activeVariantId } : a);
+
 export function migrate(p: Project): Project {
-  let out = p;
+  let out = { ...p, areas: p.areas.map(onePlan) };
   if (!out.plantDb?.length) out = { ...out, plantDb: seedPlants() };
   const seedVersion = out.settings?.seedVersion ?? 1;
   if (seedVersion < SEED_VERSION) {
@@ -176,7 +179,7 @@ export const useProject = create<ProjectState>()((set, get) => {
     set({ project: next, past: [...past, project].slice(-HISTORY_LIMIT), future: [] });
   };
   const mapArea = (id: string, fn: (a: Area) => Area) =>
-    commit((p) => ({ ...p, areas: p.areas.map((a) => (a.id === id ? fn(a) : a)) }));
+    commit((p) => ({ ...p, areas: p.areas.map((a) => (a.id === id ? onePlan(fn(a)) : a)) }));
   /** Change the item list of the active variant of the current area. */
   const mapItems = (fn: (items: PlacedItem[]) => PlacedItem[]) => {
     const id = get().currentAreaId;
@@ -674,7 +677,7 @@ export const useProject = create<ProjectState>()((set, get) => {
 
     setChosenVariant: (vid) => {
       const areaId = get().currentAreaId;
-      if (areaId) mapArea(areaId, (a) => (a.chosenVariantId === vid ? a : { ...a, chosenVariantId: vid }));
+      if (areaId) mapArea(areaId, (a) => (a.chosenVariantId === vid && a.activeVariantId === vid ? a : { ...a, chosenVariantId: vid, activeVariantId: vid }));
     },
 
     undo: () => {

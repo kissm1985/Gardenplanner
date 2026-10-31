@@ -2,6 +2,7 @@
 import { useSyncExternalStore } from 'react';
 import { exportJson } from '../engine/io';
 import type { Project } from '../model/types';
+import { localName } from '../i18n/names';
 import { downloadText } from './download';
 
 const LAST_BACKUP = 'kerttervezo:last-backup';
@@ -66,13 +67,13 @@ const slug = (s: string) =>
 
 /** Full JSON backup to a file; remembers when, so the reminder goes quiet. */
 export async function backupNow(project: Project): Promise<void> {
-  const name = `gardenly-${slug(project.name)}-${new Date().toISOString().slice(0, 10)}.json`;
+  const name = `planterra-${slug(localName(project.name))}-${new Date().toISOString().slice(0, 10)}.json`;
   const json = exportJson(project);
   // Chrome/Edge on computers: let the user pick the folder (e.g. a synced one). Elsewhere: a download.
   const picker = (window as Window & { showSaveFilePicker?: (o: unknown) => Promise<FileSystemFileHandle> }).showSaveFilePicker;
   if (picker && !matchMedia('(pointer: coarse)').matches) {
     try {
-      const h = await picker({ suggestedName: name, types: [{ description: 'Gardenly JSON', accept: { 'application/json': ['.json'] } }] });
+      const h = await picker({ suggestedName: name, types: [{ description: 'Planterra JSON', accept: { 'application/json': ['.json'] } }] });
       const w = await h.createWritable();
       await w.write(json);
       await w.close();

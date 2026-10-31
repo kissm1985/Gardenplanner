@@ -1,41 +1,37 @@
-# Gardenly – arculat
+# Planterra – arculat
 
-<img src="gardenly-mark.svg" width="96" alt="Gardenly jel"> <img src="gardenly-icon.svg" width="96" alt="Gardenly alkalmazásikon">
+<img src="planterra-mark.svg" width="96" alt="Planterra jel"> <img src="planterra-icon.svg" width="96" alt="Planterra alkalmazásikon">
 
-**Név:** Gardenly · **Szlogen:** Tervezz · Ültess · Élvezd (*Design · Plant · Enjoy*)
-**Mottó:** Álmaid kertje egy tervnyire van. (*Your dream garden, one plan away.*) · Több mint egy kert. Szebb hétköznapok. (*More than a garden. A better everyday.*)
+**Név:** Planterra · **Alcím:** Kerttervező szoftver (*Garden design software*) · **Szlogen:** Formáld az élő tereket. (*Shape living spaces.*)
 
 ## Jel
 
-Tetővonal kéménnyel, alatta két levél: a ház és a kert együtt. A forrás `src/ui/Logo.tsx` (a téma színeit követi), önálló fájlok:
+Egy „P” betű, amelynek öble levél: a sötétzöld szárat a levéltől egy világos ív választja el. A forrás `src/ui/Logo.tsx` (a téma színeit követi), önálló fájlok:
 
-- `gardenly-mark.svg` – a jel világos háttérre;
-- `gardenly-icon.svg` – alkalmazásikon (sötétzöld alapon krém tető);
+- `planterra-mark.svg` – a jel világos háttérre;
+- `planterra-icon.svg` – alkalmazásikon (erdőzöld alapon elefántcsont szár, olívzöld levél);
 - `public/icon-*.png`, `public/apple-touch-icon.png`, `public/icon-maskable-512.png` – telepítési ikonok.
 
 ## Színek
 
 | Név | Szín | Token | Használat |
 |---|---|---|---|
-| Erdő | `#173a28` | `--brand-roof`, `--fg` | logó, szöveg |
-| Természet | `#31632e` | `--accent` | fő gombok, kiemelés |
-| Levél | `#3a8f3c` | `--brand-leaf` | logó nagy levele |
-| Növekedés | `#6c904a` | `--brand-leaf-2` | logó kis levele |
-| Harmónia | `#adbca2` | `--sage` | csempék, háttérárnyalat |
-| Tisztaság | `#f1e5d0` | `--cream` | világos felületek |
-| Melegség | `#e1cba8` | `--sand` | csempék |
-| Háttér | `#fbf8f2` | `--bg` | oldal háttere |
+| Forest | `#244B3C` | `--forest`, `--accent`, `--brand-stem` | logó, fő gombok, kiemelés |
+| Olive | `#8A9462` | `--olive`, `--brand-leaf` | logó levele, másodlagos kiemelés |
+| Sandstone | `#D5C5A7` | `--sandstone`, `--soil` | ágyásfelület, csempék |
+| Ivory | `#F7F4EC` | `--ivory`, `--bg` | háttér |
+| Dark Earth | `#343A32` | `--earth` | sötét felületek; a szöveg ennek mélyebb árnyalata (`#2B322B`) |
 
-Sötét módban krém tető és világosabb zöldek (`--accent: #8cc47a`) a `#0f1c14` alapon. Minden szín a `src/styles/tokens.css`-ben van.
+Sötét módban elefántcsont szár, olívzöld levél és olívzöld kiemelés a `#1D231E` alapon. Minden szín a `src/styles/tokens.css`-ben van.
 
 ## Betűk
 
-- **Fraunces** – szövegek és címek (a mottó dőlten).
-- **JetBrains Mono** – gombok, címkék, feliratok (nagybetűs, ritkított), a szlogen és a rajz műszaki feliratai.
-- **Outfit** (700, szűk betűköz) – csak a „Gardenly” logófelirat.
+- **Fraunces** – szövegek és címek.
+- **JetBrains Mono** – gombok, címkék, feliratok (nagybetűs, ritkított) és a rajz műszaki feliratai.
+- **Outfit** (500, szűk betűköz) – a „Planterra” logófelirat. A mintaképen szereplő Söhne fizetős betűtípus; az Outfit hozzá hasonló, szabad (SIL OFL) humanista-geometrikus sans.
 
 Mindhárom a buildbe csomagolva, offline is működik.
 
 ## Forma
 
-Lekerekített sarkok (gombok 12 px, mezők 8 px), kártyák vékony meleg keretvonallal, ikonok vékony vonallal.
+Lekerekített sarkok (gombok 12 px, mezők 8 px), vékony, meleg keretvonalak, tervrajzszerű felülnézet.

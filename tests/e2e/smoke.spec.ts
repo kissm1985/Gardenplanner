@@ -31,8 +31,15 @@ test('first launch → templates → canvas → new area persists after reload',
   // Autosave → survives a reload.
   await page.waitForTimeout(600);
   await page.reload();
-  // The last open area comes back.
+  // The start page comes first: a new area at the top, then the areas already planned.
+  await expect(page.locator('.tpl-own')).toContainText('Új terület létrehozása');
+  await expect(page.locator('.home-area')).toHaveCount(3);
+  await page.locator('.home-area', { hasText: 'Teszt ágyás' }).click();
   await expect(page.locator('.area-name')).toHaveText('Teszt ágyás');
+  // The logo leads back to the start page.
+  await page.getByRole('button', { name: /Kezdőoldal/ }).click();
+  await expect(page.locator('.home-area')).toHaveCount(3);
+  await page.locator('.home-area', { hasText: 'Teszt ágyás' }).click();
   await page.locator('.area-switch').click();
   const list = page.locator('.area-list');
   await expect(list.getByRole('button', { name: /Teszt ágyás/ })).toBeVisible();
@@ -41,7 +48,7 @@ test('first launch → templates → canvas → new area persists after reload',
 
 test('start screen: create my own area instead of the templates', async ({ page }) => {
   await page.goto('/');
-  await page.getByRole('button', { name: /Saját terület létrehozása/ }).click();
+  await page.getByRole('button', { name: /Új terület létrehozása/ }).click();
   const dlg = page.locator('dialog[open]');
   await expect(dlg.locator('.sheet-head')).toContainText('Területek');
   await dlg.getByLabel('Név').fill('Előkert');
@@ -96,7 +103,7 @@ test('a broken saved plan opens the recovery screen: download it, then start ove
   await expect(page.getByRole('heading', { name: 'Valami elromlott' })).toBeVisible();
   await expect(page.locator('.recovery-msg')).toContainText('hibás pontlista');
   const [dl] = await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'Terv letöltése (JSON)' }).click()]);
-  expect(dl.suggestedFilename()).toMatch(/^gardenly-mentes-.*\.json$/);
+  expect(dl.suggestedFilename()).toMatch(/^planterra-mentes-.*\.json$/);
   page.once('dialog', (d) => d.accept());
   await page.getByRole('button', { name: /Tiszta lap/ }).click();
   await expect(page.getByRole('heading', { name: 'Tervezzük meg a kertet' })).toBeVisible();

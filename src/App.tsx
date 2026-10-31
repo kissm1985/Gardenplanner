@@ -35,6 +35,7 @@ import { backupNow, lastBackupAt, needsReminder, requestPersistence, snoozeRemin
 import { QuickPanel, type QuickAction, type Step } from './ui/QuickPanel';
 import { markSeen, seen } from './ui/seen';
 import { setTheme, toggleTheme, useTheme, type Theme } from './ui/theme';
+import { localName } from './i18n/names';
 import { Welcome } from './ui/Welcome';
 
 // Tools arrive phase by phase (SPEC §7); unavailable ones are shown but disabled.
@@ -94,6 +95,7 @@ export function App({ loading }: { loading: boolean }) {
   const rowMode = useUi((s) => s.rowMode);
   const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
   const [sheet, setSheet] = useState<SheetId>(null);
+  const home = useUi((s) => s.home);
   // Ask the browser to keep the plan once there is one (no effect where it is not supported).
   const hasPlan = useProject((s) => !!s.project);
   useEffect(() => {
@@ -191,7 +193,7 @@ export function App({ loading }: { loading: boolean }) {
   }, [tool0]);
 
   if (loading) return <div className="splash">{t('Betöltés…', 'Loading…')}</div>;
-  if (!project) return <Welcome />;
+  if (!project || home) return <Welcome />;
 
   const ui = useUi.getState();
   const go = (f: () => void) => () => {
@@ -207,7 +209,7 @@ export function App({ loading }: { loading: boolean }) {
     { id: 'areas', label: t('Területek', 'Areas'), hint: t('Váltás, új terület, méret, alak, sablonok', 'Switch, new area, size, shape, templates'), words: 'terület sablon alak', run: () => setSheet('areas') },
     { id: 'ideas', label: t('Ötletgenerátor', 'Idea generator'), hint: t('Kész összeállítás új változatba, vagy kijelölt rész kitöltése', 'A ready composition in a new variant, or fill a region'), words: 'generál random véletlen', run: () => setSheet('ideas') },
     { id: 'replace', label: t('Növény cseréje', 'Replace plants'), hint: t('Egy faj cseréje egy vagy több másikra', 'Swap a species for one or more others'), words: 'csere', run: () => openReplace() },
-    { id: 'variants', label: t('Változatok', 'Variants'), hint: t('Másolás, mappák, választott változat', 'Copy, folders, chosen variant'), words: 'terv másolat', run: () => setSheet('variants') },
+    { id: 'variants', label: t('Változatok', 'Variants'), hint: t('Megnyitás, másolás, mappák', 'Open, copy, folders'), words: 'terv másolat', run: () => setSheet('variants') },
     ...(area && area.variants.length > 1 ? [{ id: 'compare', label: t('Változatok összehasonlítása', 'Compare variants'), hint: t('Két változat egymás mellett', 'Two variants side by side'), run: go(() => { ui.setTool('select'); ui.setCompare(true); }) }] : []),
     { id: 'visual', label: t('Látványterv (ChatGPT)', 'Visualisation (ChatGPT)'), hint: t('Kamera a rajzon, leírás és kép küldése, kész képek', 'Camera on the plan, send brief and image, finished images'), words: 'kép kamera chatgpt ai mi', run: () => setSheet('visual') },
     { id: 'season', label: t('Évszaknézet', 'Season view'), hint: t('Színek hónapról hónapra, négy évszak', 'Colours month by month, four seasons'), run: tool_('season') },
@@ -239,11 +241,20 @@ export function App({ loading }: { loading: boolean }) {
   return (
     <div className="app">
       <header className="topbar">
-        <span className="topbar-brand" title="Gardenly">
+        <button
+          type="button"
+          className="topbar-brand"
+          title={t('Kezdőoldal', 'Start page')}
+          aria-label={t('Kezdőoldal: területek és új terület', 'Start page: areas and new area')}
+          onClick={() => {
+            setSheet(null);
+            useUi.getState().setHome(true);
+          }}
+        >
           <LogoMark size={26} />
-        </span>
+        </button>
         <button type="button" className="area-switch" onClick={() => setSheet('areas')} aria-haspopup="dialog">
-          <span className="area-name">{area ? area.name : t('Nincs terület', 'No area')}</span>
+          <span className="area-name">{area ? localName(area.name) : t('Nincs terület', 'No area')}</span>
           {area && (
             <span className="area-meta mono">
               {area.widthCm} × {area.lengthCm} cm · <b className="meta-count">{t(`${total} tő`, `${total} plants`)}</b> · {ORIENTATION_LABEL[area.orientation]}
@@ -292,9 +303,8 @@ export function App({ loading }: { loading: boolean }) {
         ) : area ? (
           <>
             <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
-            <button type="button" className="variant-pill" onClick={() => setSheet('variants')} aria-label={t(`Változat: ${activeVariant(area).name}. Változatok kezelése`, `Variant: ${activeVariant(area).name}. Manage variants`)}>
-              {activeVariant(area).name}
-              {activeVariant(area).id === area.chosenVariantId ? ' ★' : ''}
+            <button type="button" className="variant-pill" onClick={() => setSheet('variants')} aria-label={t(`Változat: ${localName(activeVariant(area).name)}. Változatok kezelése`, `Variant: ${localName(activeVariant(area).name)}. Manage variants`)}>
+              {localName(activeVariant(area).name)}
               {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
             </button>
             {shapeEditing && <ShapeEditBar />}
@@ -348,7 +358,7 @@ export function App({ loading }: { loading: boolean }) {
             {(tool === 'select' || tool === 'fixtures') && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
               <FixtureBar id={selectedFixture} label={(() => {
                 const f = area.fixtures.find((x) => x.id === selectedFixture);
-                return f ? f.label || FIXTURE_LABEL[f.type] : '';
+                return f ? localName(f.label) || FIXTURE_LABEL[f.type] : '';
               })()} onProps={() => setSheet('fixtures')} />
             )}
           </>

@@ -177,7 +177,7 @@ test('backup reminder: shows once there is a plan worth saving, goes quiet after
   const bar = page.locator('.backup-reminder');
   await expect(bar).toContainText('még nincs mentésed');
   const [dl] = await Promise.all([page.waitForEvent('download'), bar.getByRole('button', { name: 'Mentés fájlba' }).click()]);
-  expect(dl.suggestedFilename()).toMatch(/^gardenly-.*\.json$/);
+  expect(dl.suggestedFilename()).toMatch(/^planterra-.*\.json$/);
   await expect(bar).toHaveCount(0);
   await menu(page);
   await expect(page.locator('dialog[open] .backup-status')).toContainText('Utolsó mentés: ma.');

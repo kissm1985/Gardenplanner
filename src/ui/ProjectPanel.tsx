@@ -10,6 +10,7 @@ import { copy } from './clipboard';
 import { downloadBlob, downloadText } from './download';
 import { planSvg, svgToPng, type LegendRow } from './exportImage';
 import { t } from '../i18n';
+import { localName } from '../i18n/names';
 import { plantName } from '../model/plants';
 
 export type Orientation = 'portrait' | 'landscape';
@@ -66,8 +67,8 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
           count: r.planted,
         }))
       : [];
-    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: opts.month !== undefined ? opts.month : month, legend, caption: `${area.name} – ${v.name} · ${area.widthCm} × ${area.lengthCm} cm` });
-    const name = `${slug(area.name)}-${slug(v.name)}${opts.suffix ?? ''}`;
+    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: opts.month !== undefined ? opts.month : month, legend, caption: `${localName(area.name)} – ${localName(v.name)} · ${area.widthCm} × ${area.lengthCm} cm` });
+    const name = `${slug(localName(area.name))}-${slug(localName(v.name))}${opts.suffix ?? ''}`;
     try {
       if (kind === 'svg') downloadText(`${name}.svg`, svg, 'image/svg+xml');
       else downloadBlob(`${name}.png`, await svgToPng(svg), 'image/png');
@@ -81,7 +82,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
     setLink(url);
     if (navigator.share) {
       try {
-        await navigator.share({ title: t(`${project.name} – kerterv`, `${project.name} – garden plan`), url });
+        await navigator.share({ title: t(`${localName(project.name)} – kerterv`, `${localName(project.name)} – garden plan`), url });
         return;
       } catch {
         /* fall back to copy */
@@ -99,7 +100,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
     <div className="form">
       <label className="field">
         <span>{t('Projekt neve', 'Project name')}</span>
-        <input defaultValue={project.name} onBlur={(e) => useProject.getState().renameProject(e.target.value)} />
+        <input defaultValue={localName(project.name)} onBlur={(e) => useProject.getState().renameProject(e.target.value)} />
       </label>
 
       <fieldset className="field-group">
@@ -133,13 +134,13 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
           {t('Csak olvasható link', 'Read-only link')}
         </button>
         {link && <textarea ref={linkRef} className="sched-text" readOnly rows={3} value={link} onFocus={(e) => e.currentTarget.select()} aria-label={t('Megosztható link', 'Shareable link')} />}
-        <p className="mono muted">{t('A terv a link végében, kódolva utazik – nincs szerver. A választott változatokat mutatja.', 'The plan travels encoded at the end of the link – no server. It shows the chosen variants.')}</p>
+        <p className="mono muted">{t('A terv a link végében, kódolva utazik – nincs szerver. A rajzon lévő változatokat mutatja.', 'The plan travels encoded at the end of the link – no server. It shows the variants on the plan.')}</p>
       </fieldset>
 
       <fieldset className="field-group">
         <legend>
           {t('Kép a rajzról', 'Image of the plan')}
-          {area ? ` – ${area.name}` : ''}
+          {area ? ` – ${localName(area.name)}` : ''}
         </legend>
         <div className="form-actions form-actions-start">
           <button type="button" className="btn btn-small" onClick={() => image('png')} disabled={!area}>
@@ -185,7 +186,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
         <button type="button" className="btn btn-primary" onClick={() => onPrint(orient)}>
           {t('Nyomtatás / mentés PDF-be', 'Print / save as PDF')}
         </button>
-        <p className="mono muted">{t('Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A választott változatokból.', 'One page per area: plan view, four seasons, plant list, warnings. From the chosen variants.')}</p>
+        <p className="mono muted">{t('Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A rajzon lévő változatokból.', 'One page per area: plan view, four seasons, plant list, warnings. From the variants on the plan.')}</p>
       </fieldset>
 
       <div className="form-actions form-actions-start">

@@ -9,6 +9,7 @@ import { gardenLocation } from '../model/location';
 import { fillPath, fillPolygon } from './fill';
 import { areaSunLevel } from './rules';
 import { mulchAdvice } from './schedule';
+import { localName } from '../i18n/names';
 import { plantLook, SEASON_MONTH, type Season } from './season';
 
 /** camera = the viewpoint placed on the plan; eye = from the bottom edge; aerial = bird's-eye; both = eye (or camera) + aerial. */
@@ -90,7 +91,7 @@ function cameraLines(area: Area, items: PlacedItem[], plants: Map<string, Plant>
   }
   for (const f of area.fixtures) {
     const ps: Pt[] = f.polygon ? [...f.polygon, centroid(f.polygon)] : f.radius != null ? [[f.x, f.y]] : along(f.x, f.y, f.w ?? 0, f.h ?? 0);
-    look(f.label || f.type, ps);
+    look(localName(f.label, lang) || f.type, ps);
   }
   const out: string[] = [];
   out.push(
@@ -157,12 +158,13 @@ function fixtureLines(area: Area, lang: Lang): string[] {
   const fmt = lang === 'hu' ? m : mEn;
   const out: string[] = [];
   for (const f of area.fixtures) {
-    const label = f.label ?? f.type;
+    const fl = localName(f.label, lang);
+    const label = fl || f.type;
     if (f.type === 'lawn' && f.polygon) {
       const b = bbox(f.polygon);
       const curved = f.polygon.length > 12;
       const corners = f.polygon.map(([x, y]) => (lang === 'hu' ? `(${fmt(x)}; ${fmt(y)})` : `(${fmt(x)}, ${fmt(y)})`)).join(', ');
-      const name = f.label || (lang === 'hu' ? 'Gyep' : 'Lawn');
+      const name = fl || (lang === 'hu' ? 'Gyep' : 'Lawn');
       out.push(
         lang === 'hu'
           ? curved
@@ -218,7 +220,7 @@ function fixtureLines(area: Area, lang: Lang): string[] {
               raisedBed: 'raised bed (timber frame)',
               other: label,
             }[f.type as string] ?? label);
-      out.push(`${what[0].toUpperCase() + what.slice(1)}${f.label && !what.toLowerCase().includes(f.label.toLowerCase()) ? ` („${f.label}”)` : ''}: ${where}.`);
+      out.push(`${what[0].toUpperCase() + what.slice(1)}${fl && !what.toLowerCase().includes(fl.toLowerCase()) ? ` („${fl}”)` : ''}: ${where}.`);
     }
   }
   return out;
@@ -246,8 +248,8 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
   L.push(hu ? '## Terület' : '## Site');
   L.push(
     hu
-      ? `${area.name}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ? AREA_KIND_LABEL[area.kind] : 'évelőágyás'}, ${ORIENTATION_LABEL[area.orientation]}i fekvés, ${sun === 'sun' ? 'napos' : sun === 'part' ? 'félárnyékos' : 'árnyékos'}${area.sunUntil ? ` (közvetlen nap ${area.sunUntil})` : ''}${area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}. Hely: ${gardenLocation(project.settings).name} környéki kertes ház (Magyarország).`
-      : `${area.name}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ?? 'bed'}, facing ${ORIENT_EN[area.orientation]}, ${sun === 'sun' ? 'sunny' : sun === 'part' ? 'half shade' : 'shade'}${area.sunUntil ? ` (direct sun ${area.sunUntil})` : ''}${area.soil ? `, ${area.soil} soil` : ''}. Setting: a family house garden near ${gardenLocation(project.settings).name}, Hungary.`,
+      ? `${localName(area.name, 'hu')}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ? AREA_KIND_LABEL[area.kind] : 'évelőágyás'}, ${ORIENTATION_LABEL[area.orientation]}i fekvés, ${sun === 'sun' ? 'napos' : sun === 'part' ? 'félárnyékos' : 'árnyékos'}${area.sunUntil ? ` (közvetlen nap ${area.sunUntil})` : ''}${area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}. Hely: ${gardenLocation(project.settings).name} környéki kertes ház (Magyarország).`
+      : `${localName(area.name, 'en')}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ?? 'bed'}, facing ${ORIENT_EN[area.orientation]}, ${sun === 'sun' ? 'sunny' : sun === 'part' ? 'half shade' : 'shade'}${area.sunUntil ? ` (direct sun ${area.sunUntil})` : ''}${area.soil ? `, ${area.soil} soil` : ''}. Setting: a family house garden near ${gardenLocation(project.settings).name}, Hungary.`,
   );
   L.push(
     hu

@@ -8,6 +8,7 @@ import { saveProject } from '../store/persist';
 import { migrate } from '../store/projectStore';
 import { PlantChip } from './PlantChip';
 import { t } from '../i18n';
+import { localName } from '../i18n/names';
 import { plantName } from '../model/plants';
 
 /** Read-only page opened from a share link (#view=…); never touches the local plan unless asked. */
@@ -50,7 +51,7 @@ export function ReadOnlyView({ code }: { code: string }) {
         <div className="seg" role="group" aria-label={t('Terület', 'Area')}>
           {p.areas.map((a) => (
             <button key={a.id} type="button" className="chip-btn" aria-pressed={a.id === area?.id} onClick={() => setAreaId(a.id)}>
-              {a.name}
+              {localName(a.name)}
             </button>
           ))}
         </div>

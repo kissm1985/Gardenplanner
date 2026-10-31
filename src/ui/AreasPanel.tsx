@@ -6,6 +6,7 @@ import { useProject } from '../store/projectStore';
 import { AreaForm } from './AreaForm';
 import { startLawnEdit, startShapeEdit } from './ShapeEditBar';
 import { useUi } from '../store/uiStore';
+import { localName } from '../i18n/names';
 import { t } from '../i18n';
 
 type Mode = { kind: 'list' } | { kind: 'new' } | { kind: 'edit'; id: string };
@@ -79,7 +80,7 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
               onDone();
             }}
             onDelete={() => {
-              if (confirm(t(`Biztosan törlöd a(z) „${a.name}” területet? Visszavonással visszahozható.`, `Delete the area “${a.name}”? Undo brings it back.`))) deleteArea(a.id);
+              if (confirm(t(`Biztosan törlöd a(z) „${localName(a.name)}” területet? Visszavonással visszahozható.`, `Delete the area “${localName(a.name)}”? Undo brings it back.`))) deleteArea(a.id);
             }}
           />
         ))}
@@ -126,7 +127,7 @@ function AreaCard({ a, current, onOpen, onEdit, onShape, onLawn, onDelete }: {
   return (
     <li className={`area-card${current ? ' is-current' : ''}`}>
       <button type="button" className="area-open" onClick={onOpen}>
-        <b>{a.name}</b>
+        <b>{localName(a.name)}</b>
         <span className="mono">
           {a.widthCm} × {a.lengthCm} cm · {ORIENTATION_LABEL[a.orientation]}
           {a.sunUntil && t(` · napos ${a.sunUntil}`, ` · sun ${a.sunUntil}`)}

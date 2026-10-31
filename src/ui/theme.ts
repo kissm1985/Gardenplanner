@@ -28,7 +28,7 @@ function apply() {
   if (current === 'auto') delete root.dataset.theme;
   else root.dataset.theme = current;
   // Status bar colour on phones.
-  const color = isDark() ? '#0f1c14' : '#133726';
+  const color = isDark() ? '#1d231e' : '#244b3c';
   document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', color));
 }
 

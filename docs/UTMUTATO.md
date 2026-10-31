@@ -1,6 +1,6 @@
-# Gardenly – felhasználói útmutató
+# Planterra – felhasználói útmutató
 
-A Gardenly egy telefonon és számítógépen is használható ültetéstervező. Felülnézetben, centiméterre pontosan rajzolod meg a kertet. Az alkalmazás közben:
+A Planterra egy telefonon és számítógépen is használható ültetéstervező. Felülnézetben, centiméterre pontosan rajzolod meg a kertet. Az alkalmazás közben:
 
 - figyeli a terület szabályait (magasság, mérgező növény, diófa-zóna, tőtáv stb.);
 - kiszámolja, hány tő kell és mennyibe kerül;
@@ -36,14 +36,17 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
 
 <img src="img/01-kezdo.png" width="280" align="right" alt="Kezdőképernyő">
 
-1. Nyisd meg az alkalmazást.
-2. A kezdőképernyőn válaszd ki, melyik kész sablonnal indulsz:
+Az alkalmazás minden indításkor a **kezdőoldallal** nyílik, és a felső sáv bal szélén lévő **Planterra-logóval** bármikor ide jutsz vissza. Fentről lefelé:
+
+1. **+ Új terület létrehozása**: üres területtel kezdesz; azonnal megnyílik az űrlap (név, méret, fekvés, napsütés; téglalap vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)).
+2. **Területeid**: a már megtervezett területek (méret, a rajzon lévő terv, tőszám). Koppintásra megnyílik.
+3. **Sablonok**:
    - **Házoldali sáv**: 120 × 1200 cm-es kavicsos sáv a ház fala és a járda között, legfeljebb 50 cm magas növényekkel;
    - **Gyepsávos kert**: 500 × 1200 cm, ívelt gyepsáv a közepén, ágyások két oldalt, diófával a szomszédban.
-3. Nyomd meg a **Kezdés** gombot.
-4. Vagy válaszd alatta a **+ Saját terület létrehozása** lehetőséget: azonnal megnyílik az új terület űrlapja (név, méret, fekvés, napsütés; téglalap vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)). A sablonok később is hozzáadhatók.
 
-A kezdőképernyő jobb felső sarkában átválthatsz angol nyelvre és sötét módra; később a felső sáv **EN / HU** és **☾ / ☀** gombjával. Az alkalmazás alapból a böngésző nyelvét követi.
+   Első indításkor kipipálhatod őket, és a **Kezdés a kiválasztott sablonokkal** gombbal indulsz; később egy koppintással új területként adod hozzá.
+
+A kezdőoldal jobb felső sarkában átválthatsz angol nyelvre és sötét módra; később a felső sáv **EN / HU** és **☾ / ☀** gombjával. Nyelvváltáskor az alkalmazás által adott nevek is átfordulnak (pl. *Kerítés → Fence*, *Házoldali sáv → House-side strip*, *A terv → Plan A*); a saját magad által adott nevek változatlanok. Az alkalmazás alapból a böngésző nyelvét követi.
 
 Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosabb gombokat. Később a **⋯ → Bevezető újra** gombbal újra megnézheted.
 
@@ -55,6 +58,7 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 
 **Felső sáv**
 
+- **Planterra-logó**: vissza a kezdőoldalra (új terület, területeid, sablonok).
 - **A terület neve ▾**: itt váltasz a területek között, és itt hozol létre újat. Alatta látszik a terület mérete, a tövek száma, az égtáj és a napsütés.
 - **↶ / ↷**: visszavonás és újra (100 lépésig). Számítógépen **Ctrl+Z** és **Ctrl+Y** is működik.
 - **EN / HU**: egy koppintással vált angolra, illetve magyarra.
@@ -304,15 +308,12 @@ Az adatbázisban 146 faj van: évelők, díszfüvek, talajtakarók, cserjék, s�
 
 Egy területre több tervet is készíthetsz (A terv, B terv, ötletek), és összehasonlíthatod őket. A rajz jobb felső sarkában a **változatgomb** nyitja meg a változatok **fáját**.
 
-**Két fontos fogalom**
-
-- **szerkesztett** változat: ezt látod és módosítod a rajzon;
-- **★ választott** változat: ebből készül a növénylista, a menetrend és a nyomtatás.
+**A rajzon lévő változat a választott (★)**: ebből készül a növénylista, a menetrend, a nyomtatás és a megosztott link. Egy másik változat **megnyitásával** azt választod.
 
 **A fa kezelése**
 
 - **Megnyitás**: az adott változatot szerkeszted.
-- **⋯** a sor végén: *Legyen a választott*, *Másolás*, *Átnevezés*, *Áthelyezés*, *Törlés*.
+- **⋯** a sor végén: *Másolás*, *Átnevezés*, *Áthelyezés*, *Törlés*.
 - **Másolás**: a másolat az eredeti alá kerül.
 - **+ Mappa**: a változatok csoportosítása. Az **Áthelyezés** bármely mappa vagy változat alá, illetve a legfelső szintre visz.
 - **▾ / ▸**: ágak összecsukása; csukva kiírja, hány változat van benne.
@@ -399,12 +400,12 @@ Az **Évszak** eszközzel a rajz a növények valódi színeit mutatja:
 
 <img src="img/07-lista.png" width="280" align="right" alt="Növénylista">
 
-A **Lista** eszköz alapból azt a tervet összesíti, **amelyik éppen a rajzon látszik** (az aktuális terület szerkesztett változatát; a fejléc ki is írja a nevét). A **★ Választott változatok** gombbal a választott változatokból készült listára váltasz – ebből készül a nyomtatás is.
+A **Lista** eszköz azt a tervet összesíti, **amelyik a rajzon látszik** (ez egyben a választott változat; a fejléc ki is írja a nevét). *Összesítve* módban minden terület rajzon lévő változatát adja össze.
 
 - **Ültetés**: hány tő kerül a földbe.
 - **Rendelés**: hány darabot rendelj, **tartalékkal**. A tartalék %-a állítható; a fák nem kapnak tartalékot.
 - **Becsült költség**: a „becsl.” jelölésű árak becslések, a „bolt” jelölésűek valós ajánlatból származnak.
-- **Szűrés**: *Látható terv* vagy *★ Választott változatok*; *Összesítve* vagy területenként; állapot szerint (*kell, megrendelve, megvan, beültetve*).
+- **Szűrés**: *Összesítve* vagy területenként; állapot szerint (*kell, megrendelve, megvan, beültetve*).
 - **Állapot**: a táblázatban fajonként egyszerre állítható.
 - **Másolás szövegként**: üzenetbe, e-mailbe.
 - **Másolás táblázatként (Excel)**: beillesztve helyes oszlopokat ad.
@@ -527,4 +528,4 @@ A kezdőlista kertészeti alapadatokból készült. A bizonytalan adatok (külö
 
 ---
 
-*Gardenly · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István. Minden jog fenntartva.*
+*Planterra · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István. Minden jog fenntartva.*

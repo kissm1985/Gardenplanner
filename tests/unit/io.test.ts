@@ -40,7 +40,7 @@ describe('JSON backup', () => {
 
   it('rejects foreign or broken files with a Hungarian message', () => {
     expect(() => parseProject('nem json')).toThrow('nem érvényes JSON');
-    expect(() => parseProject('{"a":1}')).toThrow('Gardenly');
+    expect(() => parseProject('{"a":1}')).toThrow('Planterra');
     expect(() => parseProject(JSON.stringify({ schemaVersion: 1, areas: [{ id: 'x' }], plantDb: [] }))).toThrow('Hibás adat a mentésben');
   });
 
@@ -71,7 +71,7 @@ describe('share link', () => {
     expect(back).toEqual(shareSnapshot(p));
     expect(back.areas.every((a) => a.variants.length === 1)).toBe(true);
     expect(buildBom(back).planted).toBe(buildBom(p).planted);
-    expect(back.plantDb.map((x) => x.code).sort()).toEqual(['LA', 'NE', 'TH']);
+    expect(back.plantDb.map((x) => x.code).sort()).toEqual(['LA', 'NE', 'SE', 'TH']); // B (with SE) is open, so chosen
   });
 
   it('stays short enough for a URL with 200+ plants', () => {

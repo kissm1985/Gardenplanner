@@ -12,6 +12,7 @@ import { ORIENTATION_LABEL, type Project } from "../model/types";
 import { areaSunLevel } from "../engine/rules";
 import type { Orientation } from "./ProjectPanel";
 import { locale, t } from '../i18n';
+import { localName } from '../i18n/names';
 import { plantName } from '../model/plants';
 
 /**
@@ -50,15 +51,15 @@ export function PrintView({
             <header className="print-head">
               <div>
                 <div className="eyebrow">
-                  {project.name} · {date}
+                  {localName(project.name)} · {date}
                 </div>
-                <h1>{area.name}</h1>
+                <h1>{localName(area.name)}</h1>
                 <p className="mono">
                   {area.widthCm} × {area.lengthCm} cm ·{" "}
                   {ORIENTATION_LABEL[area.orientation]} ·{" "}
                   {SUN_LABEL[areaSunLevel(area)]}
                   {area.sunUntil ? t(` (napos ${area.sunUntil})`, ` (sun ${area.sunUntil})`) : ""} ·{" "}
-                  {t("változat", "variant")}: {v.name}
+                  {t("változat", "variant")}: {localName(v.name)}
                 </p>
               </div>
               <dl className="print-kpi">
@@ -81,7 +82,7 @@ export function PrintView({
                   labelPx={260}
                 />
                 <figcaption className="mono">
-                  {t("Felülnézet a választott változatból", "Plan view of the chosen variant")}
+                  {t("Felülnézet", "Plan view")}
                 </figcaption>
               </figure>
               <div className="print-seasons">
@@ -207,7 +208,7 @@ export function PrintView({
                 <th>{t("Növény", "Plant")}</th>
                 {project.areas.map((a) => (
                   <th key={a.id} className="n">
-                    {a.name}
+                    {localName(a.name)}
                   </th>
                 ))}
                 <th className="n">{t("Ültet.", "Plant")}</th>

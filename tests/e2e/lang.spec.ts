@@ -5,7 +5,7 @@ test('switch to English and back: interface, plant names, warnings, help', async
   // Language button on the start screen.
   await page.getByRole('button', { name: 'English' }).click();
   await expect(page.getByRole('heading', { level: 1 })).toHaveText("Let's plan the garden");
-  await page.getByRole('button', { name: /Start with/ }).click();
+  await page.getByRole('button', { name: 'Start with the chosen templates' }).click();
   await expect(page.getByRole('button', { name: 'Select', exact: true })).toBeVisible();
   await expect(page.locator('.area-name')).toHaveText('House-side strip');
 
@@ -22,7 +22,7 @@ test('switch to English and back: interface, plant names, warnings, help', async
 
   // Help in English.
   await page.getByRole('button', { name: 'Help: user guide' }).click();
-  await expect(page.locator('dialog[open] .guide h1')).toHaveText('Gardenly – user guide');
+  await expect(page.locator('dialog[open] .guide h1')).toHaveText('Planterra – user guide');
   await page.locator('dialog[open] .sheet-head button[aria-label="Close"]').click();
 
   // Back to Hungarian from the View menu; the choice is remembered.
@@ -30,7 +30,15 @@ test('switch to English and back: interface, plant names, warnings, help', async
   await page.locator('dialog[open]').getByLabel('Magyar').click();
   await expect(page.getByRole('button', { name: 'Kijelölés', exact: true })).toBeVisible();
   await page.reload();
+  // Default names follow the language: the template area and its elements are Hungarian again.
+  await page.locator('.home-area', { hasText: 'Házoldali sáv' }).click();
   await expect(page.getByRole('button', { name: 'Kijelölés', exact: true })).toBeVisible();
-  // The area keeps the name it was created with (data is not renamed).
+  await expect(page.locator('.area-name')).toHaveText('Házoldali sáv');
+  await expect(page.locator('.variant-pill')).toContainText('A terv');
+  await expect(page.locator('.fx-paving .fx-label')).toHaveText('JÁRDA');
+  await page.getByRole('button', { name: 'Switch to English' }).click();
   await expect(page.locator('.area-name')).toHaveText('House-side strip');
+  await expect(page.locator('.variant-pill')).toContainText('Plan A');
+  await expect(page.locator('.fx-paving .fx-label')).toHaveText('PAVEMENT');
+  await expect(page.locator('.fx-wall .fx-label')).toHaveText('HOUSE');
 });

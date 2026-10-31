@@ -1,6 +1,6 @@
-# Gardenly – user guide
+# Planterra – user guide
 
-Gardenly is a planting planner for phones and computers. You draw the garden from above, to the centimetre, and the app:
+Planterra is a planting planner for phones and computers. You draw the garden from above, to the centimetre, and the app:
 
 - checks the rules of the area (height, toxic plants, walnut zone, spacing and so on);
 - works out how many plants you need and what they cost;
@@ -36,14 +36,17 @@ All data stays on your own device, there is no sign-up, and after the first visi
 
 <img src="img/en/01-kezdo.png" width="280" align="right" alt="Start screen">
 
-1. Open the app.
-2. On the start screen, choose which ready-made templates to start with:
+The app opens with the **start page** every time, and the **Planterra logo** at the left of the top bar brings you back to it at any time. From the top:
+
+1. **+ Create a new area**: start with an empty area; the form opens at once (name, size, facing, sun; a rectangle or a free shape drawn on the plan, see [chapter 3](#3-areas)).
+2. **Your areas**: the areas already planned (size, the plan on screen, plant count). Tap one to open it.
+3. **Templates**:
    - **House-side strip**: a 120 × 1200 cm gravel strip between the house wall and the pavement, for plants up to 50 cm;
    - **Garden with lawn strip**: 500 × 1200 cm, a curved lawn strip in the middle, beds on both sides, a walnut tree next door.
-3. Tap **Start**.
-4. Or choose **+ Create my own area** below: the new-area form opens at once (name, size, facing, sun; a rectangle or a free shape drawn on the plan, see [chapter 3](#3-areas)). The templates can be added later too.
 
-At the top right of the start screen you can switch to Hungarian and to dark mode; later with the **EN / HU** and **☾ / ☀** buttons in the top bar. By default the app follows the browser language.
+   On the first start tick them and use **Start with the chosen templates**; later one tap adds a template as a new area.
+
+At the top right of the start page you can switch to Hungarian and to dark mode; later with the **EN / HU** and **☾ / ☀** buttons in the top bar. When you switch language, the names the app gave also switch (e.g. *Kerítés → Fence*, *Házoldali sáv → House-side strip*, *A terv → Plan A*); names you typed yourself stay as they are. By default the app follows the browser language.
 
 The first time, a short three-step introduction shows the most important buttons. You can see it again with **⋯ → Show the intro again**.
 
@@ -55,6 +58,7 @@ The first time, a short three-step introduction shows the most important buttons
 
 **Top bar**
 
+- **Planterra logo**: back to the start page (new area, your areas, templates).
 - **Area name ▾**: switch between areas and create new ones here. Below it: the size of the area, the number of plants, the facing and the sun.
 - **↶ / ↷**: undo and redo (up to 100 steps). On a computer **Ctrl+Z** and **Ctrl+Y** work too.
 - **EN / HU**: switches to English or Hungarian with one tap.
@@ -304,15 +308,12 @@ The database has 146 species: perennials, grasses, ground covers, shrubs, hedge 
 
 An area can have several plans (Plan A, Plan B, ideas) that you can compare. The **variant button** at the top right of the plan opens the variant **tree**.
 
-**Two key terms**
-
-- the **edited** variant: the one you see and change on the plan;
-- the **★ chosen** variant: the plant list, schedule and printout come from it.
+**The variant on the plan is the chosen one (★)**: the plant list, schedule, printout and shared link come from it. **Opening** another variant chooses it.
 
 **Working with the tree**
 
 - **Open**: edit that variant.
-- **⋯** at the end of a row: *Make it the chosen one*, *Copy*, *Rename*, *Move*, *Delete*.
+- **⋯** at the end of a row: *Copy*, *Rename*, *Move*, *Delete*.
 - **Copy**: the copy goes under its original.
 - **+ Folder**: group variants. **Move** puts an item under any folder or variant, or at the top level.
 - **▾ / ▸**: collapse branches; when collapsed it shows how many variants are inside.
@@ -399,12 +400,12 @@ An image (PNG/SVG) made from the season view uses that month’s colours.
 
 <img src="img/en/07-lista.png" width="280" align="right" alt="Plant list">
 
-By default the **List** tool totals **the plan currently on screen** (the edited variant of the current area; the header shows its name). **★ Chosen variants** switches to the list made from the chosen variants – the printout uses those too.
+The **List** tool totals **the plan on screen** (which is also the chosen variant; the header shows its name). *Combined* adds up the plan on screen of every area.
 
 - **Planting**: how many plants go in the ground.
 - **Order**: how many to order, with a **spare**. The spare % can be set; trees get none.
 - **Estimated cost**: prices marked “est.” are estimates, those marked “shop” come from real offers. Prices are in HUF.
-- **Filter**: *Plan on screen* or *★ Chosen variants*; *Combined* or per area; by status (*needed, ordered, have it, planted*).
+- **Filter**: *Combined* or per area; by status (*needed, ordered, have it, planted*).
 - **Status**: can be set for a whole species at once in the table.
 - **Copy as text**: for messages and e-mail.
 - **Copy as table (Excel)**: pastes into the right columns.
@@ -527,4 +528,4 @@ The starting list is built from general horticultural data. Uncertain data (espe
 
 ---
 
-*Gardenly · Created by Kiss-Mihály István · © 2026 Kiss-Mihály István. All rights reserved.*
+*Planterra · Created by Kiss-Mihály István · © 2026 Kiss-Mihály István. All rights reserved.*
