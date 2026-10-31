@@ -1,0 +1,99 @@
+import { areaPoints } from '../canvas/AreaShape';
+import { bbox } from '../model/geometry';
+import type { Area, Fixture } from '../model/types';
+import { useProject } from '../store/projectStore';
+import { useUi } from '../store/uiStore';
+import { t } from '../i18n';
+
+/** Start editing the outline of an area (rectangles become 4-corner polygons). */
+export function startShapeEdit(area: Area) {
+  useUi.getState().setTool('select');
+  useUi.getState().setShapeEdit({ areaId: area.id, mode: 'edit', points: areaPoints(area).map(([x, y]) => [x, y]), selected: null });
+}
+
+/** Draw a new lawn in the area (no plants go there), or reshape an existing one. */
+export function startLawnEdit(area: Area, lawn?: Fixture) {
+  useUi.getState().setTool('select');
+  useUi.getState().setShapeEdit({
+    areaId: area.id,
+    mode: lawn?.polygon ? 'edit' : 'draw',
+    points: lawn?.polygon?.map(([x, y]) => [x, y]) ?? [],
+    selected: null,
+    target: { kind: 'lawn', fixtureId: lawn?.id },
+  });
+}
+
+/** Draw the region the zone fill will plant (the plants come from the list in the idea panel). */
+export function startZoneEdit(area: Area) {
+  useUi.getState().setTool('select');
+  useUi.getState().setShapeEdit({ areaId: area.id, mode: 'draw', points: [], selected: null, target: { kind: 'zone' } });
+}
+
+/** Save a lawn outline: corners kept inside the area's bounding box, whole cm. */
+function saveLawn(area: Area, fixtureId: string | undefined, points: [number, number][]) {
+  const b = bbox(areaPoints(area));
+  const pts = points.map(([x, y]) => [Math.round(Math.min(b.maxX, Math.max(b.minX, x))), Math.round(Math.min(b.maxY, Math.max(b.minY, y)))] as [number, number]);
+  const pb = bbox(pts);
+  const st = useProject.getState();
+  if (fixtureId) st.updateFixture(fixtureId, { polygon: pts, x: pb.minX, y: pb.minY });
+  else st.addFixture({ type: 'lawn', label: t('Gyepsáv', 'Lawn strip'), x: pb.minX, y: pb.minY, polygon: pts });
+}
+
+/** Floating controls while drawing or editing an area outline or a lawn. */
+export function ShapeEditBar() {
+  const se = useUi((s) => s.shapeEdit)!;
+  const ui = useUi.getState();
+  const n = se.points.length;
+  const lawn = se.target?.kind === 'lawn';
+  const zone = se.target?.kind === 'zone';
+  const finish = () => {
+    if (n < 3) return;
+    const area = useProject.getState().project?.areas.find((a) => a.id === se.areaId);
+    if (zone) ui.setZoneDraft({ areaId: se.areaId, points: se.points.map(([x, y]) => [Math.round(x), Math.round(y)]) });
+    else if (lawn && area && se.target?.kind === 'lawn') saveLawn(area, se.target.fixtureId, se.points);
+    else useProject.getState().setAreaShape(se.areaId, se.points);
+    ui.setShapeEdit(null);
+  };
+  return (
+    <div className={`shape-bar${lawn ? ' is-lawn' : ''}${zone ? ' is-zone' : ''}`} role="toolbar" aria-label={zone ? t('Kitöltendő rész', 'Region to fill') : lawn ? t('Gyepsáv alakja', 'Lawn shape') : t('Terület alakja', 'Area shape')}>
+      <p className="shape-hint">
+        {lawn && <b>{t('Gyepsáv: ', 'Lawn strip: ')}</b>}
+        {zone && <b>{t('Kitöltendő rész: ', 'Region to fill: ')}</b>}
+        {se.mode === 'draw'
+          ? n === 0
+            ? zone
+              ? t('Koppints a rész első sarkára; ide kerülnek a listádból a növények.', 'Tap the first corner of the region; plants from your list go here.')
+              : lawn
+              ? t('Koppints a gyep első sarkára (ide nem kerül növény).', 'Tap the first corner of the lawn (no plants go here).')
+              : t('Koppints a terület első sarkára.', 'Tap the first corner of the area.')
+            : n < 3
+              ? t(`Következő sarok… (${n} pont)`, `Next corner… (${n} points)`)
+              : t('Folytasd, vagy koppints az első pontra / a Kész gombra a lezáráshoz.', 'Go on, or tap the first point / Done to close the shape.')
+          : t('Húzd a sarkokat; az oldalak közepén lévő pöttyel új sarkot szúrsz be.', 'Drag the corners; the dot in the middle of a side adds a corner.')}
+      </p>
+      <div className="shape-actions">
+        {se.mode === 'draw' && (
+          <button type="button" className="btn btn-small" disabled={!n} onClick={() => ui.setShapeEdit({ ...se, points: se.points.slice(0, -1) })}>
+            {t('Vissza', 'Back')}
+          </button>
+        )}
+        {se.mode === 'edit' && (
+          <button
+            type="button"
+            className="btn btn-small"
+            disabled={se.selected == null || n <= 3}
+            onClick={() => se.selected != null && ui.setShapeEdit({ ...se, points: se.points.filter((_, i) => i !== se.selected), selected: null })}
+          >
+            {t('Sarok törlése', 'Delete corner')}
+          </button>
+        )}
+        <button type="button" className="btn btn-small" onClick={() => ui.setShapeEdit(null)}>
+          {t('Mégse', 'Cancel')}
+        </button>
+        <button type="button" className="btn btn-small btn-primary" disabled={n < 3} onClick={finish}>
+          {t('Kész', 'Done')}
+        </button>
+      </div>
+    </div>
+  );
+}

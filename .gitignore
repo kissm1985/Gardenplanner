@@ -1,0 +1,8 @@
+node_modules
+dist
+dev-dist
+*.tsbuildinfo
+test-results
+playwright-report
+# Generated before every build / dev start (scripts/licenses.mjs)
+public/third-party-licenses.txt

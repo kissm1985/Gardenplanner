@@ -1,0 +1,362 @@
+// Text brief for an image model (e.g. ChatGPT) to render a realistic visualisation of one area.
+// Paste it together with the plan PNG (with legend) exported from the app.
+import { areaPoints } from '../model/area';
+import { bbox, centroid } from '../model/geometry';
+import { SOIL_LABEL } from '../model/plants';
+import { AREA_KIND_LABEL, ORIENTATION_LABEL, type Area, type Camera, type PlacedItem, type Plant, type Project, type Pt } from '../model/types';
+import { CAMERA_FOV } from '../model/camera';
+import { gardenLocation } from '../model/location';
+import { fillPath, fillPolygon } from './fill';
+import { areaSunLevel } from './rules';
+import { mulchAdvice } from './schedule';
+import { localName } from '../i18n/names';
+import { plantLook, SEASON_MONTH, type Season } from './season';
+
+/** camera = the viewpoint placed on the plan; eye = from the bottom edge; aerial = bird's-eye; both = eye (or camera) + aerial. */
+export type Viewpoint = 'camera' | 'eye' | 'aerial' | 'both';
+export type Lang = 'hu' | 'en';
+export type VizStyle = 'photo' | 'watercolor' | 'sketch';
+export type TimeOfDay = 'morning' | 'afternoon' | 'sunset';
+export type Weather = 'sunny' | 'overcast';
+
+export interface PromptOptions {
+  season: Season;
+  viewpoint: Viewpoint;
+  lang: Lang;
+  /** Show plants at mature size (2–3 years after planting) or as just planted. */
+  mature: boolean;
+  style?: VizStyle;
+  time?: TimeOfDay;
+  weather?: Weather;
+}
+
+const STYLE_TASK: Record<VizStyle, { hu: string; en: string }> = {
+  photo: { hu: 'fotórealisztikus kerti látványtervet', en: 'a photorealistic garden visualisation' },
+  watercolor: { hu: 'akvarell stílusú kerti látványtervet', en: 'a watercolour garden visualisation' },
+  sketch: { hu: 'tájépítészeti tervezői vázlatot', en: 'a landscape architect’s design sketch' },
+};
+const STYLE_DESC: Record<VizStyle, { hu: string; en: string }> = {
+  photo: { hu: 'fotórealisztikus, természetes színek', en: 'photorealistic, natural colours' },
+  watercolor: { hu: 'akvarell festmény: lágy, áttetsző színek, finom papírtextúra, de pontos elrendezés és arányok', en: 'watercolour painting: soft, translucent colours, fine paper texture, but accurate layout and proportions' },
+  sketch: { hu: 'tervezői vázlat: tus kontúrok, színes ceruza vagy marker színezés, világos papír háttér', en: 'design sketch: ink outlines, coloured pencil or marker shading, light paper background' },
+};
+const TIME_DESC: Record<TimeOfDay, { hu: string; en: string }> = {
+  morning: { hu: 'reggel, alacsony szögű lágy napfény, hosszú árnyékok, friss, harmatos hangulat', en: 'morning, low soft sunlight, long shadows, fresh dewy mood' },
+  afternoon: { hu: 'délután, meleg, erős napfény, határozott árnyékok', en: 'afternoon, warm strong sunlight, defined shadows' },
+  sunset: { hu: 'naplemente, aranyló meleg fény, hosszú árnyékok, a növények szélein ellenfény', en: 'sunset, golden warm light, long shadows, backlit plant edges' },
+};
+const WEATHER_DESC: Record<Weather, { hu: string; en: string }> = {
+  sunny: { hu: 'derült, napos idő, tiszta kék ég', en: 'clear sunny weather, blue sky' },
+  overcast: { hu: 'borult idő, egyenletes szórt fény, lágy árnyékok, telítettebb lombszínek', en: 'overcast weather, even diffuse light, soft shadows, richer foliage colours' },
+};
+const OVERCAST_TIME: Record<TimeOfDay, { hu: string; en: string }> = {
+  morning: { hu: 'reggel', en: 'morning' },
+  afternoon: { hu: 'délután', en: 'afternoon' },
+  sunset: { hu: 'alkonyat, halványuló fény', en: 'dusk, fading light' },
+};
+
+const DIR_HU = ['jobbra (x növekvő irányába)', 'jobbra lefelé', 'lefelé (y növekvő irányába)', 'balra lefelé', 'balra (x csökkenő irányába)', 'balra felfelé', 'felfelé (y csökkenő irányába)', 'jobbra felfelé'];
+const DIR_EN = ['to the right (towards larger x)', 'down and to the right', 'down (towards larger y)', 'down and to the left', 'to the left (towards smaller x)', 'up and to the left', 'up (towards smaller y)', 'up and to the right'];
+const sector = (deg: number) => Math.round((((deg % 360) + 360) % 360) / 45) % 8;
+
+/** What the camera sees, nearest first: plants and elements inside the field of view, as foreground / middle / background. */
+function cameraLines(area: Area, items: PlacedItem[], plants: Map<string, Plant>, cam: Camera, lang: Lang): string[] {
+  const hu = lang === 'hu';
+  const fmt = hu ? m : mEn;
+  type Seen = { name: string; d: number; side: number };
+  const seen: Seen[] = [];
+  /** The nearest of the given points that lies in the field of view. */
+  const look = (name: string, ps: Pt[]) => {
+    let best: Seen | null = null;
+    for (const p of ps) {
+      const dx = p[0] - cam.x;
+      const dy = p[1] - cam.y;
+      const d = Math.hypot(dx, dy);
+      let rel = (Math.atan2(dy, dx) * 180) / Math.PI - cam.dir;
+      rel = ((rel + 540) % 360) - 180;
+      if (Math.abs(rel) <= CAMERA_FOV / 2 + 5 && d > 1 && (!best || d < best.d)) best = { name, d, side: rel };
+    }
+    if (best) seen.push(best);
+  };
+  /** Points along a box's long middle line, every 50 cm. */
+  const along = (x: number, y: number, w: number, h: number): Pt[] => {
+    const n = Math.max(1, Math.ceil(Math.max(w, h) / 50));
+    return Array.from({ length: n + 1 }, (_, i) => (w >= h ? [x + (w * i) / n, y + h / 2] : [x + w / 2, y + (h * i) / n]) as Pt);
+  };
+  for (const it of items) {
+    const p = plants.get(it.plantId);
+    if (!p) continue;
+    const name = hu ? `${p.code} ${p.nameHu.toLowerCase()}` : `${p.code} ${(p.nameEn || p.nameHu).toLowerCase()}`;
+    look(name, it.kind === 'plant' ? [[it.x, it.y]] : it.kind === 'drift' ? fillPolygon(it.polygon, it.spacingCm, it.pattern) : fillPath(it.path, it.spacingCm));
+  }
+  for (const f of area.fixtures) {
+    const ps: Pt[] = f.polygon ? [...f.polygon, centroid(f.polygon)] : f.radius != null ? [[f.x, f.y]] : along(f.x, f.y, f.w ?? 0, f.h ?? 0);
+    look(localName(f.label, lang) || f.type, ps);
+  }
+  const out: string[] = [];
+  out.push(
+    hu
+      ? `A kép a rajzon jelölt nézőpontból készül: a (${fmt(cam.x)}; ${fmt(cam.y)}) m pontban állva, szemmagasságban (kb. 1,6 m), a rajzon ${DIR_HU[sector(cam.dir)]} nézve, kb. ${CAMERA_FOV}°-os látószöggel (35 mm-es objektív). A mellékelt alaprajzon a narancssárga kamera és a látómező mutatja.`
+      : `The image is taken from the viewpoint marked on the plan: standing at (${fmt(cam.x)}, ${fmt(cam.y)}) m at eye level (about 1.6 m), looking ${DIR_EN[sector(cam.dir)]} on the plan, with a field of view of about ${CAMERA_FOV}° (35 mm lens). The orange camera and its view cone on the attached plan show it.`,
+  );
+  if (!seen.length) return out;
+  seen.sort((a, b) => a.d - b.d);
+  // Depth bands in metres, as a person sees a garden: up to 2.5 m, 2.5–6 m, beyond.
+  const where = (s: Seen) => (Math.abs(s.side) < 10 ? (hu ? 'középen' : 'centre') : s.side < 0 ? (hu ? 'balra' : 'left') : hu ? 'jobbra' : 'right');
+  const band = (lo: number, hi: number) => {
+    const names: string[] = [];
+    for (const s of seen) if (s.d > lo && s.d <= hi) {
+      const n = `${s.name} (${where(s)}, ${fmt(s.d)} m)`;
+      if (!names.includes(n) && names.length < 8) names.push(n);
+    }
+    return names;
+  };
+  const bands: [string, string[]][] = hu
+    ? [['Előtér', band(-1, 250)], ['Középtér', band(250, 600)], ['Háttér', band(600, Infinity)]]
+    : [['Foreground', band(-1, 250)], ['Middle ground', band(250, 600)], ['Background', band(600, Infinity)]];
+  for (const [label, names] of bands) if (names.length) out.push(`${label}: ${names.join('; ')}.`);
+  return out;
+}
+
+const m = (cm: number) => (Math.round(cm / 10) / 10).toLocaleString('hu-HU', { minimumFractionDigits: 1 });
+const mEn = (cm: number) => (Math.round(cm / 10) / 10).toFixed(1);
+
+const FORM: Record<string, { hu: string; en: string }> = {
+  circle: { hu: 'bokros évelő', en: 'clump-forming perennial' },
+  square: { hu: 'alacsony talajtakaró / párna', en: 'low ground cover / cushion' },
+  triangle: { hu: 'díszfű / felálló levélcsomó', en: 'ornamental grass / upright tuft' },
+  diamond: { hu: 'kis fa / nagycserje', en: 'small tree / large shrub' },
+};
+
+const SEASON_NAME = { hu: ['tavasz', 'nyár', 'ősz', 'tél'], en: ['spring', 'summer', 'autumn', 'winter'] };
+const SEASON_DESC = {
+  hu: ['április közepe, friss hajtások', 'július, teljes virágzás', 'október, őszi lombszínek', 'január, téli állapot, lehet dér'],
+  en: ['mid-April, fresh growth', 'July, peak bloom', 'October, autumn foliage colours', 'January, winter state, possibly frost'],
+};
+
+const ORIENT_EN: Record<string, string> = { N: 'north', NE: 'north-east', E: 'east', SE: 'south-east', S: 'south', SW: 'south-west', W: 'west', NW: 'north-west' };
+
+/** Where an item lies, in metres from the top-left corner of the plan. */
+function placement(it: PlacedItem, lang: Lang): string {
+  const fmt = lang === 'hu' ? m : mEn;
+  if (it.kind === 'plant') return lang === 'hu' ? `x ${fmt(it.x)} m, y ${fmt(it.y)} m` : `x ${fmt(it.x)} m, y ${fmt(it.y)} m`;
+  const pts: Pt[] = it.kind === 'drift' ? it.polygon : it.path;
+  const b = bbox(pts);
+  const box = `x ${fmt(b.minX)}–${fmt(b.maxX)} m, y ${fmt(b.minY)}–${fmt(b.maxY)} m`;
+  if (it.kind === 'drift') return lang === 'hu' ? `folt: ${box}, ${it.pattern === 'staggered' ? 'eltolt' : 'négyzetes'} kiosztás, ${it.spacingCm} cm tőtáv` : `drift: ${box}, ${it.pattern === 'staggered' ? 'staggered' : 'grid'} layout, ${it.spacingCm} cm apart`;
+  const [a, z] = [it.path[0], it.path[it.path.length - 1]];
+  return lang === 'hu'
+    ? `${it.path.length > 2 ? 'íves sor' : 'egyenes sor'} (${fmt(a[0])}; ${fmt(a[1])}) m-től (${fmt(z[0])}; ${fmt(z[1])}) m-ig, ${it.spacingCm} cm tőtáv`
+    : `${it.path.length > 2 ? 'curved row' : 'straight row'} from (${fmt(a[0])}, ${fmt(a[1])}) m to (${fmt(z[0])}, ${fmt(z[1])}) m, ${it.spacingCm} cm apart`;
+}
+
+function count(it: PlacedItem) {
+  return it.kind === 'plant' ? 1 : it.kind === 'drift' ? fillPolygon(it.polygon, it.spacingCm, it.pattern).length : fillPath(it.path, it.spacingCm).length;
+}
+
+function fixtureLines(area: Area, lang: Lang): string[] {
+  const fmt = lang === 'hu' ? m : mEn;
+  const out: string[] = [];
+  for (const f of area.fixtures) {
+    const fl = localName(f.label, lang);
+    const label = fl || f.type;
+    if (f.type === 'lawn' && f.polygon) {
+      const b = bbox(f.polygon);
+      const curved = f.polygon.length > 12;
+      const corners = f.polygon.map(([x, y]) => (lang === 'hu' ? `(${fmt(x)}; ${fmt(y)})` : `(${fmt(x)}, ${fmt(y)})`)).join(', ');
+      const name = fl || (lang === 'hu' ? 'Gyep' : 'Lawn');
+      out.push(
+        lang === 'hu'
+          ? curved
+            ? `${name}: ívelt, lágy szélű nyírt gyep, kb. x ${fmt(b.minX)}–${fmt(b.maxX)} m, y ${fmt(b.minY)}–${fmt(b.maxY)} m között (alakja a mellékelt rajzon). Növény nincs rajta.`
+            : `${name}: nyírt gyep, sarokpontjai (m): ${corners}. Növény nincs rajta.`
+          : curved
+            ? `${name}: mown lawn with soft curved edges, roughly x ${fmt(b.minX)}–${fmt(b.maxX)} m, y ${fmt(b.minY)}–${fmt(b.maxY)} m (exact shape on the attached plan). No plants on it.`
+            : `${name}: mown lawn, corners (m): ${corners}. No plants on it.`,
+      );
+    } else if (f.type === 'walnut' || f.type === 'tree') {
+      out.push(
+        lang === 'hu'
+          ? `${label}: nagy lombkoronájú fa a (${fmt(f.x)}; ${fmt(f.y)}) m pontnál${f.x < 0 || f.x > area.widthCm || f.y < 0 || f.y > area.lengthCm ? ' – a területen kívül, a háttérben' : ''}, korona sugara kb. ${fmt(f.radius ?? 200)} m.`
+          : `${label}: large-crowned tree at (${fmt(f.x)}, ${fmt(f.y)}) m${f.x < 0 || f.x > area.widthCm || f.y < 0 || f.y > area.lengthCm ? ' – outside the area, in the background' : ''}, crown radius about ${fmt(f.radius ?? 200)} m.`,
+      );
+    } else {
+      const where = `x ${fmt(f.x)}–${fmt(f.x + (f.w ?? 0))} m, y ${fmt(f.y)}–${fmt(f.y + (f.h ?? 0))} m`;
+      const what =
+        lang === 'hu'
+          ? ({
+              wall: 'a ház fala (vakolt, világos)',
+              fence: 'kerítés',
+              paving: 'burkolat / járda',
+              tap: 'kerti csap / akna',
+              manhole: 'akna fedlap',
+              window: 'ablak',
+              gravel: 'kavicságy (világos zúzottkő, köztük ültetett növények)',
+              path: 'kerti ösvény (lépőkő vagy kavics)',
+              pond: 'kerti tó (víztükör, természetes kőszegély)',
+              well: 'kút (kőkáva)',
+              shed: 'kerti tároló (fa szerszámoskamra)',
+              compost: 'komposztáló (fa láda)',
+              rainBarrel: 'esővízgyűjtő hordó',
+              bench: 'kerti pad (fa)',
+              raisedBed: 'magaságyás (fa keret)',
+              other: label,
+            }[f.type as string] ?? label)
+          : ({
+              wall: 'house wall (light rendered)',
+              fence: 'garden fence',
+              paving: 'paving / pavement',
+              tap: 'garden tap / manhole',
+              manhole: 'manhole cover',
+              window: 'window',
+              gravel: 'gravel bed (light crushed stone, plants set into it)',
+              path: 'garden path (stepping stones or gravel)',
+              pond: 'garden pond (water surface, natural stone edge)',
+              well: 'well (stone surround)',
+              shed: 'garden shed (wooden tool shed)',
+              compost: 'compost bin (wooden crate)',
+              rainBarrel: 'rain barrel',
+              bench: 'garden bench (wooden)',
+              raisedBed: 'raised bed (timber frame)',
+              other: label,
+            }[f.type as string] ?? label);
+      out.push(`${what[0].toUpperCase() + what.slice(1)}${fl && !what.toLowerCase().includes(fl.toLowerCase()) ? ` („${fl}”)` : ''}: ${where}.`);
+    }
+  }
+  return out;
+}
+
+export function buildVisualPrompt(project: Project, area: Area, items: PlacedItem[], opt: PromptOptions): string {
+  const hu = opt.lang === 'hu';
+  const fmt = hu ? m : mEn;
+  const plants = new Map(project.plantDb.map((p) => [p.code, p]));
+  const month = SEASON_MONTH[opt.season];
+  const used: Plant[] = [...new Set(items.map((i) => i.plantId))].map((c) => plants.get(c)!).filter(Boolean);
+  const sun = areaSunLevel(area);
+  const pts = areaPoints(area);
+  const style = opt.style ?? 'photo';
+  const L: string[] = [];
+
+  // Task
+  L.push(
+    hu
+      ? `Készíts ${STYLE_TASK[style].hu} a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A növények helye, darabszáma, mérete és színe pontosan egyezzen a tervvel; ne adj hozzá más növényt vagy tárgyat.`
+      : `Create ${STYLE_TASK[style].en} from the exact description below and the attached plan (PNG with legend). Plant positions, counts, sizes and colours must match the plan exactly; do not add any other plants or objects.`,
+  );
+  L.push('');
+  // Site
+  L.push(hu ? '## Terület' : '## Site');
+  L.push(
+    hu
+      ? `${localName(area.name, 'hu')}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ? AREA_KIND_LABEL[area.kind] : 'évelőágyás'}, ${ORIENTATION_LABEL[area.orientation]}i fekvés, ${sun === 'sun' ? 'napos' : sun === 'part' ? 'félárnyékos' : 'árnyékos'}${area.sunUntil ? ` (közvetlen nap ${area.sunUntil})` : ''}${area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}. Hely: ${gardenLocation(project.settings).name} környéki kertes ház (Magyarország).`
+      : `${localName(area.name, 'en')}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ?? 'bed'}, facing ${ORIENT_EN[area.orientation]}, ${sun === 'sun' ? 'sunny' : sun === 'part' ? 'half shade' : 'shade'}${area.sunUntil ? ` (direct sun ${area.sunUntil})` : ''}${area.soil ? `, ${area.soil} soil` : ''}. Setting: a family house garden near ${gardenLocation(project.settings).name}, Hungary.`,
+  );
+  L.push(
+    hu
+      ? `Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.`
+      : `Coordinates: the top-left corner of the attached plan is (0, 0); x runs across the width (left to right), y along the length (top to bottom), in metres.`,
+  );
+  if (area.shape.kind === 'polygon')
+    L.push(hu ? `Az ágyás alakja (sarokpontok, m): ${pts.map(([x, y]) => `(${fmt(x)}; ${fmt(y)})`).join(', ')}.` : `Bed outline (corners, m): ${pts.map(([x, y]) => `(${fmt(x)}, ${fmt(y)})`).join(', ')}.`);
+  for (const f of fixtureLines(area, opt.lang)) L.push(`- ${f}`);
+  L.push('');
+
+  // Plants
+  L.push(hu ? '## Növények és elhelyezésük' : '## Plants and placement');
+  const byPlant = new Map<string, PlacedItem[]>();
+  for (const it of items) byPlant.set(it.plantId, [...(byPlant.get(it.plantId) ?? []), it]);
+  for (const p of used) {
+    const its = byPlant.get(p.code)!;
+    const n = its.reduce((s, it) => s + count(it), 0);
+    const look = plantLook(p, month);
+    const h = opt.mature ? p.maxHeightCm : Math.max(10, Math.round(p.maxHeightCm * 0.4));
+    const w = opt.mature ? p.spreadCm : Math.max(8, Math.round(p.spreadCm * 0.35));
+    const f = p.isTree
+      ? p.maxHeightCm > 800
+        ? opt.lang === 'hu'
+          ? 'nagy fa (itt fiatal, telepített állapotú is lehet)'
+          : 'large tree (may be shown as a young planted tree)'
+        : FORM.diamond[opt.lang]
+      : p.maxHeightCm >= 120 && p.symbol !== 'triangle'
+        ? (opt.lang === 'hu' ? (p.winterInterest ? 'cserje (télen is lombos / örökzöld)' : 'lombhullató cserje') : p.winterInterest ? 'shrub (evergreen / keeps winter structure)' : 'deciduous shrub')
+        : FORM[p.symbol ?? 'circle'][opt.lang];
+    const form = f[0].toUpperCase() + f.slice(1);
+    const state = hu
+      ? look.blooming
+        ? `most virágzik: ${p.bloomColor}`
+        : opt.season === 3 && !p.winterInterest
+          ? 'téli állapot: visszavágva / lombtalan, alig látszik'
+          : `most nem virágzik; lomb: ${p.foliageColor}`
+      : look.blooming
+        ? `in bloom now: ${p.en?.bloomColor ?? p.bloomColor}`
+        : opt.season === 3 && !p.winterInterest
+          ? 'winter state: cut back / leafless, barely visible'
+          : `not in bloom; foliage: ${p.en?.foliageColor ?? p.foliageColor}`;
+    L.push(
+      hu
+        ? `- **${p.code} – ${p.nameHu}** (*${p.nameLat}*), ${n} tő. ${form}, kb. ${h} cm magas és ${w} cm széles; ${state}.`
+        : `- **${p.code} – ${p.nameEn || p.nameHu}** (*${p.nameLat}*), ${n} plants. ${form}, about ${h} cm tall and ${w} cm wide; ${state}.`,
+    );
+    for (const it of its) L.push(`  - ${placement(it, opt.lang)}${it.kind === 'plant' ? '' : hu ? ` (${count(it)} tő)` : ` (${count(it)} plants)`}`);
+  }
+  if (!used.length) L.push(hu ? '- (Még nincs növény a tervben.)' : '- (No plants in the plan yet.)');
+  L.push('');
+
+  // Ground and season
+  const mul = mulchAdvice(used);
+  L.push(hu ? '## Talajtakarás, évszak, fény' : '## Ground cover, season, light');
+  L.push(
+    area.kind === 'gravel'
+      ? hu
+        ? 'Az ágyás felszíne világos, 4–8 mm-es mosott kavics.'
+        : 'Bed surface: light washed gravel, 4–8 mm.'
+      : mul.gravel.length
+        ? hu
+          ? `Világos apró kavicsmulcs a szárazságtűrők (${mul.gravel.map((p) => p.nameHu.toLowerCase()).join(', ')}) körül${mul.bark.length ? ', máshol sötét fakéreg mulcs' : ''}.`
+          : `Light fine gravel mulch around the drought-tolerant plants (${mul.gravel.map((p) => p.nameLat).join(', ')})${mul.bark.length ? ', dark bark mulch elsewhere' : ''}.`
+        : hu
+          ? 'Sötét fakéreg mulcs a tövek között.'
+          : 'Dark bark mulch between the plants.',
+  );
+  L.push(
+    hu
+      ? `Évszak: ${SEASON_NAME.hu[opt.season]} (${SEASON_DESC.hu[opt.season]}). ${opt.mature ? 'A növények kifejlett, 2–3 éves állapotban.' : 'Frissen ültetett állapot: kis tövek, sok látható mulcs.'}`
+      : `Season: ${SEASON_NAME.en[opt.season]} (${SEASON_DESC.en[opt.season]}). ${opt.mature ? 'Plants shown established, 2–3 years after planting.' : 'Just planted: small plants with plenty of visible mulch.'}`,
+  );
+  if (opt.time || opt.weather) {
+    const w = opt.weather ?? 'sunny';
+    const time = opt.time ?? 'afternoon';
+    const td = w === 'overcast' ? OVERCAST_TIME[time] : TIME_DESC[time];
+    L.push(hu ? `Napszak és idő: ${td.hu}; ${WEATHER_DESC[w].hu}.` : `Time and weather: ${td.en}; ${WEATHER_DESC[w].en}.`);
+  } else
+    L.push(
+      hu
+        ? `Fény: természetes ${area.orientation.includes('E') ? 'délelőtti' : area.orientation.includes('W') ? 'késő délutáni' : 'napközbeni'} napfény, valósághű árnyékokkal.`
+        : `Light: natural ${area.orientation.includes('E') ? 'morning' : area.orientation.includes('W') ? 'late-afternoon' : 'midday'} sunlight with realistic shadows.`,
+    );
+  L.push('');
+
+  // Camera
+  L.push(hu ? '## Nézőpont és stílus' : '## Viewpoint and style');
+  const eye = hu
+    ? `Szemmagasságból (kb. 1,6 m), az alaprajz alsó széle (y = ${fmt(area.lengthCm)} m) felől a terület hossza mentén nézve, 35 mm-es objektívvel.`
+    : `Eye level (about 1.6 m) from the bottom edge of the plan (y = ${fmt(area.lengthCm)} m), looking along the length, 35 mm lens.`;
+  const aerial = hu ? 'Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.' : 'Bird’s-eye view at about 45° so the layout is clearly visible.';
+  const cam = opt.viewpoint !== 'aerial' && opt.viewpoint !== 'eye' ? area.camera : undefined;
+  const camLines = cam ? cameraLines(area, items, plants, cam, opt.lang) : [];
+  if (opt.viewpoint === 'eye' || (opt.viewpoint === 'camera' && !cam)) L.push(eye);
+  else if (opt.viewpoint === 'camera') L.push(...camLines);
+  else if (opt.viewpoint === 'aerial') L.push(aerial);
+  else if (cam) {
+    L.push(hu ? 'Két kép:' : 'Two images:');
+    L.push(`1) ${camLines[0]}`, ...camLines.slice(1), `2) ${aerial}`);
+  } else L.push(hu ? `Két kép: 1) ${eye} 2) ${aerial}` : `Two images: 1) ${eye} 2) ${aerial}`);
+  L.push(
+    hu
+      ? `Stílus: ${STYLE_DESC[style].hu}; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.`
+      : `Style: ${STYLE_DESC[style].en}; no people, no text or watermarks. Do not print the codes (e.g. LA) on the image.`,
+  );
+  const centre = items.length ? centroid(items.map((i) => (i.kind === 'plant' ? [i.x, i.y] : centroid(i.kind === 'drift' ? i.polygon : i.path)) as Pt)) : null;
+  if (centre) L.push(hu ? `(A beültetés súlypontja kb. (${fmt(centre[0])}; ${fmt(centre[1])}) m.)` : `(The planting is centred around (${fmt(centre[0])}, ${fmt(centre[1])}) m.)`);
+  return L.join('\n');
+}

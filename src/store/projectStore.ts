@@ -1,0 +1,736 @@
+import { create } from 'zustand';
+import { itemCount, itemPositions, type Pattern } from '../engine/fill';
+import { mixAssign, type MixPart } from '../engine/mix';
+import { SEED_PLANTS, SEED_SINCE } from '../data/plants.seed';
+import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
+import { uid } from '../model/ids';
+import { isAncestor } from '../model/variantTree';
+import { DEFAULT_SETTINGS, type Area, type Camera, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Render, type Settings, type Variant } from '../model/types';
+import { t } from '../i18n';
+
+export const HISTORY_LIMIT = 100;
+
+export type ItemPatch = Partial<{ plantId: string; status: ItemStatus; note: string; x: number; y: number; pattern: Pattern; spacingCm: number; spreadCm: number | undefined }>;
+
+/** Where a species replacement applies: the edited variant, every variant of the area, or the whole project. */
+export type ReplaceScope = 'variant' | 'area' | 'project';
+
+export interface ProjectState {
+  project: Project | null;
+  currentAreaId: string | null;
+  past: Project[];
+  future: Project[];
+
+  setLoaded: (p: Project | null) => void;
+  createProject: (templateKeys: string[]) => void;
+  addArea: (input: AreaInput) => string;
+  addTemplateArea: (templateKey: string) => string | null;
+  updateArea: (id: string, patch: Partial<Omit<Area, 'id'>>) => void;
+  deleteArea: (id: string) => void;
+  selectArea: (id: string) => void;
+  updateSettings: (patch: Partial<Settings>) => void;
+
+  addPlant: (p: Plant) => void;
+  updatePlant: (code: string, p: Plant) => void;
+  deletePlant: (code: string) => void;
+  importPlants: (plants: Plant[], mode: 'merge' | 'replace') => void;
+
+  placePlant: (plantId: string, x: number, y: number) => string | null;
+  addDrift: (plantId: string, polygon: Pt[], pattern: Pattern, spacingCm?: number) => string | null;
+  addRow: (plantId: string, path: Pt[], spacingCm?: number) => string | null;
+  updateShape: (id: string, points: Pt[]) => void;
+  moveItems: (ids: string[], dx: number, dy: number) => void;
+  updateItems: (ids: string[], patch: ItemPatch) => void;
+  deleteItems: (ids: string[]) => void;
+  /** Split drifts and rows into single plants at their positions; returns the ids of the new plants. */
+  explodeItems: (ids: string[]) => string[];
+  /** Add plants (and remove some) in the edited variant as one undoable step (zone fill). */
+  applyFill: (add: PlacedItem[], removeIds: string[]) => void;
+  /**
+   * Replace every plant of one species with another in the chosen scope. Drifts and rows take the
+   * new plant's spacing (their count is recomputed) unless keepSpacing. With several targets the species are
+   * mixed at random in proportion to their weights, per item or (mode 'plant') per single plant.
+   * Returns the number of items (or plants) changed.
+   */
+  replaceSpecies: (from: string, to: string | MixPart[], scope: ReplaceScope, keepSpacing?: boolean, mode?: 'item' | 'plant') => number;
+  duplicateItems: (ids: string[], dx: number, dy: number) => string[];
+
+  setMuted: (warningId: string, muted: boolean) => void;
+  /** Set the status of every item of a species in the chosen variants of the given areas. */
+  setSpeciesStatus: (code: string, status: ItemStatus, areaIds: string[], onlyFrom?: ItemStatus | null) => void;
+
+  addFixture: (f: Omit<Fixture, 'id'>) => string | null;
+  updateFixture: (id: string, patch: Partial<Omit<Fixture, 'id'>>) => void;
+  moveFixture: (id: string, dx: number, dy: number) => void;
+  deleteFixture: (id: string) => void;
+
+  renameProject: (name: string) => void;
+  /** Replace the outline with a free polygon; everything is shifted so the outline starts at 0,0. */
+  setAreaShape: (areaId: string, points: Pt[]) => void;
+  setBackground: (bg: Area['background'] | null) => void;
+  /** Viewpoint of the current area for the visualisation (null removes it). */
+  setCamera: (cam: Camera | null) => void;
+  addRender: (variantId: string, r: Omit<Render, 'id'>) => void;
+  deleteRender: (variantId: string, renderId: string) => void;
+  setScheduleWindow: (start: string, end: string) => void;
+  toggleTask: (taskId: string) => void;
+
+  duplicateVariant: (variantId: string) => string | null;
+  addEmptyVariant: () => string | null;
+  /** New variant with ready items (e.g. from the idea generator); it becomes the edited one. */
+  addVariantWith: (name: string, items: PlacedItem[], notes: string, folderName?: string) => string | null;
+  addVariantFolder: (name: string, parentId?: string | null) => string | null;
+  renameVariantFolder: (folderId: string, name: string) => void;
+  /** Removes the folder only; its contents move up one level. */
+  deleteVariantFolder: (folderId: string) => void;
+  /** Move a variant or folder under another one (null = top level); refuses cycles. */
+  moveVariantNode: (id: string, parentId: string | null) => void;
+  /** Replace a variant's items in one undoable step (idea generator "Újra"). */
+  setVariantItems: (variantId: string, items: PlacedItem[], notes: string) => void;
+  renameVariant: (variantId: string, name: string) => void;
+  deleteVariant: (variantId: string) => void;
+  setActiveVariant: (variantId: string) => void;
+  setChosenVariant: (variantId: string) => void;
+
+  undo: () => void;
+  redo: () => void;
+}
+
+export function newProject(templateKeys: string[]): Project {
+  const areas = AREA_TEMPLATES.filter((t) => templateKeys.includes(t.key)).map((t) => t.build());
+  return { schemaVersion: 1, id: uid('p'), name: t('Kertem', 'My garden'), areas, plantDb: seedPlants(), settings: { ...DEFAULT_SETTINGS } };
+}
+
+const seedPlants = () => SEED_PLANTS.map((p) => ({ ...p }));
+
+/** Upgrade projects saved by earlier builds. */
+/** The plan on the canvas is always the chosen one: opening a variant chooses it. */
+export const onePlan = (a: Area): Area => (a.activeVariantId && a.activeVariantId !== a.chosenVariantId ? { ...a, chosenVariantId: a.activeVariantId } : a);
+
+export function migrate(p: Project): Project {
+  let out = { ...p, areas: p.areas.map(onePlan) };
+  if (!out.plantDb?.length) out = { ...out, plantDb: seedPlants() };
+  const seedVersion = out.settings?.seedVersion ?? 1;
+  if (seedVersion < SEED_VERSION) {
+    // Merge the expanded built-in list once: add new species, fill soil on built-in ones.
+    // Plants the user edited keep their values; a deleted built-in species stays deleted later.
+    const have = new Map(out.plantDb.map((x) => [x.code, x]));
+    const seeds = seedPlants();
+    const byCode = new Map(seeds.map((x) => [x.code, x]));
+    const updated = out.plantDb.map((x) => {
+      const seed = byCode.get(x.code);
+      if (!seed || seed.nameLat !== x.nameLat) return x;
+      // Fill what older builds lacked (soil, English texts); never overwrite the user's values.
+      let y = x;
+      if (!y.soil?.length) y = { ...y, soil: seed.soil };
+      if (!y.nameEn && seed.nameEn) y = { ...y, nameEn: seed.nameEn };
+      if (!y.en && seed.en) y = { ...y, en: seed.en };
+      return y;
+    });
+    // Only species newer than the project's list are added, so earlier deletions stick.
+    const added = seeds.filter((x) => !have.has(x.code) && (SEED_SINCE[x.code] ?? 2) > seedVersion);
+    out = { ...out, plantDb: [...updated, ...added] };
+  }
+  out = { ...out, settings: { ...DEFAULT_SETTINGS, ...out.settings, seedVersion: Math.max(seedVersion, SEED_VERSION) } };
+  return out;
+}
+
+/** Bump when the built-in plant list grows. */
+export const SEED_VERSION = 5;
+
+/** Copy with a new parent; a missing parent removes the field (top level). */
+function withParent<T extends { parentId?: string }>(x: T, parentId: string | undefined): T {
+  const { parentId: _old, ...rest } = x;
+  void _old;
+  return (parentId ? { ...rest, parentId } : rest) as T;
+}
+
+export const activeVariant = (a: Area): Variant =>
+  a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0];
+
+/** Next free plan name: "A terv", "B terv", … ("Plan A", "Plan B" in English). */
+export function nextVariantName(vs: Variant[]): string {
+  const used = new Set(vs.map((v) => v.name));
+  const name = (c: string) => t(`${c} terv`, `Plan ${c}`);
+  for (const c of 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') if (!used.has(name(c))) return name(c);
+  return t(`${vs.length + 1}. terv`, `Plan ${vs.length + 1}`);
+}
+
+function translateItem(it: PlacedItem, dx: number, dy: number): PlacedItem {
+  switch (it.kind) {
+    case 'plant':
+      return { ...it, x: it.x + dx, y: it.y + dy };
+    case 'drift':
+      return { ...it, polygon: it.polygon.map(([x, y]) => [x + dx, y + dy]) };
+    case 'row':
+      return { ...it, path: it.path.map(([x, y]) => [x + dx, y + dy]) };
+  }
+}
+
+const round1 = (n: number) => Math.round(n * 10) / 10;
+
+export const useProject = create<ProjectState>()((set, get) => {
+  /** Apply an immutable change to the project and record it for undo. */
+  const commit = (fn: (p: Project) => Project) => {
+    const { project, past } = get();
+    if (!project) return;
+    const next = fn(project);
+    if (next === project) return;
+    set({ project: next, past: [...past, project].slice(-HISTORY_LIMIT), future: [] });
+  };
+  const mapArea = (id: string, fn: (a: Area) => Area) =>
+    commit((p) => ({ ...p, areas: p.areas.map((a) => (a.id === id ? onePlan(fn(a)) : a)) }));
+  /** Change the item list of the active variant of the current area. */
+  const mapItems = (fn: (items: PlacedItem[]) => PlacedItem[]) => {
+    const id = get().currentAreaId;
+    if (!id) return;
+    mapArea(id, (a) => {
+      const v = activeVariant(a);
+      const items = fn(v.items);
+      if (items === v.items) return a;
+      return { ...a, variants: a.variants.map((x) => (x.id === v.id ? { ...x, items } : x)) };
+    });
+  };
+
+  const mapFixtures = (fn: (fs: Fixture[]) => Fixture[]) => {
+    const id = get().currentAreaId;
+    if (id) mapArea(id, (a) => ({ ...a, fixtures: fn(a.fixtures) }));
+  };
+
+  return {
+    project: null,
+    currentAreaId: null,
+    past: [],
+    future: [],
+
+    setLoaded: (p) => {
+      const m = p && migrate(p);
+      set({ project: m, currentAreaId: m?.areas[0]?.id ?? null, past: [], future: [] });
+    },
+
+    createProject: (keys) => {
+      const p = newProject(keys);
+      set({ project: p, currentAreaId: p.areas[0]?.id ?? null, past: [], future: [] });
+    },
+
+    addArea: (input) => insertArea(makeArea(input)),
+
+    addTemplateArea: (key) => {
+      const t = AREA_TEMPLATES.find((x) => x.key === key);
+      return t ? insertArea(t.build()) : null;
+    },
+
+    updateArea: (id, patch) => mapArea(id, (a) => ({ ...a, ...patch })),
+
+    deleteArea: (id) => {
+      commit((p) => ({ ...p, areas: p.areas.filter((a) => a.id !== id) }));
+      const { project, currentAreaId } = get();
+      if (currentAreaId === id) set({ currentAreaId: project?.areas[0]?.id ?? null });
+    },
+
+    selectArea: (id) => set({ currentAreaId: id }),
+
+    updateSettings: (patch) => commit((p) => ({ ...p, settings: { ...p.settings, ...patch } })),
+
+    // ---------- plant database ----------
+    addPlant: (plant) => commit((p) => ({ ...p, plantDb: [...p.plantDb, plant] })),
+
+    updatePlant: (code, plant) =>
+      commit((p) => ({
+        ...p,
+        plantDb: p.plantDb.map((x) => (x.code === code ? plant : x)),
+        // A code change must follow the placed items.
+        areas:
+          code === plant.code
+            ? p.areas
+            : p.areas.map((a) => ({
+                ...a,
+                variants: a.variants.map((v) => ({
+                  ...v,
+                  items: v.items.map((it) => (it.plantId === code ? { ...it, plantId: plant.code } : it)),
+                })),
+              })),
+      })),
+
+    deletePlant: (code) =>
+      commit((p) => ({
+        ...p,
+        plantDb: p.plantDb.filter((x) => x.code !== code),
+        areas: p.areas.map((a) => ({
+          ...a,
+          variants: a.variants.map((v) => ({ ...v, items: v.items.filter((it) => it.plantId !== code) })),
+        })),
+      })),
+
+    importPlants: (plants, mode) =>
+      commit((p) => {
+        if (mode === 'replace') {
+          // Keep species that are still placed somewhere, so no item loses its plant.
+          const used = new Set(p.areas.flatMap((a) => a.variants.flatMap((v) => v.items.map((i) => i.plantId))));
+          const incoming = new Set(plants.map((x) => x.code));
+          return { ...p, plantDb: [...plants, ...p.plantDb.filter((x) => used.has(x.code) && !incoming.has(x.code))] };
+        }
+        const byCode = new Map(p.plantDb.map((x) => [x.code, x]));
+        for (const x of plants) byCode.set(x.code, x);
+        return { ...p, plantDb: [...byCode.values()] };
+      }),
+
+    // ---------- placed items ----------
+    placePlant: (plantId, x, y) => {
+      if (!get().currentAreaId) return null;
+      const id = uid('i');
+      mapItems((items) => [...items, { kind: 'plant', id, plantId, x: round1(x), y: round1(y), status: 'needed' }]);
+      return id;
+    },
+
+    addDrift: (plantId, polygon, pattern, spacingCm) => {
+      const sp = spacingCm ?? plantSpacing(plantId);
+      if (!get().currentAreaId || polygon.length < 3 || !sp) return null;
+      const id = uid('i');
+      const it = withCount({ kind: 'drift', id, plantId, polygon: roundPts(polygon), pattern, spacingCm: sp, count: 0, status: 'needed' });
+      mapItems((items) => [...items, it]);
+      return id;
+    },
+
+    addRow: (plantId, path, spacingCm) => {
+      const sp = spacingCm ?? plantSpacing(plantId);
+      if (!get().currentAreaId || path.length < 2 || !sp) return null;
+      const id = uid('i');
+      const it = withCount({ kind: 'row', id, plantId, path: roundPts(path), spacingCm: sp, count: 0, status: 'needed' });
+      mapItems((items) => [...items, it]);
+      return id;
+    },
+
+    updateShape: (id, points) =>
+      mapItems((items) =>
+        items.map((it) => {
+          if (it.id !== id) return it;
+          if (it.kind === 'drift') return withCount({ ...it, polygon: roundPts(points) });
+          if (it.kind === 'row') return withCount({ ...it, path: roundPts(points) });
+          return it;
+        }),
+      ),
+
+    moveItems: (ids, dx, dy) => {
+      if (!ids.length || (dx === 0 && dy === 0)) return;
+      const set_ = new Set(ids);
+      mapItems((items) => items.map((it) => (set_.has(it.id) ? withCount(roundItem(translateItem(it, dx, dy))) : it)));
+    },
+
+    updateItems: (ids, patch) => {
+      const set_ = new Set(ids);
+      mapItems((items) =>
+        items.map((it) => {
+          if (!set_.has(it.id)) return it;
+          const { x, y, pattern, spacingCm, ...rest } = patch;
+          let next = { ...it, ...rest } as PlacedItem;
+          if (next.kind === 'plant') {
+            if (x !== undefined || y !== undefined) next = { ...next, x: round1(x ?? next.x), y: round1(y ?? next.y) };
+            return next;
+          }
+          // A species change on a drift/row adopts the new plant's spacing unless one is given.
+          const sp = spacingCm ?? (rest.plantId && rest.plantId !== it.plantId ? plantSpacing(rest.plantId) : undefined);
+          if (sp && sp > 0) next = { ...next, spacingCm: Math.round(sp * 10) / 10 };
+          if (pattern && next.kind === 'drift') next = { ...next, pattern };
+          return withCount(next);
+        }),
+      );
+    },
+
+    replaceSpecies: (from, to, scope, keepSpacing = false, mode = 'item') => {
+      const p0 = get().project;
+      const areaId = get().currentAreaId;
+      if (!p0) return 0;
+      const byCode = new Map(p0.plantDb.map((x) => [x.code, x]));
+      const parts = (typeof to === 'string' ? [{ code: to, weight: 1 }] : to).filter((x) => x.code !== from && byCode.has(x.code) && x.weight > 0);
+      if (!parts.length) return 0;
+      // Several targets "per plant": drifts and rows are split into single plants at their current positions.
+      const perPlant = parts.length > 1 && mode === 'plant';
+      const inScope = (a: Area, v: Variant) => (scope === 'project' || a.id === areaId) && (scope !== 'variant' || v.id === activeVariant(a).id);
+      let slots = 0;
+      for (const a of p0.areas)
+        for (const v of a.variants)
+          if (inScope(a, v)) for (const it of v.items) if (it.plantId === from) slots += perPlant ? itemPositions(it).length : 1;
+      if (!slots) return 0;
+      const assign = mixAssign(slots, parts);
+      let k = 0;
+      const swap = (items: PlacedItem[]): PlacedItem[] =>
+        items.flatMap((it): PlacedItem[] => {
+          if (it.plantId !== from) return [it];
+          if (perPlant && it.kind !== 'plant')
+            return itemPositions(it).map(([x, y]) => ({ kind: 'plant', id: uid('i'), plantId: assign[k++], x: round1(x), y: round1(y), status: it.status, ...(it.note ? { note: it.note } : {}) }));
+          const code = assign[k++];
+          if (it.kind === 'plant') return [{ ...it, plantId: code }];
+          return [withCount({ ...it, plantId: code, spacingCm: keepSpacing ? it.spacingCm : byCode.get(code)!.spacingCm })];
+        });
+      commit((p) => ({
+        ...p,
+        areas: p.areas.map((a) => {
+          const variants = a.variants.map((v) => (inScope(a, v) && v.items.some((it) => it.plantId === from) ? { ...v, items: swap(v.items) } : v));
+          return variants.some((v, i) => v !== a.variants[i]) ? { ...a, variants } : a;
+        }),
+      }));
+      return slots;
+    },
+
+    explodeItems: (ids) => {
+      const set_ = new Set(ids);
+      const created: string[] = [];
+      mapItems((items) =>
+        items.some((it) => set_.has(it.id) && it.kind !== 'plant')
+          ? items.flatMap((it): PlacedItem[] => {
+              if (!set_.has(it.id) || it.kind === 'plant') return [it];
+              return itemPositions(it).map(([x, y]) => {
+                const id = uid('i');
+                created.push(id);
+                return { kind: 'plant', id, plantId: it.plantId, x: round1(x), y: round1(y), status: it.status, ...(it.note ? { note: it.note } : {}) };
+              });
+            })
+          : items,
+      );
+      return created;
+    },
+
+    applyFill: (add, removeIds) => {
+      if (!add.length && !removeIds.length) return;
+      const rm = new Set(removeIds);
+      mapItems((items) => [...items.filter((i) => !rm.has(i.id)), ...add]);
+    },
+
+    deleteItems: (ids) => {
+      if (!ids.length) return;
+      const set_ = new Set(ids);
+      mapItems((items) => (items.some((i) => set_.has(i.id)) ? items.filter((i) => !set_.has(i.id)) : items));
+    },
+
+    duplicateItems: (ids, dx, dy) => {
+      const set_ = new Set(ids);
+      const created: string[] = [];
+      mapItems((items) => {
+        const copies = items
+          .filter((i) => set_.has(i.id))
+          .map((i) => {
+            const c = { ...withCount(roundItem(translateItem(i, dx, dy))), id: uid('i') };
+            created.push(c.id);
+            return c;
+          });
+        return copies.length ? [...items, ...copies] : items;
+      });
+      return created;
+    },
+
+    setMuted: (wid, muted) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => {
+        const v = activeVariant(a);
+        const cur = v.muted ?? [];
+        if (cur.includes(wid) === muted) return a;
+        const next = muted ? [...cur, wid] : cur.filter((x) => x !== wid);
+        return { ...a, variants: a.variants.map((x) => (x.id === v.id ? { ...x, muted: next } : x)) };
+      });
+    },
+
+    setSpeciesStatus: (code, status, areaIds, onlyFrom) =>
+      commit((p) => ({
+        ...p,
+        areas: p.areas.map((a) =>
+          !areaIds.includes(a.id)
+            ? a
+            : {
+                ...a,
+                variants: a.variants.map((v) =>
+                  v.id !== a.chosenVariantId
+                    ? v
+                    : {
+                        ...v,
+                        items: v.items.map((it) =>
+                          it.plantId === code && (!onlyFrom || it.status === onlyFrom) && it.status !== status ? { ...it, status } : it,
+                        ),
+                      },
+                ),
+              },
+        ),
+      })),
+
+    addFixture: (f) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('f');
+      mapArea(areaId, (a) => ({ ...a, fixtures: [...a.fixtures, { ...f, id }] }));
+      return id;
+    },
+
+    updateFixture: (fid, patch) => mapFixtures((fs) => fs.map((f) => (f.id === fid ? { ...f, ...patch } : f))),
+
+    moveFixture: (fid, dx, dy) => {
+      if (dx === 0 && dy === 0) return;
+      mapFixtures((fs) =>
+        fs.map((f) =>
+          f.id === fid
+            ? {
+                ...f,
+                x: round1(f.x + dx),
+                y: round1(f.y + dy),
+                ...(f.polygon ? { polygon: f.polygon.map(([x, y]) => [round1(x + dx), round1(y + dy)] as Pt) } : {}),
+              }
+            : f,
+        ),
+      );
+    },
+
+    deleteFixture: (fid) => mapFixtures((fs) => fs.filter((f) => f.id !== fid)),
+
+    setCamera: (cam) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => {
+        if (!cam) {
+          const { camera: _drop, ...rest } = a;
+          return rest;
+        }
+        return { ...a, camera: { x: Math.round(cam.x), y: Math.round(cam.y), dir: Math.round(((cam.dir % 360) + 360) % 360) } };
+      });
+    },
+
+    addRender: (vid, r) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, renders: [...(v.renders ?? []), { ...r, id: uid('r') }] } : v)) }));
+    },
+
+    deleteRender: (vid, rid) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, renders: (v.renders ?? []).filter((x) => x.id !== rid) } : v)) }));
+    },
+
+    setBackground: (bg) => {
+      const id = get().currentAreaId;
+      if (!id) return;
+      mapArea(id, (a) => {
+        if (!bg) {
+          const { background: _drop, ...rest } = a;
+          return rest;
+        }
+        return { ...a, background: bg };
+      });
+    },
+
+    setAreaShape: (areaId, pts) => {
+      if (pts.length < 3) return;
+      // Whole centimetres are plenty for an outline drawn on a phone.
+      const whole = pts.map(([x, y]) => [Math.round(x), Math.round(y)] as Pt);
+      const xs = whole.map((p) => p[0]);
+      const ys = whole.map((p) => p[1]);
+      const [minX, minY] = [Math.min(...xs), Math.min(...ys)];
+      const dx = -minX;
+      const dy = -minY;
+      const points = whole.map(([x, y]) => [x + dx, y + dy] as Pt);
+      mapArea(areaId, (a) => ({
+        ...a,
+        shape: { kind: 'polygon', points },
+        widthCm: Math.max(...xs) - minX,
+        lengthCm: Math.max(...ys) - minY,
+        variants: a.variants.map((v) => ({ ...v, items: v.items.map((it) => withCount(roundItem(translateItem(it, dx, dy)))) })),
+        fixtures: a.fixtures.map((f) => ({
+          ...f,
+          x: round1(f.x + dx),
+          y: round1(f.y + dy),
+          ...(f.polygon ? { polygon: f.polygon.map(([x, y]) => [round1(x + dx), round1(y + dy)] as Pt) } : {}),
+        })),
+        ...(a.background ? { background: { ...a.background, x: a.background.x + dx, y: a.background.y + dy } } : {}),
+      }));
+    },
+
+    renameProject: (name) => {
+      const n = name.trim();
+      if (n) commit((p) => (p.name === n ? p : { ...p, name: n }));
+    },
+
+    setScheduleWindow: (start, end) =>
+      commit((p) => ({ ...p, schedule: { start, end, done: p.schedule?.done ?? [] } })),
+
+    toggleTask: (tid) =>
+      commit((p) => {
+        if (!p.schedule) return p;
+        const done = p.schedule.done.includes(tid) ? p.schedule.done.filter((x) => x !== tid) : [...p.schedule.done, tid];
+        return { ...p, schedule: { ...p.schedule, done } };
+      }),
+
+    duplicateVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('v');
+      mapArea(areaId, (a) => {
+        const src = a.variants.find((v) => v.id === vid);
+        if (!src) return a;
+        const copy: Variant = {
+          id,
+          name: nextVariantName(a.variants),
+          notes: src.notes,
+          items: src.items.map((it) => ({ ...it, id: uid('i') })),
+          // Muted ids that refer to items no longer match; species-level ones carry over.
+          muted: src.muted?.filter((m) => !m.includes('i_')),
+          parentId: src.id,
+        };
+        return { ...a, variants: [...a.variants, copy], activeVariantId: id };
+      });
+      return id;
+    },
+
+    addEmptyVariant: () => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('v');
+      mapArea(areaId, (a) => ({ ...a, variants: [...a.variants, { id, name: nextVariantName(a.variants), items: [], notes: '' }], activeVariantId: id }));
+      return id;
+    },
+
+    addVariantWith: (name, items, notes, folderName) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return null;
+      const id = uid('v');
+      mapArea(areaId, (a) => {
+        let folders = a.variantFolders ?? [];
+        let parentId: string | undefined;
+        if (folderName) {
+          const f = folders.find((x) => x.name === folderName && !x.parentId);
+          parentId = f?.id ?? uid('f');
+          if (!f) folders = [...folders, { id: parentId, name: folderName }];
+        }
+        return { ...a, variantFolders: folders, variants: [...a.variants, { id, name, items, notes, ...(parentId ? { parentId } : {}) }], activeVariantId: id };
+      });
+      return id;
+    },
+
+    addVariantFolder: (name, parentId) => {
+      const areaId = get().currentAreaId;
+      const n = name.trim();
+      if (!areaId || !n) return null;
+      const id = uid('f');
+      mapArea(areaId, (a) => ({ ...a, variantFolders: [...(a.variantFolders ?? []), { id, name: n, ...(parentId ? { parentId } : {}) }] }));
+      return id;
+    },
+
+    renameVariantFolder: (fid, name) => {
+      const areaId = get().currentAreaId;
+      const n = name.trim();
+      if (!areaId || !n) return;
+      mapArea(areaId, (a) => ({ ...a, variantFolders: (a.variantFolders ?? []).map((f) => (f.id === fid ? { ...f, name: n } : f)) }));
+    },
+
+    deleteVariantFolder: (fid) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return;
+      mapArea(areaId, (a) => {
+        const f = a.variantFolders?.find((x) => x.id === fid);
+        if (!f) return a;
+        const up = <T extends { parentId?: string }>(x: T): T => (x.parentId === fid ? withParent(x, f.parentId) : x);
+        return { ...a, variantFolders: a.variantFolders!.filter((x) => x.id !== fid).map(up), variants: a.variants.map(up) };
+      });
+    },
+
+    moveVariantNode: (id, parentId) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return;
+      mapArea(areaId, (a) => {
+        const exists = (x: string) => a.variants.some((v) => v.id === x) || !!a.variantFolders?.some((f) => f.id === x);
+        if (!exists(id) || (parentId && (!exists(parentId) || isAncestor(a, id, parentId)))) return a;
+        const mv = <T extends { id: string; parentId?: string }>(x: T): T => (x.id === id ? withParent(x, parentId ?? undefined) : x);
+        return { ...a, variants: a.variants.map(mv), variantFolders: a.variantFolders?.map(mv) };
+      });
+    },
+
+    setVariantItems: (vid, items, notes) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return;
+      mapArea(areaId, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, items, notes, muted: [] } : v)) }));
+    },
+
+    renameVariant: (vid, name) => {
+      const areaId = get().currentAreaId;
+      const n = name.trim();
+      if (!areaId || !n) return;
+      mapArea(areaId, (a) => ({ ...a, variants: a.variants.map((v) => (v.id === vid ? { ...v, name: n } : v)) }));
+    },
+
+    deleteVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (!areaId) return;
+      mapArea(areaId, (a) => {
+        if (a.variants.length <= 1 || !a.variants.some((v) => v.id === vid)) return a;
+        const gone = a.variants.find((v) => v.id === vid)!;
+        // Children of the deleted variant move up to its parent.
+        const up = <T extends { parentId?: string }>(x: T): T => (x.parentId === vid ? withParent(x, gone.parentId) : x);
+        const variants = a.variants.filter((v) => v.id !== vid).map(up);
+        const chosen = a.chosenVariantId === vid ? variants[0].id : a.chosenVariantId;
+        const active = (a.activeVariantId ?? a.chosenVariantId) === vid ? chosen : a.activeVariantId;
+        return { ...a, variants, variantFolders: a.variantFolders?.map(up), chosenVariantId: chosen, activeVariantId: active };
+      });
+    },
+
+    setActiveVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (areaId) mapArea(areaId, (a) => (a.activeVariantId === vid ? a : { ...a, activeVariantId: vid }));
+    },
+
+    setChosenVariant: (vid) => {
+      const areaId = get().currentAreaId;
+      if (areaId) mapArea(areaId, (a) => (a.chosenVariantId === vid && a.activeVariantId === vid ? a : { ...a, chosenVariantId: vid, activeVariantId: vid }));
+    },
+
+    undo: () => {
+      const { past, project, future } = get();
+      const prev = past[past.length - 1];
+      if (!prev || !project) return;
+      set({ project: prev, past: past.slice(0, -1), future: [project, ...future] });
+      ensureCurrentArea();
+    },
+
+    redo: () => {
+      const { past, project, future } = get();
+      const next = future[0];
+      if (!next || !project) return;
+      set({ project: next, past: [...past, project], future: future.slice(1) });
+      ensureCurrentArea();
+    },
+  };
+
+  function plantSpacing(code: string): number {
+    return get().project?.plantDb.find((p) => p.code === code)?.spacingCm ?? 0;
+  }
+
+  function insertArea(area: Area) {
+    commit((p) => ({ ...p, areas: [...p.areas, area] }));
+    set({ currentAreaId: area.id });
+    return area.id;
+  }
+
+  function ensureCurrentArea() {
+    const { project, currentAreaId } = get();
+    if (project && !project.areas.some((a) => a.id === currentAreaId)) set({ currentAreaId: project.areas[0]?.id ?? null });
+  }
+});
+
+const roundPts = (pts: Pt[]): Pt[] => pts.map(([x, y]) => [round1(x), round1(y)]);
+
+/** Drifts and rows keep their plant count in sync with their shape and spacing. */
+function withCount(it: PlacedItem): PlacedItem {
+  return it.kind === 'plant' ? it : { ...it, count: itemCount(it) };
+}
+
+function roundItem(it: PlacedItem): PlacedItem {
+  if (it.kind === 'plant') return { ...it, x: round1(it.x), y: round1(it.y) };
+  if (it.kind === 'drift') return { ...it, polygon: it.polygon.map(([x, y]) => [round1(x), round1(y)]) };
+  return { ...it, path: it.path.map(([x, y]) => [round1(x), round1(y)]) };
+}
+
+export const selectCurrentArea = (s: ProjectState): Area | null =>
+  s.project?.areas.find((a) => a.id === s.currentAreaId) ?? null;
+
+const EMPTY: PlacedItem[] = [];
+export const selectItems = (s: ProjectState): PlacedItem[] => {
+  const a = selectCurrentArea(s);
+  return a ? activeVariant(a).items : EMPTY;
+};
