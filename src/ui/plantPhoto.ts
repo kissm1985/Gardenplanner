@@ -11,7 +11,9 @@ export type PhotoState =
   | { state: 'none' }
   | { state: 'loading' }
   | { state: 'ok'; src: string; credit: string; pageUrl?: string; filePage?: string; license?: string; licenseUrl?: string; own: boolean }
-  | { state: 'offline' };
+  | { state: 'offline' }
+  /** Wikipedia photos are off: ask before the first look-up. */
+  | { state: 'ask' };
 
 interface Cached {
   at: number;
@@ -65,7 +67,7 @@ async function load(nameLat: string): Promise<PhotoState> {
 
 /** Photo for a plant; only looks up when `enabled` (e.g. while the card is visible). */
 export function usePlantPhoto(plant: Plant | null, enabled = true): PhotoState {
-  const wiki = useProject((s) => s.project?.settings.wikiPhotos !== false);
+  const wiki = useProject((s) => s.project?.settings.wikiPhotos === true);
   const [st, setSt] = useState<PhotoState>({ state: 'loading' });
   const own = plant?.photoUrl;
   const name = plant?.nameLat ?? '';
@@ -73,7 +75,7 @@ export function usePlantPhoto(plant: Plant | null, enabled = true): PhotoState {
   useEffect(() => {
     if (!enabled || !hasPlant || own) return;
     if (!wiki || !name.trim()) {
-      setSt({ state: 'none' });
+      setSt({ state: wiki ? 'none' : 'ask' });
       return;
     }
     let live = true;

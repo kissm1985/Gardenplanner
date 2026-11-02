@@ -30,6 +30,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
   const area = useProject(selectCurrentArea);
   const [msg, setMsg] = useState('');
   const [link, setLink] = useState('');
+  const [noNotes, setNoNotes] = useState(false);
   const [orient, setOrient] = useState<Orientation>('portrait');
   const [withLegend, setWithLegend] = useState(true);
   const fileRef = useRef<HTMLInputElement>(null);
@@ -81,7 +82,7 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
   };
 
   const makeLink = async () => {
-    const url = shareUrl(project);
+    const url = shareUrl(project, location.href, { withoutNotes: noNotes });
     setLink(url);
     if (navigator.share) {
       try {
@@ -133,6 +134,16 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
 
       <fieldset className="field-group">
         <legend>{t('Megosztás', 'Sharing')}</legend>
+        <p className="share-notice">
+          {t(
+            'Aki megkapja a linket, látja a területek nevét, a növényeket és a jegyzeteket. A link a csevegőkben és a böngészőelőzményekben is megmarad, ezért ne legyen benne cím vagy név, amit nem szeretnél továbbadni. Háttérkép, látványkép és saját növényfotó nem kerül bele.',
+            'Whoever gets the link sees the area names, the plants and the notes. The link stays in chats and browser history, so keep out addresses or names you would not pass on. Background images, visualisations and own plant photos are never included.',
+          )}
+        </p>
+        <label className="check">
+          <input type="checkbox" checked={noNotes} onChange={(e) => setNoNotes(e.target.checked)} />
+          <span>{t('Jegyzetek nélkül', 'Without notes')}</span>
+        </label>
         <button type="button" className="btn btn-small" onClick={makeLink}>
           {t('Csak olvasható link', 'Read-only link')}
         </button>

@@ -259,11 +259,12 @@ Hover over a plant on the plan or in the palette, or hold your finger on it for 
 
 **Photos**
 
+- **Turning them on**: they are off by default, because Wikimedia sees your IP address when the app looks them up. Turn them on under *View → Plant photos from Wikipedia*, or with **Turn on Wikipedia photos** on a plant’s page.
 - **Source**: the app downloads them from Wikipedia/Wikimedia Commons by the Latin name. The author and the licence are shown under the image.
 - **Offline**: after the first load the photo is stored on the device and shows without internet.
 - **Species, not cultivar**: Wikipedia usually has a photo of the species rather than the exact cultivar.
 - **Own photo**: for a different picture, upload your own or give an image link on the plant’s page.
-- **Turning it off**: *View → Plant photos from Wikipedia*.
+- **Turning it off**: in the same place, *View → Plant photos from Wikipedia*.
 
 **“To check” data**
 
@@ -450,7 +451,7 @@ The **⋯** button in the top bar opens the **Project** menu:
 - **Backup reminder**: once there is something to lose and you have not backed up for a week (or ever), a bar below the top bar says so. **Save to file** or **Later** (quiet for 3 days).
 - **Location and climate**: which town the garden is near (or your own frost dates). The schedule’s frost notes and the visualisation brief use it.
 - **About**: version, author, **Legal information and privacy** (terms of use, privacy notice, data sources) and the **open-source licences**.
-- **Read-only link**: the plan travels encoded at the end of the link, no server. Whoever opens it sees the plan and the list but can’t change them.
+- **Read-only link**: the plan travels encoded at the end of the link, no server. Whoever opens it sees the plan and the list but can’t change them. Tick **Without notes** to leave the notes out; background images, visualisations and own plant photos are never included.
 - **Image of the plan**: **PNG** or **SVG**, optionally **with a legend** (code → plant name, Latin name, count).
 - **Visualisation with ChatGPT**: see the next chapter.
 - **Print / save as PDF**: A4, portrait or landscape. One page per area: plan view, four seasons, plant list, warnings, with a summary at the end. Save as PDF from the browser’s print dialog (“Save as PDF”).

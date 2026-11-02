@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
 import { PlanCanvas, SNAP_CM } from './canvas/PlanCanvas';
 import { evaluate, partition } from './engine/rules';
@@ -7,13 +7,9 @@ import { activeVariant, selectCurrentArea, selectItems, useProject } from './sto
 import { useUi, type Layers, type Tool } from './store/uiStore';
 import { AreasPanel } from './ui/AreasPanel';
 import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
-import { PlantDbPanel } from './ui/PlantDbPanel';
 import { PlantFilterForm } from './ui/PlantFilterForm';
 import { PlantPalette } from './ui/PlantPalette';
 import { Coach, introDone } from './ui/Coach';
-import { CompareView } from './ui/CompareView';
-import { ListView } from './ui/ListView';
-import { SchedulePage } from './ui/SchedulePage';
 import { ShapeEditBar } from './ui/ShapeEditBar';
 import { PrintView } from './ui/PrintView';
 import { ProjectPanel, type Orientation } from './ui/ProjectPanel';
@@ -21,22 +17,31 @@ import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
 import { ItemProps, SelectionBar } from './ui/Selection';
 import { Sheet } from './ui/Sheet';
 import { VariantsPanel } from './ui/VariantsPanel';
-import { IdeaPanel } from './ui/IdeaPanel';
-import { ReplacePanel } from './ui/ReplacePanel';
-import { HelpPanel } from './ui/HelpPanel';
 import { helpId, type HelpKey } from './ui/helpSections';
 import { getLang, labels, setLang, t, type Lang } from './i18n';
 import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { LogoMark } from './ui/Logo';
-import { VisualPanel } from './ui/VisualPanel';
-import { LegalPanel } from './ui/LegalPanel';
 import { backupNow, lastBackupAt, needsReminder, requestPersistence, snoozeReminder, useBackupState } from './ui/backup';
 import { QuickPanel, type QuickAction, type Step } from './ui/QuickPanel';
 import { markSeen, seen } from './ui/seen';
 import { setTheme, toggleTheme, useTheme, type Theme } from './ui/theme';
 import { localName } from './i18n/names';
 import { Welcome } from './ui/Welcome';
+
+// Windows and pages that are not needed at start load on first use (the service worker still keeps them offline).
+const PlantDbPanel = lazy(() => import('./ui/PlantDbPanel').then((m) => ({ default: m.PlantDbPanel })));
+const CompareView = lazy(() => import('./ui/CompareView').then((m) => ({ default: m.CompareView })));
+const ListView = lazy(() => import('./ui/ListView').then((m) => ({ default: m.ListView })));
+const SchedulePage = lazy(() => import('./ui/SchedulePage').then((m) => ({ default: m.SchedulePage })));
+const IdeaPanel = lazy(() => import('./ui/IdeaPanel').then((m) => ({ default: m.IdeaPanel })));
+const ReplacePanel = lazy(() => import('./ui/ReplacePanel').then((m) => ({ default: m.ReplacePanel })));
+const HelpPanel = lazy(() => import('./ui/HelpPanel').then((m) => ({ default: m.HelpPanel })));
+const VisualPanel = lazy(() => import('./ui/VisualPanel').then((m) => ({ default: m.VisualPanel })));
+const LegalPanel = lazy(() => import('./ui/LegalPanel').then((m) => ({ default: m.LegalPanel })));
+const Loading = () => <p className="mono muted lazy-loading">{t('Betöltés…', 'Loading…')}</p>;
+/** Mounted only while open, so its code is fetched on first use. */
+const Lazy = ({ when, children }: { when: boolean; children: ReactNode }) => (when ? <Suspense fallback={<Loading />}>{children}</Suspense> : null);
 
 // Tools arrive phase by phase (SPEC §7); unavailable ones are shown but disabled.
 const TOOL_LABEL = labels<Tool>({
@@ -300,11 +305,17 @@ export function App({ loading }: { loading: boolean }) {
       <BackupReminder />
       <main className={`stage${page || tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
         {page === 'schedule' ? (
-          <SchedulePage />
+          <Lazy when>
+            <SchedulePage />
+          </Lazy>
         ) : tool === 'list' ? (
-          <ListView />
+          <Lazy when>
+            <ListView />
+          </Lazy>
         ) : compare && area ? (
-          <CompareView area={area} />
+          <Lazy when>
+            <CompareView area={area} />
+          </Lazy>
         ) : fourUp && area ? (
           <FourSeasons area={area} plantDb={project.plantDb} showMature={project.settings.showMatureSize} />
         ) : area ? (
@@ -421,7 +432,9 @@ export function App({ loading }: { loading: boolean }) {
         />
       </Sheet>
       <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('db')} title={t('Növényadatbázis', 'Plant database')} onClose={() => setSheet(null)}>
-        <PlantDbPanel />
+        <Lazy when={sheet === 'plantdb'}>
+          <PlantDbPanel />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'props'} onHelp={() => openHelp('select')} title={t('Tulajdonságok', 'Properties')} onClose={() => setSheet(null)}>
         <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
@@ -442,16 +455,20 @@ export function App({ loading }: { loading: boolean }) {
         <QuickPanel actions={quickActions} steps={steps} />
       </Sheet>
       <Sheet open={sheet === 'legal'} title={t('Jogi információk', 'Legal information')} onClose={() => setSheet(null)} wide>
-        <LegalPanel />
+        <Lazy when={sheet === 'legal'}>
+          <LegalPanel />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'visual'} onHelp={() => openHelp('visual')} title={t('Látványterv', 'Visualisation')} onClose={() => setSheet(null)}>
-        <VisualPanel
-          onPickCamera={() => {
-            setSheet(null);
-            ui.setTool('select');
-            ui.setCameraEdit(true);
-          }}
-        />
+        <Lazy when={sheet === 'visual'}>
+          <VisualPanel
+            onPickCamera={() => {
+              setSheet(null);
+              ui.setTool('select');
+              ui.setCameraEdit(true);
+            }}
+          />
+        </Lazy>
       </Sheet>
       {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
       {print && <PrintView project={project} orientation={print} />}
@@ -469,13 +486,19 @@ export function App({ loading }: { loading: boolean }) {
         <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} onVisual={() => setSheet('visual')} />
       </Sheet>
       <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
-        <HelpPanel section={helpAt} />
+        <Lazy when={sheet === 'help'}>
+          <HelpPanel section={helpAt} />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'replace'} onHelp={() => openHelp('replace')} title={t('Növény cseréje', 'Replace plants')} onClose={() => setSheet(null)}>
-        <ReplacePanel key={replaceFrom ?? ''} from={replaceFrom} onDone={() => setSheet(null)} />
+        <Lazy when={sheet === 'replace'}>
+          <ReplacePanel key={replaceFrom ?? ''} from={replaceFrom} onDone={() => setSheet(null)} />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'ideas'} onHelp={() => openHelp('ideas')} title={t('Ötletgenerátor', 'Idea generator')} onClose={() => setSheet(null)}>
-        <IdeaPanel onDone={() => setSheet(null)} />
+        <Lazy when={sheet === 'ideas'}>
+          <IdeaPanel onDone={() => setSheet(null)} />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'warnings'} onHelp={() => openHelp('warnings')} title={t(`Figyelmeztetések (${warnings.length})`, `Warnings (${warnings.length})`)} onClose={() => setSheet(null)}>
         <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
@@ -520,10 +543,10 @@ export function App({ loading }: { loading: boolean }) {
           <label className="check">
             <input
               type="checkbox"
-              checked={project.settings.wikiPhotos !== false}
+              checked={project.settings.wikiPhotos === true}
               onChange={(e) => useProject.getState().updateSettings({ wikiPhotos: e.target.checked })}
             />
-            <span>{t('Növényfotók a Wikipédiáról (első alkalommal internet kell)', 'Plant photos from Wikipedia (needs internet the first time)')}</span>
+            <span>{t('Növényfotók a Wikipédiáról (első alkalommal internet kell; a Wikimedia látja az IP-címedet)', 'Plant photos from Wikipedia (needs internet the first time; Wikimedia sees your IP address)')}</span>
           </label>
           <label className="check">
             <input type="checkbox" checked={snapOn} onChange={(e) => ui.setSnap(e.target.checked)} />

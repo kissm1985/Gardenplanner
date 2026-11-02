@@ -69,6 +69,7 @@ export function PlantCard({ plant, item }: { plant: Plant; item?: PlacedItem }) 
         </figure>
       )}
       {photo.state === 'loading' && <div className="plant-tip-photo is-empty">{t('fotó betöltése…', 'loading photo…')}</div>}
+      {photo.state === 'ask' && <div className="plant-tip-photo is-empty">{t('Fotó: Nézet → Növényfotók a Wikipédiáról, vagy a növény adatlapján.', 'Photo: View → Plant photos from Wikipedia, or on the plant’s page.')}</div>}
       {photo.state === 'offline' && <div className="plant-tip-photo is-empty">{t('A fotóhoz internet kell (első alkalommal).', 'The photo needs internet (the first time).')}</div>}
       <div className="plant-tip-head">
         <PlantIcon p={plant} size={48} />

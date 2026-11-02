@@ -259,11 +259,12 @@ Vidd az egeret egy növény fölé a rajzon vagy a palettán, telefonon tartsd r
 
 **A fotók**
 
+- **Bekapcsolás**: alapból ki vannak kapcsolva, mert a lekérdezéskor a Wikimedia látja az IP-címedet. Bekapcsolás: *Nézet → Növényfotók a Wikipédiáról*, vagy a növény adatlapján a **Wikipédia-fotók bekapcsolása** gomb.
 - **Forrás**: a program a latin név alapján a Wikipédiáról/Wikimedia Commonsból tölti le őket. A kép alatt ott a szerző és a licenc.
 - **Offline**: első betöltés után a fotó a készüléken tárolódik, utána internet nélkül is megjelenik.
 - **Fajta helyett faj**: a Wikipédián többnyire a fajról van kép, nem a konkrét fajtáról.
 - **Saját fotó**: ha más képet szeretnél, a növény adatlapján feltölthetsz sajátot, vagy megadhatsz egy képlinket.
-- **Kikapcsolás**: *Nézet → Növényfotók a Wikipédiáról*.
+- **Kikapcsolás**: ugyanott, *Nézet → Növényfotók a Wikipédiáról*.
 
 **„Ellenőrizendő” adat**
 
@@ -450,7 +451,7 @@ A felső sáv **⋯** gombja nyitja a **Projekt** menüt:
 - **Mentés-emlékeztető**: ha már van mit elveszíteni, és egy hete (vagy még soha) nem mentettél, a felső sáv alatt egy sáv szól. **Mentés fájlba** vagy **Később** (3 napig csendben marad).
 - **Helyszín és éghajlat**: a kert melyik város közelében van (vagy saját fagydátumok). A menetrend fagyfigyelmeztetései és a látványterv-leírás ezt használják.
 - **Névjegy**: verzió, készítő, **Jogi információk és adatvédelem** (felhasználási feltételek, adatvédelmi tájékoztató, adatforrások) és a **nyílt forrású licencek**.
-- **Csak olvasható link**: a terv a link végében, kódolva utazik, szerver nélkül. Aki megnyitja, látja a rajzot és a listát, de nem tudja módosítani.
+- **Csak olvasható link**: a terv a link végében, kódolva utazik, szerver nélkül. Aki megnyitja, látja a rajzot és a listát, de nem tudja módosítani. A **Jegyzetek nélkül** jelölővel a jegyzetek kimaradnak; háttérkép, látványkép és saját növényfotó sosem kerül bele.
 - **Kép a rajzról**: **PNG** vagy **SVG**, kérésre **jelmagyarázattal** (kód → növény neve, latin neve, darabszám).
 - **Látványterv ChatGPT-nek**: lásd a következő fejezetet.
 - **Nyomtatás / mentés PDF-be**: A4, álló vagy fekvő tájolásban. Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések, a végén összesítés. PDF-be a böngésző nyomtatási ablakában menthetsz („Mentés PDF-ként”).

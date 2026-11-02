@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { JUGLONE_LABEL, MONTHS, plantName, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL, FIELD_LABEL } from '../model/plants';
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
 import { usePlantPhoto } from './plantPhoto';
+import { useProject } from '../store/projectStore';
 import { PICTOGRAM_CODES } from './pictograms';
 import { PlantIcon } from './PlantIcon';
 import { getLang, t, type Lang } from '../i18n';
@@ -357,6 +358,18 @@ function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v
               )}
             </figcaption>
           </figure>
+        ) : photo.state === 'ask' ? (
+          <div className="photo-ask">
+            <p className="mono muted">
+              {t(
+                'A Wikipédia-fotók ki vannak kapcsolva. Bekapcsolva az alkalmazás a latin névvel lekérdezi a Wikipédiát; ekkor a Wikimedia Alapítvány látja az IP-címedet. A fotók utána a készüléken maradnak.',
+                'Wikipedia photos are off. When on, the app looks up the Latin name on Wikipedia; the Wikimedia Foundation then sees your IP address. Photos then stay on the device.',
+              )}
+            </p>
+            <button type="button" className="btn btn-small" onClick={() => useProject.getState().updateSettings({ wikiPhotos: true })}>
+              {t('Wikipédia-fotók bekapcsolása', 'Turn on Wikipedia photos')}
+            </button>
+          </div>
         ) : (
           <p className="mono muted">
             {photo.state === 'loading'

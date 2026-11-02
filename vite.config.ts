@@ -23,10 +23,28 @@ export const CSP = [
   "form-action 'none'",
 ].join('; ');
 
+/**
+ * Security headers for hosts that let us set them (Netlify / Cloudflare Pages: dist/_headers, Vercel: vercel.json).
+ * Only a real header can forbid framing (frame-ancestors is ignored in a <meta> CSP); the meta tag stays as a
+ * fallback for hosts without headers (e.g. GitHub Pages).
+ */
+export const SECURITY_HEADERS: [string, string][] = [
+  ['Content-Security-Policy', `${CSP}; frame-ancestors 'none'`],
+  ['Strict-Transport-Security', 'max-age=31536000; includeSubDomains'],
+  ['X-Content-Type-Options', 'nosniff'],
+  ['X-Frame-Options', 'DENY'],
+  ['Referrer-Policy', 'no-referrer'],
+  ['Permissions-Policy', 'camera=(), microphone=(), geolocation=(), payment=(), usb=(), interest-cohort=()'],
+  ['Cross-Origin-Opener-Policy', 'same-origin'],
+];
+
 const csp = (): Plugin => ({
   name: 'planterra-csp',
   apply: 'build',
   transformIndexHtml: (html) => html.replace('<meta charset="UTF-8" />', `<meta charset="UTF-8" />\n    <meta http-equiv="Content-Security-Policy" content="${CSP}" />`),
+  generateBundle() {
+    this.emitFile({ type: 'asset', fileName: '_headers', source: `/*\n${SECURITY_HEADERS.map(([k, v]) => `  ${k}: ${v}`).join('\n')}\n` });
+  },
 });
 
 // Relative base so the build works on GitHub Pages sub-paths as well as Netlify/Vercel roots.
@@ -39,7 +57,8 @@ export default defineConfig({
   },
   // Listen on the local network too, so a phone on the same Wi-Fi can open the dev/preview server.
   server: { host: true },
-  preview: { host: true },
+  // The preview server sends the same headers as production, so the e2e tests run under them.
+  preview: { host: true, headers: Object.fromEntries(SECURITY_HEADERS) },
   // Older iPhones (iOS 15) still run the build.
   build: { target: ['es2020', 'safari15'] },
   plugins: [

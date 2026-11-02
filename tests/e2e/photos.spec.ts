@@ -21,10 +21,20 @@ async function mockWiki(page: Page) {
   return () => lookups;
 }
 
+
+/** Wikipedia photos are off by default (privacy); the first test turns them on from a plant card hint, the others in View. */
+async function photosOn(page: Page) {
+  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  const dlg = page.locator('dialog[open]');
+  await dlg.getByLabel(/Növényfotók a Wikipédiáról/).check();
+  await dlg.locator('.sheet-head button[aria-label="Bezárás"]').click();
+}
+
 test('photo in the palette card (hover) and in the plan card; cached after the first look-up', async ({ page }) => {
   const lookups = await mockWiki(page);
   await page.goto('/');
   await page.getByRole('button', { name: /Kezdés/ }).click();
+  await photosOn(page);
   await page.getByRole('button', { name: 'Növény', exact: true }).click();
   await page.getByLabel('Növény keresése').fill('levendula');
   const item = page.locator('.palette-item').first();
@@ -54,6 +64,7 @@ test('own photo overrides Wikipedia and can be switched off again', async ({ pag
   await mockWiki(page);
   await page.goto('/');
   await page.getByRole('button', { name: /Kezdés/ }).click();
+  await photosOn(page);
   await page.getByRole('button', { name: 'Növény', exact: true }).click();
   await page.getByRole('button', { name: 'Adatbázis' }).click();
   const dlg = page.locator('dialog[open]');

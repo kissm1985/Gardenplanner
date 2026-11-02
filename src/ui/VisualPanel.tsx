@@ -221,6 +221,12 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
         </div>
       </fieldset>
 
+      <p className="share-notice visual-privacy">
+        {t(
+          'A leírást (terület- és növénynevek, méretek, a beállított település; jegyzetek nélkül) és a rajzot a ChatGPT kapja meg, az OpenAI feltételei szerint. Ne írj a terület nevébe címet vagy személynevet. A háttérkép és a fotóid nem kerülnek bele.',
+          'ChatGPT receives the description (area and plant names, sizes, the town you set; no notes) and the plan, under OpenAI’s terms. Keep addresses and personal names out of the area name. Background images and your photos are not included.',
+        )}
+      </p>
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-primary" onClick={send}>
           {t('Küldés a ChatGPT-nek', 'Send to ChatGPT')}

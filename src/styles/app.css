@@ -3136,3 +3136,10 @@ button.topbar-brand {
   font-size: 10.5px;
   color: var(--mute);
 }
+
+.share-notice {
+  margin: 0 0 6px;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--mute);
+}

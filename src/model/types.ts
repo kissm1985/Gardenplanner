@@ -212,7 +212,7 @@ export interface Settings {
   reservePct: number;
   walnutRadiusCm: number;
   showMatureSize: boolean;
-  /** Look up plant photos on Wikipedia (default on). */
+  /** Look up plant photos on Wikipedia. Off until the user turns it on: the look-up sends the IP address to Wikimedia. */
   wikiPhotos?: boolean;
   /** Version of the built-in plant list last merged into this project. */
   seedVersion?: number;

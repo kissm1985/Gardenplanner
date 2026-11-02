@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { lazy, Suspense, useState } from 'react';
 import { AREA_TEMPLATES } from '../data/templates';
 import { getLang, setLang, t } from '../i18n';
 import { localName } from '../i18n/names';
@@ -7,8 +7,9 @@ import { useUi } from '../store/uiStore';
 import { AUTHOR, copyrightLine } from './About';
 import { ExamplePlans } from './ExamplePlans';
 import { Logo } from './Logo';
-import { LegalPanel } from './LegalPanel';
 import { toggleTheme, useTheme } from './theme';
+
+const LegalPanel = lazy(() => import('./LegalPanel').then((m) => ({ default: m.LegalPanel })));
 
 const plants = (n: number) => t(`${n} tő`, `${n} plants`);
 
@@ -19,6 +20,7 @@ const plants = (n: number) => t(`${n} tő`, `${n} plants`);
 export function Welcome() {
   const project = useProject((s) => s.project);
   const [picked, setPicked] = useState<string[]>(AREA_TEMPLATES.map((tp) => tp.key));
+  const [legalOpen, setLegalOpen] = useState(false);
   const toggle = (k: string) => setPicked((p) => (p.includes(k) ? p.filter((x) => x !== k) : [...p, k]));
   const other = getLang() === 'hu' ? 'en' : 'hu';
   const { dark } = useTheme();
@@ -154,9 +156,13 @@ export function Welcome() {
       <p className="welcome-credit mono muted">
         {t('Készítette', 'Created by')} {AUTHOR} · {copyrightLine()}
       </p>
-      <details className="welcome-legal">
+      <details className="welcome-legal" onToggle={(e) => setLegalOpen(e.currentTarget.open)}>
         <summary>{t('Felhasználási feltételek és adatvédelem', 'Terms of use and privacy')}</summary>
-        <LegalPanel />
+        {legalOpen && (
+          <Suspense fallback={<p className="mono muted">{t('Betöltés…', 'Loading…')}</p>}>
+            <LegalPanel />
+          </Suspense>
+        )}
       </details>
     </main>
   );

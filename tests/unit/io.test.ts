@@ -1,7 +1,8 @@
 import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildBom } from '../../src/engine/bom';
-import { decodeShare, encodeShare, exportJson, parseProject, shareSnapshot } from '../../src/engine/io';
+import { deflateSync } from 'fflate';
+import { decodeShare, encodeShare, exportJson, inflateLimited, parseProject, SHARE_MAX_CODE, shareSnapshot } from '../../src/engine/io';
 import { loadProject, saveProject } from '../../src/store/persist';
 import { useProject } from '../../src/store/projectStore';
 
@@ -83,5 +84,28 @@ describe('share link', () => {
 
   it('broken codes give a friendly error', () => {
     expect(() => decodeShare('abc')).toThrow('megosztott link');
+  });
+
+  it('never carries own plant photos; notes can be left out', () => {
+    const p = richProject();
+    const withPhoto = { ...p, plantDb: p.plantDb.map((x) => (x.code === 'LA' ? { ...x, photoUrl: 'https://tracker.example/x.png', photoCredit: 'me' } : x)), areas: p.areas.map((a) => ({ ...a, notes: 'Fő utca 1.' })) };
+    const back = decodeShare(encodeShare(withPhoto));
+    expect(back.plantDb.find((x) => x.code === 'LA')?.photoUrl).toBeUndefined();
+    expect(back.plantDb.find((x) => x.code === 'LA')?.photoCredit).toBeUndefined();
+    expect(back.areas[0].notes).toBe('Fő utca 1.');
+    const bare = decodeShare(encodeShare(withPhoto, { withoutNotes: true }));
+    expect(bare.areas.every((a) => a.notes === '' && a.variants[0].notes === '' && a.variants[0].items.every((it) => !it.note))).toBe(true);
+  });
+
+  it('a crafted link that unpacks to a huge size is refused, not unpacked', () => {
+    // 64 MB of spaces packs to ~60 KB.
+    const bomb = deflateSync(new Uint8Array(64 * 1024 * 1024).fill(32), { level: 9 });
+    let s = '';
+    for (let i = 0; i < bomb.length; i += 0x8000) s += String.fromCharCode(...bomb.subarray(i, i + 0x8000));
+    const code = btoa(s).replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    expect(code.length).toBeLessThan(SHARE_MAX_CODE);
+    expect(() => decodeShare(code)).toThrow('túl nagy');
+    expect(() => decodeShare('A'.repeat(SHARE_MAX_CODE + 1))).toThrow('túl nagy');
+    expect(inflateLimited(deflateSync(new Uint8Array(10)), 100)).toHaveLength(10);
   });
 });
