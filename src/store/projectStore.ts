@@ -3,6 +3,7 @@ import { itemCount, itemPositions, type Pattern } from '../engine/fill';
 import { mixAssign, type MixPart } from '../engine/mix';
 import { SEED_PLANTS, SEED_SINCE } from '../data/plants.seed';
 import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
+import { buildExample, EXAMPLE_PLANS, exampleCodes } from '../data/examples';
 import { uid } from '../model/ids';
 import { isAncestor } from '../model/variantTree';
 import { DEFAULT_SETTINGS, type Area, type Camera, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Render, type Settings, type Variant } from '../model/types';
@@ -25,6 +26,8 @@ export interface ProjectState {
   createProject: (templateKeys: string[]) => void;
   addArea: (input: AreaInput) => string;
   addTemplateArea: (templateKey: string) => string | null;
+  /** Adds a ready-made example plan as a new area (creating the project if there is none); returns its id. */
+  addExampleArea: (key: string) => string | null;
   updateArea: (id: string, patch: Partial<Omit<Area, 'id'>>) => void;
   deleteArea: (id: string) => void;
   selectArea: (id: string) => void;
@@ -218,6 +221,21 @@ export const useProject = create<ProjectState>()((set, get) => {
     addTemplateArea: (key) => {
       const t = AREA_TEMPLATES.find((x) => x.key === key);
       return t ? insertArea(t.build()) : null;
+    },
+
+    addExampleArea: (key) => {
+      const ex = EXAMPLE_PLANS.find((x) => x.key === key);
+      if (!ex) return null;
+      if (!get().project) get().createProject([]);
+      const area = buildExample(ex);
+      // Species the user deleted from the database come back, so the example's list is complete.
+      const have = new Set(get().project!.plantDb.map((x) => x.code));
+      const missing = exampleCodes(area).filter((c) => !have.has(c));
+      if (missing.length) {
+        const seeds = seedPlants().filter((x) => missing.includes(x.code));
+        commit((p) => ({ ...p, plantDb: [...p.plantDb, ...seeds] }));
+      }
+      return insertArea(area);
     },
 
     updateArea: (id, patch) => mapArea(id, (a) => ({ ...a, ...patch })),

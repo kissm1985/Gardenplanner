@@ -1,6 +1,7 @@
 // Names the app gives by default (element labels, template areas, "Plan A", "Idea 2"…) are stored as text in
 // the language of the moment. On screen they follow the current language; names the user typed stay as they are.
 import { FIXTURE_LABEL_PAIRS } from '../model/fixtures';
+import { EXAMPLE_NAME_PAIRS } from '../data/examples';
 import { getLang, type Lang } from './index';
 
 const PAIRS: [hu: string, en: string][] = [
@@ -16,6 +17,7 @@ const PAIRS: [hu: string, en: string][] = [
   ['Ötletek', 'Ideas'],
   ['Mappa', 'Folder'],
   ['Saját hely', 'My place'],
+  ...EXAMPLE_NAME_PAIRS,
 ];
 const BY_TEXT = new Map<string, [string, string]>();
 for (const p of PAIRS) for (const s of p) BY_TEXT.set(s.toLowerCase(), p);

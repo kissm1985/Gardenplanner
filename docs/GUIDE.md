@@ -40,7 +40,8 @@ The app opens with the **start page** every time, and the **Planterra logo** at 
 
 1. **+ Create a new area**: start with an empty area; the form opens at once (name, size, facing, sun; a rectangle, a circle or a free shape drawn on the plan, see [chapter 3](#3-areas)).
 2. **Your areas**: the areas already planned (size, the plan on screen, plant count). Tap one to open it.
-3. **Templates**:
+3. **Example plans**: ten finished, planted plans for inspiration, each with a small drawing: *Mediterranean garden, Château garden, Country yard, Alpine rock garden, English garden, Japanese garden, Prairie garden, Shade garden, Modern city garden, Round pollinator garden*. Tap one and it is added to your project as a new area with its planted **Plan A** and design notes; then change, copy or generate ideas for it freely. They use built-in species only, at the recommended spacing; a species you deleted from the database comes back.
+4. **Templates** (empty, only the area's data and elements):
    - **House-side strip**: a 120 × 1200 cm gravel strip between the house wall and the pavement, for plants up to 50 cm;
    - **Garden with lawn strip**: 500 × 1200 cm, a curved lawn strip in the middle, beds on both sides, a walnut tree next door.
 
@@ -58,7 +59,7 @@ The first time, a short three-step introduction shows the most important buttons
 
 **Top bar**
 
-- **Planterra logo**: back to the start page (new area, your areas, templates).
+- **Planterra logo**: back to the start page (new area, your areas, example plans, templates).
 - **Area name ▾**: switch between areas and create new ones here. Below it: the size of the area, the number of plants, the facing and the sun.
 - **↶ / ↷**: undo and redo (up to 100 steps). On a computer **Ctrl+Z** and **Ctrl+Y** work too.
 - **EN / HU**: switches to English or Hungarian with one tap.

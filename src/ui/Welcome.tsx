@@ -5,6 +5,7 @@ import { localName } from '../i18n/names';
 import { activeVariant, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { AUTHOR, copyrightLine } from './About';
+import { ExamplePlans } from './ExamplePlans';
 import { Logo } from './Logo';
 import { LegalPanel } from './LegalPanel';
 import { toggleTheme, useTheme } from './theme';
@@ -90,6 +91,20 @@ export function Welcome() {
           </ul>
         </>
       )}
+
+      <h2 className="sub-h">{t('Példatervek', 'Example plans')}</h2>
+      <p className="muted example-lead">
+        {t(
+          'Kész, beültetett tervek ötletnek. Koppints egyre: új területként kerül a projektedbe, és szabadon átalakíthatod.',
+          'Finished, planted plans for inspiration. Tap one: it is added to your project as a new area, and you can change anything.',
+        )}
+      </p>
+      <ExamplePlans
+        onPick={(key) => {
+          const id = st.addExampleArea(key);
+          if (id) open(id);
+        }}
+      />
 
       <h2 className="sub-h">{project ? t('Új terület sablonból', 'New area from a template') : t('Vagy kezdj kész sablonokkal', 'Or start with ready templates')}</h2>
       {project ? (
