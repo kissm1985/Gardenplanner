@@ -12,6 +12,7 @@ import { downloadBlob } from './download';
 import { planSvg, svgToPng, type LegendRow } from './exportImage';
 import { localName } from '../i18n/names';
 import { loadImage } from './imageFile';
+import { embedTopViews } from './pictograms';
 
 const CHATGPT_URL = 'https://chatgpt.com/';
 const m1 = (cm: number) => (cm / 100).toLocaleString(locale(), { maximumFractionDigits: 1 });
@@ -26,6 +27,7 @@ const slug = (s: string) =>
 
 /** The plan of one variant as a PNG with a legend and the viewpoint, always in light colours (reads best for the image model). */
 export async function vizPng(project: Project, area: Area, v: Variant, season: Season): Promise<Blob> {
+  if (project.settings.planStyle === 'concept') await embedTopViews(project.plantDb.filter((p) => v.items.some((it) => it.plantId === p.code)));
   const legend: LegendRow[] = bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
     code: r.plant.code,
     nameHu: plantName(r.plant),

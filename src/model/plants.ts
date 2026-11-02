@@ -151,6 +151,7 @@ const CSV_COLS: { key: keyof Plant; head: string }[] = [
   { key: 'notes', head: 'megjegyzes' },
   { key: 'photoUrl', head: 'foto_url' },
   { key: 'photoCredit', head: 'foto_forras' },
+  { key: 'pictogram', head: 'piktogram' },
   { key: 'verify', head: 'ellenorizendo' },
   { key: 'dataSource', head: 'adat_forras' },
   { key: 'checkedAt', head: 'ellenorizve' },
@@ -299,11 +300,13 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       notes: get('megjegyzes'),
       photoUrl: get('foto_url') || undefined,
       photoCredit: get('foto_forras') || undefined,
+      pictogram: /^[A-Z0-9]{1,4}$/.test(get('piktogram')) ? get('piktogram') : undefined,
       verify: list('ellenorizendo') as (keyof Plant)[],
       dataSource: get('adat_forras') || undefined,
       checkedAt: /^\d{4}-\d{2}-\d{2}$/.test(get('ellenorizve')) ? get('ellenorizve') : undefined,
     };
     if (p.dataSource === undefined) delete p.dataSource;
+    if (p.pictogram === undefined) delete p.pictogram;
     if (p.checkedAt === undefined) delete p.checkedAt;
     if (!p.sun.length) p.sun = ['sun'];
     if (p.seasonColors === undefined) delete p.seasonColors;

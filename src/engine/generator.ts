@@ -127,6 +127,17 @@ export function poolsFor(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFA
   };
 }
 
+/** Pools from the user's own choice: every kind, regardless of the area's limits (the rules flag misfits). */
+function preferredPools(area: Area, chosen: Plant[]) {
+  const has = (p: Plant, k: PlantKind) => plantKinds(p).has(k);
+  return {
+    drift: chosen.filter((p) => !p.isTree && p.symbol !== 'diamond' && !(has(p, 'hedge') && p.maxHeightCm >= 150) && !(has(p, 'shrub') && p.spacingCm >= 60)),
+    hedge: chosen.filter((p) => has(p, 'hedge') && p.maxHeightCm >= 150),
+    shrub: chosen.filter((p) => has(p, 'shrub') && !p.isTree && p.spacingCm >= 60),
+    tree: area.constraints.maxTrees === 0 ? [] : chosen.filter((p) => (p.isTree || has(p, 'tree')) && treeFits(area, p)),
+  };
+}
+
 /** All species the generator may use for the area and the requested types. */
 export function candidates(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFAULT_KINDS): Plant[] {
   const p = poolsFor(area, plantDb, kinds);
@@ -248,14 +259,17 @@ export function generateIdea(
     mixed?: boolean;
     /** Extra distance between plants, cm (sparser planting). */
     extraGapCm?: number;
+    /** Preferred species codes: the idea is made from these only (the area's limits are not applied; the rules still check them). */
+    prefer?: string[];
   } = {},
 ): Idea {
+  const preferred = opts.prefer?.length ? plantDb.filter((p) => opts.prefer!.includes(p.code)) : null;
   const extra = Math.max(0, Math.round(opts.extraGapCm ?? 0));
   const seed = opts.seed ?? Math.floor(Math.random() * 2 ** 31);
   const r = rng(seed);
   const kinds = opts.kinds?.length ? opts.kinds : DEFAULT_KINDS;
   const keys = Object.keys(PALETTES) as PaletteKey[];
-  const pools = poolsFor(area, plantDb, kinds);
+  const pools = preferred ? preferredPools(area, preferred) : poolsFor(area, plantDb, kinds);
   const all = [...new Set([...pools.drift, ...pools.hedge, ...pools.shrub, ...pools.tree])];
   // Palette: the requested one, or a random one that the pool can actually serve.
   const serve = (k: PaletteKey) => all.filter((p) => [...colourFamilies(p)].some((f) => PALETTES[k].families.includes(f) && f !== 'green')).length;
@@ -277,29 +291,35 @@ export function generateIdea(
         total++;
         if (inWalnut([x, y])) inZone++;
       }
-  const underWalnut = total > 0 && inZone / total > 0.4 && all.filter((p) => p.juglone === 'tolerant').length >= 3;
+  const underWalnut = !preferred && total > 0 && inZone / total > 0.4 && all.filter((p) => p.juglone === 'tolerant').length >= 3;
   const tol = (xs: Plant[]) => (underWalnut ? xs.filter((p) => p.juglone === 'tolerant') : xs);
   if (underWalnut)
     notes.push(t('A terület nagy része a diófa zónájában van, ezért csak juglone-tűrő fajokból válogattam.', 'Most of the area is in the walnut zone, so only juglone-tolerant species were used.'));
 
   // One water band for everything (low+medium or medium+high), so neighbours don't clash.
   const lowSide = all.filter((p) => p.water !== 'high').length >= all.filter((p) => p.water !== 'low').length;
-  const wb = (xs: Plant[]) => tol(xs).filter((p) => (lowSide ? p.water !== 'high' : p.water !== 'low'));
+  // The user's own choice is used as it is: no water band, no palette trimming.
+  const wb = (xs: Plant[]) => (preferred ? xs : tol(xs).filter((p) => (lowSide ? p.water !== 'high' : p.water !== 'low')));
 
-  const hedge = pickSpecies(wb(pools.hedge), palette, 1, r)[0];
-  const trees = pickSpecies(wb(pools.tree).filter((p) => p !== hedge), palette, 1, r);
-  const shrubs = pickSpecies(wb(pools.shrub).filter((p) => p !== hedge), palette, m2 > 20 ? 2 : 1, r);
+  const hedge = preferred ? pools.hedge[0] : pickSpecies(wb(pools.hedge), palette, 1, r)[0];
+  const trees = preferred ? pools.tree.filter((p) => p !== hedge).slice(0, 1) : pickSpecies(wb(pools.tree).filter((p) => p !== hedge), palette, 1, r);
+  const shrubs = preferred
+    ? pools.shrub.filter((p) => p !== hedge && !trees.includes(p))
+    : pickSpecies(wb(pools.shrub).filter((p) => p !== hedge), palette, m2 > 20 ? 2 : 1, r);
   const woody = !!hedge || trees.length > 0 || shrubs.length > 0;
   const nDrift = (m2 < 4 ? 3 : m2 < 12 ? 4 : 5) - (woody ? 1 : 0);
   // On large areas tiny plants would mean hundreds of pots per patch.
   const minSpacing = m2 > 40 ? 25 : 15;
-  const species = pickSpecies(
-    wb(pools.drift).filter((p) => p !== hedge && !shrubs.includes(p) && p.spacingCm >= minSpacing),
-    palette,
-    nDrift,
-    r,
-  );
-  for (const k of kinds) {
+  const species = preferred
+    ? // Low to tall, so the tiers put the taller ones at the back.
+      pools.drift.filter((p) => p !== hedge && !shrubs.includes(p) && !trees.includes(p)).sort((a, b) => b.maxHeightCm - a.maxHeightCm)
+    : pickSpecies(
+        wb(pools.drift).filter((p) => p !== hedge && !shrubs.includes(p) && p.spacingCm >= minSpacing),
+        palette,
+        nDrift,
+        r,
+      );
+  for (const k of preferred ? [] : kinds) {
     const empty = k === 'hedge' ? !hedge : k === 'tree' ? !trees.length : k === 'shrub' ? !shrubs.length : !species.some((p) => plantKinds(p).has(k));
     if (empty)
       notes.push(
@@ -458,7 +478,7 @@ export function generateIdea(
         };
         const best = Math.max(...cands.map(fill));
         // Keep the rhythm (first candidate) unless it would leave the strip clearly emptier than another one.
-        const plant = cands.find((p) => fill(p) >= best * 0.75) ?? cands[0];
+        const plant = cands.find((p) => fill(p) >= best * (preferred ? 0.45 : 0.75)) ?? cands[0];
         // At the area's edge keep the mature spread inside (ground covers spread wider than their spacing);
         // next to the shrub / hedge strip leave a quarter spacing.
         const edgeIns = Math.min(Math.ceil(Math.max(0, plant.spreadCm - plant.spacingCm) / 2), 40);
@@ -509,6 +529,20 @@ export function generateIdea(
     s = end;
   }
 
+  if (preferred) {
+    // Said after the layout: a chosen plant can still be left out (walnut zone, too big for the strips).
+    const left = preferred.filter((p) => !usedCodes.has(p.code));
+    const walnutMiss = left.filter((p) => walnuts.length && p.juglone !== 'tolerant');
+    notes.push(
+      t(`A kiválasztott ${preferred.length} növényből készült.`, `Made from the ${preferred.length} chosen plants.`) +
+        (left.length
+          ? t(
+              ` Kimaradt: ${left.map((p) => plantName(p).toLowerCase()).join(', ')}${walnutMiss.length ? ' (a diófa juglone-zónájában nem ajánlott, vagy nem fért el)' : ' (nem fért el a sávokban)'}.`,
+              ` Left out: ${left.map((p) => plantName(p).toLowerCase()).join(', ')}${walnutMiss.length ? ' (not advised in the walnut’s juglone zone, or did not fit)' : ' (did not fit the strips)'}.`,
+            )
+          : ''),
+    );
+  }
   const ordered = [...(hedge ? [hedge] : []), ...trees, ...shrubs, ...species];
   const used = ordered.filter((p) => usedCodes.has(p.code));
   notes.push(t(`Színvilág: ${PALETTES[palette].label}.`, `Colour scheme: ${PALETTES[palette].label}.`));

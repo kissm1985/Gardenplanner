@@ -72,7 +72,7 @@ function area(a: unknown, i: number) {
   if (!((a.widthCm as number) > 0 && (a.lengthCm as number) > 0)) fail(where, t('a méret nem pozitív', 'size is not positive'));
   if (!isObj(a.shape)) fail(where, t('hiányzó alak', 'missing shape'));
   if (a.shape.kind === 'polygon') points(a.shape.points, where, 3);
-  else if (a.shape.kind !== 'rect') fail(where, t('ismeretlen alak', 'unknown shape'));
+  else if (a.shape.kind !== 'rect' && a.shape.kind !== 'ellipse') fail(where, t('ismeretlen alak', 'unknown shape'));
   if (!isObj(a.constraints)) fail(where, t('hiányzó korlátok', 'missing limits'));
   for (const f of arr(a, 'fixtures', where, LIMITS.fixtures)) {
     if (!isObj(f)) fail(where, t('hibás elem', 'bad element'));

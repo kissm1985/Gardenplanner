@@ -3026,3 +3026,40 @@ button.topbar-brand {
   padding: 0;
   cursor: pointer;
 }
+
+/* ---------- plant pictograms ---------- */
+.picon {
+  position: relative;
+  display: inline-block;
+  flex: 0 0 auto;
+}
+.picon img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.picon .pchip {
+  position: absolute;
+  right: -4px;
+  bottom: -4px;
+  box-shadow: 0 0 0 1.5px var(--bg);
+}
+.picto-field {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.picto-field .field {
+  flex: 1;
+}
+/* Concept plan: pictograms carry the colour; the hit circle keeps them easy to grab. */
+.plant-hit {
+  fill: transparent;
+}
+.plant-picto {
+  pointer-events: none;
+}
+.drift-area.is-concept {
+  fill-opacity: 0.06;
+  stroke-dasharray: 4 4;
+}

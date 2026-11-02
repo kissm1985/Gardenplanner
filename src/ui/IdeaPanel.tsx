@@ -8,7 +8,8 @@ import { activeVariant, selectCurrentArea, useProject } from '../store/projectSt
 import { useUi } from '../store/uiStore';
 import { PlantMultiPicker } from './PlantMultiPicker';
 import { startZoneEdit } from './ShapeEditBar';
-import { PlantChip } from './PlantChip';
+import { PlantIcon } from './PlantIcon';
+import type { MixPart } from '../engine/mix';
 import { labels, t } from '../i18n';
 
 /** Idea generator: a whole new variant for the area, or random planting of a drawn region from my own list. */
@@ -172,7 +173,7 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
               const p = byCode.get(code);
               return p ? (
                 <li key={code}>
-                  <PlantChip p={p} size={26} /> {plantName(p)} <span className="muted">{t(`${n} tő`, `${n} plants`)}</span>
+                  <PlantIcon p={p} size={32} /> {plantName(p)} <span className="muted">{t(`${n} tő`, `${n} plants`)}</span>
                 </li>
               ) : null;
             })}
@@ -198,6 +199,8 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
   const [kinds, setKinds] = useState<PlantKind[]>(DEFAULT_KINDS);
   const [mixed, setMixed] = useState(false);
   const [gap, setGap] = useState(0);
+  const prefer = useUi((s) => s.ideaPrefer);
+  const setPrefer = (parts: MixPart[]) => useUi.getState().setIdeaPrefer(parts);
   const [idea, setIdea] = useState<{ variantId: string; idea: Idea } | null>(null);
   if (!area) return null;
   const pools = poolsFor(area, project.plantDb, kinds);
@@ -212,7 +215,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
 
   const run = (again: boolean) => {
     const st = useProject.getState();
-    const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined, kinds, mixed, extraGapCm: gap });
+    const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined, kinds, mixed, extraGapCm: gap, prefer: prefer.map((x) => x.code) });
     const notes = next.notes.join(' ');
     if (again && idea && variantAlive) {
       st.setVariantItems(idea.variantId, next.items, notes);
@@ -242,9 +245,29 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
           'a random but considered composition: one colour scheme, taller plants at the back, lower in front, in a repeating rhythm. Each idea goes into its own variant; the existing plan stays as it is.',
         )}
       </p>
+      <fieldset className="field-group">
+        <legend>{t('Preferált növények (nem kötelező)', 'Preferred plants (optional)')}</legend>
+        <PlantMultiPicker
+          area={area}
+          options={[...project.plantDb].sort(byPlantName).map((p, i) => ({ p, score: i / 10000 }))}
+          picked={prefer}
+          onChange={setPrefer}
+          label={t('Ezekből készüljön az ötlet', 'Make the idea from these')}
+          max={12}
+          weights={false}
+        />
+        <p className="mono muted">
+          {prefer.length
+            ? t(
+                'Az ötlet csak ezekből a növényekből készül: a magasabbak hátra, az alacsonyabbak előre kerülnek. A színvilág és a típusok ilyenkor nem számítanak; ha egy növény nem illik a területhez, a figyelmeztetések jelzik.',
+                'The idea is made from these plants only: taller ones at the back, lower ones in front. The colour scheme and the kinds do not apply then; the warnings flag a plant that does not suit the area.',
+              )
+            : t('Ha nem választasz, a program maga válogat a terület feltételeihez illő fajokból.', 'If you pick none, the app chooses from the species that suit the area.')}
+        </p>
+      </fieldset>
       <label className="field">
         <span className="lbl">{t('Színvilág', 'Colour scheme')}</span>
-        <select value={palette} onChange={(e) => setPalette(e.target.value as PaletteKey | '')}>
+        <select value={palette} disabled={prefer.length > 0} onChange={(e) => setPalette(e.target.value as PaletteKey | '')}>
           <option value="">{t('Meglepetés', 'Surprise me')}</option>
           {(Object.keys(PALETTES) as PaletteKey[]).map((k) => (
             <option key={k} value={k}>
@@ -263,7 +286,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
                 <input
                   type="checkbox"
                   checked={kinds.includes(k)}
-                  disabled={!n && !kinds.includes(k)}
+                  disabled={prefer.length > 0 || (!n && !kinds.includes(k))}
                   onChange={(e) => setKinds(e.target.checked ? [...kinds, k] : kinds.filter((x) => x !== k))}
                 />
                 <span>
@@ -289,7 +312,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
         <GapField value={gap} onChange={setGap} />
       </fieldset>
       <div className="form-actions form-actions-start">
-        <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!kinds.length || pool.length < 1}>
+        <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!prefer.length && (!kinds.length || pool.length < 1)}>
           {shown ? t('Új ötlet új változatba', 'New idea in a new variant') : t('Ötlet generálása', 'Generate an idea')}
         </button>
         {shown && (
@@ -298,7 +321,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
           </button>
         )}
       </div>
-      {kinds.length > 0 && pool.length < 1 && <p className="form-error">{t('Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.', 'Too few species fit the area. Relax the limits or extend the database.')}</p>}
+      {!prefer.length && kinds.length > 0 && pool.length < 1 && <p className="form-error">{t('Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.', 'Too few species fit the area. Relax the limits or extend the database.')}</p>}
 
       {shown && (
         <div className="idea-result" aria-live="polite">
@@ -308,7 +331,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
           <ul className="idea-species">
             {shown.species.map((p) => (
               <li key={p.code}>
-                <PlantChip p={p} size={26} /> {plantName(p)}{' '}
+                <PlantIcon p={p} size={32} /> {plantName(p)}{' '}
                 <span className="muted">
                   {p.maxHeightCm} cm · {plantBloom(p) !== '–' ? plantBloom(p) : plantFoliage(p)}
                 </span>

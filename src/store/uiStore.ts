@@ -55,6 +55,9 @@ export interface UiState {
   /** Options of the visualisation brief (kept while the app is open). */
   vizOptions: PromptOptions;
   setVizOptions: (o: PromptOptions) => void;
+  /** Idea generator: preferred species (kept while the app is open). */
+  ideaPrefer: MixPart[];
+  setIdeaPrefer: (p: MixPart[]) => void;
   /** The start page is showing (on every launch, and from the logo). */
   home: boolean;
   setHome: (v: boolean) => void;
@@ -129,6 +132,8 @@ export const useUi = create<UiState>()((set) => ({
   setVisualOpen: (visualOpen) => set({ visualOpen }),
   startWithNewArea: false,
   home: true,
+  ideaPrefer: [],
+  setIdeaPrefer: (ideaPrefer) => set({ ideaPrefer }),
   setHome: (home) => set({ home, compare: false, page: null }),
   setStartWithNewArea: (startWithNewArea) => set({ startWithNewArea }),
   vizOptions: { season: 1, viewpoint: 'camera', lang: getLang(), mature: true, style: 'photo', time: 'afternoon', weather: 'sunny' },

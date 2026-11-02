@@ -38,7 +38,7 @@ All data stays on your own device, there is no sign-up, and after the first visi
 
 The app opens with the **start page** every time, and the **Planterra logo** at the left of the top bar brings you back to it at any time. From the top:
 
-1. **+ Create a new area**: start with an empty area; the form opens at once (name, size, facing, sun; a rectangle or a free shape drawn on the plan, see [chapter 3](#3-areas)).
+1. **+ Create a new area**: start with an empty area; the form opens at once (name, size, facing, sun; a rectangle, a circle or a free shape drawn on the plan, see [chapter 3](#3-areas)).
 2. **Your areas**: the areas already planned (size, the plan on screen, plant count). Tap one to open it.
 3. **Templates**:
    - **House-side strip**: a 120 × 1200 cm gravel strip between the house wall and the pavement, for plants up to 50 cm;
@@ -63,10 +63,15 @@ The first time, a short three-step introduction shows the most important buttons
 - **↶ / ↷**: undo and redo (up to 100 steps). On a computer **Ctrl+Z** and **Ctrl+Y** work too.
 - **EN / HU**: switches to English or Hungarian with one tap.
 - **☾ / ☀**: dark or light mode with one tap.
-- **◫ View**: layers, plant size (mature or at planting), photos, snap, **appearance** (automatic, light, dark), **language**; the plant database, fixed elements, idea generator and schedule open from here as well.
+- **◫ View**: **plan style** (standard or concept plan, see below), layers, plant size (mature or at planting), photos, snap, **appearance** (automatic, light, dark), **language**; the plant database, fixed elements, idea generator and schedule open from here as well.
 - **? Help**: this guide, inside the app, offline too. It opens at the chapter for the tool in use.
 - **⋯ Project**: save, load, share, images, visualisation, print.
 - **Round number**: the number of warnings. Green when all is fine, red when there is an error.
+
+**Plan style** (*View → Plan style*, or in ⚡ quick actions):
+
+- **Standard**: every plant is a coloured disc with its species code (e.g. purple coneflower = pink disc marked “EC”). The list and the legend use these.
+- **Concept plan**: each plant shows the species’ top-view drawing, sized by its mature spread; drifts keep their “code × count” label. Image exports follow it. The season view shows the monthly colours in both styles.
 
 **Quick actions (⚡)**: on the right of the plan, above the zoom buttons. A searchable list of every feature (e.g. “replace”, “image”, “backup”), and the **steps of a first plan** checklist: area, fixed elements, plants, fixing errors, a variant, the list, a backup. Done steps tick themselves. On a computer **Ctrl+K** opens it too.
 
@@ -112,6 +117,7 @@ A project can have several areas (e.g. front garden, side strip, back garden). T
 - **Name**
 - **Shape**:
   - **rectangle**: enter the width and length in cm;
+  - **circle / oval**: the width is the diameter; set a different length for an oval. *Edit shape* later turns it into a free shape;
   - **free shape**: you draw it on the plan. Tap the corners one after another, then tap the first point again or press **Done**. While drawing, side lengths show in cm; **Back** removes the last point.
 - **Facing and sun**: give the sun as text, e.g. “until 13:00”, “until noon”, “all day”. From this the app works out whether the spot is sunny, part shade or shade; you can override it with *Light for the rules*.
 - **Area type**: perennial bed, gravel/rock garden, shade bed, edging, patio with pots. It affects the mulch advice and the idea generator.
@@ -288,7 +294,8 @@ Tap the round number in the top bar to open the **list**. Tapping a warning jump
 
 The database has 146 species: perennials, grasses, ground covers, shrubs, hedge plants, spreading evergreens and trees. Open it with *View → Plant database*, or the **Database** button in the palette.
 
-- **Edit**: tap a plant to change any of its data: name, code, size, spacing, needs, flowering, colours, price, pot size, photo, notes. Tap the “to check ✓” label to mark that you have checked it. Each plant has an English and a Hungarian name and texts; the other language is in the box at the bottom.
+- **Pictograms**: all 146 built-in species have a side-view and a top-view drawing. The side view shows in the palette, the database, the pickers and the info card (with the code), the top view on the plan in concept plan mode. An own plant can use a similar species’ drawing (*Pictogram* field).
+- **Edit**: tap a plant to change any of its data: name, code, size, spacing, needs, flowering, colours, price, pot size, photo, pictogram, notes. Tap the “to check ✓” label to mark that you have checked it. Each plant has an English and a Hungarian name and texts; the other language is in the box at the bottom.
 - **+ New plant**: add your own plant; the code is suggested from the name.
 - **Data check**: on a plant’s form you can give the **data source** and the **last checked** date; *All checked* clears every “to check” mark. **List of values to check (CSV)** collects the values still to check, per species and field, with an empty “correct value” column for an expert review.
 - **Toxicity**: for information only, not medical or veterinary advice; check it in a reliable source before planting near children or pets. The filter, the info card and the area’s “Non-toxic only” limit say so too.
@@ -333,6 +340,7 @@ Not sure where to begin? Ask for an idea. Open it from the variants with **✦ G
 
 ### Whole area → new variant
 
+0. **Preferred plants** (optional): search and tap species from the catalogue. With a choice, the idea is made **from these only** (taller ones at the back, lower in front); the colour scheme and the kinds do not apply then. If a species is left out (e.g. not advised in the walnut’s juglone zone, or it does not fit), the idea’s notes name it.
 1. **Colour scheme**: *Surprise me*, or purple–silver, warm yellow–burgundy, white–blue–green, pink–purple.
 2. **Which kinds of plants** (see the table), and the **Variety and density** part:
    - **Mixed planting**: species alternate plant by plant instead of drifts, and no two of the same plant go side by side;

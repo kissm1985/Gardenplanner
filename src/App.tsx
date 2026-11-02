@@ -220,6 +220,13 @@ export function App({ loading }: { loading: boolean }) {
     { id: 'backup', label: t('Mentés fájlba', 'Save to file'), hint: t('Teljes mentés JSON-ban', 'Full backup as JSON'), words: 'backup json mentés', run: go(() => backupNow(project)) },
     { id: 'project', label: t('Projekt: betöltés, megosztás, nyomtatás, képek', 'Project: load, share, print, images'), hint: t('Link, PNG, SVG, PDF, helyszín, névjegy', 'Link, PNG, SVG, PDF, location, about'), words: 'pdf png link helyszín éghajlat', run: () => setSheet('project') },
     { id: 'view', label: t('Nézet és rétegek', 'View and layers'), hint: t('Rétegek, méret, fotók, megjelenés, nyelv', 'Layers, size, photos, appearance, language'), run: () => setSheet('view') },
+    {
+      id: 'planstyle',
+      label: project.settings.planStyle === 'concept' ? t('Vissza az alap jelekre', 'Back to standard symbols') : t('Koncepcióterv-mód', 'Concept plan mode'),
+      hint: t('Színes jelek vagy növényábrák (piktogramok) a rajzon', 'Coloured symbols or plant drawings (pictograms) on the plan'),
+      words: 'koncepció piktogram ábra mód concept',
+      run: go(() => useProject.getState().updateSettings({ planStyle: project.settings.planStyle === 'concept' ? 'symbol' : 'concept' })),
+    },
     { id: 'theme', label: t('Sötét / világos mód', 'Dark / light mode'), hint: t('Váltás egy koppintással', 'Switch with one tap'), words: 'dark light téma', run: go(toggleTheme) },
     { id: 'lang', label: getLang() === 'hu' ? 'English' : 'Magyar', hint: getLang() === 'hu' ? 'Switch to English' : 'Váltás magyarra', words: 'nyelv language', run: go(() => setLang(getLang() === 'hu' ? 'en' : 'hu')) },
     { id: 'help', label: t('Súgó', 'Help'), hint: t('Felhasználói útmutató', 'User guide'), words: 'útmutató', run: () => openHelp() },
@@ -544,6 +551,10 @@ export function App({ loading }: { loading: boolean }) {
             </button>
           </div>
           <fieldset className="field-group">
+            <legend>{t('Tervező mód', 'Plan style')}</legend>
+            <PlanStyleChoice />
+          </fieldset>
+          <fieldset className="field-group">
             <legend>{t('Megjelenés', 'Appearance')}</legend>
             <ThemeChoice />
           </fieldset>
@@ -635,6 +646,28 @@ function QuickToggles() {
         {dark ? '☀' : '☾'}
       </button>
     </>
+  );
+}
+
+/** Default symbols (coloured disc + code) or the concept plan (top-view pictograms). */
+function PlanStyleChoice() {
+  const style = useProject((s) => s.project?.settings.planStyle ?? 'symbol');
+  const opts: ['symbol' | 'concept', string, string][] = [
+    ['symbol', t('Alap: színes jel kóddal', 'Standard: coloured symbol with code'), t('pl. bíbor kúpvirág = rózsaszín kör „EC” felirattal', 'e.g. purple coneflower = pink disc marked “EC”')],
+    ['concept', t('Koncepcióterv: növényábrák', 'Concept plan: plant drawings'), t('felülnézeti piktogram, a kifejlett szélesség szerint méretezve', 'top-view pictogram, sized by the mature spread')],
+  ];
+  return (
+    <div className="plan-style">
+      {opts.map(([v, label, hint]) => (
+        <label key={v} className="check">
+          <input type="radio" name="plan-style" checked={style === v} onChange={() => useProject.getState().updateSettings({ planStyle: v })} />
+          <span>
+            {label}
+            <small className="mono muted"> – {hint}</small>
+          </span>
+        </label>
+      ))}
+    </div>
   );
 }
 

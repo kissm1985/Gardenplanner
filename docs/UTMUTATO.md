@@ -38,7 +38,7 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
 
 Az alkalmazás minden indításkor a **kezdőoldallal** nyílik, és a felső sáv bal szélén lévő **Planterra-logóval** bármikor ide jutsz vissza. Fentről lefelé:
 
-1. **+ Új terület létrehozása**: üres területtel kezdesz; azonnal megnyílik az űrlap (név, méret, fekvés, napsütés; téglalap vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)).
+1. **+ Új terület létrehozása**: üres területtel kezdesz; azonnal megnyílik az űrlap (név, méret, fekvés, napsütés; téglalap, kör vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)).
 2. **Területeid**: a már megtervezett területek (méret, a rajzon lévő terv, tőszám). Koppintásra megnyílik.
 3. **Sablonok**:
    - **Házoldali sáv**: 120 × 1200 cm-es kavicsos sáv a ház fala és a járda között, legfeljebb 50 cm magas növényekkel;
@@ -63,10 +63,15 @@ Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosab
 - **↶ / ↷**: visszavonás és újra (100 lépésig). Számítógépen **Ctrl+Z** és **Ctrl+Y** is működik.
 - **EN / HU**: egy koppintással vált angolra, illetve magyarra.
 - **☾ / ☀**: sötét, illetve világos mód egy koppintással.
-- **◫ Nézet**: rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes, **megjelenés** (automatikus, világos, sötét), **nyelv**; innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
+- **◫ Nézet**: **tervező mód** (alap vagy koncepcióterv, lásd lent), rétegek, növényméret (kifejlett vagy ültetéskori), fotók, mágnes, **megjelenés** (automatikus, világos, sötét), **nyelv**; innen nyílik a növényadatbázis, a rögzített elemek, az ötletgenerátor, valamint a menetrend és gondozás.
 - **? Súgó**: ez az útmutató, az alkalmazáson belül, internet nélkül is. Az éppen használt eszközhöz tartozó fejezetnél nyílik meg.
 - **⋯ Projekt**: mentés, betöltés, megosztás, képek, látványterv, nyomtatás.
 - **Kerek szám**: a figyelmeztetések száma. Zöld, ha nincs gond, piros, ha hiba van.
+
+**Tervező mód** (*Nézet → Tervező mód*, vagy a ⚡ gyors műveletek között):
+
+- **Alap**: minden tő színes kör a fajkóddal (pl. bíbor kúpvirág = rózsaszín kör „EC” felirattal). Ezzel számol a lista és a jelmagyarázat.
+- **Koncepcióterv**: a tövek helyén a faj felülnézeti rajza látszik, a kifejlett szélesség szerint méretezve; a foltok mellett továbbra is ott a „kód × darab” felirat. A képexport is így készül. Az évszaknézet mindkét módban a havi színeket mutatja.
 
 **Gyors műveletek (⚡)**: a rajz jobb oldalán, a nagyítógombok fölött. Kereshető lista minden funkcióról (pl. „csere”, „kép”, „mentés”), és az **első terv lépései** ellenőrzőlista: terület, rögzített elemek, növények, hibák javítása, változat, lista, mentés. A kész lépések maguktól kipipálódnak. Számítógépen **Ctrl+K** is megnyitja.
 
@@ -112,6 +117,7 @@ Egy projektben több terület is lehet (pl. előkert, oldalkert, hátsó kert). 
 - **Név**
 - **Alak**:
   - **téglalap**: megadod a szélességet és a hosszt cm-ben;
+  - **kör / ellipszis**: a szélesség az átmérő; ha a hosszt eltérőre állítod, ellipszis lesz. Később az *Alak szerkesztése* gombbal szabad alakra alakítható;
   - **szabad alak**: a terven rajzolod meg. Koppints a sarkokra egymás után, majd koppints újra az első pontra, vagy nyomd meg a **Kész** gombot. Rajzolás közben az oldalak hossza cm-ben látszik, a **Vissza** az utolsó pontot veszi el.
 - **Égtáj és napsütés**: a napsütést szövegesen adod meg, pl. „13:00-ig”, „délig”, „egész nap”. Ebből számolja a program, hogy a hely napos, félárnyékos vagy árnyékos; a *Napfény a szabályokhoz* mezőben felülírhatod.
 - **Területtípus**: évelőágyás, kavicsos/kőkert, árnyékkert, szegély, edényes. A mulcsajánlást és az ötletgenerátort befolyásolja.
@@ -288,7 +294,8 @@ A felső sáv kerek számára koppintva nyílik a **lista**. Egy figyelmeztetés
 
 Az adatbázisban 146 faj van: évelők, díszfüvek, talajtakarók, cserjék, sövénynövények, terülő örökzöldek és fák. Megnyitása: *Nézet → Növényadatbázis*, vagy a palettán az **Adatbázis** gomb.
 
-- **Szerkesztés**: egy növényre koppintva minden adata módosítható: név, kód, méret, tőtáv, igények, virágzás, színek, ár, kiszerelés, fotó, megjegyzés. Az „ellenőrizendő ✓” címkére koppintva jelölöd, hogy utánanéztél.
+- **Piktogramok**: mind a 146 beépített fajnak van oldalnézeti és felülnézeti rajza. Az oldalnézet a palettán, az adatbázisban, a választókban és az infókártyán látszik (mellette a kód), a felülnézet koncepcióterv-módban a rajzon. Saját növényhez a *Piktogram* mezőben egy hasonló faj rajza választható.
+- **Szerkesztés**: egy növényre koppintva minden adata módosítható: név, kód, méret, tőtáv, igények, virágzás, színek, ár, kiszerelés, fotó, piktogram, megjegyzés. Az „ellenőrizendő ✓” címkére koppintva jelölöd, hogy utánanéztél.
 - **+ Új növény**: saját növény felvétele; a kódot a név alapján javasolja.
 - **Import és export**: JSON és CSV. A CSV Excelben, Google Táblázatban szerkeszthető, és visszatölthető. Az `=`, `+`, `-` vagy `@` jellel kezdődő szövegek elé aposztróf kerül, hogy az Excel ne futtassa őket képletként; visszatöltéskor ez eltűnik.
 - **Adatok ellenőrzése**: a növény űrlapján megadhatod az **adatforrást** és az **utolsó ellenőrzés** dátumát; a *Mindent ellenőriztem* gomb levesz minden „ellenőrizendő” jelölést. Az **Ellenőrizendők listája (CSV)** gomb fajonként és adatonként kigyűjti a még ellenőrizendő értékeket egy üres „helyes érték” oszloppal, szakértői átnézéshez.
@@ -333,6 +340,7 @@ Ha nem tudod, hol kezdd, kérj ötletet. Megnyitása: változatok → **✦ Ötl
 
 ### Egész terület → új változat
 
+0. **Preferált növények** (nem kötelező): keress rá és koppints a katalógus fajaira. Ha választasz, az ötlet **csak ezekből** készül (a magasabbak hátra, az alacsonyabbak előre); a színvilág és a típusok ilyenkor nem számítanak. Ha egy faj kimarad (pl. a diófa juglone-zónájában nem ajánlott, vagy nem fér el), az ötlet leírása megnevezi.
 1. **Színvilág**: *Meglepetés*, vagy lila–ezüst, meleg sárga–bordó, fehér–kék–zöld, rózsaszín–lila.
 2. **Milyen növények kerüljenek a tervre** (lásd a táblázatot), és a **Változatosság és sűrűség** rész:
    - **Vegyes ültetés**: foltok helyett tövenként váltakoznak a fajok, és azonos növény nem kerül egymás mellé;

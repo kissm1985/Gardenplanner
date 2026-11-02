@@ -21,6 +21,7 @@ type Draft = AreaInput & {
   soil?: Soil;
   kind?: AreaKind;
   freeShape?: boolean;
+  round?: boolean;
 };
 
 const blank: Draft = {
@@ -119,8 +120,8 @@ export function AreaForm({
               <input
                 type="radio"
                 name="shape"
-                checked={!d.freeShape}
-                onChange={() => set("freeShape", false)}
+                checked={!d.freeShape && !d.round}
+                onChange={() => setD((p) => ({ ...p, freeShape: false, round: false }))}
               />
               <span>{t("téglalap", "rectangle")}</span>
             </label>
@@ -128,12 +129,29 @@ export function AreaForm({
               <input
                 type="radio"
                 name="shape"
+                checked={!!d.round && !d.freeShape}
+                onChange={() => setD((p) => ({ ...p, freeShape: false, round: true, lengthCm: p.widthCm }))}
+              />
+              <span>{t("kör / ellipszis", "circle / oval")}</span>
+            </label>
+            <label className="seg-item">
+              <input
+                type="radio"
+                name="shape"
                 checked={!!d.freeShape}
-                onChange={() => set("freeShape", true)}
+                onChange={() => setD((p) => ({ ...p, freeShape: true, round: false }))}
               />
               <span>{t("szabad alak – a terven rajzolom", "free shape – I draw it on the plan")}</span>
             </label>
           </div>
+          {d.round && !d.freeShape && (
+            <p className="mono muted">
+              {t(
+                "Kör alakú terület: a szélesség az átmérő. Ha a hosszt eltérőre állítod, ellipszis lesz.",
+                "Round area: the width is the diameter. Set a different length for an oval.",
+              )}
+            </p>
+          )}
           {d.freeShape && (
             <p className="mono muted">
               {t(
@@ -155,14 +173,18 @@ export function AreaForm({
         <div className="field-row">
           <label className="field">
             <span>
-              {d.freeShape ? t("Rajzterület szélessége (cm)", "Drawing space width (cm)") : t("Szélesség (cm)", "Width (cm)")}
+              {d.freeShape ? t("Rajzterület szélessége (cm)", "Drawing space width (cm)") : d.round ? t("Átmérő / szélesség (cm)", "Diameter / width (cm)") : t("Szélesség (cm)", "Width (cm)")}
             </span>
             <input
               type="number"
               inputMode="numeric"
               min={10}
               value={d.widthCm}
-              onChange={(e) => set("widthCm", +e.target.value)}
+              onChange={(e) => {
+                const w = +e.target.value;
+                // A circle stays a circle while its length follows the width.
+                setD((p) => ({ ...p, widthCm: w, ...(p.round && p.lengthCm === p.widthCm ? { lengthCm: w } : {}) }));
+              }}
             />
           </label>
           <label className="field">

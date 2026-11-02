@@ -3,9 +3,9 @@ import { activeFilterCount, filterPlants, NO_FILTER } from '../model/plantFilter
 import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { canvasBridge, useUi } from '../store/uiStore';
-import { PlantChip } from './PlantChip';
 import { PlantCard } from './PlantTooltip';
 import { byPlantName, plantName } from '../model/plants';
+import { PlantIcon } from './PlantIcon';
 import { labels, t } from '../i18n';
 
 const DRAG_START_PX = 12;
@@ -142,7 +142,7 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
                   }
                 }}
               >
-                <PlantChip p={p} size={34} />
+                <PlantIcon p={p} size={40} />
                 <span className="palette-name">{plantName(p)}</span>
                 <span className="palette-meta mono">
                   {p.maxHeightCm} cm · {p.spacingCm} cm
@@ -167,7 +167,7 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
       )}
       {ghost && (
         <div className="drag-ghost" style={{ left: ghost.x, top: ghost.y }} aria-hidden="true">
-          <PlantChip p={ghost.p} size={40} />
+          <PlantIcon p={ghost.p} size={48} />
         </div>
       )}
     </section>

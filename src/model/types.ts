@@ -49,6 +49,8 @@ export interface Plant {
   photoUrl?: string;
   /** Credit line for the own photo. */
   photoCredit?: string;
+  /** Code of the built-in pictogram to use (own plants); built-in species use their own code. */
+  pictogram?: string;
   /** Field names whose values still need checking ("ellenőrizendő"). */
   verify?: (keyof Plant)[];
   /** Where the data comes from (book, nursery catalogue, own observation…). */
@@ -176,7 +178,8 @@ export interface Background {
 /** What the area is used for; drives mulch advice and the idea generator. */
 export type AreaKind = 'bed' | 'gravel' | 'shade' | 'border' | 'pots';
 
-export type AreaShape = { kind: 'rect' } | { kind: 'polygon'; points: Pt[] };
+/** rect and ellipse fill the width × length box (an ellipse with equal sides is a circle); polygon is a free shape. */
+export type AreaShape = { kind: 'rect' } | { kind: 'ellipse' } | { kind: 'polygon'; points: Pt[] };
 
 export interface Area {
   id: string;
@@ -213,6 +216,8 @@ export interface Settings {
   wikiPhotos?: boolean;
   /** Version of the built-in plant list last merged into this project. */
   seedVersion?: number;
+  /** How plants are drawn: coloured symbols with codes (default) or the concept plan's top-view pictograms. */
+  planStyle?: 'symbol' | 'concept';
   /** Where the garden is (frost dates, brief); Győr when missing. */
   location?: GardenLocation;
 }

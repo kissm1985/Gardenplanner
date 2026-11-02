@@ -23,8 +23,8 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
       <AreaForm
         submitLabel={t('Terület létrehozása', 'Create area')}
         onCancel={() => setMode({ kind: 'list' })}
-        onSubmit={({ freeShape, ...d }) => {
-          const id = addArea(d);
+        onSubmit={({ freeShape, round, ...d }) => {
+          const id = addArea({ ...d, round: round && !freeShape });
           if (freeShape) {
             useUi.getState().setTool('select');
             useUi.getState().setShapeEdit({ areaId: id, mode: 'draw', points: [], selected: null });
@@ -119,6 +119,7 @@ function AreaCard({ a, current, onOpen, onEdit, onShape, onLawn, onDelete }: {
     a.soil && t(`talaj: ${SOIL_LABEL[a.soil]}`, `soil: ${SOIL_LABEL[a.soil]}`),
     a.kind && AREA_KIND_LABEL[a.kind],
     a.shape.kind === 'polygon' && t('szabad alak', 'free shape'),
+    a.shape.kind === 'ellipse' && (a.widthCm === a.lengthCm ? t('kör alakú', 'round') : t('ellipszis alakú', 'oval')),
     c.noThorns && t('tüskementes', 'no thorns'),
     c.nonToxic && t('nem mérgező', 'non-toxic'),
     c.drip && t('csepegtető', 'drip irrigation'),

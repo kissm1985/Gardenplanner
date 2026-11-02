@@ -30,11 +30,11 @@ test('photo in the palette card (hover) and in the plan card; cached after the f
   const item = page.locator('.palette-item').first();
   await item.hover();
   const tip = page.getByRole('tooltip');
-  await expect(tip.locator('img')).toBeVisible();
+  await expect(tip.locator('.plant-tip-photo img')).toBeVisible();
   await expect(tip).toContainText('Jane Doe · CC BY-SA 4.0 · forrás: Wikimedia Commons');
   await expect(tip.getByRole('link', { name: 'CC BY-SA 4.0' })).toHaveAttribute('href', 'https://creativecommons.org/licenses/by-sa/4.0');
   await expect(tip.getByRole('link', { name: /forrás/ })).toHaveAttribute('href', 'https://commons.wikimedia.org/wiki/File:Lavender.jpg');
-  await expect.poll(() => tip.locator('img').evaluate((i: HTMLImageElement) => i.naturalWidth)).toBe(48);
+  await expect.poll(() => tip.locator('.plant-tip-photo img').evaluate((i: HTMLImageElement) => i.naturalWidth)).toBe(48);
   await page.mouse.move(5, 5);
   await expect(tip).toHaveCount(0);
   const n = lookups();
@@ -46,7 +46,7 @@ test('photo in the palette card (hover) and in the plan card; cached after the f
   await page.getByRole('button', { name: 'Kijelölés' }).click();
   const pl = (await page.locator('g.plant').first().boundingBox())!;
   await page.mouse.move(pl.x + pl.width / 2, pl.y + pl.height / 2, { steps: 4 });
-  await expect(page.getByRole('tooltip').locator('img')).toBeVisible();
+  await expect(page.getByRole('tooltip').locator('.plant-tip-photo img')).toBeVisible();
   expect(lookups()).toBe(n);
 });
 

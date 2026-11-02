@@ -97,7 +97,9 @@ interface Pos {
 }
 
 const inArea = (area: Area, [x, y]: Pt, tol = 1) =>
-  area.shape.kind === 'polygon'
+  area.shape.kind === 'ellipse'
+    ? ((x - area.widthCm / 2) / (area.widthCm / 2 + tol)) ** 2 + ((y - area.lengthCm / 2) / (area.lengthCm / 2 + tol)) ** 2 <= 1
+    : area.shape.kind === 'polygon'
     ? pointInPolygon([x, y], area.shape.points)
     : x >= -tol && y >= -tol && x <= area.widthCm + tol && y <= area.lengthCm + tol;
 

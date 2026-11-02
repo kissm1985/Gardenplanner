@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { About } from './About';
+import { embedTopViews } from './pictograms';
 import { LocationField } from './LocationField';
 import { backupNow, isInstalled, useBackupState } from './backup';
 import { bomFromEntries } from '../engine/bom';
@@ -57,6 +58,8 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
   const image = async (kind: 'png' | 'svg', opts: { month?: number | null; legend?: boolean; suffix?: string } = {}) => {
     if (!area) return;
     const v = activeVariant(area);
+    // Concept plan: embed the pictograms, so the file shows them outside the app too.
+    if (project.settings.planStyle === 'concept') await embedTopViews(project.plantDb.filter((p) => v.items.some((it) => it.plantId === p.code)));
     const legend: LegendRow[] = (opts.legend ?? withLegend)
       ? bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
           code: r.plant.code,

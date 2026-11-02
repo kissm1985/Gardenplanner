@@ -1,9 +1,9 @@
 import { effectivePlant, JUGLONE_LABEL, plantBloom, plantFoliage, plantName, MONTHS, SOIL_LABEL, SUN_LABEL, TOXIC_LABEL, WATER_LABEL } from '../model/plants';
 import type { PlacedItem, Plant } from '../model/types';
-import { PlantChip } from './PlantChip';
 import { ToxicNotice } from './Disclaimer';
 import { STATUS_LABEL } from './Selection';
 import { usePlantPhoto } from './plantPhoto';
+import { PlantIcon } from './PlantIcon';
 import { labels, t } from '../i18n';
 
 /** "jún–júl, szept" from bloom months. */
@@ -71,7 +71,7 @@ export function PlantCard({ plant, item }: { plant: Plant; item?: PlacedItem }) 
       {photo.state === 'loading' && <div className="plant-tip-photo is-empty">{t('fotó betöltése…', 'loading photo…')}</div>}
       {photo.state === 'offline' && <div className="plant-tip-photo is-empty">{t('A fotóhoz internet kell (első alkalommal).', 'The photo needs internet (the first time).')}</div>}
       <div className="plant-tip-head">
-        <PlantChip p={plant} size={30} />
+        <PlantIcon p={plant} size={48} />
         <div>
           <b>{plantName(plant)}</b>
           <i>{plant.nameLat}</i>

@@ -4,6 +4,8 @@ import { plantLook } from '../../engine/season';
 import { bbox, centroid } from '../../model/geometry';
 import { effectivePlant, textOn } from '../../model/plants';
 import type { PlacedItem, Plant, Pt } from '../../model/types';
+import { useProject } from '../../store/projectStore';
+import { topHref } from '../../ui/pictograms';
 
 export interface DragOffset {
   ids: Set<string>;
@@ -45,6 +47,8 @@ export function withShape(it: PlacedItem, shape: ShapeOverride | null): PlacedIt
  * re-render this layer; each mark is memoised so dragging re-renders only the moved ones.
  */
 export const PlantsLayer = memo(function PlantsLayer({ items, plants, selected, drag, shape, showMature, showSpacing, month }: Props) {
+  // Concept plan: top-view pictograms instead of coloured symbols (the season view keeps its colours).
+  const concept = useProject((s) => s.project?.settings.planStyle === 'concept') && !month;
   return (
     <g className="plants">
       {items.map((raw) => {
@@ -74,15 +78,16 @@ export const PlantsLayer = memo(function PlantsLayer({ items, plants, selected, 
               selected={sel}
               spacing={showSpacing}
               planted={it.status === 'planted'}
+              concept={concept}
             />
           );
-        return <GroupMark key={it.id} item={it} plant={p} r={r} fill={fill} opacity={op} dx={dx} dy={dy} selected={sel} spacing={showSpacing} />;
+        return <GroupMark key={it.id} item={it} plant={p} r={r} fill={fill} opacity={op} dx={dx} dy={dy} selected={sel} spacing={showSpacing} concept={concept} />;
       })}
     </g>
   );
 });
 
-const PlantMark = memo(function PlantMark({ id, x, y, plant, r, fill, opacity, selected, spacing, planted }: {
+const PlantMark = memo(function PlantMark({ id, x, y, plant, r, fill, opacity, selected, spacing, planted, concept }: {
   id: string;
   x: number;
   y: number;
@@ -93,18 +98,33 @@ const PlantMark = memo(function PlantMark({ id, x, y, plant, r, fill, opacity, s
   selected: boolean;
   spacing: boolean;
   planted: boolean;
+  concept: boolean;
 }) {
   return (
     <g className={`plant${selected ? ' is-selected' : ''}`} data-id={id} transform={`translate(${x} ${y})`}>
-      <Dot plant={plant} r={r} fill={fill} opacity={opacity} spacing={spacing} />
+      <Dot plant={plant} r={r} fill={fill} opacity={opacity} spacing={spacing} concept={concept} />
       {planted && <circle className="plant-planted" cx={r * 0.7} cy={-r * 0.7} r={Math.max(2, r * 0.18)} />}
       {selected && <circle className="select-ring" r={r + Math.max(2, r * 0.12)} vectorEffect="non-scaling-stroke" />}
     </g>
   );
 });
 
-/** One plant symbol at the origin: footprint, shape glyph, code. */
-function Dot({ plant, r, fill, opacity, spacing }: { plant: Plant; r: number; fill: string; opacity: number; spacing: boolean }) {
+/** Pictograms have about 10 % optical room around the drawing; this keeps the foliage edge at the spread. */
+const PICTO_SCALE = 1.1;
+
+/** One plant symbol at the origin: footprint, shape glyph, code – or its top-view pictogram on a concept plan. */
+function Dot({ plant, r, fill, opacity, spacing, concept = false }: { plant: Plant; r: number; fill: string; opacity: number; spacing: boolean; concept?: boolean }) {
+  const href = concept ? topHref(plant) : null;
+  if (href) {
+    const h = r * PICTO_SCALE;
+    return (
+      <>
+        {spacing && <circle className="spacing-ring" r={plant.spacingCm / 2} vectorEffect="non-scaling-stroke" />}
+        <circle className="plant-hit" r={r} />
+        <image className="plant-picto" href={href} x={-h} y={-h} width={2 * h} height={2 * h} />
+      </>
+    );
+  }
   const fs = Math.max(3, Math.min(r * 0.75, 14));
   // Faded (winter) plants keep a readable dark code.
   const tc = opacity < 0.6 ? 'var(--fg)' : textOn(fill);
@@ -126,7 +146,7 @@ function Dot({ plant, r, fill, opacity, spacing }: { plant: Plant; r: number; fi
 
 type Group = Extract<PlacedItem, { kind: 'drift' | 'row' }>;
 
-const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, dy, selected, spacing }: {
+const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, dy, selected, spacing, concept }: {
   item: Group;
   plant: Plant;
   r: number;
@@ -136,6 +156,7 @@ const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, d
   dy: number;
   selected: boolean;
   spacing: boolean;
+  concept: boolean;
 }) {
   const pts = useMemo(
     () => (item.kind === 'drift' ? fillPolygon(item.polygon, item.spacingCm, item.pattern) : fillPath(item.path, item.spacingCm)),
@@ -145,13 +166,13 @@ const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, d
   return (
     <g className={`group group-${item.kind}${selected ? ' is-selected' : ''}`} data-id={item.id} transform={`translate(${dx} ${dy})`}>
       {item.kind === 'drift' ? (
-        <polygon className="drift-area" points={outline} fill={fill} stroke={fill} vectorEffect="non-scaling-stroke" />
+        <polygon className={`drift-area${concept ? ' is-concept' : ''}`} points={outline} fill={fill} stroke={fill} vectorEffect="non-scaling-stroke" />
       ) : (
         <polyline className="row-line" points={outline} stroke={fill} strokeWidth={Math.max(6, r * 0.5)} />
       )}
       {pts.map(([x, y], i) => (
         <g key={i} transform={`translate(${x} ${y})`}>
-          <Dot plant={plant} r={r} fill={fill} opacity={opacity} spacing={spacing} />
+          <Dot plant={plant} r={r} fill={fill} opacity={opacity} spacing={spacing} concept={concept} />
         </g>
       ))}
       {selected && (

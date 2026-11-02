@@ -4,7 +4,7 @@ import { byPlantName, JUGLONE_LABEL, plantName, SUN_LABEL, TOXIC_LABEL, WATER_LA
 import type { ItemStatus, PlacedItem, Plant } from '../model/types';
 import { selectItems, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
-import { PlantChip } from './PlantChip';
+import { PlantIcon } from './PlantIcon';
 import { labels, t } from '../i18n';
 
 export const STATUS_LABEL: Record<ItemStatus, string> = labels({
@@ -260,7 +260,7 @@ function CoordField({ label, v, on }: { label: string; v: number; on: (v: number
 function PlantSummary({ p, count }: { p: Plant; count: number }) {
   return (
     <div className="psum">
-      <PlantChip p={p} size={44} />
+      <PlantIcon p={p} size={52} />
       <div>
         <b>{plantName(p)}</b>
         {count > 1 && <span className="mono muted"> · {t(`${count} tő`, `${count} plants`)}</span>}

@@ -4,7 +4,7 @@ import { areaSunLevel } from '../engine/rules';
 import { matchesQuery } from '../model/plantFilter';
 import { plantName, SUN_LABEL } from '../model/plants';
 import type { Area, Plant } from '../model/types';
-import { PlantChip } from './PlantChip';
+import { PlantIcon } from './PlantIcon';
 import { t } from '../i18n';
 
 /** Why a plant does not suit the area (empty = fits). */
@@ -39,6 +39,7 @@ export function PlantMultiPicker({
   onChange,
   label,
   max = 8,
+  weights = true,
 }: {
   area: Area;
   options: PickOption[];
@@ -46,6 +47,8 @@ export function PlantMultiPicker({
   onChange: (parts: MixPart[]) => void;
   label: string;
   max?: number;
+  /** Show the share ("arány") field for each picked plant. */
+  weights?: boolean;
 }) {
   const [q, setQ] = useState('');
   const byCode = new Map(options.map((o) => [o.p.code, o.p]));
@@ -70,9 +73,9 @@ export function PlantMultiPicker({
             if (!p) return null;
             return (
               <li key={x.code} className="picked-item">
-                <PlantChip p={p} size={26} />
+                <PlantIcon p={p} size={32} />
                 <span className="picked-name">{plantName(p)}</span>
-                {picked.length > 1 && (
+                {weights && picked.length > 1 && (
                   <label className="picked-weight">
                     <span className="mono muted">{t('arány', 'share')}</span>
                     <input
@@ -98,7 +101,7 @@ export function PlantMultiPicker({
         {list.map(({ p, tag, bad }) => (
           <li key={p.code}>
             <button type="button" role="option" aria-selected={isPicked(p.code)} className={`plant-row${isPicked(p.code) ? ' is-picked' : ''}`} onClick={() => toggle(p.code)}>
-              <PlantChip p={p} size={30} />
+              <PlantIcon p={p} size={36} />
               <span className="plant-row-text">
                 <b>
                   {isPicked(p.code) ? '✓ ' : ''}

@@ -2,6 +2,8 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { JUGLONE_LABEL, MONTHS, plantName, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL, FIELD_LABEL } from '../model/plants';
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
 import { usePlantPhoto } from './plantPhoto';
+import { PICTOGRAM_CODES } from './pictograms';
+import { PlantIcon } from './PlantIcon';
 import { getLang, t, type Lang } from '../i18n';
 
 interface Props {
@@ -214,6 +216,8 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
 
       <PhotoField p={p} set={set} />
 
+      <PictogramField p={p} set={set} others={others} />
+
       <fieldset className="field-group">
         <legend>{t('Adatok ellenőrzése', 'Data check')}</legend>
         <label className="field">
@@ -415,6 +419,37 @@ function PhotoField({ p, set }: { p: Plant; set: <K extends keyof Plant>(k: K, v
         </label>
       )}
       {err && <p className="form-error">{err}</p>}
+    </fieldset>
+  );
+}
+
+/** Pictogram of the plant: built-in species have their own; an own plant can borrow a similar one. */
+function PictogramField({ p, set, others }: { p: Plant; set: <K extends keyof Plant>(k: K, v: Plant[K]) => void; others: Plant[] }) {
+  const own = PICTOGRAM_CODES.includes(p.code);
+  const names = new Map(others.map((o) => [o.code, plantName(o)]));
+  return (
+    <fieldset className="field-group">
+      <legend>{t('Piktogram', 'Pictogram')}</legend>
+      <div className="picto-field">
+        <PlantIcon p={p} size={64} />
+        <label className="field">
+          <span className="lbl">{own && !p.pictogram ? t('Saját piktogram (a kód szerint)', 'Own pictogram (by its code)') : t('Ezt a piktogramot használja', 'Uses this pictogram')}</span>
+          <select value={p.pictogram ?? (own ? p.code : '')} onChange={(e) => set('pictogram', e.target.value && e.target.value !== p.code ? e.target.value : undefined)}>
+            {!own && <option value="">{t('— nincs: színes jel —', '— none: coloured symbol —')}</option>}
+            {PICTOGRAM_CODES.map((c) => (
+              <option key={c} value={c}>
+                {c} – {names.get(c) ?? c}
+              </option>
+            ))}
+          </select>
+        </label>
+      </div>
+      <p className="mono muted">
+        {t(
+          'A növényválasztóban az oldalnézet, koncepcióterv-módban a rajzon a felülnézet látszik. Saját növényhez egy hasonló faj piktogramja választható.',
+          'Pickers show the side view; in concept plan mode the plan shows the top view. An own plant can use the pictogram of a similar species.',
+        )}
+      </p>
     </fieldset>
   );
 }

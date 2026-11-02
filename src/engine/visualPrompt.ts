@@ -256,6 +256,16 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
       ? `Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.`
       : `Coordinates: the top-left corner of the attached plan is (0, 0); x runs across the width (left to right), y along the length (top to bottom), in metres.`,
   );
+  if (area.shape.kind === 'ellipse')
+    L.push(
+      area.widthCm === area.lengthCm
+        ? hu
+          ? `Az ágyás kör alakú, ${fmt(area.widthCm)} m átmérőjű, a (${fmt(area.widthCm / 2)}; ${fmt(area.lengthCm / 2)}) m középponttal.`
+          : `The bed is round, ${fmt(area.widthCm)} m across, centred at (${fmt(area.widthCm / 2)}, ${fmt(area.lengthCm / 2)}) m.`
+        : hu
+          ? `Az ágyás ellipszis alakú (${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m), a (${fmt(area.widthCm / 2)}; ${fmt(area.lengthCm / 2)}) m középponttal.`
+          : `The bed is oval (${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m), centred at (${fmt(area.widthCm / 2)}, ${fmt(area.lengthCm / 2)}) m.`,
+    );
   if (area.shape.kind === 'polygon')
     L.push(hu ? `Az ágyás alakja (sarokpontok, m): ${pts.map(([x, y]) => `(${fmt(x)}; ${fmt(y)})`).join(', ')}.` : `Bed outline (corners, m): ${pts.map(([x, y]) => `(${fmt(x)}, ${fmt(y)})`).join(', ')}.`);
   for (const f of fixtureLines(area, opt.lang)) L.push(`- ${f}`);

@@ -5,9 +5,9 @@ import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { downloadText } from './download';
-import { PlantChip } from './PlantChip';
 import { PlantForm } from './PlantForm';
 import { PlantFilterForm } from './PlantFilterForm';
+import { PlantIcon } from './PlantIcon';
 import { t } from '../i18n';
 
 /** Plant database: search, filters, add / edit / delete, JSON & CSV import/export. */
@@ -80,7 +80,7 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
         {list.map((p) => (
           <li key={p.code}>
             <button type="button" className="plant-row" onClick={() => (onPick ? onPick(p.code) : setEditing({ plant: p, isNew: false }))}>
-              <PlantChip p={p} size={36} />
+              <PlantIcon p={p} size={44} />
               <span className="plant-row-text">
                 <b>{plantName(p)}</b>
                 <i>{p.nameLat}</i>
