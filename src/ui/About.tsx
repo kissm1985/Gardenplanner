@@ -3,6 +3,8 @@ import { LogoMark } from './Logo';
 
 export const AUTHOR = 'Kiss-Mihály István';
 export const COPYRIGHT_YEAR = 2026;
+/** Contact for questions about the app and data handling (also in the privacy notice). */
+export const CONTACT_EMAIL = 'istvan.kissm@gmail.com';
 
 /** One-line author and rights notice (start screen, project window, printouts). */
 export function copyrightLine() {
@@ -23,6 +25,8 @@ export function About({ onLegal }: { onLegal?: () => void }) {
       </div>
       <p>
         {t('Készítette:', 'Created by')} <b>{AUTHOR}</b>
+        <br />
+        {t('Kapcsolat:', 'Contact:')} <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
       </p>
       <p className="mono muted about-version">
         {t('Verzió', 'Version')} {__APP_VERSION__} · {t('build', 'build')} {new Date(__BUILD_TIME__).toLocaleString(locale(), { dateStyle: 'short', timeStyle: 'short' })}

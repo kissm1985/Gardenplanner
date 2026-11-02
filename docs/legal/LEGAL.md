@@ -18,7 +18,7 @@ Planterra · Created by Kiss-Mihály István · © 2026 Kiss-Mihály István. Al
 
 **In short: Planterra collects no personal data about you, and has no server that stores your plans.**
 
-- **Who is responsible?** The app is made and run by Kiss-Mihály István (the author). The author has no access to your plans and does not process them.
+- **Who is responsible?** The app is made and run by Kiss-Mihály István (the author), e-mail: [istvan.kissm@gmail.com](mailto:istvan.kissm@gmail.com). The author has no access to your plans and does not process them.
 - **What is stored, and where?** Your plans, settings, uploaded photos and visualisations stay only on your own device, in the browser’s storage (IndexedDB, localStorage). They leave it only when you save them to a file or share them. Uploaded photos are resized and re-encoded, so their location (GPS) and device data are removed. The location setting is only the name of a town; the app never asks for your position.
 - **Hosting and server logs.** The app’s files are served by a web host. Like any website, the host may keep technical logs of the download (IP address, time, browser) to run the service and prevent abuse (legitimate interest, GDPR Art. 6(1)(f)). The author does not access or use them. The host’s name and the log retention period will be listed here before the public launch.
 - **Shared link.** The read-only link carries the chosen variants (area names, plants, notes) compressed at the end of the link; the notes can be left out. Background images, visualisations and own plant photos are never included. Its content is not stored on a server, but it stays in chats and browser history and can be forwarded anywhere, so keep out addresses or names you would not pass on.
@@ -28,7 +28,7 @@ Planterra · Created by Kiss-Mihály István · © 2026 Kiss-Mihály István. Al
 - **Cookies, analytics, ads.** None. The app uses browser storage only to work, so no consent is needed for it.
 - **Your rights.** As the author holds no data about you, you exercise access, correction, erasure and portability directly: your data is on your device, can be saved to JSON and deleted. For data handled by outside services (host, Wikimedia, OpenAI) their own notices apply. You can lodge a complaint with the Hungarian data protection authority (NAIH, 1055 Budapest, Falk Miksa utca 9–11, [naih.hu](https://naih.hu), ugyfelszolgalat@naih.hu) or the authority of your country.
 - **Deletion.** Clearing the browser’s data, or the “Start over” button after an error, removes everything from the device. On a shared device this is recommended after use.
-- **Contact.** Questions about data handling can be addressed to the author, Kiss-Mihály István.
+- **Contact.** Questions about data handling or the app can be addressed to the author, Kiss-Mihály István: [istvan.kissm@gmail.com](mailto:istvan.kissm@gmail.com).
 
 ## Data sources
 

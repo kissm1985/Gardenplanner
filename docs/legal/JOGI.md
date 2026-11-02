@@ -18,7 +18,7 @@ Planterra · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István.
 
 **Röviden: a Planterra nem gyűjt rólad személyes adatot, és nincs szervere, amely a terveidet tárolná.**
 
-- **Ki a felelős?** Az alkalmazás készítője és üzemeltetője Kiss-Mihály István (a továbbiakban: készítő). A készítő a terveidhez nem fér hozzá, azokat nem kezeli.
+- **Ki a felelős?** Az alkalmazás készítője és üzemeltetője Kiss-Mihály István (a továbbiakban: készítő), e-mail: [istvan.kissm@gmail.com](mailto:istvan.kissm@gmail.com). A készítő a terveidhez nem fér hozzá, azokat nem kezeli.
 - **Mit tárol, és hol?** A terveid, beállításaid, a feltöltött fotók és látványképek kizárólag a saját készülékeden, a böngésző tárhelyén (IndexedDB, localStorage) maradnak. Innen akkor kerülnek ki, ha te mented ki őket fájlba, vagy te osztod meg őket. A feltöltött fotókat az alkalmazás átméretezi és újrakódolja, ezért a bennük lévő helyadatok (GPS) és készülékadatok törlődnek. A helyszín beállítása csak egy település neve; az alkalmazás nem kéri le a tartózkodási helyedet.
 - **Tárhely és szervernaplók.** Az alkalmazás fájljait egy webtárhely szolgálja ki. A tárhelyszolgáltató – mint minden weboldalnál – a letöltéskor technikai naplót készíthet (IP-cím, időpont, böngésző), az üzemeltetés és a visszaélések elleni védelem érdekében (jogos érdek, GDPR 6. cikk (1) f)). Ezekhez a készítő nem fér hozzá, és nem használja őket. A tárhelyszolgáltató neve és a naplók megőrzési ideje a nyilvános indulásig itt kerül feltüntetésre.
 - **Megosztott link.** A „csak olvasható link” a választott változatokat (területnevek, növények, jegyzetek) a link végén, tömörítve tartalmazza; a jegyzetek kihagyhatók. Háttérkép, látványkép és saját növényfotó nem kerül bele. A link tartalma nem kerül szerverre, de a csevegőkben és a böngészőelőzményekben megmarad, és bárhová továbbítható, ezért ne tegyél bele címet vagy nevet, amit nem szeretnél továbbadni.
@@ -28,7 +28,7 @@ Planterra · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István.
 - **Sütik, analitika, hirdetés.** Nincsenek. A böngésző tárhelyét az alkalmazás csak a működéséhez használja, ezért ehhez nem kell hozzájárulás.
 - **Jogaid.** Mivel a készítő rólad nem kezel adatot, a hozzáférés, helyesbítés, törlés és hordozhatóság jogát közvetlenül gyakorolhatod: az adataid a készülékeden vannak, JSON-ba menthetők és törölhetők. A külső szolgáltatóknál (tárhely, Wikimedia, OpenAI) kezelt adatokkal kapcsolatban az ő tájékoztatójuk az irányadó. Panaszt a Nemzeti Adatvédelmi és Információszabadság Hatóságnál tehetsz (NAIH, 1055 Budapest, Falk Miksa utca 9–11., [naih.hu](https://naih.hu), ugyfelszolgalat@naih.hu).
 - **Törlés.** A böngésző adatainak törlésével, vagy hiba esetén a „Tiszta lap” gombbal minden adat eltűnik a készülékről. Közös használatú eszközön ez ajánlott a használat után.
-- **Kapcsolat.** Az adatkezeléssel kapcsolatos kérdéseiddel a készítőhöz, Kiss-Mihály Istvánhoz fordulhatsz.
+- **Kapcsolat.** Az adatkezeléssel és az alkalmazással kapcsolatos kérdéseiddel a készítőhöz, Kiss-Mihály Istvánhoz fordulhatsz: [istvan.kissm@gmail.com](mailto:istvan.kissm@gmail.com).
 
 ## Adatforrások
 

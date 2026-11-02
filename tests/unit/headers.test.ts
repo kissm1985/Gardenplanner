@@ -15,3 +15,10 @@ describe('security headers', () => {
     expect(CSP).toContain("script-src 'self'");
   });
 });
+
+describe('contact in the legal texts', () => {
+  it('the privacy notices and About give the same e-mail address', async () => {
+    const { CONTACT_EMAIL } = await import('../../src/ui/About');
+    for (const f of ['docs/legal/JOGI.md', 'docs/legal/LEGAL.md']) expect(readFileSync(f, 'utf8')).toContain(`mailto:${CONTACT_EMAIL}`);
+  });
+});
