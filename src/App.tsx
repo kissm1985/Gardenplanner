@@ -198,7 +198,17 @@ export function App({ loading }: { loading: boolean }) {
   }, [tool0]);
 
   if (loading) return <div className="splash">{t('Betöltés…', 'Loading…')}</div>;
-  if (!project || home) return <Welcome />;
+  if (!project || home)
+    return (
+      <>
+        <Welcome onHelp={() => openHelp()} />
+        <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
+          <Lazy when={sheet === 'help'}>
+            <HelpPanel section={helpAt} />
+          </Lazy>
+        </Sheet>
+      </>
+    );
 
   const ui = useUi.getState();
   const go = (f: () => void) => () => {

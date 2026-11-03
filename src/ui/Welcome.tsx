@@ -17,7 +17,7 @@ const plants = (n: number) => t(`${n} tő`, `${n} plants`);
  * Start page, on every launch and from the logo: a new area first, then the areas already planned,
  * then the ready-made templates.
  */
-export function Welcome() {
+export function Welcome({ onHelp }: { onHelp: () => void }) {
   const project = useProject((s) => s.project);
   const [picked, setPicked] = useState<string[]>(AREA_TEMPLATES.map((tp) => tp.key));
   const [legalOpen, setLegalOpen] = useState(false);
@@ -41,6 +41,9 @@ export function Welcome() {
       <div className="welcome-top">
         <span />
         <span className="welcome-switches">
+          <button type="button" className="btn btn-small welcome-help" onClick={onHelp} aria-label={t('Súgó: felhasználói útmutató', 'Help: user guide')}>
+            ?
+          </button>
           <button type="button" className="btn btn-small" onClick={toggleTheme} aria-label={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}>
             {dark ? '☀' : '☾'}
           </button>

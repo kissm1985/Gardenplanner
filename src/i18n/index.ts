@@ -1,5 +1,5 @@
 // Two languages, Hungarian and English. Texts sit side by side at the call site: t('Bezárás', 'Close').
-// The language is chosen per device (localStorage), by default from the browser; switching it
+// The language is chosen per device (localStorage); English until the user picks Hungarian. Switching it
 // re-mounts the app, so engines that build texts (rules, lists, exports) just read the current one.
 import { useSyncExternalStore } from 'react';
 
@@ -13,8 +13,7 @@ function detect(): Lang {
   } catch {
     /* private mode */
   }
-  const nav = typeof navigator !== 'undefined' ? (navigator.languages?.[0] ?? navigator.language ?? 'hu') : 'hu';
-  return nav.toLowerCase().startsWith('hu') ? 'hu' : 'en';
+  return 'en';
 }
 
 let current: Lang = detect();

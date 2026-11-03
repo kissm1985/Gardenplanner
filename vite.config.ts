@@ -68,10 +68,10 @@ export default defineConfig({
       registerType: 'autoUpdate',
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
-        name: 'Planterra – kerttervező',
+        name: 'Planterra – garden planner',
         short_name: 'Planterra',
-        description: 'Planterra – kerttervező szoftver: terület, növények, lista, évszakok, látványterv.',
-        lang: 'hu',
+        description: 'Planterra – garden design software: areas, plants, lists, seasons, visualisation.',
+        lang: 'en',
         start_url: './',
         scope: './',
         display: 'standalone',

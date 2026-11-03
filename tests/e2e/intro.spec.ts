@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 
-test.use({ storageState: { cookies: [], origins: [] } });
+// A fresh device, only with Hungarian chosen (the default is English).
+test.use({ storageState: { cookies: [], origins: [{ origin: 'http://localhost:4173', localStorage: [{ name: 'kerttervezo.lang', value: 'hu' }] }] } });
 
 test('first start shows the 3-step intro once', async ({ page }) => {
   await page.goto('/');

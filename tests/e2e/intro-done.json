@@ -4,8 +4,18 @@
     {
       "origin": "http://localhost:4173",
       "localStorage": [
-        { "name": "kerttervezo:intro-done", "value": "1" },
-        { "name": "kerttervezo:backup-snooze", "value": "9999999999999" }
+        {
+          "name": "kerttervezo:intro-done",
+          "value": "1"
+        },
+        {
+          "name": "kerttervezo:backup-snooze",
+          "value": "9999999999999"
+        },
+        {
+          "name": "kerttervezo.lang",
+          "value": "hu"
+        }
       ]
     }
   ]

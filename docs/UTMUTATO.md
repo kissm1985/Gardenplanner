@@ -47,7 +47,7 @@ Az alkalmazás minden indításkor a **kezdőoldallal** nyílik, és a felső s�
 
    Első indításkor kipipálhatod őket, és a **Kezdés a kiválasztott sablonokkal** gombbal indulsz; később egy koppintással új területként adod hozzá.
 
-A kezdőoldal jobb felső sarkában átválthatsz angol nyelvre és sötét módra; később a felső sáv **EN / HU** és **☾ / ☀** gombjával. Nyelvváltáskor az alkalmazás által adott nevek is átfordulnak (pl. *Kerítés → Fence*, *Házoldali sáv → House-side strip*, *A terv → Plan A*); a saját magad által adott nevek változatlanok. Az alkalmazás alapból a böngésző nyelvét követi.
+A kezdőoldal jobb felső sarkában a **?** gombbal megnyithatod ezt az útmutatót, és átválthatsz angol nyelvre és sötét módra; később a felső sáv **EN / HU** és **☾ / ☀** gombjával. Nyelvváltáskor az alkalmazás által adott nevek is átfordulnak (pl. *Kerítés → Fence*, *Házoldali sáv → House-side strip*, *A terv → Plan A*); a saját magad által adott nevek változatlanok. Az alkalmazás alapból angolul indul; a választott nyelvet a készülék megjegyzi.
 
 Első alkalommal egy rövid, háromlépéses bevezető mutatja meg a legfontosabb gombokat. Később a **⋯ → Bevezető újra** gombbal újra megnézheted.
 

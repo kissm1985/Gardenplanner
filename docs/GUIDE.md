@@ -47,7 +47,7 @@ The app opens with the **start page** every time, and the **Planterra logo** at 
 
    On the first start tick them and use **Start with the chosen templates**; later one tap adds a template as a new area.
 
-At the top right of the start page you can switch to Hungarian and to dark mode; later with the **EN / HU** and **☾ / ☀** buttons in the top bar. When you switch language, the names the app gave also switch (e.g. *Kerítés → Fence*, *Házoldali sáv → House-side strip*, *A terv → Plan A*); names you typed yourself stay as they are. By default the app follows the browser language.
+At the top right of the start page the **?** button opens this guide, and you can switch to Hungarian and to dark mode; later with the **EN / HU** and **☾ / ☀** buttons in the top bar. When you switch language, the names the app gave also switch (e.g. *Kerítés → Fence*, *Házoldali sáv → House-side strip*, *A terv → Plan A*); names you typed yourself stay as they are. The app starts in English by default; the device remembers the language you choose.
 
 The first time, a short three-step introduction shows the most important buttons. You can see it again with **⋯ → Show the intro again**.
 
