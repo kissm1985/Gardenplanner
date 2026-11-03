@@ -68,8 +68,8 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         <b>{t('+ Új terület létrehozása', '+ Create a new area')}</b>
         <small>
           {t(
-            'Üres területtel kezdesz: megadod a nevét, méretét, fekvését és napsütését; téglalap vagy a rajzon körberajzolt szabad alak.',
-            'Start with an empty area: give its name, size, facing and sun; a rectangle or a free shape drawn on the plan.',
+            'Üres területtel kezdesz: megadod a nevét, méretét, fekvését és napsütését; téglalap, kör vagy a rajzon körberajzolt szabad alak.',
+            'Start with an empty area: give its name, size, facing and sun; a rectangle, a circle or a free shape drawn on the plan.',
           )}
         </small>
       </button>
