@@ -26,7 +26,14 @@ A Cloudflare az új projekteket Workerként hozza létre; a cím `https://plante
 
 Ha már létezik egy üres `planterra` Worker, nyisd meg, és a **Settings → Build** alatt kösd össze a tárolóval ugyanezekkel a beállításokkal.
 
-**B) A saját gépedről:** `npm run build`, majd `npx wrangler login` (egyszer) és `npx wrangler deploy`.
+**B) A saját gépedről, GitHub nélkül:** a projekt mappájában (Windowson cmd-ben is):
+
+```bat
+npx --yes wrangler@4 login
+npm run deploy:test
+```
+
+A `login` csak először kell: megnyílik a böngésző, ott engedélyezd a hozzáférést. A `deploy:test` buildel és feltölt a `planterra` Workerre. Új verziónál csak a `npm run deploy:test` kell.
 
 **Előnézeti címek:** a projekt **Settings → Domains & Routes** részében kapcsold ki a **Preview URLs** lehetőséget, hogy csak a védett fő cím legyen elérhető.
 
