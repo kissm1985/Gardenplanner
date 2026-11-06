@@ -1,4 +1,9 @@
 import '@fontsource-variable/outfit';
+import { band, installErrorReporting, track } from './engine/analytics';
+import { getLang } from './i18n';
+import { getTier } from './model/tier';
+
+installErrorReporting(__APP_VERSION__);
 import '@fontsource-variable/fraunces';
 import '@fontsource/jetbrains-mono/400.css';
 import '@fontsource/jetbrains-mono/500.css';
@@ -6,13 +11,15 @@ import './styles/tokens.css';
 import './styles/app.css';
 import './styles/print.css';
 
-import { StrictMode, useEffect, useState } from 'react';
+import { lazy, StrictMode, Suspense, useEffect, useState } from 'react';
+
+// Shared links open a read-only view; its code (and the decompression) loads only then.
+const ReadOnlyView = lazy(() => import('./ui/ReadOnlyView').then((m) => ({ default: m.ReadOnlyView })));
 import { createRoot } from 'react-dom/client';
 import { registerSW } from 'virtual:pwa-register';
 import { App } from './App';
 import { useLang } from './i18n';
 import { SHARE_PREFIX } from './engine/io';
-import { ReadOnlyView } from './ui/ReadOnlyView';
 import { autosave, loadProject, setCurrentProjectId, StoredProjectError } from './store/persist';
 import { useProjects } from './store/projects';
 import { ErrorBoundary, RecoveryScreen } from './ui/Recovery';
@@ -40,6 +47,7 @@ function Root() {
       .then((p) => {
         if (cancelled || p === undefined) return;
         useProject.getState().setLoaded(p);
+        track('app_start', { lang: getLang(), tier: getTier(), projects: band(p ? 1 : 0) });
         void useProjects.getState().refresh();
         // Reopen the area that was open last time.
         const last = readLastArea();
@@ -95,7 +103,11 @@ function writeLastArea(id: string | null) {
 
 function ReadOnlyRoot({ code }: { code: string }) {
   const lang = useLang();
-  return <ReadOnlyView key={lang} code={code} />;
+  return (
+    <Suspense fallback={null}>
+      <ReadOnlyView key={lang} code={code} />
+    </Suspense>
+  );
 }
 
 // Look for a new version on start, whenever the app comes back to the foreground and every half hour;

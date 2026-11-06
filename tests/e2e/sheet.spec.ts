@@ -9,6 +9,7 @@ test('long sheets fit the visible screen: the × stays visible, the body scrolls
   await menuItem(page, /Projekt: mentés/);
   const dlg = page.locator('dialog[open]');
   const close = dlg.locator('.sheet-head button[aria-label="Bezárás"]');
+  await expect(dlg.getByRole('button', { name: 'Bevezető újra' })).toBeAttached();
   const box = (await close.boundingBox())!;
   expect(box.y).toBeGreaterThanOrEqual(0);
   expect(box.y + box.height).toBeLessThanOrEqual(560);

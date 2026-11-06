@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { track } from '../engine/analytics';
 import { bomFromEntries } from '../engine/bom';
 import { SEASON_LABEL, SEASON_MONTH, type Season } from '../engine/season';
 import { buildVisualPrompt, type Lang, type PromptOptions, type TimeOfDay, type Viewpoint, type VizStyle, type Weather } from '../engine/visualPrompt';
@@ -101,6 +102,7 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
   };
 
   const send = async () => {
+    track('visual_sent');
     const s = brief();
     const blob = png ?? (await vizPng(project, area, v, opt.season));
     const file = new File([blob], fileName, { type: 'image/png' });

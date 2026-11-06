@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from 'react';
+import { track } from '../engine/analytics';
 import { centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
 import { effectivePlant, plantMap } from '../model/plants';
 import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, MOVE_WHEN_SELECTED, newFixture } from '../model/fixtures';
@@ -46,7 +47,8 @@ type Gesture =
 
 const DOUBLE_TAP_MS = 300;
 const TAP_SLOP_PX = 8;
-export const SNAP_CM = 10;
+import { SNAP_CM } from './constants';
+export { SNAP_CM };
 
 /** Spread (cm, in 5 cm steps) whose drawn radius is r — the inverse of plantRadius. */
 const spreadFromRadius = (r: number, mature: boolean) => Math.min(5000, Math.max(5, Math.round((mature ? r * 2 : r / 0.2) / 5) * 5));
@@ -109,6 +111,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
   const snapPt = ([x, y]: Pt): Pt => (useUi.getState().snap ? [snap(x, SNAP_CM), snap(y, SNAP_CM)] : [x, y]);
 
   const place = (plantId: string, w: Pt) => {
+    if (!items.length) track('plant_placed', { tool: 'plant' });
     const [x, y] = snapPt(w);
     const id = useProject.getState().placePlant(plantId, x, y);
     if (id) useUi.getState().select([id]);

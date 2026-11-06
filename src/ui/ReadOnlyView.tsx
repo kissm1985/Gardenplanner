@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StaticPlan } from '../canvas/StaticPlan';
 import { buildBom, chosenItems, fmtFt, fmtInt } from '../engine/bom';
-import { decodeShare } from '../engine/io';
+import { decodeShare } from '../engine/share';
 import { SEASON_LABEL, SEASON_MONTH, type Season } from '../engine/season';
 import { ORIENTATION_LABEL, type Project } from '../model/types';
 import { saveAsNew, setCurrentProjectId } from '../store/persist';

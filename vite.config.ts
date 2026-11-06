@@ -9,13 +9,16 @@ import type { Plugin } from 'vite';
  * Code, styles and fonts only from the app itself; data only from Wikipedia / Wikimedia (plant photos);
  * images may also be any https link the user typed for an own photo.
  */
+/** Servers set at build time: the statistics endpoint (VITE_ANALYTICS_URL) and the Pro backend (VITE_API_ORIGIN). */
+const EXTRA_CONNECT = [process.env.VITE_ANALYTICS_URL, process.env.VITE_API_ORIGIN].filter((u): u is string => !!u).map((u) => new URL(u).origin);
+
 export const CSP = [
   "default-src 'self'",
   "script-src 'self'",
   "style-src 'self' 'unsafe-inline'",
   "img-src 'self' data: blob: https:",
   "font-src 'self' data:",
-  "connect-src 'self' https://*.wikipedia.org https://commons.wikimedia.org https://upload.wikimedia.org",
+  `connect-src 'self' https://*.wikipedia.org https://commons.wikimedia.org https://upload.wikimedia.org${EXTRA_CONNECT.map((o) => ` ${o}`).join('')}`,
   "worker-src 'self'",
   "manifest-src 'self'",
   "object-src 'none'",
@@ -59,8 +62,9 @@ export default defineConfig({
   server: { host: true },
   // The preview server sends the same headers as production, so the e2e tests run under them.
   preview: { host: true, headers: Object.fromEntries(SECURITY_HEADERS) },
-  // Older iPhones (iOS 15) still run the build.
-  build: { target: ['es2020', 'safari15'] },
+  // Older iPhones (iOS 15) still run the build. Pictograms stay separate files (cached by the service worker)
+  // instead of being inlined into the JavaScript as base64.
+  build: { target: ['es2020', 'safari15'], assetsInlineLimit: (file: string) => (file.includes('/pictograms/') ? false : undefined) },
   plugins: [
     react(),
     csp(),

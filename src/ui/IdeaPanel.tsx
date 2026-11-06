@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { track } from '../engine/analytics';
 import { requireFeature } from './Locked';
 import { hasFeature, useFeature } from '../model/tier';
 import { DEFAULT_KINDS, generateIdea, KIND_LABEL, PALETTES, poolsFor, type Idea, type PaletteKey, type PlantKind } from '../engine/generator';
@@ -81,6 +82,7 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
   const set = (patch: Partial<typeof cfg>) => ui.setZoneConfig({ ...cfg, ...patch });
 
   const run = (points: [number, number][], drop: string[] = []) => {
+    track('idea_generated', { mode: 'zone' });
     if (!area) return;
     const items = activeVariant(area).items.filter((it) => !drop.includes(it.id));
     const res = fillZone({
@@ -227,6 +229,7 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
   const variantAlive = idea && area.variants.some((v) => v.id === idea.variantId);
 
   const run = (again: boolean) => {
+    track('idea_generated', { mode: 'area' });
     const st = useProject.getState();
     const next = generateIdea(area, project.plantDb, project.settings, { palette: palette || undefined, kinds, mixed, extraGapCm: gap, prefer: prefer.map((x) => x.code) });
     const notes = next.notes.join(' ');

@@ -1,25 +1,17 @@
 import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { flushSync } from 'react-dom';
-import { PlanCanvas, SNAP_CM } from './canvas/PlanCanvas';
+import { SNAP_CM } from './canvas/constants';
 import { evaluate, partition } from './engine/rules';
 import { ORIENTATION_LABEL } from './model/types';
 import { activeVariant, selectCurrentArea, selectItems, useProject } from './store/projectStore';
 import { useUi, type Layers, type Tool } from './store/uiStore';
-import { AreasPanel } from './ui/AreasPanel';
-import { FIXTURE_LABEL, FixturesPanel } from './ui/FixturesPanel';
+import { FIXTURE_LABEL } from './model/fixtures';
 import { PlantFilterForm } from './ui/PlantFilterForm';
-import { PlantPalette } from './ui/PlantPalette';
 import { Coach, introDone } from './ui/Coach';
-import { ShapeEditBar } from './ui/ShapeEditBar';
-import { PrintView } from './ui/PrintView';
-import { ProjectPanel, type Orientation } from './ui/ProjectPanel';
-import { FourSeasons, SeasonPanel } from './ui/SeasonPanel';
-import { ItemProps, SelectionBar } from './ui/Selection';
+import type { Orientation } from './ui/ProjectPanel';
 import { Sheet } from './ui/Sheet';
-import { VariantsPanel } from './ui/VariantsPanel';
 import { helpId, type HelpKey } from './ui/helpSections';
 import { getLang, setLang, t, type Lang } from './i18n';
-import { FixtureTools } from './ui/FixtureTools';
 import { WarningsPanel } from './ui/WarningsPanel';
 import { LogoMark } from './ui/Logo';
 import { backupNow, lastBackupAt, requestPersistence } from './ui/backup';
@@ -48,6 +40,24 @@ const IdeaPanel = lazy(() => import('./ui/IdeaPanel').then((m) => ({ default: m.
 const ReplacePanel = lazy(() => import('./ui/ReplacePanel').then((m) => ({ default: m.ReplacePanel })));
 const HelpPanel = lazy(() => import('./ui/HelpPanel').then((m) => ({ default: m.HelpPanel })));
 const VisualPanel = lazy(() => import('./ui/VisualPanel').then((m) => ({ default: m.VisualPanel })));
+// The plan editor loads after the start page (and is fetched in the background while it shows).
+const PlanCanvas = lazy(() => import('./canvas/PlanCanvas').then((m) => ({ default: m.PlanCanvas })));
+const PlantPalette = lazy(() => import('./ui/PlantPalette').then((m) => ({ default: m.PlantPalette })));
+const ShapeEditBar = lazy(() => import('./ui/ShapeEditBar').then((m) => ({ default: m.ShapeEditBar })));
+const FourSeasons = lazy(() => import('./ui/SeasonPanel').then((m) => ({ default: m.FourSeasons })));
+const SeasonPanel = lazy(() => import('./ui/SeasonPanel').then((m) => ({ default: m.SeasonPanel })));
+const ItemProps = lazy(() => import('./ui/Selection').then((m) => ({ default: m.ItemProps })));
+const SelectionBar = lazy(() => import('./ui/Selection').then((m) => ({ default: m.SelectionBar })));
+const FixtureTools = lazy(() => import('./ui/FixtureTools').then((m) => ({ default: m.FixtureTools })));
+/** Fetch the editor's code while the start page is open, so opening a plan is instant. */
+export const prefetchEditor = () => Promise.all([import('./canvas/PlanCanvas'), import('./ui/Selection'), import('./ui/PlantPalette'), import('./ui/PrintView')]);
+/** The print view must render synchronously when printing starts, so it is kept as a loaded module. */
+let printMod: typeof import('./ui/PrintView') | null = null;
+const loadPrint = async () => (printMod ??= await import('./ui/PrintView'));
+const AreasPanel = lazy(() => import('./ui/AreasPanel').then((m) => ({ default: m.AreasPanel })));
+const ProjectPanel = lazy(() => import('./ui/ProjectPanel').then((m) => ({ default: m.ProjectPanel })));
+const VariantsPanel = lazy(() => import('./ui/VariantsPanel').then((m) => ({ default: m.VariantsPanel })));
+const FixturesPanel = lazy(() => import('./ui/FixturesPanel').then((m) => ({ default: m.FixturesPanel })));
 const FeedbackPanel = lazy(() => import('./ui/FeedbackPanel').then((m) => ({ default: m.FeedbackPanel })));
 const LegalPanel = lazy(() => import('./ui/LegalPanel').then((m) => ({ default: m.LegalPanel })));
 const Loading = () => <p className="mono muted lazy-loading">{t('Betöltés…', 'Loading…')}</p>;
@@ -145,6 +155,13 @@ export function App({ loading }: { loading: boolean }) {
   const [print, setPrint] = useState<Orientation | null>(null);
   const [coach, setCoach] = useState(() => !introDone());
 
+  // Fetch the editor and the print view in the background once the app is idle.
+  useEffect(() => {
+    const go = () => void prefetchEditor().then(loadPrint);
+    const w = window as Window & { requestIdleCallback?: (f: () => void) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(go);
+    else setTimeout(go, 800);
+  }, []);
   // Ctrl+P / browser print menu also gets the print document (portrait by default).
   // Once requested it stays mounted; it is hidden on screen by the print stylesheet.
   useEffect(() => {
@@ -152,7 +169,8 @@ export function App({ loading }: { loading: boolean }) {
     window.addEventListener('beforeprint', before);
     return () => window.removeEventListener('beforeprint', before);
   }, []);
-  const startPrint = (o: Orientation) => {
+  const startPrint = async (o: Orientation) => {
+    await loadPrint();
     setSheet(null);
     flushSync(() => setPrint(o));
     // Give the dialog close a frame, then open the system print dialog (PDF on phones).
@@ -414,124 +432,128 @@ export function App({ loading }: { loading: boolean }) {
 
       <BackupReminder />
       <main className={`stage${page || tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
-        {page === 'schedule' ? (
-          <Lazy when>
-            <SchedulePage />
-          </Lazy>
-        ) : tool === 'list' ? (
-          <Lazy when>
-            <ListView />
-          </Lazy>
-        ) : compare && area ? (
-          <Lazy when>
-            <CompareView area={area} />
-          </Lazy>
-        ) : fourUp && area ? (
-          <FourSeasons area={area} plantDb={project.plantDb} showMature={project.settings.showMatureSize} />
-        ) : area ? (
-          <>
-            <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
-            <button
-              type="button"
-              className="variant-pill"
-              onClick={() => setSheet('variants')}
-              aria-label={t(`Változat: ${localName(activeVariant(area).name)}. Változatok kezelése`, `Variant: ${localName(activeVariant(area).name)}. Manage variants`)}
-            >
-              {localName(activeVariant(area).name)}
-              {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
-            </button>
-            {shapeEditing && <ShapeEditBar />}
-            {cameraEdit && <CameraBar onDone={() => setSheet('visual')} />}
-            {!cameraEdit && !shapeEditing && (
+        <Suspense fallback={<Loading />}>
+          {page === 'schedule' ? (
+            <Lazy when>
+              <SchedulePage />
+            </Lazy>
+          ) : tool === 'list' ? (
+            <Lazy when>
+              <ListView />
+            </Lazy>
+          ) : compare && area ? (
+            <Lazy when>
+              <CompareView area={area} />
+            </Lazy>
+          ) : fourUp && area ? (
+            <FourSeasons area={area} plantDb={project.plantDb} showMature={project.settings.showMatureSize} />
+          ) : area ? (
+            <>
+              <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
               <button
                 type="button"
-                className="quick-fab"
-                onClick={() => setSheet('quick')}
-                aria-label={t('Gyors műveletek', 'Quick actions')}
-                title={t('Gyors műveletek (Ctrl+K)', 'Quick actions (Ctrl+K)')}
+                className="variant-pill"
+                onClick={() => setSheet('variants')}
+                aria-label={t(`Változat: ${localName(activeVariant(area).name)}. Változatok kezelése`, `Variant: ${localName(activeVariant(area).name)}. Manage variants`)}
               >
-                ⚡
+                {localName(activeVariant(area).name)}
+                {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
               </button>
-            )}
-            {tool === 'select' && !shapeEditing && (
-              <div className="stage-tools" role="toolbar" aria-label={t('Kijelölés módja', 'Selection mode')}>
-                <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
-                  {t('Lasszó', 'Lasso')}
-                </button>
+              {shapeEditing && <ShapeEditBar />}
+              {cameraEdit && <CameraBar onDone={() => setSheet('visual')} />}
+              {!cameraEdit && !shapeEditing && (
                 <button
                   type="button"
-                  className="chip-btn"
-                  aria-pressed={snapOn}
-                  onClick={() => ui.setSnap(!snapOn)}
-                  title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}
+                  className="quick-fab"
+                  onClick={() => setSheet('quick')}
+                  aria-label={t('Gyors műveletek', 'Quick actions')}
+                  title={t('Gyors műveletek (Ctrl+K)', 'Quick actions (Ctrl+K)')}
                 >
-                  {t('Mágnes', 'Snap')}
+                  ⚡
                 </button>
-              </div>
-            )}
-            {tool === 'plant' && (
-              <div className="stage-tools" role="toolbar" aria-label={t('Elhelyezés', 'Placing')}>
-                <button
-                  type="button"
-                  className="chip-btn"
-                  aria-pressed={snapOn}
-                  onClick={() => ui.setSnap(!snapOn)}
-                  title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}
-                >
-                  {t('Mágnes', 'Snap')}
-                </button>
-              </div>
-            )}
-            {tool === 'drift' && (
-              <div className="stage-tools" role="toolbar" aria-label={t('Folt kiosztása', 'Drift layout')}>
-                <button type="button" className="chip-btn" aria-pressed={driftPattern === 'staggered'} onClick={() => ui.setDriftPattern('staggered')}>
-                  {t('Eltolt rács', 'Staggered')}
-                </button>
-                <button type="button" className="chip-btn" aria-pressed={driftPattern === 'grid'} onClick={() => ui.setDriftPattern('grid')}>
-                  {t('Négyzetes', 'Grid')}
-                </button>
-              </div>
-            )}
-            {tool === 'row' && (
-              <div className="stage-tools" role="toolbar" aria-label={t('Sor fajtája', 'Row type')}>
-                <button type="button" className="chip-btn" aria-pressed={rowMode === 'line'} onClick={() => ui.setRowMode('line')}>
-                  {t('Egyenes', 'Straight')}
-                </button>
-                <button type="button" className="chip-btn" aria-pressed={rowMode === 'curve'} onClick={() => ui.setRowMode('curve')}>
-                  {t('Ív', 'Curve')}
-                </button>
-                <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
-                  {t('Mágnes', 'Snap')}
-                </button>
-              </div>
-            )}
-            {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} onReplace={openReplace} />}
-            {(tool === 'select' || tool === 'fixtures') && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
-              <FixtureBar
-                id={selectedFixture}
-                label={(() => {
-                  const f = area.fixtures.find((x) => x.id === selectedFixture);
-                  return f ? localName(f.label) || FIXTURE_LABEL[f.type] : '';
-                })()}
-                onProps={() => setSheet('fixtures')}
-              />
-            )}
-          </>
-        ) : (
-          <div className="empty-stage">
-            <p>{t('Még nincs területed. Hozz létre egyet, és kezdjük a rajzolást.', 'You have no area yet. Create one and start drawing.')}</p>
-            <button type="button" className="btn btn-primary" onClick={() => setSheet('areas')}>
-              {t('Terület hozzáadása', 'Add an area')}
-            </button>
-          </div>
-        )}
+              )}
+              {tool === 'select' && !shapeEditing && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Kijelölés módja', 'Selection mode')}>
+                  <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
+                    {t('Lasszó', 'Lasso')}
+                  </button>
+                  <button
+                    type="button"
+                    className="chip-btn"
+                    aria-pressed={snapOn}
+                    onClick={() => ui.setSnap(!snapOn)}
+                    title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}
+                  >
+                    {t('Mágnes', 'Snap')}
+                  </button>
+                </div>
+              )}
+              {tool === 'plant' && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Elhelyezés', 'Placing')}>
+                  <button
+                    type="button"
+                    className="chip-btn"
+                    aria-pressed={snapOn}
+                    onClick={() => ui.setSnap(!snapOn)}
+                    title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}
+                  >
+                    {t('Mágnes', 'Snap')}
+                  </button>
+                </div>
+              )}
+              {tool === 'drift' && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Folt kiosztása', 'Drift layout')}>
+                  <button type="button" className="chip-btn" aria-pressed={driftPattern === 'staggered'} onClick={() => ui.setDriftPattern('staggered')}>
+                    {t('Eltolt rács', 'Staggered')}
+                  </button>
+                  <button type="button" className="chip-btn" aria-pressed={driftPattern === 'grid'} onClick={() => ui.setDriftPattern('grid')}>
+                    {t('Négyzetes', 'Grid')}
+                  </button>
+                </div>
+              )}
+              {tool === 'row' && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Sor fajtája', 'Row type')}>
+                  <button type="button" className="chip-btn" aria-pressed={rowMode === 'line'} onClick={() => ui.setRowMode('line')}>
+                    {t('Egyenes', 'Straight')}
+                  </button>
+                  <button type="button" className="chip-btn" aria-pressed={rowMode === 'curve'} onClick={() => ui.setRowMode('curve')}>
+                    {t('Ív', 'Curve')}
+                  </button>
+                  <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
+                    {t('Mágnes', 'Snap')}
+                  </button>
+                </div>
+              )}
+              {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} onReplace={openReplace} />}
+              {(tool === 'select' || tool === 'fixtures') && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
+                <FixtureBar
+                  id={selectedFixture}
+                  label={(() => {
+                    const f = area.fixtures.find((x) => x.id === selectedFixture);
+                    return f ? localName(f.label) || FIXTURE_LABEL[f.type] : '';
+                  })()}
+                  onProps={() => setSheet('fixtures')}
+                />
+              )}
+            </>
+          ) : (
+            <div className="empty-stage">
+              <p>{t('Még nincs területed. Hozz létre egyet, és kezdjük a rajzolást.', 'You have no area yet. Create one and start drawing.')}</p>
+              <button type="button" className="btn btn-primary" onClick={() => setSheet('areas')}>
+                {t('Terület hozzáadása', 'Add an area')}
+              </button>
+            </div>
+          )}
+        </Suspense>
       </main>
 
       {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && !page && !compare && (
-        <PlantPalette onOpenDb={() => setSheet('plantdb')} onOpenFilters={() => setSheet('filters')} />
+        <Suspense fallback={null}>
+          <PlantPalette onOpenDb={() => setSheet('plantdb')} onOpenFilters={() => setSheet('filters')} />
+        </Suspense>
       )}
-      {tool === 'fixtures' && area && !page && !compare && !shapeEditing && <FixtureTools onList={() => setSheet('fixtures')} />}
-      {tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}
+      <Suspense fallback={null}>{tool === 'fixtures' && area && !page && !compare && !shapeEditing && <FixtureTools onList={() => setSheet('fixtures')} />}</Suspense>
+      <Suspense fallback={null}>{tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}</Suspense>
 
       <nav className={`toolbar${simple && !moreTools ? ' is-simple' : ''}`} aria-label={t('Eszközök', 'Tools')}>
         {TOOLS.filter((tb) => !simple || moreTools || SIMPLE_TOOLS.has(tb.id)).map((tb) => (
@@ -586,14 +608,16 @@ export function App({ loading }: { loading: boolean }) {
           setSheet(null);
         }}
       >
-        <AreasPanel
-          key={newArea ? 'new' : 'list'}
-          startNew={newArea}
-          onDone={() => {
-            setNewArea(false);
-            setSheet(null);
-          }}
-        />
+        <Lazy when={sheet === 'areas'}>
+          <AreasPanel
+            key={newArea ? 'new' : 'list'}
+            startNew={newArea}
+            onDone={() => {
+              setNewArea(false);
+              setSheet(null);
+            }}
+          />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('db')} title={t('Növényadatbázis', 'Plant database')} onClose={() => setSheet(null)}>
         <Lazy when={sheet === 'plantdb'}>
@@ -601,19 +625,23 @@ export function App({ loading }: { loading: boolean }) {
         </Lazy>
       </Sheet>
       <Sheet open={sheet === 'props'} onHelp={() => openHelp('select')} title={t('Tulajdonságok', 'Properties')} onClose={() => setSheet(null)}>
-        <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
+        <Lazy when={sheet === 'props'}>
+          <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'project'} onHelp={() => openHelp('project')} title={t('Projekt', 'Project')} onClose={() => setSheet(null)}>
-        <ProjectPanel
-          onPrint={startPrint}
-          onIntro={() => {
-            setSheet(null);
-            setCoach(true);
-          }}
-          onDone={() => setSheet(null)}
-          onVisual={() => setSheet('visual')}
-          onLegal={() => setSheet('legal')}
-        />
+        <Lazy when={sheet === 'project'}>
+          <ProjectPanel
+            onPrint={startPrint}
+            onIntro={() => {
+              setSheet(null);
+              setCoach(true);
+            }}
+            onDone={() => setSheet(null)}
+            onVisual={() => setSheet('visual')}
+            onLegal={() => setSheet('legal')}
+          />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'quick'} title={t('Gyors műveletek', 'Quick actions')} onClose={() => setSheet(null)}>
         <QuickPanel actions={quickActions} steps={steps} />
@@ -635,7 +663,7 @@ export function App({ loading }: { loading: boolean }) {
         </Lazy>
       </Sheet>
       {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
-      {print && <PrintView project={project} orientation={print} />}
+      {print && printMod && <printMod.PrintView project={project} orientation={print} />}
       <Sheet open={sheet === 'filters'} onHelp={() => openHelp('db')} title={t('Növényszűrők', 'Plant filters')} onClose={() => setSheet(null)}>
         <div className="form">
           <PlantFilterForm />
@@ -647,7 +675,9 @@ export function App({ loading }: { loading: boolean }) {
         </div>
       </Sheet>
       <Sheet open={sheet === 'variants'} onHelp={() => openHelp('variants')} title={t('Változatok', 'Variants')} onClose={() => setSheet(null)}>
-        <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} onVisual={() => setSheet('visual')} />
+        <Lazy when={sheet === 'variants'}>
+          <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} onVisual={() => setSheet('visual')} />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
         <Lazy when={sheet === 'help'}>
@@ -673,7 +703,9 @@ export function App({ loading }: { loading: boolean }) {
         <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
       </Sheet>
       <Sheet open={sheet === 'fixtures'} onHelp={() => openHelp('fixtures')} title={t('Rögzített elemek', 'Fixed elements')} onClose={() => setSheet(null)}>
-        <FixturesPanel onDone={() => setSheet(null)} />
+        <Lazy when={sheet === 'fixtures'}>
+          <FixturesPanel onDone={() => setSheet(null)} />
+        </Lazy>
       </Sheet>
       <Sheet open={sheet === 'view'} onHelp={() => openHelp('screen')} title={t('Nézet', 'View')} onClose={() => setSheet(null)}>
         <div className="form">

@@ -1,6 +1,5 @@
 import { makeArea, AREA_TEMPLATES } from '../../data/templates';
-import { buildExample, EXAMPLE_PLANS, exampleCodes, scaleArea } from '../../data/examples';
-import { newProject, seedPlants, migrate } from '../projectModel';
+import { newProject, migrate } from '../projectModel';
 import type { Actions, StoreCtx } from '../projectState';
 
 export const projectSlice = ({ set, get, commit, mapArea, insertArea, ensureCurrentArea }: StoreCtx) =>
@@ -22,19 +21,12 @@ export const projectSlice = ({ set, get, commit, mapArea, insertArea, ensureCurr
       return t ? insertArea(t.build()) : null;
     },
 
-    addExampleArea: (key, size) => {
-      const ex = EXAMPLE_PLANS.find((x) => x.key === key);
-      if (!ex) return null;
+    addAreaWithPlants: (area, plants) => {
       if (!get().project) get().createProject([]);
-      const built = buildExample(ex);
-      const area = size ? scaleArea(built, size.widthCm, size.lengthCm) : built;
-      // Species the user deleted from the database come back, so the example's list is complete.
+      // Species the user deleted from the database come back, so the area's list is complete.
       const have = new Set(get().project!.plantDb.map((x) => x.code));
-      const missing = exampleCodes(area).filter((c) => !have.has(c));
-      if (missing.length) {
-        const seeds = seedPlants().filter((x) => missing.includes(x.code));
-        commit((p) => ({ ...p, plantDb: [...p.plantDb, ...seeds] }));
-      }
+      const missing = plants.filter((x) => !have.has(x.code));
+      if (missing.length) commit((p) => ({ ...p, plantDb: [...p.plantDb, ...missing] }));
       return insertArea(area);
     },
 

@@ -1,4 +1,5 @@
-import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
+import { band, track } from '../engine/analytics';
 import { FeatureButton } from './Locked';
 import { bomTable, buildBom, fmtFt, fmtInt, STATUSES, toCsv, toHtmlTable, toText, toTsv } from '../engine/bom';
 import { buildXlsx } from '../engine/xlsx';
@@ -17,6 +18,9 @@ type Scope = 'all' | string;
 
 /** Plant list and shopping (SPEC §4.6). */
 export function ListView() {
+  useEffect(() => {
+    track('list_opened', { plants: band(useProject.getState().project ? buildBom(useProject.getState().project!).planted : 0) });
+  }, []);
   const project = useProject((s) => s.project)!;
   const current = useProject(selectCurrentArea);
   // Default: the plan on screen – the current area's shown variant.
@@ -51,6 +55,7 @@ export function ListView() {
   };
 
   const xlsx = () => {
+    track('export', { format: 'xlsx' });
     const sheets = [{ name: scope === 'all' ? t('Összesen', 'Total') : title, rows: table }];
     if (scope === 'all' && project.areas.length > 1) for (const a of project.areas) sheets.push({ name: localName(a.name), rows: bomTable(buildBom(project, [a.id], status)) });
     downloadBlob(`${fileBase}.xlsx`, buildXlsx(sheets), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
@@ -148,7 +153,13 @@ export function ListView() {
         <button type="button" className="btn btn-small" onClick={() => doCopy(toTsv(table), t('A táblázat', 'The table'), toHtmlTable(table))}>
           {t('Másolás táblázatként (Excel)', 'Copy as table (Excel)')}
         </button>
-        <FeatureButton feature="dataExport" onClick={() => downloadText(`${fileBase}.csv`, toCsv(table), 'text/csv;charset=utf-8')}>
+        <FeatureButton
+          feature="dataExport"
+          onClick={() => {
+            track('export', { format: 'csv' });
+            downloadText(`${fileBase}.csv`, toCsv(table), 'text/csv;charset=utf-8');
+          }}
+        >
           CSV
         </FeatureButton>
         <FeatureButton feature="dataExport" onClick={xlsx}>

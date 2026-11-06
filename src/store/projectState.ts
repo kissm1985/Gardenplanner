@@ -21,7 +21,8 @@ export interface ProjectState {
   addArea: (input: AreaInput) => string;
   addTemplateArea: (templateKey: string) => string | null;
   /** Adds a ready-made example plan as a new area (creating the project if there is none); returns its id. */
-  addExampleArea: (key: string, size?: { widthCm: number; lengthCm: number }) => string | null;
+  /** Add a ready-made area (an example), with the built-in species it needs (creating the project if there is none). */
+  addAreaWithPlants: (area: Area, plants: Plant[]) => string;
   updateArea: (id: string, patch: Partial<Omit<Area, 'id'>>) => void;
   deleteArea: (id: string) => void;
   selectArea: (id: string) => void;

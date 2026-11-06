@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { ConsentBanner } from './ConsentBanner';
 import { roomForArea, roomForProject } from './Locked';
 import { AREA_TEMPLATES } from '../data/templates';
 import { getLang, setLang, t } from '../i18n';
@@ -8,11 +9,13 @@ import { useUi } from '../store/uiStore';
 import { duplicateProject, newProject, openProject, removeProject, renameProject, useProjects } from '../store/projects';
 import type { ProjectMeta } from '../store/persist';
 import { AUTHOR, copyrightLine } from './About';
-import { ExamplePlans } from './ExamplePlans';
-import { ExampleSizeSheet } from './ExampleSize';
+
 import { Logo } from './Logo';
 import { toggleTheme, useTheme } from './theme';
 
+// The example plans (data and thumbnails) load right after the start page.
+const ExamplePlans = lazy(() => import('./ExamplePlans').then((m) => ({ default: m.ExamplePlans })));
+const ExampleSizeSheet = lazy(() => import('./ExampleSize').then((m) => ({ default: m.ExampleSizeSheet })));
 const LegalPanel = lazy(() => import('./LegalPanel').then((m) => ({ default: m.LegalPanel })));
 
 const plants = (n: number) => t(`${n} tő`, `${n} plants`);
@@ -87,6 +90,8 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         )}
       </p>
 
+      <ConsentBanner />
+
       {returning && currentArea && (
         <button type="button" className="tpl home-continue" onClick={() => open(currentArea.id)}>
           <b>
@@ -142,21 +147,24 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
           'Finished, planted plans for inspiration. Tap one: it is added to your project as a new area, and you can change anything.',
         )}
       </p>
-      <ExamplePlans
-        strip={returning && !allExamples}
-        onPick={(key) => {
-          if (project && !roomForArea()) return;
-          setPickExample(key);
-        }}
-      />
-      <ExampleSizeSheet
-        exampleKey={pickExample}
-        onClose={() => setPickExample(null)}
-        onAdd={(key, size) => {
-          const id = st.addExampleArea(key, size);
-          if (id) open(id);
-        }}
-      />
+      <Suspense fallback={<p className="mono muted">{t('Példatervek betöltése…', 'Loading examples…')}</p>}>
+        <ExamplePlans
+          strip={returning && !allExamples}
+          onPick={(key) => {
+            if (project && !roomForArea()) return;
+            setPickExample(key);
+          }}
+        />
+        <ExampleSizeSheet
+          exampleKey={pickExample}
+          onClose={() => setPickExample(null)}
+          onAdd={async (key, size) => {
+            const { addExampleArea } = await import('../store/exampleActions');
+            const id = addExampleArea(key, size);
+            if (id) open(id);
+          }}
+        />
+      </Suspense>
       {returning && (
         <button type="button" className="btn btn-small example-all" onClick={() => setAllExamples((v) => !v)}>
           {allExamples ? t('Kevesebb példa', 'Fewer examples') : t('Összes példa ›', 'All examples ›')}

@@ -7,6 +7,8 @@ import { validateProject } from '../../src/engine/validate';
 import { localName } from '../../src/i18n/names';
 import { DEFAULT_SETTINGS } from '../../src/model/types';
 import { useProject } from '../../src/store/projectStore';
+import { addExampleArea } from '../../src/store/exampleActions';
+import { EXAMPLE_NAME_PAIRS } from '../../src/data/exampleNames';
 
 describe('example plans', () => {
   it('ten distinct, planted examples', () => {
@@ -51,7 +53,7 @@ describe('adding an example', () => {
   beforeEach(() => useProject.setState({ project: null, currentAreaId: null, past: [], future: [] }));
 
   it('creates the project when there is none and opens the new area', () => {
-    const id = useProject.getState().addExampleArea('japanese');
+    const id = addExampleArea('japanese');
     const s = useProject.getState();
     expect(s.project?.areas).toHaveLength(1);
     expect(s.currentAreaId).toBe(id);
@@ -64,13 +66,13 @@ describe('adding an example', () => {
     st.createProject([]);
     st.deletePlant('LA');
     expect(useProject.getState().project!.plantDb.some((p) => p.code === 'LA')).toBe(false);
-    st.addExampleArea('mediterranean');
+    addExampleArea('mediterranean');
     expect(useProject.getState().project!.plantDb.some((p) => p.code === 'LA')).toBe(true);
-    expect(useProject.getState().addExampleArea('nope')).toBeNull();
+    expect(addExampleArea('nope')).toBeNull();
   });
 
   it('the round example is round', () => {
-    useProject.getState().addExampleArea('pollinator');
+    addExampleArea('pollinator');
     expect(useProject.getState().project!.areas[0].shape.kind).toBe('ellipse');
   });
 });
@@ -91,5 +93,11 @@ describe('example fitted to my size', () => {
     const tree = a.fixtures.find((f) => f.radius != null);
     if (tree) expect(s.fixtures.find((f) => f.id === tree.id)?.radius).toBe(tree.radius);
     expect(scaleArea(a, a.widthCm, a.lengthCm)).toBe(a);
+  });
+});
+
+describe('example names', () => {
+  it('every example name is in the language list', () => {
+    for (const e of EXAMPLE_PLANS) expect(EXAMPLE_NAME_PAIRS).toContainEqual(e.name);
   });
 });

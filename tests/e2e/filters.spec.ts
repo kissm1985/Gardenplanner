@@ -4,6 +4,7 @@ test('shared plant filters in the palette and the database; area soil', async ({
   await page.goto('/');
   await page.getByRole('button', { name: /Kezdés/ }).click();
   await page.getByRole('button', { name: 'Növény', exact: true }).click();
+  await expect(page.locator('.palette-item').first()).toBeVisible();
   const all = await page.locator('.palette-item').count();
   expect(all).toBeGreaterThanOrEqual(55);
 

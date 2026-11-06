@@ -29,6 +29,8 @@ jobs:
       - run: npm run check:size
       - run: npm test
       - run: npm run build
+      - name: Start-up JavaScript budget (150 KB gzip)
+        run: npm run check:bundle
       - name: Install Chromium for Playwright
         run: npx playwright install --with-deps chromium
       - name: End-to-end tests (Pixel 7 profile)

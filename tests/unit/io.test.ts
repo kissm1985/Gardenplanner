@@ -2,7 +2,8 @@ import 'fake-indexeddb/auto';
 import { beforeEach, describe, expect, it } from 'vitest';
 import { buildBom } from '../../src/engine/bom';
 import { deflateSync } from 'fflate';
-import { decodeShare, encodeShare, exportJson, inflateLimited, parseProject, SHARE_MAX_CODE, shareSnapshot } from '../../src/engine/io';
+import { exportJson, parseProject } from '../../src/engine/io';
+import { decodeShare, encodeShare, inflateLimited, SHARE_MAX_CODE, shareSnapshot } from '../../src/engine/share';
 import { loadProject, saveProject } from '../../src/store/persist';
 import { useProject } from '../../src/store/projectStore';
 

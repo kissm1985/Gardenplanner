@@ -581,27 +581,7 @@ export function exampleCodes(area: Area): string[] {
   return [...new Set(area.variants.flatMap((v) => v.items.map((it) => it.plantId)))];
 }
 
-/** Every name the examples give (area names and their element labels), for language switching. */
-export const EXAMPLE_NAME_PAIRS: [string, string][] = [
-  ...EXAMPLE_PLANS.map((e) => e.name),
-  ['Terasz', 'Terrace'],
-  ['Kavicsos út', 'Gravel path'],
-  ['Agyagkorsó', 'Terracotta urn'],
-  ['Főtengely', 'Main axis'],
-  ['Keresztút', 'Cross walk'],
-  ['Szökőkút', 'Fountain'],
-  ['Járólapok', 'Stepping path'],
-  ['Szikla', 'Rock'],
-  ['Lépőkövek', 'Stepping stones'],
-  ['Gereblyézett kavics', 'Raked gravel'],
-  ['Kőlámpás', 'Stone lantern'],
-  ['Nyírt ösvény', 'Mown path'],
-  ['Meglévő fa', 'Existing tree'],
-  ['Kéregmulcsos ösvény', 'Bark path'],
-  ['Járólap', 'Stepping slab'],
-  ['Kültéri pad', 'Outdoor bench'],
-  ['Madáritató', 'Bird bath'],
-];
+export { EXAMPLE_NAME_PAIRS } from './exampleNames';
 
 /**
  * The example fitted to the user's own size: beds, rows, paths and elements stretch with the area, spacing stays,

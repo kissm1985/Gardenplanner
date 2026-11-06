@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { track } from '../engine/analytics';
 import { FeatureButton } from './Locked';
 import { TierPanel } from './TierPanel';
 import { PdfHeaderPanel } from './PdfHeaderPanel';
@@ -7,7 +8,8 @@ import { embedTopViews } from './pictograms';
 import { LocationField } from './LocationField';
 import { backupNow, isInstalled, useBackupState } from './backup';
 import { bomFromEntries } from '../engine/bom';
-import { parseProject, shareUrl } from '../engine/io';
+import { parseProject } from '../engine/io';
+import { shareUrl } from '../engine/share';
 import { activeVariant, migrate, selectCurrentArea, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { copy } from './clipboard';
@@ -72,6 +74,7 @@ export function ProjectPanel({
   };
 
   const image = async (kind: 'png' | 'svg', opts: { month?: number | null; legend?: boolean; suffix?: string } = {}) => {
+    track('export', { format: kind });
     if (!area) return;
     const v = activeVariant(area);
     // Concept plan: embed the pictograms, so the file shows them outside the app too.
@@ -105,6 +108,7 @@ export function ProjectPanel({
   };
 
   const makeLink = async () => {
+    track('export', { format: 'link' });
     const url = shareUrl(project, location.href, { withoutNotes: noNotes });
     setLink(url);
     if (navigator.share) {

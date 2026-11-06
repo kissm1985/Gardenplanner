@@ -1,4 +1,5 @@
 import { t } from '../../i18n';
+import { ConsentToggle } from '../ConsentBanner';
 import { useProject } from '../../store/projectStore';
 import { setSimpleMode, useSimpleMode } from '../simpleMode';
 import { setLargeText, useLargeText } from '../textSize';
@@ -20,6 +21,7 @@ export function ReadingChoices() {
         <input type="checkbox" checked={large} onChange={(e) => setLargeText(e.target.checked)} />
         <span>{t('Nagyobb betűk', 'Larger text')}</span>
       </label>
+      <ConsentToggle />
     </>
   );
 }

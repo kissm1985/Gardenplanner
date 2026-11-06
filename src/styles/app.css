@@ -3319,3 +3319,15 @@ html[data-text='large'] :is(small, .mono, .muted, .tool-label, .area-meta, .lbl,
   border-radius: 4px;
   background: #fff;
 }
+
+.consent {
+  margin: 12px 0;
+  padding: 12px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  background: color-mix(in srgb, var(--accent) 6%, var(--panel));
+}
+.consent p {
+  margin: 0 0 8px;
+  font-size: 14px;
+}

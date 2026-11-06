@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { track } from '../engine/analytics';
 import { roomForArea } from './Locked';
 import { AREA_TEMPLATES } from '../data/templates';
 import { SOIL_LABEL } from '../model/plants';
@@ -27,6 +28,7 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
         onSubmit={({ freeShape, round, ...d }) => {
           if (!roomForArea()) return;
           const id = addArea({ ...d, round: round && !freeShape });
+          track('area_created', { source: 'empty', shape: freeShape ? 'free' : round ? 'round' : 'rect' });
           if (freeShape) {
             useUi.getState().setTool('select');
             useUi.getState().setShapeEdit({ areaId: id, mode: 'draw', points: [], selected: null });
