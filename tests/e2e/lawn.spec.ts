@@ -1,7 +1,7 @@
 import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
-test('draw a lawn strip in an area; plants on it are warned about; reshape it later', async ({ page }) => {
+test('draw a lawn strip in an area; plants on it are fine (no warning); reshape it later', async ({ page }) => {
   await page.goto('/');
   await page.getByRole('button', { name: /Kezdés/ }).click();
   await page.locator('.area-switch').click();
@@ -18,15 +18,13 @@ test('draw a lawn strip in an area; plants on it are warned about; reshape it la
   await page.getByRole('button', { name: 'Kész' }).click();
   await expect(page.locator('polygon.fx-lawn')).toHaveCount(1);
 
-  // A plant on the lawn → warning.
+  // A plant on the lawn (e.g. a tree or bulbs in the grass) → no warning.
   await page.getByRole('button', { name: 'Növény', exact: true }).click();
   await page.getByLabel('Növény keresése').fill('levendula');
   await page.locator('.palette-item').first().click();
   await at(60, 700);
-  await expect(page.locator('.warn-badge')).toHaveText('1');
-  await page.locator('.warn-badge').click();
-  await expect(page.locator('dialog[open]')).toContainText('„Gyepsáv” területére esik');
-  await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
+  await expect(page.locator('.plants .plant-code')).toHaveCount(1);
+  await expect(page.locator('.warn-badge')).toHaveClass(/is-ok/);
 
   // The fixture list shows its size and lets me reshape it on the plan.
   await menuItem(page, 'Nézet és rétegek');

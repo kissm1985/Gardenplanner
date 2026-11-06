@@ -304,22 +304,7 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
       });
 
     for (const f of area.fixtures) {
-      if (f.type === 'lawn' && f.polygon && f.polygon.length >= 3) {
-        const hit = ps.filter((q) => pointInPolygon(q, f.polygon!));
-        if (hit.length)
-          out.push({
-            id: `lawn:${it.id}:${f.id}`,
-            rule: 'lawn',
-            severity: 'warn',
-            itemIds: [it.id],
-            at: hit[0],
-            message: t(
-              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} tő ` : ''}a(z) „${localName(f.label) || 'gyep'}” területére esik.`,
-              `${plantName(p)}: ${hit.length > 1 ? `${hit.length} plants are` : 'it is'} on the “${localName(f.label) || 'lawn'}”.`,
-            ),
-            hint: t('A gyepre nem kerül növény; húzd az ágyásba, vagy igazítsd a gyep alakját.', 'No plants go on the lawn; drag it into the bed, or reshape the lawn.'),
-          });
-      }
+      // Plants on a drawn lawn are fine (e.g. a tree or a bulb drift in the grass): no warning.
       if (KEEP_CLEAR.has(f.type)) {
         const hit = ps.filter((q) => inRect(f, q));
         if (hit.length)

@@ -145,7 +145,7 @@ Fixed elements are not plants but part of the plan: the rules and the idea gener
 
 | Element | How you draw it |
 |---|---|
-| **Lawn strip** | Tap its corners, then *Done*. No plants go there: you get a warning if one does. |
+| **Lawn strip** | Tap its corners, then *Done*. Plants may go on it (e.g. a tree or bulbs in the grass) without a warning; it does not count towards the bed area. |
 | **Paving, Gravel bed, Pond, Shed, Raised bed** | Drag out the rectangle (the pond becomes an oval); a tap places one of the default size. |
 | **Wall, Fence, Path** | Drag along the line; it follows the longer direction. |
 | **Window, Tap, Manhole, Well, Compost bin, Rain barrel, Bench, Tree, Walnut, Other** | Tap the plan where it should go. |

@@ -145,7 +145,7 @@ A rögzített elemek nem növények, de a terv része: a szabályok és az ötle
 
 | Elem | Hogyan rajzolod |
 |---|---|
-| **Gyepsáv** | Koppints a sarkaira, majd *Kész*. Ide nem kerül növény: ha mégis oda tennél, figyelmeztet. |
+| **Gyepsáv** | Koppints a sarkaira, majd *Kész*. Növény is kerülhet rá (pl. fa vagy hagymások a gyepben), figyelmeztetés nélkül; az ágyás területébe nem számít bele. |
 | **Burkolat, Kavicságy, Kerti tó, Tároló, Magaságyás** | Húzd végig a téglalapot (a tó ovális lesz); egy koppintás alapméretű elemet tesz le. |
 | **Fal, Kerítés, Ösvény** | Húzd végig a vonalat; a hosszabb irányba áll be. |
 | **Ablak, Csap, Akna, Kút, Komposztáló, Esővízgyűjtő, Pad, Fa, Diófa, Egyéb** | Koppints a rajzra, ahová kerüljön. |

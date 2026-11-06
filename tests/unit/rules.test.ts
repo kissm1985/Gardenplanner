@@ -181,7 +181,7 @@ describe('walnut and juglone (lawn garden)', () => {
 });
 
 describe('lawn', () => {
-  it('plants on a drawn lawn are warned about; the bed area excludes the lawn', async () => {
+  it('plants on a drawn lawn get no warning; the bed area excludes the lawn', async () => {
     const { useProject, selectCurrentArea, selectItems } = await import('../../src/store/projectStore');
     const { evaluate } = await import('../../src/engine/rules');
     const { bedAreaM2 } = await import('../../src/engine/schedule');
@@ -205,8 +205,7 @@ describe('lawn', () => {
     st().placePlant('LA', 60, 300); // in the bed
     const a = selectCurrentArea(st())!;
     const w = evaluate(a, selectItems(st()), st().project!.plantDb, st().project!.settings).filter((x) => x.rule === 'lawn');
-    expect(w).toHaveLength(1);
-    expect(w[0].message).toContain('„Gyepsáv” területére esik');
+    expect(w).toHaveLength(0);
     expect(bedAreaM2(a)).toBeCloseTo(before - 2.4, 5);
   });
 });

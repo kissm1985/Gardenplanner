@@ -1278,8 +1278,17 @@ button.warn-badge {
   stroke: #8a6a45;
   stroke-width: 4;
 }
-:is(.fx-shed, .fx-compost, .fx-rainBarrel) .fx-label {
+:is(.fx-shed, .fx-compost, .fx-rainBarrel, .fx-raisedBed) .fx-label {
   fill: #fff;
+}
+/* The bench is light wood: dark brown text with a light halo stays readable in both themes. */
+.fx-bench .fx-label {
+  fill: #3b2a17;
+  font-weight: 600;
+  stroke: #f1e2cc;
+  stroke-width: 3px;
+  stroke-linejoin: round;
+  paint-order: stroke;
 }
 .fx-dot-gravel,
 .fx-dot-path {
