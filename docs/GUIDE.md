@@ -7,7 +7,7 @@ Planterra is a planting planner for phones and computers. You draw the garden fr
 - shows the garden in every season;
 - builds a planting schedule.
 
-All data stays on your own device, there is no sign-up, and after the first visit it also works offline.
+All data stays on your own device, there is no sign-up, and after the first visit it also works offline. (Except where you ask for it: anonymous statistics and the Pro tier’s nursery catalogue, see chapters 19–20.)
 
 **Contents**
 
@@ -29,6 +29,8 @@ All data stays on your own device, there is no sign-up, and after the first visi
 16. [Visualisation with ChatGPT](#16-visualisation-with-chatgpt)
 17. [Installing on the phone, offline use](#17-installing-on-the-phone-offline-use)
 18. [Tips and FAQ](#18-tips-and-faq)
+19. [Projects, tiers, simple mode](#19-projects-tiers-simple-mode)
+20. [Nursery catalogue (Pro)](#20-nursery-catalogue-pro)
 
 ---
 
@@ -444,7 +446,7 @@ Open it with **Planting schedule and care →** at the top of the *List* (or *Vi
 
 **Automatic saving**: your work is saved on the device after every change; there is no “Save” button.
 
-The **⋯** button in the top bar opens the **Project** menu:
+The **⋯** (Menu) button in the top bar → **Project: save, share, print**:
 
 - **Project name**
 - **Full backup (JSON)**: the whole project in one file. Use it to move to another device; it is also your backup. On a computer (Chrome, Edge) you can pick the folder too. Above it you see when you last backed up and whether the browser keeps the plan permanently. **Load from JSON** restores it (it replaces the current plan); the file is checked first, and a broken or oversized backup is refused.
@@ -535,6 +537,60 @@ Yes: *View → Language → Magyar*. The interface, warnings, lists and exports 
 
 **Is the plant data accurate?**
 The starting list is built from general horticultural data. Uncertain data (especially toxicity, juglone tolerance and estimated prices) is marked **to check**; look it up before buying and correct it in the database.
+
+
+## 19. Projects, tiers, simple mode
+
+**Several projects**: on the start page **Your projects** lists the plans stored on this device (open, copy, rename, delete). **Continue** opens the plan you edited last. Start a new project from the list; it is named “My garden 2”, “My garden 3”… and you can rename it. Images (background, own photos, visualisations) are stored separately, once each, so saving stays quick.
+
+**Menu**: the **⋯** button in the top bar holds **Project: save, share, print**, **View and layers**, **Redo**, **Dark mode**, **Quick actions** and **Feedback**. The language switch (**EN / HU**) stays one tap away in the top bar.
+
+**Tiers** (*Project* window → **Tier**): one app, three levels. There are no payments yet: choose freely; no plan is lost when you switch.
+
+- **Basic**: about 40 common, easy species, 1 project, 2 areas, plants and drifts. Starts in simple mode.
+- **Advanced** (default): the full app with the whole plant list – variants, visualisation, exports, schedule.
+- **Pro**: Advanced plus a nursery catalogue with prices (see chapter 20), PDFs with your own header and quote requests.
+
+A locked feature stays visible with a lock; tap it to see which tier has it.
+
+**Simple mode and larger text** (*View and layers*): simple mode shows only the main tools (select, plant, drift, list, idea); the rest is under **More**. **Larger text** makes the whole interface easier to read.
+
+**Tree crowns** (*View and layers*): outline (default), transparent or filled – with the outline you can see the planting under a tree.
+
+**Example plans in your own size**: when you open an example plan you can give the size of your garden; the plan is scaled and the plant counts follow the area.
+
+**Edible garden**: the plant list also has roses, fruit, vegetables and herbs (filters: *Group*, and *Only edible / native / bee-friendly*). The care calendar shows sowing, planting out and harvest for them. The idea generator only uses edible plants when you ask for them.
+
+**Guide prices**: prices are guide prices for the month shown (e.g. 2026-10) and vary from shop to shop. The list shows which price is a guide price, which an estimate and which the nursery’s own price.
+
+**Feedback** (*Menu* → **Feedback**): send a bug report or an idea by e-mail. When the planner is connected to a nursery server, feedback goes there.
+
+**Anonymous statistics**: at first start the app asks whether it may send anonymous usage statistics (e.g. how many areas were made, whether the idea generator was used). It never sends plans, plant names or locations. You can switch it off any time in *View and layers*.
+
+## 20. Nursery catalogue (Pro)
+
+With the Pro tier a planner can work from a nursery’s own catalogue: its species, pot sizes, prices and stock go into the plant list, and the order list uses the nursery’s prices.
+
+**Connecting** (*Project* window → **Nursery catalogue**): enter the nursery id (e.g. *zoldkert*) and tap **Connect**. Under **Server** you can give another server (https only). Then:
+
+- the catalogue is stored on the device, so it also works **offline**; at start and with **Update** the app downloads only the changes since its copy;
+- plants in your list get the nursery’s price and stock (the offer in the plant’s pot size, or the cheapest one); the nursery price overrides the guide price;
+- the nursery’s own species are added to the list as new plants (missing data is marked *to check*);
+- when the nursery no longer offers a species your plan uses, the panel warns you and says how many plants it affects – replace them (*Replace*) or ask the nursery. A sync never deletes a plant.
+
+**Disconnect**: ends the connection and deletes the catalogue copy; prices already in the list stay until you change them.
+
+### The nursery’s admin page
+
+Nursery staff manage the catalogue on **…/admin.html** (on the same server):
+
+- **Sign in**: nursery id and e-mail address → a 6-digit code valid for 10 minutes arrives by e-mail. Two-step sign-in (authenticator app) is switched on in the **Account** tab.
+- **Species**: search, new species, edit (names, size, notes), price and stock per pot size. A star (*) marks changes not yet published.
+- **Import price list**: a CSV or XLSX file, the first row is the header (code, pot, price, and if you have them: stock, Hungarian and Latin name). Columns are recognised, or map them by hand. The preview shows per row what is new, what changes, what stays and what is wrong; rows with errors are skipped.
+- **Publish**: the draft’s changes (new, changed, removed) become a new numbered version for the planners.
+- **Users** (owner): add staff with a role (*owner*, *editor*, *viewer*), disable, delete. **Log** (owner): sign-ins, failed attempts, changes, imports, publications.
+
+Installing and running the server: [docs/SZERVER.md](SZERVER.md) (in Hungarian).
 
 ---
 

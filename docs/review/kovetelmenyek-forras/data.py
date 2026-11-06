@@ -230,3 +230,35 @@ REQ = [
  'A felhasználók ma nem találják meg az alkalmazást. A landing oldal fő üzenete: „Tervezd meg a kerted 10 perc alatt – magyar növényekkel, pontos bevásárlólistával, regisztráció nélkül”. Részei: rövid bemutatóvideó vagy animáció, példatervek külön aloldalakon növénylistával (SEO: kerttervező, ágyástervező, évelőágyás), csomag-összehasonlítás, GYIK, impresszum és adatvédelem. Mérés a PL-ANA-01 szerint.',
  'UI-vázlat (landing oldal szerkezete)'),
 ]
+
+# Állapot a 0.7.0-ban (2026-11-06): azonosító → (állapot, megjegyzés). A többi követelmény nyitott.
+KESZ, RESZ = 'Kész', 'Részben kész'
+STATUS = {
+ 'PL-SEC-01': (RESZ, 'E-mail-kódos belépés (HMAC, lejárat, próbálkozáskorlát), TOTP második lépés (tulajdonosnak kötelezővé tehető), 12 órás tokenek, zárolás, rate limit, bérlőnkénti és szerepenkénti ellenőrzés, bemenet-ellenőrzés közös sémával, biztonsági napló, bérlők közti tesztek. Hátra: ASVS L2 szerinti átvizsgálás és külső behatolásteszt.'),
+ 'PL-BE-01': (RESZ, 'Több bérlős API (v1) és adatbázis (SQLite, tárolórétegek mögött): kertészetenként kínálat, árak, készlet, felhasználók, napló (server/, docs/SZERVER.md). Hátra: ügyfélprojektek a szerveren, PostgreSQL éles üzemhez.'),
+ 'PL-BE-02': (RESZ, 'Admin felület (admin.html): fajok keresése, felvétele, szerkesztése, törlése, közzététel, felhasználók, napló, 2FA. Hátra: fotó- és piktogramfeltöltés, láthatóság fajonként.'),
+ 'PL-BE-03': (RESZ, 'Ár és készlet cserépméretenként; CSV/XLSX-import oszloppárosítással, előnézettel, soronkénti hibákkal, egy tranzakcióban. Hátra: akciós ár és érvényességi dátum.'),
+ 'PL-BE-04': (KESZ, 'Verziózott katalógus (version, changes?since=N), csak a változás töltődik le, IndexedDB-másolat offline, a kertészet ára és készlete a növénylistába kerül, figyelmeztetés a már nem kínált fajokra. Frissítés induláskor és kézzel.'),
+ 'PL-FUN-01': (KESZ, 'Alap / Haladó / Profi funkciókapcsolók egy kódbázisban, ~40 fajos Alap, lakatos zárolt funkciók. Fizetés még nincs: a csomag szabadon választható.'),
+ 'PL-DAT-01': (RESZ, 'A lektorálás munkafolyamata kész (export, CSV-visszatöltés, adatforrás és dátum fajonként, ellenőrizendő-jelölések). Hátra: maga a szakértői lektorálás.'),
+ 'PL-CMP-06': (KESZ, 'A piktogramok eredete és felhasználási joga a JOGI.md-ben (146 a készítőtől, 25 generált); Wikimedia-fotó csak az infókártyán jelenik meg, szerzővel és licenccel, exportba nem kerül.'),
+ 'PL-CMP-07': (RESZ, 'Irányárak boltnév nélkül, felelősségkizárás; jogászi kérdéslista: docs/legal/JOGASZI-ATNEZES.md. Hátra: a jogász átnézése.'),
+ 'PL-FUN-02': (KESZ, 'Projektlista a kezdőoldalon, új, megnyitás, átnevezés, másolás, törlés, projektenkénti mentés.'),
+ 'PL-FUN-06': (RESZ, 'Visszajelzés-űrlap (típus, szöveg, technikai adatok), e-mailben vagy a szerverre. Hátra: képernyőkép csatolása.'),
+ 'PL-DAT-02': (RESZ, '171 faj: +25 rózsa, gyümölcs, zöldség, fűszer; ehető, őshonos, méhbarát jelölés és szűrők, vetési, kiültetési, szüreti naptár. Hátra: 300+ fajig bővítés.'),
+ 'PL-DAT-03': (KESZ, 'Irányár dátummal (2026-10) és forrásjelöléssel, boltnév nélkül; a lista jelzi az irányárat, becslést és a kertészet árát. Az évi kétszeri frissítés folyamatos feladat.'),
+ 'PL-UX-01': (KESZ, 'Egyszerű mód (Alapban alapból), a többi eszköz a „Több” gomb alatt.'),
+ 'PL-UX-04': (RESZ, 'Minden betűméret legalább 12 px, „Nagyobb betűk” kapcsoló. Hátra: kontrasztmérés eszközzel mindkét témában.'),
+ 'PL-ANA-01': (KESZ, 'Süti nélküli, hozzájáruláshoz kötött statisztika és hibajelentés (Umami-kompatibilis végpont, VITE_ANALYTICS_URL). A szervert be kell állítani.'),
+ 'PL-QA-02': (RESZ, 'Induló JavaScript 197 → 139 KB gzip, CI-keret 150 KB. Hátra: mérés közepes kategóriás telefonon.'),
+ 'PL-FUN-04': (KESZ, 'Példaterv átméretezése a megadott szélességre és hosszra, a tőszámok újraszámolásával.'),
+ 'PL-FUN-05': (KESZ, 'Profi: saját logó, cégnév, elérhetőség, ajánlati érvényesség a PDF fejlécében.'),
+ 'PL-UX-02': (KESZ, 'Ritka műveletek a ⋯ menüben; a nyelvváltó a felső sávban maradt (kérésre).'),
+ 'PL-UX-03': (KESZ, '„Folytatás” gomb, példatervek sávja és „Összes példa”, projektlista.'),
+ 'PL-UX-05': (KESZ, 'Háromlépéses bevezető (terület, növények, lista), a példatervek kiemelve.'),
+ 'PL-QA-03': (KESZ, 'Migrációs tesztek a 0.2–0.6 valós mentéseivel (tests/fixtures/saves).'),
+ 'PL-ARC-01': (KESZ, 'Store, App és vászon szétbontva; ESLint, Prettier és fájlméret-figyelés a CI-ban.'),
+ 'PL-ARC-02': (KESZ, 'Képek tartalom szerint címzett Blobként, a projekt csak hivatkozást tart.'),
+ 'PL-SEC-03': (KESZ, 'A közepes sebezhetőségek megszűntek (override-ok); 4 alacsony (deepmerge) maradt, javítás nincs rá.'),
+ 'PL-UX-06': (KESZ, 'Címkeütközés kezelése vezetővonallal; lombkorona körvonal / áttetsző / kitöltött.'),
+}

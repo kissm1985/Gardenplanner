@@ -18,9 +18,10 @@ rows = sorted(R, key=lambda r: (PR.index(r[2]), cats.index(r[1]), r[0]))
 
 wb = Workbook()
 ws = wb.active; ws.title = 'Követelmények'
-head = ['Követelmény azonosító', 'Kategória', 'Prioritás', 'Komplexitás', 'Érintett funkció', 'Rövid leírás', 'Bővebb kifejtés', 'Vizuális magyarázat (kérésre elérhető)']
+head = ['Követelmény azonosító', 'Kategória', 'Prioritás', 'Komplexitás', 'Érintett funkció', 'Rövid leírás', 'Bővebb kifejtés', 'Vizuális magyarázat (kérésre elérhető)', 'Állapot (0.7.0)', 'Megvalósítás és ami hátravan']
 ws.append(head)
-for r in rows: ws.append(list(r))
+ST = getattr(d, 'STATUS', {})
+for r in rows: ws.append(list(r) + list(ST.get(r[0], ('Nyitott', ''))))
 hdr = PatternFill('solid', fgColor='244B3C'); thin = Side(style='thin', color='D9D2C0')
 for c in ws[1]:
     c.font = Font(bold=True, color='F7F4EC'); c.fill = hdr; c.alignment = Alignment(wrap_text=True, vertical='center')
@@ -28,12 +29,14 @@ for row in ws.iter_rows(min_row=2):
     for c in row:
         c.alignment = Alignment(wrap_text=True, vertical='top'); c.border = Border(bottom=thin)
     row[0].font = Font(bold=True)
-    for i in (2, 3): row[i].alignment = Alignment(horizontal='center', vertical='top')
-for col, w in zip('ABCDEFGH', [16, 18, 11, 12, 24, 42, 80, 30]):
+    for i in (2, 3, 8): row[i].alignment = Alignment(horizontal='center', vertical='top')
+for col, w in zip('ABCDEFGHIJ', [16, 18, 11, 12, 24, 42, 80, 30, 14, 60]):
     ws.column_dimensions[col].width = w
 ws.row_dimensions[1].height = 32
 n = len(rows) + 1
-ws.freeze_panes = 'B2'; ws.auto_filter.ref = f'A1:H{n}'
+ws.freeze_panes = 'B2'; ws.auto_filter.ref = f'A1:J{n}'
+for v, col in [('Kész', 'B7E1A1'), ('Részben kész', 'FCE8B2'), ('Nyitott', 'FFFFFF')]:
+    ws.conditional_formatting.add(f'I2:I{n}', CellIsRule(operator='equal', formula=[f'"{v}"'], fill=PatternFill('solid', fgColor=col)))
 for v, col in [('Kritikus', 'F4C7C3'), ('Magas', 'FCE8B2'), ('Közepes', 'D9EAD3'), ('Alacsony', 'E8EAED')]:
     ws.conditional_formatting.add(f'C2:C{n}', CellIsRule(operator='equal', formula=[f'"{v}"'], fill=PatternFill('solid', fgColor=col)))
 for rng, opts in [(f'C2:C{n}', PR), (f'D2:D{n}', CX)]:
@@ -93,7 +96,12 @@ s2.append([])
 s2.append(['Komplexitás'] + CX + ['Összesen'])
 k = last + 3
 s2.append(['Darab'] + [f'=COUNTIF({SH}!$D:$D,"{x}")' for x in CX] + [f'=SUM(B{k+1}:F{k+1})'])
-for r in (1, k):
+s2.append([])
+ST3 = ['Kész', 'Részben kész', 'Nyitott']
+s2.append(['Állapot (0.7.0)'] + ST3 + ['Összesen'])
+k2 = k + 3
+s2.append(['Darab'] + [f'=COUNTIF({SH}!$I:$I,"{x}")' for x in ST3] + [f'=SUM(B{k2+1}:D{k2+1})'])
+for r in (1, k, k2):
     for c in s2[r]: c.font = Font(bold=True, color='F7F4EC'); c.fill = hdr
 for c in s2[last + 1]: c.font = Font(bold=True)
 s2.column_dimensions['A'].width = 24
@@ -116,6 +124,8 @@ L = [
  ('XXL', '2 hónapnál több'),
  ('', ''),
  ('Vizuális magyarázat', 'Az oszlop azt nevezi meg, milyen ábra készülhet kérésre a követelmény megértéséhez (folyamatábra, UI-vázlat, architektúra- vagy adatmodell-ábra stb.). „Nem szükséges”: a leírás önmagában érthető.'),
+ ('', ''),
+ ('Állapot (0.7.0)', 'Kész: a követelmény a 0.7.0-ban teljesül. Részben kész: a fő része megvan, a „Megvalósítás és ami hátravan” oszlop mondja meg, mi maradt. Nyitott: még nem kezdtük el. Frissítve: 2026-11-06.'),
  ('', ''),
  ('Alap', 'Az összeállítás a Planterra 0.6.2 állapotára, a 0.6.0 auditra (docs/review/Planterra-audit.xlsx), a perszónákra, a piacra lépési tervre és a három termékváltozatra (Alap, Haladó, Profi) épül. Összeállítva: 2026-11-05.'),
 ]

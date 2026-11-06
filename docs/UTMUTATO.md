@@ -7,7 +7,7 @@ A Planterra egy telefonon és számítógépen is használható ültetéstervez�
 - megmutatja a kertet minden évszakban;
 - elkészíti az ültetési menetrendet.
 
-Minden adat a saját készülékeden marad, nincs regisztráció, és első megnyitás után internet nélkül is működik.
+Minden adat a saját készülékeden marad, nincs regisztráció, és első megnyitás után internet nélkül is működik. (Kivétel, ha te kéred: a névtelen statisztika és a Profi csomag kertészeti katalógusa, lásd a 19–20. fejezetet.)
 
 **Tartalom**
 
@@ -29,6 +29,8 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
 16. [Látványterv ChatGPT-vel](#16-látványterv-chatgpt-vel)
 17. [Telepítés a telefonra, offline használat](#17-telepítés-a-telefonra-offline-használat)
 18. [Tippek és gyakori kérdések](#18-tippek-és-gyakori-kérdések)
+19. [Projektek, csomagok, egyszerű mód](#19-projektek-csomagok-egyszerű-mód)
+20. [Kertészeti katalógus (Profi)](#20-kertészeti-katalógus-profi)
 
 ---
 
@@ -444,7 +446,7 @@ A *Lista* tetején az **Ültetési menetrend és gondozás →** gomb nyitja meg
 
 **Automatikus mentés**: a munka minden módosítás után a készüléken mentődik, nincs „Mentés” gomb.
 
-A felső sáv **⋯** gombja nyitja a **Projekt** menüt:
+A felső sáv **⋯** (Menü) gombja → **Projekt: mentés, megosztás, nyomtatás**:
 
 - **Projekt neve**
 - **Teljes mentés (JSON)**: a teljes projekt egy fájlban. Ezzel viheted át másik eszközre, és ez a biztonsági mentés is. Számítógépen (Chrome, Edge) kiválaszthatod a mappát is. Fölötte látszik, mikor mentettél utoljára, és hogy a böngésző tartósan tárolja-e a tervet. **Betöltés JSON-ból**: visszatölti (a mostani terv helyére kerül); a program előbb ellenőrzi a fájlt, és a hibás vagy túl nagy mentést nem tölti be.
@@ -535,6 +537,60 @@ Igen: *Nézet → Nyelv → English*. A felület, a figyelmeztetések, a listák
 
 **Pontosak a növényadatok?**
 A kezdőlista kertészeti alapadatokból készült. A bizonytalan adatok (különösen a mérgezőség, a juglone-tűrés és a becsült ár) **ellenőrizendőként** vannak jelölve; vásárlás előtt nézz utána, és javítsd az adatbázisban.
+
+
+## 19. Projektek, csomagok, egyszerű mód
+
+**Több projekt**: a kezdőképernyőn a **Projektjeid** lista mutatja a készüléken tárolt terveket (megnyitás, másolás, átnevezés, törlés). A **Folytatás** gomb a legutóbb szerkesztett tervet nyitja meg. Új projektet a listából indíthatsz; a neve „Kertem 2”, „Kertem 3”… lesz, amit utána átnevezhetsz. A képek (háttérkép, saját fotó, látványkép) külön, egyszer tárolódnak, így a projekt mentése gyors marad.
+
+**Menü**: a felső sáv **⋯** gombja alatt van a **Projekt: mentés, megosztás, nyomtatás**, a **Nézet és rétegek**, az **Újra**, a **Sötét mód**, a **Gyors műveletek** és a **Visszajelzés**. A nyelvváltó (**EN / HU**) egy koppintással a felső sávban marad.
+
+**Csomagok** (*Projekt* ablak → **Csomag**): egy alkalmazás, három szint. Fizetés még nincs, a csomag szabadon választható, és csomagváltáskor egy terv sem vész el.
+
+- **Alap**: kb. 40 gyakori, könnyen tartható faj, 1 projekt, 2 terület, tő és folt. Alapból egyszerű módban indul.
+- **Haladó** (alapértelmezett): a teljes alkalmazás a teljes növénylistával – változatok, látványterv, exportok, menetrend.
+- **Profi**: a Haladó mellett kertészeti katalógus és árak (lásd a 20. fejezetet), saját fejlécű PDF és ajánlatkérés.
+
+A zárolt funkció is látszik egy lakattal; koppintásra megmondja, melyik csomagban érhető el.
+
+**Egyszerű mód és nagyobb betűk** (*Nézet és rétegek*): az egyszerű mód csak a legfontosabb eszközöket mutatja (kijelölés, tő, folt, lista, ötlet); a többi a **Több** gomb alatt van. A **Nagyobb betűk** az egész felületen nagyobb, jobban olvasható szöveget ad.
+
+**Fák lombkoronája** (*Nézet és rétegek*): körvonal (alapértelmezett), áttetsző vagy kitöltött – a körvonal alatt jól látszanak a fa alatti ültetések.
+
+**Példatervek a saját méretedre**: egy példaterv megnyitásakor megadhatod a saját kerted méretét; a terv arányosan átméreteződik, a tövek száma a területhez igazodik.
+
+**Ehető kert**: a növénylistában rózsák, gyümölcsök, zöldségek és fűszernövények is vannak (szűrők: *Csoport*, valamint *Csak ehető / őshonos / méhbarát*). A gondozási naptár ezeknél a vetést, a kiültetést és a szüretet is mutatja. Az ötletgenerátor ehető növényt csak akkor tesz a tervbe, ha kéred.
+
+**Irányárak**: az árak tájékoztató irányárak a megadott hónapra (pl. 2026-10); boltonként eltérhetnek. A lista jelzi, melyik ár irányár, melyik becslés, és melyik a kertészet saját ára.
+
+**Visszajelzés** (*Menü* → **Visszajelzés**): hibát, ötletet küldhetsz e-mailben. Ha a tervező kertészeti szerverhez kapcsolódik, a visszajelzés oda megy.
+
+**Névtelen statisztika**: az első indításkor megkérdezzük, küldhet-e az alkalmazás névtelen használati statisztikát (pl. hány terület készült, használtad-e az ötletgenerátort). Tervet, növénynevet, helyszínt soha nem küld. Bármikor kikapcsolható a *Nézet és rétegek* ablakban.
+
+## 20. Kertészeti katalógus (Profi)
+
+A Profi csomagban a tervező egy kertészet saját katalógusából dolgozhat: a kertészet fajai, cserépméretei, árai és készlete bekerülnek a növénylistába, és a rendelési lista a kertészet áraival számol.
+
+**Kapcsolódás** (*Projekt* ablak → **Kertészeti katalógus**): írd be a kertészet azonosítóját (pl. *zoldkert*), és koppints a **Kapcsolódás** gombra. A **Szerver** alatt más szervert is megadhatsz (csak https). Ezután:
+
+- a katalógus a készülékre kerül, így **internet nélkül is** használható; indításkor és a **Frissítés** gombbal az alkalmazás csak a legutóbbi változat óta történt változásokat tölti le;
+- a meglévő növények megkapják a kertészet árát és készletét (a növény cserépmérete szerinti ajánlatot, ha nincs ilyen, a legolcsóbbat); a kertészet ára felülírja az irányárat;
+- a kertészet saját fajai új növényként bekerülnek a listába (a hiányzó adatok „ellenőrizendők”);
+- ha a kertészet már nem kínál egy fajt, amely szerepel a tervben, a panel figyelmeztet, hány tőről van szó – cseréld le (*Csere*), vagy kérdezd meg a kertészetet. Növényt a szinkron soha nem töröl.
+
+**Leválasztás**: a kapcsolat megszűnik, a készüléken tárolt katalógus törlődik; a listában lévő árak maradnak, amíg át nem írod őket.
+
+### A kertészet felülete
+
+A kertészet munkatársai a **…/admin.html** oldalon (ugyanazon a szerveren) kezelik a katalógust:
+
+- **Belépés**: kertészet-azonosító és e-mail-cím → a megadott címre 6 jegyű, 10 percig érvényes kód érkezik. Kétlépcsős belépés (hitelesítő alkalmazás) a **Fiók** fülön kapcsolható be.
+- **Fajok**: keresés, új faj, szerkesztés (név, latin név, méret, megjegyzés), cserépméretenként ár és készlet. A csillag (*) a még közzé nem tett változást jelöli.
+- **Árlista importálása**: CSV vagy XLSX fájl, az első sor a fejléc (kód, cserép, ár, és ha van: készlet, magyar és latin név). Az oszlopokat a program felismeri, de kézzel is párosíthatod. Az előnézet soronként mutatja, mi lesz új, mi változik, mi marad, és mi hibás; a hibás sorok kimaradnak.
+- **Közzététel**: a piszkozat változásai (új, változott, törölt) egy új, sorszámozott változatként jelennek meg a tervezőknek.
+- **Felhasználók** (tulajdonos): munkatársak hozzáadása szereppel (*tulajdonos*, *szerkesztő*, *megtekintő*), letiltás, törlés. **Napló** (tulajdonos): belépések, sikertelen próbálkozások, változások, importok, közzétételek.
+
+A szerver telepítése és üzemeltetése: [docs/SZERVER.md](SZERVER.md).
 
 ---
 

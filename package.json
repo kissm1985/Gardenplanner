@@ -3,7 +3,7 @@
   "private": true,
   "author": "Kiss-Mihály István",
   "license": "UNLICENSED",
-  "version": "0.6.2",
+  "version": "0.7.0",
   "type": "module",
   "scripts": {
     "dev": "node scripts/licenses.mjs && vite",

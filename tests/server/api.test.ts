@@ -1,4 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
+import { purgeOld, RETENTION_MS } from '../../server/accounts';
 import { totp } from '../../server/security';
 import { seedTenants, startServer, type TestServer } from './helpers';
 
@@ -238,4 +239,16 @@ describe('catalogue', () => {
     await s.call('PUT', '/api/v1/admin/species/NE', { token: editor, body: { nameHu: 'Macskamenta', nameLat: 'Nepeta', offers: [] } });
     expect((await s.call('GET', '/api/v1/t/kert-a/catalog/changes?since=2')).body.entries).toEqual([]);
   });
+});
+
+it('deletes the security log and feedback after a year', async () => {
+  await s.login('kert-a', 'owner@kert-a.hu');
+  await s.call('POST', '/api/v1/feedback', { body: { kind: 'bug', text: 'hiba' } });
+  const n = (sql: string) => Number((s.db.prepare(sql).get() as { n: number }).n);
+  expect(n('SELECT count(*) AS n FROM audit')).toBeGreaterThan(0);
+  purgeOld(s.db, s.clock.t + RETENTION_MS - 1000);
+  expect(n('SELECT count(*) AS n FROM audit')).toBeGreaterThan(0);
+  expect(n('SELECT count(*) AS n FROM login_codes')).toBe(0); // the spent code
+  purgeOld(s.db, s.clock.t + RETENTION_MS + 1000);
+  expect(n('SELECT count(*) AS n FROM audit') + n('SELECT count(*) AS n FROM feedback') + n('SELECT count(*) AS n FROM sessions')).toBe(0);
 });

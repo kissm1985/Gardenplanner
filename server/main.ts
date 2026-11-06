@@ -4,6 +4,7 @@
 import { createReadStream, existsSync, readFileSync, statSync } from 'node:fs';
 import { createServer } from 'node:http';
 import { extname, join, normalize, resolve } from 'node:path';
+import { purgeOld } from './accounts';
 import { createApp } from './app';
 import { openDb } from './db';
 import { makeMailer } from './mailer';
@@ -30,6 +31,10 @@ const app = createApp({
   requireOwnerTotp: env.REQUIRE_OWNER_TOTP === '1',
   mailer: makeMailer(db, { production, webhook: env.MAIL_WEBHOOK_URL, webhookToken: env.MAIL_WEBHOOK_TOKEN, log }),
 });
+
+// Retention (privacy notice): old log entries and feedback go once a day.
+purgeOld(db, Date.now());
+setInterval(() => purgeOld(db, Date.now()), 24 * 3600_000).unref();
 
 const STATIC = env.STATIC_DIR ? resolve(env.STATIC_DIR) : null;
 const TYPES: Record<string, string> = {

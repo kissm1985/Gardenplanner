@@ -169,3 +169,13 @@ export function listAudit(db: Db, tenant: number, limit = 200): AuditEntry[] {
 /** Failed logins for this address in the last hour (any tenant: an attacker can't dodge it by switching). */
 export const recentFailures = (db: Db, email: string, at: number) =>
   Number((db.prepare("SELECT count(*) AS n FROM audit WHERE action = 'login.fail' AND detail = ? AND at > ?").get(email.toLowerCase(), at - 3600_000) as Row).n);
+
+/** Retention: the security log and feedback for a year, spent codes and ended sessions not at all. */
+export const RETENTION_MS = 365 * 24 * 3600_000;
+export function purgeOld(db: Db, at: number) {
+  db.prepare('DELETE FROM audit WHERE at < ?').run(at - RETENTION_MS);
+  db.prepare('DELETE FROM feedback WHERE at < ?').run(at - RETENTION_MS);
+  db.prepare('DELETE FROM login_codes WHERE used = 1 OR expires_at < ?').run(at);
+  db.prepare('DELETE FROM sessions WHERE expires_at < ?').run(at);
+  db.prepare('DELETE FROM outbox WHERE at < ?').run(at - 24 * 3600_000);
+}
