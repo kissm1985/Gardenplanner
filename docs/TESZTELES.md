@@ -1,4 +1,4 @@
-# Zárt tesztelés: Cloudflare Pages + Cloudflare Access
+# Zárt tesztelés: Cloudflare Workers + Cloudflare Access
 
 A tervező alkalmazás egy https-címen fut, de csak azok nyithatják meg, akiknek az e-mail-címét felveszed a listára. Belépéskor a tesztelő az e-mail-címére kap egy egyszer használatos kódot, regisztráció és jelszó nélkül. 50 felhasználóig ingyenes.
 
@@ -9,21 +9,28 @@ A tervek továbbra is a tesztelők saját készülékén maradnak. A Cloudflare 
 1. Regisztrálj a https://dash.cloudflare.com/sign-up oldalon (ingyenes).
 2. A bal oldali menüben nyisd meg a **Zero Trust** részt. Első alkalommal válassz egy csapatnevet (pl. `planterra`), majd a **Free** csomagot. A Cloudflare ekkor bankkártyát kérhet, de az ingyenes csomag nem számol fel díjat.
 
-## 2. Az alkalmazás feltöltése (Cloudflare Pages)
+## 2. Az alkalmazás feltöltése (Cloudflare Workers)
+
+A Cloudflare az új projekteket Workerként hozza létre; a cím `https://planterra.<fióknév>.workers.dev` lesz. A tárolóban lévő `wrangler.jsonc` mondja meg, hogy a `dist` mappát kell kiszolgálni.
 
 **A) Automatikusan, a GitHubról (ajánlott):** minden push után magától frissül.
 
-1. Dashboard → **Workers & Pages** → **Create** → **Pages** → **Connect to Git**. Engedélyezd a `kissm1985/Gardenplanner` tárolót.
+1. Dashboard → **Workers & Pages** → **Create** → **Import a repository** (vagy *Connect to Git*) → válaszd a `kissm1985/Gardenplanner` tárolót.
 2. Beállítások:
-   - **Project name:** pl. `planterra-teszt` → a cím `https://planterra-teszt.pages.dev` lesz.
-   - **Production branch:** az az ág, amelyet tesztelni akarsz. Most `claude/k08-artifact-chapter-4-plan-k48w1z`, a beolvasztás után `main`.
-   - **Framework preset:** *None*. **Build command:** `npm run build`. **Build output directory:** `dist`.
-   - **Environment variables:** `NODE_VERSION` = `22`.
-3. **Save and Deploy.** Néhány perc múlva kész.
+   - **Project name:** `planterra` (egyezzen a `wrangler.jsonc` `name` mezőjével).
+   - **Build command:** `npm run build`
+   - **Deploy command:** `npx wrangler deploy`
+   - **Branch:** az az ág, amelyet tesztelni akarsz. Most `claude/k08-artifact-chapter-4-plan-k48w1z`, a beolvasztás után `main`.
+   - **Build variables:** `NODE_VERSION` = `22`.
+3. **Deploy.** A projekt **Deployments** / **Builds** lapján látod, sikerült-e; hiba esetén ott a napló.
 
-**B) Kézzel, fájlfeltöltéssel:** a saját gépeden futtasd az `npm run build` parancsot. Ezután: **Workers & Pages** → **Create** → **Pages** → **Upload assets**, és húzd be a `dist` mappát. Új verziónál ugyanígy töltsd fel újra.
+Ha már létezik egy üres `planterra` Worker, nyisd meg, és a **Settings → Build** alatt kösd össze a tárolóval ugyanezekkel a beállításokkal.
 
-A biztonsági fejléceket a build `dist/_headers` fájlja adja, ezt a Cloudflare Pages automatikusan alkalmazza.
+**B) A saját gépedről:** `npm run build`, majd `npx wrangler login` (egyszer) és `npx wrangler deploy`.
+
+**Előnézeti címek:** a projekt **Settings → Domains & Routes** részében kapcsold ki a **Preview URLs** lehetőséget, hogy csak a védett fő cím legyen elérhető.
+
+A biztonsági fejléceket a build `dist/_headers` fájlja adja, ezt a Cloudflare automatikusan alkalmazza.
 
 ## 3. Hozzáférés korlátozása (Cloudflare Access)
 
@@ -33,13 +40,13 @@ A biztonsági fejléceket a build `dist/_headers` fájlja adja, ezt a Cloudflare
 2. **Zero Trust** → **Access** → **Applications** → **Add an application** → **Self-hosted**.
    - **Application name:** Planterra teszt.
    - **Session duration:** pl. *1 month*, hogy a tesztelőknek ne kelljen sűrűn belépniük.
-   - **Application domain:** `planterra-teszt.pages.dev`. Vegyél fel egy második sort is: `*.planterra-teszt.pages.dev`. Ez védi az előnézeti (preview) címeket, mert minden feltöltésnek saját, külön címe is van.
+   - **Destinations → Public hostname:** **Subdomain** = `planterra`, **Domain** = `<fióknév>.workers.dev`, **Path** = üres.
 3. **Policy**:
-   - **Action:** *Allow*. **Include** → **Emails**: a tesztelők címei, egyenként.
+   - **Action:** *Allow*. **Include** → **Emails**: a tesztelők címei, egyenként. **Ne** használd az *Authentication Method* szabályt egyedül: azzal bárki beléphet, aki kódot kér.
    - Nagyobb körnél használhatsz **Emails ending in** szabályt is, pl. `@kerteszet.hu`.
 4. Mentsd el. Ezután a cím megnyitásakor egy Cloudflare beléptető oldal jelenik meg, és csak a listán szereplő címekre megy ki kód.
 
-**Ellenőrzés:** nyisd meg a címet privát böngészőablakban. Először a beléptető oldalnak kell megjelennie, az alkalmazás csak a kód beírása után töltődhet be. Próbáld ki egy előnézeti címmel is (a Pages projekt **Deployments** listájában találod).
+**Ellenőrzés:** nyisd meg a címet privát böngészőablakban. Először a beléptető oldalnak kell megjelennie, az alkalmazás csak a kód beírása után töltődhet be. Próbáld ki egy listán nem szereplő e-mail-címmel is: arra nem jöhet kód.
 
 ## 4. Tesztelők kezelése
 
@@ -49,7 +56,7 @@ A biztonsági fejléceket a build `dist/_headers` fájlja adja, ezt a Cloudflare
 
 ## 5. Mit küldj a tesztelőknek
 
-> Szia! Meghívtalak a Planterra kerttervező zárt tesztjére: https://planterra-teszt.pages.dev
+> Szia! Meghívtalak a Planterra kerttervező zárt tesztjére: https://planterra.<fióknév>.workers.dev
 > A megnyitáskor add meg ezt az e-mail-címedet, és a kapott kóddal lépj be. Telefonon a böngésző menüjéből a kezdőképernyőre is teheted (Safari: Megosztás → Főképernyőhöz adás).
 > A terveid csak a te készülékeden tárolódnak. Hibát, ötletet a ⋯ menü „Visszajelzés” pontjával küldhetsz.
 > A beléptetéshez a Cloudflare kezeli az e-mail-címedet; a teszt végén törlöm a listáról.
