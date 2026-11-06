@@ -1,0 +1,803 @@
+import { lazy, Suspense, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { flushSync } from 'react-dom';
+import { SNAP_CM } from './canvas/constants';
+import { evaluate, partition } from './engine/rules';
+import { ORIENTATION_LABEL } from './model/types';
+import { activeVariant, selectCurrentArea, selectItems, useProject } from './store/projectStore';
+import { useUi, type Layers, type Tool } from './store/uiStore';
+import { FIXTURE_LABEL } from './model/fixtures';
+import { PlantFilterForm } from './ui/PlantFilterForm';
+import { Coach, introDone } from './ui/Coach';
+import type { Orientation } from './ui/ProjectPanel';
+import { Sheet } from './ui/Sheet';
+import { helpId, type HelpKey } from './ui/helpSections';
+import { getLang, setLang, t, type Lang } from './i18n';
+import { WarningsPanel } from './ui/WarningsPanel';
+import { LogoMark } from './ui/Logo';
+import { backupNow, lastBackupAt, requestPersistence } from './ui/backup';
+import { QuickPanel, type QuickAction, type Step } from './ui/QuickPanel';
+import { markSeen, seen } from './ui/seen';
+import { toggleTheme } from './ui/theme';
+import { localName } from './i18n/names';
+import { Welcome } from './ui/Welcome';
+import { getTier, useFeature } from './model/tier';
+import { useSimpleMode } from './ui/simpleMode';
+import { CanopyChoice, ReadingChoices } from './ui/app/ReadingChoices';
+
+/** Tools in simple mode (the rest under More). */
+const SIMPLE_TOOLS = new Set(['select', 'plant', 'drift', 'list']);
+import { LockedSheet, requireFeature } from './ui/Locked';
+
+/** Rules the Basic tier checks. */
+const BASIC_RULES = new Set(['height', 'sun', 'spacing', 'outside']);
+
+// Windows and pages that are not needed at start load on first use (the service worker still keeps them offline).
+const PlantDbPanel = lazy(() => import('./ui/PlantDbPanel').then((m) => ({ default: m.PlantDbPanel })));
+const CompareView = lazy(() => import('./ui/CompareView').then((m) => ({ default: m.CompareView })));
+const ListView = lazy(() => import('./ui/ListView').then((m) => ({ default: m.ListView })));
+const SchedulePage = lazy(() => import('./ui/SchedulePage').then((m) => ({ default: m.SchedulePage })));
+const IdeaPanel = lazy(() => import('./ui/IdeaPanel').then((m) => ({ default: m.IdeaPanel })));
+const ReplacePanel = lazy(() => import('./ui/ReplacePanel').then((m) => ({ default: m.ReplacePanel })));
+const HelpPanel = lazy(() => import('./ui/HelpPanel').then((m) => ({ default: m.HelpPanel })));
+const VisualPanel = lazy(() => import('./ui/VisualPanel').then((m) => ({ default: m.VisualPanel })));
+// The plan editor loads after the start page (and is fetched in the background while it shows).
+const PlanCanvas = lazy(() => import('./canvas/PlanCanvas').then((m) => ({ default: m.PlanCanvas })));
+const PlantPalette = lazy(() => import('./ui/PlantPalette').then((m) => ({ default: m.PlantPalette })));
+const ShapeEditBar = lazy(() => import('./ui/ShapeEditBar').then((m) => ({ default: m.ShapeEditBar })));
+const FourSeasons = lazy(() => import('./ui/SeasonPanel').then((m) => ({ default: m.FourSeasons })));
+const SeasonPanel = lazy(() => import('./ui/SeasonPanel').then((m) => ({ default: m.SeasonPanel })));
+const ItemProps = lazy(() => import('./ui/Selection').then((m) => ({ default: m.ItemProps })));
+const SelectionBar = lazy(() => import('./ui/Selection').then((m) => ({ default: m.SelectionBar })));
+const FixtureTools = lazy(() => import('./ui/FixtureTools').then((m) => ({ default: m.FixtureTools })));
+/** Fetch the editor's code while the start page is open, so opening a plan is instant. */
+export const prefetchEditor = () => Promise.all([import('./canvas/PlanCanvas'), import('./ui/Selection'), import('./ui/PlantPalette'), import('./ui/PrintView')]);
+/** The print view must render synchronously when printing starts, so it is kept as a loaded module. */
+let printMod: typeof import('./ui/PrintView') | null = null;
+const loadPrint = async () => (printMod ??= await import('./ui/PrintView'));
+const AreasPanel = lazy(() => import('./ui/AreasPanel').then((m) => ({ default: m.AreasPanel })));
+const ProjectPanel = lazy(() => import('./ui/ProjectPanel').then((m) => ({ default: m.ProjectPanel })));
+const VariantsPanel = lazy(() => import('./ui/VariantsPanel').then((m) => ({ default: m.VariantsPanel })));
+const FixturesPanel = lazy(() => import('./ui/FixturesPanel').then((m) => ({ default: m.FixturesPanel })));
+const FeedbackPanel = lazy(() => import('./ui/FeedbackPanel').then((m) => ({ default: m.FeedbackPanel })));
+const LegalPanel = lazy(() => import('./ui/LegalPanel').then((m) => ({ default: m.LegalPanel })));
+const Loading = () => <p className="mono muted lazy-loading">{t('Betöltés…', 'Loading…')}</p>;
+/** Mounted only while open, so its code is fetched on first use. */
+const Lazy = ({ when, children }: { when: boolean; children: ReactNode }) => (when ? <Suspense fallback={<Loading />}>{children}</Suspense> : null);
+
+import { BackupReminder, CameraBar, FixtureBar, PlanStyleChoice, QuickToggles, ThemeChoice, TopMenu } from './ui/app/bars';
+import { HELP_SECTION, LAYER_LABELS, TOOL_LABEL, TOOLS } from './ui/app/tools';
+export { ThemeChoice } from './ui/app/bars';
+
+type SheetId =
+  | null
+  | 'quick'
+  | 'feedback'
+  | 'legal'
+  | 'visual'
+  | 'areas'
+  | 'view'
+  | 'plantdb'
+  | 'props'
+  | 'warnings'
+  | 'fixtures'
+  | 'variants'
+  | 'project'
+  | 'filters'
+  | 'ideas'
+  | 'replace'
+  | 'help';
+
+export function App({ loading }: { loading: boolean }) {
+  const project = useProject((s) => s.project);
+  const area = useProject(selectCurrentArea);
+  const canUndo = useProject((s) => s.past.length > 0);
+  const canRedo = useProject((s) => s.future.length > 0);
+  const tool = useUi((s) => s.tool);
+  const lasso = useUi((s) => s.lasso);
+  const snapOn = useUi((s) => s.snap);
+  const layers = useUi((s) => s.layers);
+  const driftPattern = useUi((s) => s.driftPattern);
+  const rowMode = useUi((s) => s.rowMode);
+  const total = useProject((s) => selectItems(s).reduce((n, i) => n + (i.kind === 'plant' ? 1 : i.count), 0));
+  const [sheet, setSheet] = useState<SheetId>(null);
+  const home = useUi((s) => s.home);
+  // Ask the browser to keep the plan once there is one (no effect where it is not supported).
+  const hasPlan = useProject((s) => !!s.project);
+  useEffect(() => {
+    if (hasPlan) requestPersistence();
+  }, [hasPlan]);
+  useEffect(() => useUi.getState().setVisualOpen(sheet === 'visual'), [sheet]);
+  // Started from "My own area" on the start screen: open the new-area form at once.
+  const [newArea, setNewArea] = useState(false);
+  const startNew = useUi((s) => s.startWithNewArea);
+  const hasProject = useProject((s) => !!s.project);
+  useEffect(() => {
+    if (!startNew || !hasProject) return;
+    useUi.getState().setStartWithNewArea(false);
+    setNewArea(true);
+    setSheet('areas');
+  }, [startNew, hasProject]);
+  const [replaceFrom, setReplaceFrom] = useState<string | undefined>(undefined);
+  // Undo/redo (or a split) can remove selected items: keep only those that still exist.
+  useEffect(
+    () =>
+      useProject.subscribe((st) => {
+        const sel = useUi.getState().selected;
+        if (!sel.length) return;
+        const ids = new Set(selectItems(st).map((i) => i.id));
+        const live = sel.filter((id) => ids.has(id));
+        if (live.length !== sel.length) useUi.getState().select(live);
+      }),
+    [],
+  );
+
+  // A zone drawn on the plan goes straight back to the idea panel, which fills it.
+  const zoneDraft = useUi((s) => s.zoneDraft);
+  useEffect(() => {
+    if (zoneDraft) setSheet('ideas');
+  }, [zoneDraft]);
+  const [helpAt, setHelpAt] = useState<string | undefined>(undefined);
+  const openHelp = (key?: HelpKey) => {
+    setHelpAt(key && helpId(key));
+    setSheet('help');
+  };
+  const openReplace = (code?: string) => {
+    setReplaceFrom(code);
+    setSheet('replace');
+  };
+  const items = useProject(selectItems);
+  const selectedFixture = useUi((s) => s.selectedFixture);
+  const fourUp = useUi((s) => s.tool === 'season' && s.fourUp);
+  const compare = useUi((s) => s.compare);
+  const page = useUi((s) => s.page);
+  const shapeEditing = useUi((s) => !!s.shapeEdit);
+  const cameraEdit = useUi((s) => s.cameraEdit);
+  const [print, setPrint] = useState<Orientation | null>(null);
+  const [coach, setCoach] = useState(() => !introDone());
+
+  // Fetch the editor and the print view in the background once the app is idle.
+  useEffect(() => {
+    const go = () => {
+      void prefetchEditor().then(loadPrint);
+      // Pro tier with a connected nursery: bring its catalogue (prices, stock) up to date.
+      if (getTier() === 'profi' && localStorage.getItem('kerttervezo.nursery')) void import('./ui/NurseryPanel').then((m) => m.syncAtStart());
+    };
+    const w = window as Window & { requestIdleCallback?: (f: () => void) => number };
+    if (w.requestIdleCallback) w.requestIdleCallback(go);
+    else setTimeout(go, 800);
+  }, []);
+  // Ctrl+P / browser print menu also gets the print document (portrait by default).
+  // Once requested it stays mounted; it is hidden on screen by the print stylesheet.
+  useEffect(() => {
+    const before = () => flushSync(() => setPrint((o) => o ?? 'portrait'));
+    window.addEventListener('beforeprint', before);
+    return () => window.removeEventListener('beforeprint', before);
+  }, []);
+  const startPrint = async (o: Orientation) => {
+    await loadPrint();
+    setSheet(null);
+    flushSync(() => setPrint(o));
+    // Give the dialog close a frame, then open the system print dialog (PDF on phones).
+    requestAnimationFrame(() => window.print());
+  };
+
+  // Rule engine: re-runs after every change of the area, its items, plants or settings.
+  // The Basic tier checks height, sun, spacing and placement only.
+  const fullRules = useFeature('fullRules');
+  const simple = useSimpleMode();
+  const [moreTools, setMoreTools] = useState(false);
+  const rowOk = useFeature('rowTool');
+  const { active: warnings, muted } = useMemo(() => {
+    if (!area || !project) return { active: [], muted: [] };
+    const all = evaluate(area, items, project.plantDb, project.settings);
+    return partition(fullRules ? all : all.filter((w) => BASIC_RULES.has(w.rule)), activeVariant(area).muted);
+  }, [area, items, project, fullRules]);
+  const errors = warnings.filter((w) => w.severity === 'error').length;
+
+  // Desktop keyboard shortcuts for undo/redo.
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || e.metaKey) || (e.target as HTMLElement).closest('input,textarea,select,dialog')) return;
+      const k = e.key.toLowerCase();
+      if (k === 'z' && !e.shiftKey) useProject.getState().undo();
+      else if (k === 'y' || (k === 'z' && e.shiftKey)) useProject.getState().redo();
+      else if (k === 'k') setSheet('quick');
+      else return;
+      e.preventDefault();
+    };
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, []);
+
+  // The first-plan checklist counts the list as seen once it was opened.
+  const tool0 = useUi((s) => s.tool);
+  useEffect(() => {
+    if (tool0 === 'list') markSeen('list');
+  }, [tool0]);
+
+  if (loading) return <div className="splash">{t('Betöltés…', 'Loading…')}</div>;
+  if (!project || home)
+    return (
+      <>
+        <Welcome onHelp={() => openHelp()} />
+        <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
+          <Lazy when={sheet === 'help'}>
+            <HelpPanel section={helpAt} />
+          </Lazy>
+        </Sheet>
+        <LockedSheet />
+      </>
+    );
+
+  const ui = useUi.getState();
+  const go = (f: () => void) => () => {
+    setSheet(null);
+    f();
+  };
+  const tool_ = (tl: Tool) => go(() => ui.setTool(tl));
+  const quickActions: QuickAction[] = [
+    { id: 'plant', label: t('Növény ültetése', 'Place a plant'), hint: t('Egyedi tő a palettáról', 'Single plant from the palette'), words: 'tő palettá', run: tool_('plant') },
+    { id: 'drift', label: t('Folt ültetése', 'Plant a drift'), hint: t('Egy rész kitöltése egy fajjal', 'Fill a patch with one species'), run: tool_('drift') },
+    { id: 'row', label: t('Sor vagy ív', 'Row or curve'), hint: t('Ültetés vonal mentén', 'Planting along a line'), words: 'sövény hedge', run: tool_('row') },
+    {
+      id: 'fixtures',
+      label: t('Rögzített elemek rajzolása', 'Draw fixed elements'),
+      hint: t('Gyep, burkolat, fal, kerítés, tó, tároló, fa…', 'Lawn, paving, wall, fence, pond, shed, tree…'),
+      words: 'elemek gyepsáv kavics kút pad',
+      run: tool_('fixtures'),
+    },
+    {
+      id: 'areas',
+      label: t('Területek', 'Areas'),
+      hint: t('Váltás, új terület, méret, alak, sablonok', 'Switch, new area, size, shape, templates'),
+      words: 'terület sablon alak',
+      run: () => setSheet('areas'),
+    },
+    {
+      id: 'ideas',
+      label: t('Ötletgenerátor', 'Idea generator'),
+      hint: t('Kész összeállítás új változatba, vagy kijelölt rész kitöltése', 'A ready composition in a new variant, or fill a region'),
+      words: 'generál random véletlen',
+      run: () => setSheet('ideas'),
+    },
+    {
+      id: 'replace',
+      label: t('Növény cseréje', 'Replace plants'),
+      hint: t('Egy faj cseréje egy vagy több másikra', 'Swap a species for one or more others'),
+      words: 'csere',
+      run: () => openReplace(),
+    },
+    { id: 'variants', label: t('Változatok', 'Variants'), hint: t('Megnyitás, másolás, mappák', 'Open, copy, folders'), words: 'terv másolat', run: () => setSheet('variants') },
+    ...(area && area.variants.length > 1
+      ? [
+          {
+            id: 'compare',
+            label: t('Változatok összehasonlítása', 'Compare variants'),
+            hint: t('Két változat egymás mellett', 'Two variants side by side'),
+            run: go(() => {
+              ui.setTool('select');
+              ui.setCompare(true);
+            }),
+          },
+        ]
+      : []),
+    {
+      id: 'visual',
+      label: t('Látványterv (ChatGPT)', 'Visualisation (ChatGPT)'),
+      hint: t('Kamera a rajzon, leírás és kép küldése, kész képek', 'Camera on the plan, send brief and image, finished images'),
+      words: 'kép kamera chatgpt ai mi',
+      run: () => setSheet('visual'),
+    },
+    { id: 'season', label: t('Évszaknézet', 'Season view'), hint: t('Színek hónapról hónapra, négy évszak', 'Colours month by month, four seasons'), run: tool_('season') },
+    {
+      id: 'list',
+      label: t('Növénylista, rendelés, költség', 'Plant list, order, cost'),
+      hint: t('Lista, tartalék, CSV, XLSX', 'List, spare, CSV, XLSX'),
+      words: 'bevásárló ár excel',
+      run: tool_('list'),
+    },
+    {
+      id: 'schedule',
+      label: t('Ültetési menetrend és gondozás', 'Planting schedule and care'),
+      hint: t('Napi lista, gondozási naptár', 'Daily list, care calendar'),
+      words: 'naptár',
+      run: go(() => ui.setPage('schedule')),
+    },
+    {
+      id: 'warnings',
+      label: t('Figyelmeztetések', 'Warnings'),
+      hint: t(`${warnings.length} figyelmeztetés ezen a területen`, `${warnings.length} warnings in this area`),
+      words: 'hiba szabály',
+      run: () => setSheet('warnings'),
+    },
+    {
+      id: 'plantdb',
+      label: t('Növényadatbázis', 'Plant database'),
+      hint: t('Fajok, szűrők, saját növény, import, ellenőrizendők', 'Species, filters, own plant, import, values to check'),
+      words: 'faj növény',
+      run: () => setSheet('plantdb'),
+    },
+    {
+      id: 'backup',
+      label: t('Mentés fájlba', 'Save to file'),
+      hint: t('Teljes mentés JSON-ban', 'Full backup as JSON'),
+      words: 'backup json mentés',
+      run: go(() => backupNow(project)),
+    },
+    {
+      id: 'project',
+      label: t('Projekt: betöltés, megosztás, nyomtatás, képek', 'Project: load, share, print, images'),
+      hint: t('Link, PNG, SVG, PDF, helyszín, névjegy', 'Link, PNG, SVG, PDF, location, about'),
+      words: 'pdf png link helyszín éghajlat',
+      run: () => setSheet('project'),
+    },
+    {
+      id: 'view',
+      label: t('Nézet és rétegek', 'View and layers'),
+      hint: t('Rétegek, méret, fotók, megjelenés, nyelv', 'Layers, size, photos, appearance, language'),
+      run: () => setSheet('view'),
+    },
+    {
+      id: 'planstyle',
+      label: project.settings.planStyle === 'concept' ? t('Vissza az alap jelekre', 'Back to standard symbols') : t('Koncepcióterv-mód', 'Concept plan mode'),
+      hint: t('Színes jelek vagy növényábrák (piktogramok) a rajzon', 'Coloured symbols or plant drawings (pictograms) on the plan'),
+      words: 'koncepció piktogram ábra mód concept',
+      run: go(() => useProject.getState().updateSettings({ planStyle: project.settings.planStyle === 'concept' ? 'symbol' : 'concept' })),
+    },
+    {
+      id: 'theme',
+      label: t('Sötét / világos mód', 'Dark / light mode'),
+      hint: t('Váltás egy koppintással', 'Switch with one tap'),
+      words: 'dark light téma',
+      run: go(toggleTheme),
+    },
+    {
+      id: 'lang',
+      label: getLang() === 'hu' ? 'English' : 'Magyar',
+      hint: getLang() === 'hu' ? 'Switch to English' : 'Váltás magyarra',
+      words: 'nyelv language',
+      run: go(() => setLang(getLang() === 'hu' ? 'en' : 'hu')),
+    },
+    { id: 'help', label: t('Súgó', 'Help'), hint: t('Felhasználói útmutató', 'User guide'), words: 'útmutató', run: () => openHelp() },
+    {
+      id: 'legal',
+      label: t('Jogi információk és adatvédelem', 'Legal information and privacy'),
+      hint: t('Feltételek, adatvédelem, adatforrások, licencek', 'Terms, privacy, data sources, licences'),
+      run: () => setSheet('legal'),
+    },
+    { id: 'intro', label: t('Bevezető újra', 'Show the intro again'), hint: t('A három lépéses bemutató', 'The three-step tour'), run: go(() => setCoach(true)) },
+  ];
+  const anyFixtures = project.areas.some((a) => a.fixtures.length > 0);
+  const anyItems = project.areas.some((a) => a.variants.some((v) => v.items.length > 0));
+  const steps: Step[] = [
+    { id: 'area', label: t('Terület megadása (méret, fekvés, napsütés)', 'Set up an area (size, facing, sun)'), done: project.areas.length > 0, run: () => setSheet('areas') },
+    { id: 'fixtures', label: t('Rögzített elemek (fal, gyep, fa…)', 'Fixed elements (wall, lawn, tree…)'), done: anyFixtures, run: tool_('fixtures') },
+    { id: 'plants', label: t('Növények elhelyezése', 'Place plants'), done: anyItems, run: tool_('plant') },
+    { id: 'warnings', label: t('Hibák javítása a figyelmeztetések alapján', 'Fix errors from the warnings'), done: anyItems && errors === 0, run: () => setSheet('warnings') },
+    {
+      id: 'variants',
+      label: t('Változat vagy ötlet kipróbálása', 'Try a variant or an idea'),
+      done: project.areas.some((a) => a.variants.length > 1),
+      run: () => setSheet('variants'),
+    },
+    { id: 'list', label: t('Növénylista és költség megnézése', 'Check the plant list and cost'), done: seen('list'), run: tool_('list') },
+    { id: 'backup', label: t('Mentés fájlba', 'Save to file'), done: lastBackupAt() != null, run: go(() => backupNow(project)) },
+  ];
+
+  return (
+    <div className="app">
+      <header className="topbar">
+        <button
+          type="button"
+          className="topbar-brand"
+          title={t('Kezdőoldal', 'Start page')}
+          aria-label={t('Kezdőoldal: területek és új terület', 'Start page: areas and new area')}
+          onClick={() => {
+            setSheet(null);
+            useUi.getState().setHome(true);
+          }}
+        >
+          <LogoMark size={26} />
+        </button>
+        <button type="button" className="area-switch" onClick={() => setSheet('areas')} aria-haspopup="dialog">
+          <span className="area-name">{area ? localName(area.name) : t('Nincs terület', 'No area')}</span>
+          {area && (
+            <span className="area-meta mono">
+              {area.widthCm} × {area.lengthCm} cm · <b className="meta-count">{t(`${total} tő`, `${total} plants`)}</b> · {ORIENTATION_LABEL[area.orientation]}
+              {area.sunUntil && ` · ${area.sunUntil}`}
+            </span>
+          )}
+        </button>
+        <div className="top-actions">
+          <button type="button" className="icon-btn" onClick={() => useProject.getState().undo()} disabled={!canUndo} aria-label={t('Visszavonás', 'Undo')}>
+            ↶
+          </button>
+          <QuickToggles langOnly />
+          <button type="button" className="icon-btn help-btn" onClick={() => openHelp(HELP_SECTION[tool])} aria-label={t('Súgó: felhasználói útmutató', 'Help: user guide')}>
+            ?
+          </button>
+          <TopMenu
+            canRedo={canRedo}
+            onView={() => setSheet('view')}
+            onProject={() => setSheet('project')}
+            onQuick={() => setSheet('quick')}
+            onFeedback={() => setSheet('feedback')}
+          />
+          <button
+            type="button"
+            className={`warn-badge${warnings.length === 0 ? ' is-ok' : errors ? ' is-error' : ''}`}
+            onClick={() => setSheet('warnings')}
+            aria-label={t(`${warnings.length} figyelmeztetés`, `${warnings.length} warnings`)}
+          >
+            {warnings.length}
+          </button>
+        </div>
+      </header>
+
+      <BackupReminder />
+      <main className={`stage${page || tool === 'list' || fourUp || (compare && area) ? ' stage-scroll' : ''}`}>
+        <Suspense fallback={<Loading />}>
+          {page === 'schedule' ? (
+            <Lazy when>
+              <SchedulePage />
+            </Lazy>
+          ) : tool === 'list' ? (
+            <Lazy when>
+              <ListView />
+            </Lazy>
+          ) : compare && area ? (
+            <Lazy when>
+              <CompareView area={area} />
+            </Lazy>
+          ) : fourUp && area ? (
+            <FourSeasons area={area} plantDb={project.plantDb} showMature={project.settings.showMatureSize} />
+          ) : area ? (
+            <>
+              <PlanCanvas area={area} settings={project.settings} plantDb={project.plantDb} warnings={warnings} />
+              <button
+                type="button"
+                className="variant-pill"
+                onClick={() => setSheet('variants')}
+                aria-label={t(`Változat: ${localName(activeVariant(area).name)}. Változatok kezelése`, `Variant: ${localName(activeVariant(area).name)}. Manage variants`)}
+              >
+                {localName(activeVariant(area).name)}
+                {area.variants.length > 1 ? <span className="mono"> · {area.variants.length}</span> : null} ▾
+              </button>
+              {shapeEditing && <ShapeEditBar />}
+              {cameraEdit && <CameraBar onDone={() => setSheet('visual')} />}
+              {!cameraEdit && !shapeEditing && (
+                <button
+                  type="button"
+                  className="quick-fab"
+                  onClick={() => setSheet('quick')}
+                  aria-label={t('Gyors műveletek', 'Quick actions')}
+                  title={t('Gyors műveletek (Ctrl+K)', 'Quick actions (Ctrl+K)')}
+                >
+                  ⚡
+                </button>
+              )}
+              {tool === 'select' && !shapeEditing && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Kijelölés módja', 'Selection mode')}>
+                  <button type="button" className="chip-btn" aria-pressed={lasso} onClick={() => ui.setLasso(!lasso)}>
+                    {t('Lasszó', 'Lasso')}
+                  </button>
+                  <button
+                    type="button"
+                    className="chip-btn"
+                    aria-pressed={snapOn}
+                    onClick={() => ui.setSnap(!snapOn)}
+                    title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}
+                  >
+                    {t('Mágnes', 'Snap')}
+                  </button>
+                </div>
+              )}
+              {tool === 'plant' && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Elhelyezés', 'Placing')}>
+                  <button
+                    type="button"
+                    className="chip-btn"
+                    aria-pressed={snapOn}
+                    onClick={() => ui.setSnap(!snapOn)}
+                    title={t(`Igazítás ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}
+                  >
+                    {t('Mágnes', 'Snap')}
+                  </button>
+                </div>
+              )}
+              {tool === 'drift' && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Folt kiosztása', 'Drift layout')}>
+                  <button type="button" className="chip-btn" aria-pressed={driftPattern === 'staggered'} onClick={() => ui.setDriftPattern('staggered')}>
+                    {t('Eltolt rács', 'Staggered')}
+                  </button>
+                  <button type="button" className="chip-btn" aria-pressed={driftPattern === 'grid'} onClick={() => ui.setDriftPattern('grid')}>
+                    {t('Négyzetes', 'Grid')}
+                  </button>
+                </div>
+              )}
+              {tool === 'row' && (
+                <div className="stage-tools" role="toolbar" aria-label={t('Sor fajtája', 'Row type')}>
+                  <button type="button" className="chip-btn" aria-pressed={rowMode === 'line'} onClick={() => ui.setRowMode('line')}>
+                    {t('Egyenes', 'Straight')}
+                  </button>
+                  <button type="button" className="chip-btn" aria-pressed={rowMode === 'curve'} onClick={() => ui.setRowMode('curve')}>
+                    {t('Ív', 'Curve')}
+                  </button>
+                  <button type="button" className="chip-btn" aria-pressed={snapOn} onClick={() => ui.setSnap(!snapOn)}>
+                    {t('Mágnes', 'Snap')}
+                  </button>
+                </div>
+              )}
+              {tool === 'select' && <SelectionBar onProps={() => setSheet('props')} onReplace={openReplace} />}
+              {(tool === 'select' || tool === 'fixtures') && selectedFixture && area.fixtures.some((x) => x.id === selectedFixture) && (
+                <FixtureBar
+                  id={selectedFixture}
+                  label={(() => {
+                    const f = area.fixtures.find((x) => x.id === selectedFixture);
+                    return f ? localName(f.label) || FIXTURE_LABEL[f.type] : '';
+                  })()}
+                  onProps={() => setSheet('fixtures')}
+                />
+              )}
+            </>
+          ) : (
+            <div className="empty-stage">
+              <p>{t('Még nincs területed. Hozz létre egyet, és kezdjük a rajzolást.', 'You have no area yet. Create one and start drawing.')}</p>
+              <button type="button" className="btn btn-primary" onClick={() => setSheet('areas')}>
+                {t('Terület hozzáadása', 'Add an area')}
+              </button>
+            </div>
+          )}
+        </Suspense>
+      </main>
+
+      {(tool === 'plant' || tool === 'drift' || tool === 'row') && area && !page && !compare && (
+        <Suspense fallback={null}>
+          <PlantPalette onOpenDb={() => setSheet('plantdb')} onOpenFilters={() => setSheet('filters')} />
+        </Suspense>
+      )}
+      <Suspense fallback={null}>{tool === 'fixtures' && area && !page && !compare && !shapeEditing && <FixtureTools onList={() => setSheet('fixtures')} />}</Suspense>
+      <Suspense fallback={null}>{tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}</Suspense>
+
+      <nav className={`toolbar${simple && !moreTools ? ' is-simple' : ''}`} aria-label={t('Eszközök', 'Tools')}>
+        {TOOLS.filter((tb) => !simple || moreTools || SIMPLE_TOOLS.has(tb.id)).map((tb) => (
+          <button
+            key={tb.id}
+            type="button"
+            className={`tool${tb.id === 'row' && !rowOk ? ' is-locked' : ''}`}
+            data-tool={tb.id}
+            aria-pressed={tool === tb.id}
+            disabled={!tb.ready}
+            title={TOOL_LABEL[tb.id]}
+            onClick={() => (tb.id === 'row' ? requireFeature('rowTool', () => ui.setTool(tb.id)) : ui.setTool(tb.id))}
+          >
+            <span className="tool-icon" aria-hidden="true">
+              {tb.id === 'row' && !rowOk ? '🔒' : tb.icon}
+            </span>
+            <span className="tool-label">{TOOL_LABEL[tb.id]}</span>
+          </button>
+        ))}
+        {simple && (
+          <>
+            {!moreTools && (
+              <button type="button" className="tool" onClick={() => setSheet('ideas')} title={t('Ötlet', 'Idea')}>
+                <span className="tool-icon" aria-hidden="true">
+                  ✦
+                </span>
+                <span className="tool-label">{t('Ötlet', 'Idea')}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className="tool"
+              aria-expanded={moreTools}
+              onClick={() => setMoreTools((v) => !v)}
+              title={moreTools ? t('Kevesebb', 'Fewer') : t('Több eszköz', 'More tools')}
+            >
+              <span className="tool-icon" aria-hidden="true">
+                {moreTools ? '‹' : '…'}
+              </span>
+              <span className="tool-label">{moreTools ? t('Kevesebb', 'Fewer') : t('Több', 'More')}</span>
+            </button>
+          </>
+        )}
+      </nav>
+
+      <Sheet
+        open={sheet === 'areas'}
+        onHelp={() => openHelp('areas')}
+        title={t('Területek', 'Areas')}
+        onClose={() => {
+          setNewArea(false);
+          setSheet(null);
+        }}
+      >
+        <Lazy when={sheet === 'areas'}>
+          <AreasPanel
+            key={newArea ? 'new' : 'list'}
+            startNew={newArea}
+            onDone={() => {
+              setNewArea(false);
+              setSheet(null);
+            }}
+          />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'plantdb'} onHelp={() => openHelp('db')} title={t('Növényadatbázis', 'Plant database')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'plantdb'}>
+          <PlantDbPanel />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'props'} onHelp={() => openHelp('select')} title={t('Tulajdonságok', 'Properties')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'props'}>
+          <ItemProps plantDb={project.plantDb} onDone={() => setSheet(null)} onReplace={openReplace} />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'project'} onHelp={() => openHelp('project')} title={t('Projekt', 'Project')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'project'}>
+          <ProjectPanel
+            onPrint={startPrint}
+            onIntro={() => {
+              setSheet(null);
+              setCoach(true);
+            }}
+            onDone={() => setSheet(null)}
+            onVisual={() => setSheet('visual')}
+            onLegal={() => setSheet('legal')}
+          />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'quick'} title={t('Gyors műveletek', 'Quick actions')} onClose={() => setSheet(null)}>
+        <QuickPanel actions={quickActions} steps={steps} />
+      </Sheet>
+      <Sheet open={sheet === 'legal'} title={t('Jogi információk', 'Legal information')} onClose={() => setSheet(null)} wide>
+        <Lazy when={sheet === 'legal'}>
+          <LegalPanel />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'visual'} onHelp={() => openHelp('visual')} title={t('Látványterv', 'Visualisation')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'visual'}>
+          <VisualPanel
+            onPickCamera={() => {
+              setSheet(null);
+              ui.setTool('select');
+              ui.setCameraEdit(true);
+            }}
+          />
+        </Lazy>
+      </Sheet>
+      {coach && !sheet && <Coach onClose={() => setCoach(false)} />}
+      {print && printMod && <printMod.PrintView project={project} orientation={print} />}
+      <Sheet open={sheet === 'filters'} onHelp={() => openHelp('db')} title={t('Növényszűrők', 'Plant filters')} onClose={() => setSheet(null)}>
+        <div className="form">
+          <PlantFilterForm />
+          <div className="form-actions">
+            <button type="button" className="btn btn-primary" onClick={() => setSheet(null)}>
+              {t('Kész', 'Done')}
+            </button>
+          </div>
+        </div>
+      </Sheet>
+      <Sheet open={sheet === 'variants'} onHelp={() => openHelp('variants')} title={t('Változatok', 'Variants')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'variants'}>
+          <VariantsPanel onDone={() => setSheet(null)} onIdeas={() => setSheet('ideas')} onReplace={() => openReplace()} onVisual={() => setSheet('visual')} />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'help'} title={t('Súgó', 'Help')} onClose={() => setSheet(null)} wide>
+        <Lazy when={sheet === 'help'}>
+          <HelpPanel section={helpAt} />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'replace'} onHelp={() => openHelp('replace')} title={t('Növény cseréje', 'Replace plants')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'replace'}>
+          <ReplacePanel key={replaceFrom ?? ''} from={replaceFrom} onDone={() => setSheet(null)} />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'ideas'} onHelp={() => openHelp('ideas')} title={t('Ötletgenerátor', 'Idea generator')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'ideas'}>
+          <IdeaPanel onDone={() => setSheet(null)} />
+        </Lazy>
+      </Sheet>
+      <Sheet
+        open={sheet === 'warnings'}
+        onHelp={() => openHelp('warnings')}
+        title={t(`Figyelmeztetések (${warnings.length})`, `Warnings (${warnings.length})`)}
+        onClose={() => setSheet(null)}
+      >
+        <WarningsPanel active={warnings} muted={muted} onJump={() => setSheet(null)} />
+      </Sheet>
+      <Sheet open={sheet === 'fixtures'} onHelp={() => openHelp('fixtures')} title={t('Rögzített elemek', 'Fixed elements')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'fixtures'}>
+          <FixturesPanel onDone={() => setSheet(null)} />
+        </Lazy>
+      </Sheet>
+      <Sheet open={sheet === 'view'} onHelp={() => openHelp('screen')} title={t('Nézet', 'View')} onClose={() => setSheet(null)}>
+        <div className="form">
+          <fieldset className="field-group">
+            <legend>{t('Rétegek', 'Layers')}</legend>
+            {(Object.keys(LAYER_LABELS) as (keyof Layers)[]).map((k) => (
+              <label key={k} className="check">
+                <input type="checkbox" checked={layers[k]} onChange={(e) => ui.setLayer(k, e.target.checked)} />
+                <span>{LAYER_LABELS[k]}</span>
+              </label>
+            ))}
+          </fieldset>
+          <fieldset className="field-group">
+            <legend>{t('Növények mérete', 'Plant size')}</legend>
+            <div className="seg">
+              <label className="seg-item">
+                <input type="radio" name="size" checked={project.settings.showMatureSize} onChange={() => useProject.getState().updateSettings({ showMatureSize: true })} />
+                <span>{t('kifejlett', 'mature')}</span>
+              </label>
+              <label className="seg-item">
+                <input type="radio" name="size" checked={!project.settings.showMatureSize} onChange={() => useProject.getState().updateSettings({ showMatureSize: false })} />
+                <span>{t('ültetéskori', 'at planting')}</span>
+              </label>
+            </div>
+          </fieldset>
+          <label className="check">
+            <input type="checkbox" checked={project.settings.wikiPhotos === true} onChange={(e) => useProject.getState().updateSettings({ wikiPhotos: e.target.checked })} />
+            <span>
+              {t(
+                'Növényfotók a Wikipédiáról (első alkalommal internet kell; a Wikimedia látja az IP-címedet)',
+                'Plant photos from Wikipedia (needs internet the first time; Wikimedia sees your IP address)',
+              )}
+            </span>
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={snapOn} onChange={(e) => ui.setSnap(e.target.checked)} />
+            <span>{t(`Mágnesezés ${SNAP_CM} cm-es rácsra`, `Snap to a ${SNAP_CM} cm grid`)}</span>
+          </label>
+          <div className="form-actions form-actions-start">
+            <button type="button" className="btn" onClick={() => setSheet('plantdb')}>
+              {t('Növényadatbázis', 'Plant database')}
+            </button>
+            <button type="button" className="btn" onClick={() => setSheet('fixtures')}>
+              {t('Rögzített elemek', 'Fixed elements')}
+            </button>
+            <button type="button" className="btn" onClick={() => setSheet('ideas')}>
+              {t('✦ Ötletgenerátor', '✦ Idea generator')}
+            </button>
+            <button
+              type="button"
+              className="btn"
+              onClick={() => {
+                ui.setPage('schedule');
+                setSheet(null);
+              }}
+            >
+              {t('Menetrend és gondozás', 'Schedule and care')}
+            </button>
+          </div>
+          <fieldset className="field-group">
+            <legend>{t('Tervező mód', 'Plan style')}</legend>
+            <PlanStyleChoice />
+            <CanopyChoice />
+          </fieldset>
+          <fieldset className="field-group">
+            <legend>{t('Megjelenés', 'Appearance')}</legend>
+            <ThemeChoice />
+            <ReadingChoices />
+          </fieldset>
+          <fieldset className="field-group">
+            <legend>{t('Nyelv', 'Language')}</legend>
+            <div className="seg">
+              {(['hu', 'en'] as Lang[]).map((l) => (
+                <label key={l} className="seg-item">
+                  <input type="radio" name="lang" checked={getLang() === l} onChange={() => setLang(l)} />
+                  <span>{l === 'hu' ? 'Magyar' : 'English'}</span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      </Sheet>
+      <Sheet open={sheet === 'feedback'} title={t('Visszajelzés', 'Feedback')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'feedback'}>
+          <FeedbackPanel onDone={() => setSheet(null)} />
+        </Lazy>
+      </Sheet>
+      <LockedSheet />
+    </div>
+  );
+}

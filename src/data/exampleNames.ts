@@ -1,0 +1,32 @@
+// Names the example plans give to areas and elements, for language switching (kept apart from the plans
+// themselves so the start-up code does not need the plan data).
+/** Every name the examples give (area names and their element labels). */
+export const EXAMPLE_NAME_PAIRS: [string, string][] = [
+  ['Mediterrán kert', 'Mediterranean garden'],
+  ['Kastélykert', 'Château garden'],
+  ['Vidéki udvar', 'Country yard'],
+  ['Alpesi sziklakert', 'Alpine rock garden'],
+  ['Angolkert', 'English garden'],
+  ['Japánkert', 'Japanese garden'],
+  ['Prérikert', 'Prairie garden'],
+  ['Árnyékkert', 'Shade garden'],
+  ['Modern városi kert', 'Modern city garden'],
+  ['Kerek pillangókert', 'Round pollinator garden'],
+  ['Terasz', 'Terrace'],
+  ['Kavicsos út', 'Gravel path'],
+  ['Agyagkorsó', 'Terracotta urn'],
+  ['Főtengely', 'Main axis'],
+  ['Keresztút', 'Cross walk'],
+  ['Szökőkút', 'Fountain'],
+  ['Járólapok', 'Stepping path'],
+  ['Szikla', 'Rock'],
+  ['Lépőkövek', 'Stepping stones'],
+  ['Gereblyézett kavics', 'Raked gravel'],
+  ['Kőlámpás', 'Stone lantern'],
+  ['Nyírt ösvény', 'Mown path'],
+  ['Meglévő fa', 'Existing tree'],
+  ['Kéregmulcsos ösvény', 'Bark path'],
+  ['Járólap', 'Stepping slab'],
+  ['Kültéri pad', 'Outdoor bench'],
+  ['Madáritató', 'Bird bath'],
+];
