@@ -4,7 +4,7 @@ import { buildBom, chosenItems, fmtFt, fmtInt } from '../engine/bom';
 import { decodeShare } from '../engine/io';
 import { SEASON_LABEL, SEASON_MONTH, type Season } from '../engine/season';
 import { ORIENTATION_LABEL, type Project } from '../model/types';
-import { saveProject } from '../store/persist';
+import { saveAsNew, setCurrentProjectId } from '../store/persist';
 import { migrate } from '../store/projectStore';
 import { PlantChip } from './PlantChip';
 import { t } from '../i18n';
@@ -38,8 +38,17 @@ export function ReadOnlyView({ code }: { code: string }) {
   const bom = area ? buildBom(p, [area.id]) : null;
 
   const adopt = async () => {
-    if (!confirm(t('Elmented ezt a tervet ezen a készüléken? A saját, eddigi terved helyére kerül.', 'Save this plan on this device? It replaces your own plan.'))) return;
-    await saveProject(p);
+    if (
+      !confirm(
+        t(
+          'Elmented ezt a tervet ezen a készüléken új projektként? A saját terveid megmaradnak.',
+          'Save this plan on this device as a new project? Your own plans stay as they are.',
+        ),
+      )
+    )
+      return;
+    const copy = await saveAsNew(p);
+    setCurrentProjectId(copy.id);
     location.href = location.pathname;
   };
 

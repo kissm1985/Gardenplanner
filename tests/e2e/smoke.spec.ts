@@ -81,19 +81,22 @@ test('a broken saved plan opens the recovery screen: download it, then start ove
   await page.getByRole('button', { name: /Kezdés/ }).click();
   await expect(page.locator('.area-outline')).toBeVisible();
   // Corrupt the saved plan the way a bad import or a bug could.
+  await page.waitForFunction(() => !!localStorage.getItem('kerttervezo:current-project'));
+  await page.waitForTimeout(500); // autosave
   await page.evaluate(
     () =>
       new Promise<void>((done) => {
+        const key = `kerttervezo:project:${localStorage.getItem('kerttervezo:current-project')}`;
         const req = indexedDB.open('keyval-store');
         req.onsuccess = () => {
           const db = req.result;
           const tx = db.transaction('keyval', 'readwrite');
           const store = tx.objectStore('keyval');
-          const get = store.get('kerttervezo:project:v1');
+          const get = store.get(key);
           get.onsuccess = () => {
             const p = get.result;
             p.areas[0].variants[0].items = [{ kind: 'drift', id: 'x', plantId: 'LA', polygon: 'oops', spacingCm: 30 }];
-            store.put(p, 'kerttervezo:project:v1');
+            store.put(p, key);
           };
           tx.oncomplete = () => done();
         };

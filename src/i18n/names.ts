@@ -27,6 +27,7 @@ const PATTERNS: { hu: RegExp; en: RegExp; toHu: (m: string) => string; toEn: (m:
   { hu: /^([A-Z]) terv$/, en: /^Plan ([A-Z])$/, toHu: (m) => `${m} terv`, toEn: (m) => `Plan ${m}` },
   { hu: /^(\d+)\. terv$/, en: /^Plan (\d+)$/, toHu: (m) => `${m}. terv`, toEn: (m) => `Plan ${m}` },
   { hu: /^Ötlet (\d+)$/, en: /^Idea (\d+)$/, toHu: (m) => `Ötlet ${m}`, toEn: (m) => `Idea ${m}` },
+  { hu: /^Kertem (\d+)$/, en: /^My garden (\d+)$/, toHu: (m) => `Kertem ${m}`, toEn: (m) => `My garden ${m}` },
 ];
 
 /** A default name in the given (default: current) language; any other name unchanged. */

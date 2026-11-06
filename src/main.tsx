@@ -13,11 +13,11 @@ import { App } from './App';
 import { useLang } from './i18n';
 import { SHARE_PREFIX } from './engine/io';
 import { ReadOnlyView } from './ui/ReadOnlyView';
-import { createAutosaver, loadProject, StoredProjectError } from './store/persist';
+import { autosave, loadProject, setCurrentProjectId, StoredProjectError } from './store/persist';
+import { useProjects } from './store/projects';
 import { ErrorBoundary, RecoveryScreen } from './ui/Recovery';
 import { useProject } from './store/projectStore';
 
-const autosave = createAutosaver();
 autosave.onError(() => {
   // Storage can fail (private mode, quota); keep working in memory and say so.
   document.documentElement.dataset.saveError = '1';
@@ -40,6 +40,7 @@ function Root() {
       .then((p) => {
         if (cancelled || p === undefined) return;
         useProject.getState().setLoaded(p);
+        void useProjects.getState().refresh();
         // Reopen the area that was open last time.
         const last = readLastArea();
         if (last && p?.areas.some((a) => a.id === last)) useProject.getState().selectArea(last);
@@ -49,7 +50,10 @@ function Root() {
           if (s.project && s.project !== prev.project) {
             autosave.schedule(s.project);
             // A brand-new or freshly loaded project is written at once, not after the debounce.
-            if (!prev.project || s.project.id !== prev.project.id) autosave.flush();
+            if (!prev.project || s.project.id !== prev.project.id) {
+              setCurrentProjectId(s.project.id);
+              autosave.flush();
+            }
           }
           if (s.currentAreaId !== prev.currentAreaId) writeLastArea(s.currentAreaId);
         });

@@ -6,13 +6,13 @@ import { itemCount } from '../engine/fill';
 import { getLang, t } from '../i18n';
 
 /** The ten ready-made example plans on the start page, each with a small drawing of its planted plan. */
-export const ExamplePlans = memo(function ExamplePlans({ onPick }: { onPick: (key: string) => void }) {
+export const ExamplePlans = memo(function ExamplePlans({ onPick, strip = false }: { onPick: (key: string) => void; /** One scrollable row instead of a grid. */ strip?: boolean }) {
   const lang = getLang();
   // Built once per language: names and element labels are stored in the language of the moment.
   // eslint-disable-next-line react-hooks/exhaustive-deps -- rebuilt on purpose when the language changes
   const built = useMemo(() => EXAMPLE_PLANS.map((ex) => ({ ex, area: buildExample(ex) })), [lang]);
   return (
-    <ul className="example-list">
+    <ul className={`example-list${strip ? ' example-strip' : ''}`}>
       {built.map(({ ex, area }) => {
         const v = area.variants[0];
         const n = v.items.reduce((s, it) => s + itemCount(it), 0);

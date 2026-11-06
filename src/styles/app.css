@@ -3144,3 +3144,72 @@ button.topbar-brand {
   line-height: 1.4;
   color: var(--mute);
 }
+
+/* ---------- start page: continue, projects, example strip ---------- */
+.home-continue {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+  border: 2px solid var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, var(--panel));
+  margin-bottom: 10px;
+}
+.home-continue b {
+  font-size: 17px;
+  color: var(--accent);
+}
+.home-projects {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.home-project-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 6px;
+  align-items: stretch;
+}
+.home-project,
+.home-project-edit {
+  width: 100%;
+  font: inherit;
+  color: inherit;
+}
+.home-project.is-current {
+  border-color: var(--accent);
+}
+.home-project-edit {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+.home-project-edit input {
+  flex: 1;
+  font: inherit;
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  color: inherit;
+}
+.home-project-menu {
+  grid-column: 1 / -1;
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px 0 8px;
+}
+.home-new-project,
+.example-all {
+  margin-top: 8px;
+}
+.example-list.example-strip {
+  display: flex;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-bottom: 6px;
+}
+.example-list.example-strip > li {
+  flex: 0 0 168px;
+  scroll-snap-align: start;
+}

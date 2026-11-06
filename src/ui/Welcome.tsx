@@ -1,9 +1,11 @@
-import { lazy, Suspense, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { AREA_TEMPLATES } from '../data/templates';
 import { getLang, setLang, t } from '../i18n';
 import { localName } from '../i18n/names';
 import { activeVariant, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
+import { duplicateProject, newProject, openProject, removeProject, renameProject, useProjects } from '../store/projects';
+import type { ProjectMeta } from '../store/persist';
 import { AUTHOR, copyrightLine } from './About';
 import { ExamplePlans } from './ExamplePlans';
 import { Logo } from './Logo';
@@ -13,9 +15,19 @@ const LegalPanel = lazy(() => import('./LegalPanel').then((m) => ({ default: m.L
 
 const plants = (n: number) => t(`${n} tő`, `${n} plants`);
 
+/** "today", "yesterday", "3 days ago", or the date. */
+export function ago(ms: number, now = Date.now()): string {
+  const days = Math.floor((new Date(now).setHours(0, 0, 0, 0) - new Date(ms).setHours(0, 0, 0, 0)) / 86400000);
+  if (days <= 0) return t('ma', 'today');
+  if (days === 1) return t('tegnap', 'yesterday');
+  if (days < 14) return t(`${days} napja`, `${days} days ago`);
+  return new Date(ms).toLocaleDateString(getLang() === 'en' ? 'en-GB' : 'hu-HU');
+}
+
 /**
- * Start page, on every launch and from the logo: a new area first, then the areas already planned,
- * then the ready-made templates.
+ * Start page, on every launch and from the logo. Returning: "Continue" first, then a new area, the areas of the
+ * open project, the other projects, the examples in a strip and the templates. First visit: a new area, the
+ * examples and the templates.
  */
 export function Welcome({ onHelp }: { onHelp: () => void }) {
   const project = useProject((s) => s.project);
@@ -35,6 +47,13 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
     if (!project) st.createProject([]);
     ui.setHome(false);
   };
+  const projects = useProjects((s) => s.list);
+  useEffect(() => {
+    void useProjects.getState().refresh();
+  }, []);
+  const [allExamples, setAllExamples] = useState(false);
+  const currentArea = project?.areas.find((a) => a.id === st.currentAreaId) ?? project?.areas[0];
+  const returning = !!currentArea;
 
   return (
     <main className="welcome">
@@ -63,6 +82,19 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
           'Draw the area, drag the plants onto it, and the app puts the list together. All data stays on this device.',
         )}
       </p>
+
+      {returning && currentArea && (
+        <button type="button" className="tpl home-continue" onClick={() => open(currentArea.id)}>
+          <b>
+            {t('Folytatás', 'Continue')}: {localName(currentArea.name)} ›
+          </b>
+          <small>
+            {localName(project!.name)} · {localName(activeVariant(currentArea).name)} ·{' '}
+            {plants(activeVariant(currentArea).items.reduce((n, it) => n + (it.kind === 'plant' ? 1 : it.count), 0))}
+            {projects.find((m) => m.id === project!.id) ? ` · ${ago(projects.find((m) => m.id === project!.id)!.updatedAt)}` : ''}
+          </small>
+        </button>
+      )}
 
       <button type="button" className="tpl tpl-own" onClick={newArea}>
         <b>{t('+ Új terület létrehozása', '+ Create a new area')}</b>
@@ -97,6 +129,8 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         </>
       )}
 
+      {projects.length > 0 && <ProjectList list={projects} currentId={project?.id} onOpen={() => ui.setHome(false)} />}
+
       <h2 className="sub-h">{t('Példatervek', 'Example plans')}</h2>
       <p className="muted example-lead">
         {t(
@@ -105,13 +139,19 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         )}
       </p>
       <ExamplePlans
+        strip={returning && !allExamples}
         onPick={(key) => {
           const id = st.addExampleArea(key);
           if (id) open(id);
         }}
       />
+      {returning && (
+        <button type="button" className="btn btn-small example-all" onClick={() => setAllExamples((v) => !v)}>
+          {allExamples ? t('Kevesebb példa', 'Fewer examples') : t('Összes példa ›', 'All examples ›')}
+        </button>
+      )}
 
-      <h2 className="sub-h">{project ? t('Új terület sablonból', 'New area from a template') : t('Vagy kezdj kész sablonokkal', 'Or start with ready templates')}</h2>
+      <h2 className="sub-h">{project ? t('Kezdés mintából (üres sablon)', 'Start from a template (empty)') : t('Vagy kezdj kész sablonokkal', 'Or start with ready templates')}</h2>
       {project ? (
         <div className="tpl-list">
           {AREA_TEMPLATES.map((tp) => (
@@ -168,5 +208,116 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         )}
       </details>
     </main>
+  );
+}
+
+/** The projects on this device: open, rename, copy, delete; and a new empty project. */
+function ProjectList({ list, currentId, onOpen }: { list: ProjectMeta[]; currentId?: string; onOpen: () => void }) {
+  const [menu, setMenu] = useState<string | null>(null);
+  const [editing, setEditing] = useState<string | null>(null);
+  return (
+    <>
+      <h2 className="sub-h">{t('Projektjeid', 'Your projects')}</h2>
+      <ul className="tpl-list home-projects">
+        {list.map((m) => (
+          <li key={m.id} className="home-project-row">
+            {editing === m.id ? (
+              <form
+                className="home-project-edit"
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  const v = new FormData(e.currentTarget).get('name');
+                  void renameProject(m.id, String(v ?? ''));
+                  setEditing(null);
+                }}
+              >
+                <input name="name" defaultValue={localName(m.name)} aria-label={t('Projekt neve', 'Project name')} autoFocus />
+                <button type="submit" className="btn btn-small btn-primary">
+                  {t('Mentés', 'Save')}
+                </button>
+              </form>
+            ) : (
+              <button
+                type="button"
+                className={`tpl home-project${m.id === currentId ? ' is-current' : ''}`}
+                onClick={async () => {
+                  if (await openProject(m.id)) onOpen();
+                }}
+              >
+                <b>
+                  {localName(m.name)}
+                  {m.id === currentId ? t(' · megnyitva', ' · open') : ''}
+                </b>
+                <small>
+                  {t(`${m.areas} terület`, `${m.areas} ${m.areas === 1 ? 'area' : 'areas'}`)} · {plants(m.plants)} · {ago(m.updatedAt)}
+                </small>
+              </button>
+            )}
+            <button
+              type="button"
+              className="icon-btn home-project-more"
+              aria-label={t(`Műveletek: ${m.name}`, `Actions: ${m.name}`)}
+              aria-expanded={menu === m.id}
+              onClick={() => setMenu(menu === m.id ? null : m.id)}
+            >
+              ⋯
+            </button>
+            {menu === m.id && (
+              <div className="home-project-menu">
+                <button
+                  type="button"
+                  className="btn btn-small"
+                  onClick={() => {
+                    setEditing(m.id);
+                    setMenu(null);
+                  }}
+                >
+                  {t('Átnevezés', 'Rename')}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-small"
+                  onClick={() => {
+                    void duplicateProject(m.id, t('(másolat)', '(copy)'));
+                    setMenu(null);
+                  }}
+                >
+                  {t('Másolás', 'Duplicate')}
+                </button>
+                <button
+                  type="button"
+                  className="btn btn-small btn-danger"
+                  onClick={() => {
+                    if (
+                      confirm(
+                        t(
+                          `Törlöd a(z) „${m.name}” projektet erről a készülékről? Ez nem vonható vissza.`,
+                          `Delete the project “${m.name}” from this device? This cannot be undone.`,
+                        ),
+                      )
+                    )
+                      void removeProject(m.id);
+                    setMenu(null);
+                  }}
+                >
+                  {t('Törlés', 'Delete')}
+                </button>
+              </div>
+            )}
+          </li>
+        ))}
+      </ul>
+      <button
+        type="button"
+        className="btn btn-small home-new-project"
+        onClick={async () => {
+          await newProject([]);
+          useUi.getState().setStartWithNewArea(true);
+          onOpen();
+        }}
+      >
+        {t('+ Új projekt', '+ New project')}
+      </button>
+    </>
   );
 }
