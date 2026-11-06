@@ -64,7 +64,12 @@ export default defineConfig({
   preview: { host: true, headers: Object.fromEntries(SECURITY_HEADERS) },
   // Older iPhones (iOS 15) still run the build. Pictograms stay separate files (cached by the service worker)
   // instead of being inlined into the JavaScript as base64.
-  build: { target: ['es2020', 'safari15'], assetsInlineLimit: (file: string) => (file.includes('/pictograms/') ? false : undefined) },
+  build: {
+    target: ['es2020', 'safari15'],
+    // The nursery catalogue admin (Pro) is its own page.
+    rollupOptions: { input: { main: 'index.html', admin: 'admin.html' } },
+    assetsInlineLimit: (file: string) => (file.includes('/pictograms/') ? false : undefined),
+  },
   plugins: [
     react(),
     csp(),
@@ -91,11 +96,12 @@ export default defineConfig({
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
         navigateFallback: 'index.html',
+        navigateFallbackDenylist: [/admin\.html/, /\/api\//],
       },
     }),
   ],
   test: {
-    include: ['tests/unit/**/*.test.ts'],
+    include: ['tests/unit/**/*.test.ts', 'tests/server/**/*.test.ts'],
     environment: 'node',
     setupFiles: ['tests/unit/setup.ts'],
   },

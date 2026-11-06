@@ -14,5 +14,5 @@
     "noEmit": true,
     "types": ["vite/client", "vite-plugin-pwa/client", "node"]
   },
-  "include": ["src", "tests/unit", "vite.config.ts", "playwright.config.ts", "tests/e2e"]
+  "include": ["src", "server", "tests/unit", "tests/server", "vite.config.ts", "playwright.config.ts", "tests/e2e"]
 }

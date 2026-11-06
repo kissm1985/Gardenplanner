@@ -46,5 +46,7 @@ export const plantDbSlice = ({ commit }: StoreCtx) =>
         return { ...p, plantDb: [...byCode.values()] };
       }),
 
+    setPlantDb: (plants) => commit((p) => ({ ...p, plantDb: plants })),
+
     adoptSeedUpdates: (codes) => commit((p) => ({ ...p, plantDb: p.plantDb.map((x) => (x.seedUpdate && (!codes || codes.includes(x.code)) ? adoptSeed(x) : x)) })),
   }) satisfies Partial<Actions>;

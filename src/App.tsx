@@ -20,7 +20,7 @@ import { markSeen, seen } from './ui/seen';
 import { toggleTheme } from './ui/theme';
 import { localName } from './i18n/names';
 import { Welcome } from './ui/Welcome';
-import { useFeature } from './model/tier';
+import { getTier, useFeature } from './model/tier';
 import { useSimpleMode } from './ui/simpleMode';
 import { CanopyChoice, ReadingChoices } from './ui/app/ReadingChoices';
 
@@ -157,7 +157,11 @@ export function App({ loading }: { loading: boolean }) {
 
   // Fetch the editor and the print view in the background once the app is idle.
   useEffect(() => {
-    const go = () => void prefetchEditor().then(loadPrint);
+    const go = () => {
+      void prefetchEditor().then(loadPrint);
+      // Pro tier with a connected nursery: bring its catalogue (prices, stock) up to date.
+      if (getTier() === 'profi' && localStorage.getItem('kerttervezo.nursery')) void import('./ui/NurseryPanel').then((m) => m.syncAtStart());
+    };
     const w = window as Window & { requestIdleCallback?: (f: () => void) => number };
     if (w.requestIdleCallback) w.requestIdleCallback(go);
     else setTimeout(go, 800);

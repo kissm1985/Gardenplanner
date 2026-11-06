@@ -32,6 +32,8 @@ export interface ProjectState {
   updatePlant: (code: string, p: Plant) => void;
   deletePlant: (code: string) => void;
   importPlants: (plants: Plant[], mode: 'merge' | 'replace') => void;
+  /** Replaces the plant list as one undoable step (nursery catalogue merge). */
+  setPlantDb: (plants: Plant[]) => void;
   /** Take the changed built-in data for the given species (all with an update when omitted). */
   adoptSeedUpdates: (codes?: string[]) => void;
 

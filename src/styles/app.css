@@ -3331,3 +3331,16 @@ html[data-text='large'] :is(small, .mono, .muted, .tool-label, .area-meta, .lbl,
   margin: 0 0 8px;
   font-size: 14px;
 }
+
+/* Nursery catalogue (Pro) */
+.warn-box {
+  border-left: 3px solid var(--warn);
+  padding: 8px 10px;
+  margin: 8px 0;
+  background: color-mix(in srgb, var(--warn) 10%, transparent);
+  border-radius: 6px;
+}
+.warn-box ul {
+  margin: 4px 0;
+  padding-left: 18px;
+}

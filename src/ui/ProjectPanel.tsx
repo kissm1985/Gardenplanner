@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { track } from '../engine/analytics';
 import { FeatureButton } from './Locked';
 import { TierPanel } from './TierPanel';
+import { NurseryPanel } from './NurseryPanel';
 import { PdfHeaderPanel } from './PdfHeaderPanel';
 import { About } from './About';
 import { embedTopViews } from './pictograms';
@@ -135,6 +136,8 @@ export function ProjectPanel({
       </label>
 
       <TierPanel />
+
+      <NurseryPanel />
 
       <fieldset className="field-group">
         <legend>{t('Mentés és visszatöltés', 'Save and restore')}</legend>
