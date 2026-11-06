@@ -75,6 +75,8 @@ export default defineConfig({
     csp(),
     VitePWA({
       registerType: 'autoUpdate',
+      // The manifest is fetched with cookies, so it also loads behind a login (e.g. Cloudflare Access for testers).
+      useCredentials: true,
       includeAssets: ['icon.svg', 'apple-touch-icon.png'],
       manifest: {
         name: 'Planterra – garden planner',
