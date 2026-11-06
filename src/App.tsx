@@ -28,6 +28,11 @@ import { markSeen, seen } from './ui/seen';
 import { toggleTheme } from './ui/theme';
 import { localName } from './i18n/names';
 import { Welcome } from './ui/Welcome';
+import { useFeature } from './model/tier';
+import { LockedSheet, requireFeature } from './ui/Locked';
+
+/** Rules the Basic tier checks. */
+const BASIC_RULES = new Set(['height', 'sun', 'spacing', 'outside']);
 
 // Windows and pages that are not needed at start load on first use (the service worker still keeps them offline).
 const PlantDbPanel = lazy(() => import('./ui/PlantDbPanel').then((m) => ({ default: m.PlantDbPanel })));
@@ -133,10 +138,14 @@ export function App({ loading }: { loading: boolean }) {
   };
 
   // Rule engine: re-runs after every change of the area, its items, plants or settings.
+  // The Basic tier checks height, sun, spacing and placement only.
+  const fullRules = useFeature('fullRules');
+  const rowOk = useFeature('rowTool');
   const { active: warnings, muted } = useMemo(() => {
     if (!area || !project) return { active: [], muted: [] };
-    return partition(evaluate(area, items, project.plantDb, project.settings), activeVariant(area).muted);
-  }, [area, items, project]);
+    const all = evaluate(area, items, project.plantDb, project.settings);
+    return partition(fullRules ? all : all.filter((w) => BASIC_RULES.has(w.rule)), activeVariant(area).muted);
+  }, [area, items, project, fullRules]);
   const errors = warnings.filter((w) => w.severity === 'error').length;
 
   // Desktop keyboard shortcuts for undo/redo.
@@ -170,6 +179,7 @@ export function App({ loading }: { loading: boolean }) {
             <HelpPanel section={helpAt} />
           </Lazy>
         </Sheet>
+        <LockedSheet />
       </>
     );
 
@@ -503,9 +513,17 @@ export function App({ loading }: { loading: boolean }) {
 
       <nav className="toolbar" aria-label={t('Eszközök', 'Tools')}>
         {TOOLS.map((tb) => (
-          <button key={tb.id} type="button" className="tool" aria-pressed={tool === tb.id} disabled={!tb.ready} title={TOOL_LABEL[tb.id]} onClick={() => ui.setTool(tb.id)}>
+          <button
+            key={tb.id}
+            type="button"
+            className={`tool${tb.id === 'row' && !rowOk ? ' is-locked' : ''}`}
+            aria-pressed={tool === tb.id}
+            disabled={!tb.ready}
+            title={TOOL_LABEL[tb.id]}
+            onClick={() => (tb.id === 'row' ? requireFeature('rowTool', () => ui.setTool(tb.id)) : ui.setTool(tb.id))}
+          >
             <span className="tool-icon" aria-hidden="true">
-              {tb.icon}
+              {tb.id === 'row' && !rowOk ? '🔒' : tb.icon}
             </span>
             <span className="tool-label">{TOOL_LABEL[tb.id]}</span>
           </button>
@@ -689,6 +707,7 @@ export function App({ loading }: { loading: boolean }) {
           </fieldset>
         </div>
       </Sheet>
+      <LockedSheet />
     </div>
   );
 }

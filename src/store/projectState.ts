@@ -31,6 +31,8 @@ export interface ProjectState {
   updatePlant: (code: string, p: Plant) => void;
   deletePlant: (code: string) => void;
   importPlants: (plants: Plant[], mode: 'merge' | 'replace') => void;
+  /** Take the changed built-in data for the given species (all with an update when omitted). */
+  adoptSeedUpdates: (codes?: string[]) => void;
 
   placePlant: (plantId: string, x: number, y: number) => string | null;
   addDrift: (plantId: string, polygon: Pt[], pattern: Pattern, spacingCm?: number) => string | null;

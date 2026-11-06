@@ -2,7 +2,8 @@ import { itemCount } from '../engine/fill';
 import { SEED_PLANTS, SEED_SINCE } from '../data/plants.seed';
 import { AREA_TEMPLATES } from '../data/templates';
 import { uid } from '../model/ids';
-import { DEFAULT_SETTINGS, type Area, type PlacedItem, type Project, type Pt, type Variant } from '../model/types';
+import { DEFAULT_SETTINGS, type Area, type PlacedItem, type Plant, type Project, type Pt, type Variant } from '../model/types';
+import { hashString, stableJson } from '../model/hash';
 import { t } from '../i18n';
 
 import type { ProjectState } from './projectState';
@@ -12,7 +13,41 @@ export function newProject(templateKeys: string[]): Project {
   return { schemaVersion: 1, id: uid('p'), name: t('Kertem', 'My garden'), areas, plantDb: seedPlants(), settings: { ...DEFAULT_SETTINGS } };
 }
 
-export const seedPlants = () => SEED_PLANTS.map((p) => ({ ...p }));
+/** Fields that are not plant data: they never make a copy count as edited. */
+const NOT_DATA = new Set(['seedHash', 'seedUpdate', 'nurseryPrice', 'nurseryStock', 'photoUrl', 'photoCredit']);
+const dataOf = (p: Plant) => Object.fromEntries(Object.entries(p).filter(([k]) => !NOT_DATA.has(k)));
+
+/** Fingerprint of a plant's data (not its photo or nursery price). */
+export const plantHash = (p: Plant) => hashString(stableJson(dataOf(p)));
+
+const SEED_WITH_HASH = SEED_PLANTS.map((p) => ({ ...p, seedHash: plantHash(p) }));
+export const seedPlants = (): Plant[] => SEED_WITH_HASH.map((p) => ({ ...p }));
+export const seedByCode = (code: string) => SEED_WITH_HASH.find((p) => p.code === code);
+
+/** Take the current built-in data for a species, keeping the user's photo and the nursery price. */
+export const adoptSeed = (x: Plant): Plant => {
+  const seed = seedByCode(x.code);
+  if (!seed) return x;
+  const keep = Object.fromEntries(Object.entries(x).filter(([k, v]) => NOT_DATA.has(k) && k !== 'seedHash' && k !== 'seedUpdate' && v !== undefined));
+  return { ...seed, ...keep };
+};
+
+/** Fields older copies may lack; filled from the built-in data without touching the user's values. */
+const FILL_KEYS: (keyof Plant)[] = [
+  'soil',
+  'nameEn',
+  'en',
+  'priceDate',
+  'native',
+  'beeFriendly',
+  'category',
+  'lifecycle',
+  'edible',
+  'harvestMonths',
+  'sowMonths',
+  'plantOutMonths',
+  'pollinators',
+];
 
 /** Upgrade projects saved by earlier builds. */
 /** The plan on the canvas is always the chosen one: opening a variant chooses it. */
@@ -31,11 +66,16 @@ export function migrate(p: Project): Project {
     const updated = out.plantDb.map((x) => {
       const seed = byCode.get(x.code);
       if (!seed || seed.nameLat !== x.nameLat) return x;
-      // Fill what older builds lacked (soil, English texts); never overwrite the user's values.
+      // Untouched since it was copied: take the new built-in data (expert review, new fields).
+      if (x.seedHash && plantHash(x) === x.seedHash) return x.seedHash === seed.seedHash ? x : adoptSeed(x);
+      // Edited (or copied before fingerprints existed): keep the user's values, fill only what is missing…
       let y = x;
-      if (!y.soil?.length) y = { ...y, soil: seed.soil };
-      if (!y.nameEn && seed.nameEn) y = { ...y, nameEn: seed.nameEn };
-      if (!y.en && seed.en) y = { ...y, en: seed.en };
+      for (const k of FILL_KEYS) {
+        const cur = y[k] as unknown;
+        if ((cur === undefined || (Array.isArray(cur) && !cur.length)) && seed[k] !== undefined) y = { ...y, [k]: seed[k] };
+      }
+      // …and offer the changed built-in data when we know it changed since the copy.
+      if (x.seedHash && x.seedHash !== seed.seedHash) y = { ...y, seedUpdate: true };
       return y;
     });
     // Only species newer than the project's list are added, so earlier deletions stick.
@@ -47,7 +87,7 @@ export function migrate(p: Project): Project {
 }
 
 /** Bump when the built-in plant list grows. */
-export const SEED_VERSION = 5;
+export const SEED_VERSION = 6;
 
 /** Copy with a new parent; a missing parent removes the field (top level). */
 export function withParent<T extends { parentId?: string }>(x: T, parentId: string | undefined): T {

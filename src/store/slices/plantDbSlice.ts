@@ -1,3 +1,4 @@
+import { adoptSeed } from '../projectModel';
 import type { Actions, StoreCtx } from '../projectState';
 
 export const plantDbSlice = ({ commit }: StoreCtx) =>
@@ -44,4 +45,6 @@ export const plantDbSlice = ({ commit }: StoreCtx) =>
         for (const x of plants) byCode.set(x.code, x);
         return { ...p, plantDb: [...byCode.values()] };
       }),
+
+    adoptSeedUpdates: (codes) => commit((p) => ({ ...p, plantDb: p.plantDb.map((x) => (x.seedUpdate && (!codes || codes.includes(x.code)) ? adoptSeed(x) : x)) })),
   }) satisfies Partial<Actions>;

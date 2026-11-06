@@ -39,8 +39,15 @@ export interface Plant {
   /** Colours per season [spring, summer, autumn, winter] for the season view. */
   seasonColors?: [string, string, string, string];
   pot: string;
+  /** Guide price: a typical retail price ('shop') or an estimate; it varies from shop to shop. */
   unitPriceHuf: number;
   priceSource?: 'shop' | 'estimate';
+  /** When the guide price was last checked (YYYY-MM). */
+  priceDate?: string;
+  /** Pro tier: the nursery's own current price, from its catalogue; it overrides the guide price. */
+  nurseryPrice?: number;
+  /** Pro tier: units the nursery has in stock (missing = not reported). */
+  nurseryStock?: number;
   color: string;
   symbol?: 'circle' | 'square' | 'triangle' | 'diamond';
   isTree?: boolean;
@@ -51,6 +58,28 @@ export interface Plant {
   photoCredit?: string;
   /** Code of the built-in pictogram to use (own plants); built-in species use their own code. */
   pictogram?: string;
+  /** Group beyond ornamentals: roses, fruit, vegetables, herbs (filter and schedule). */
+  category?: 'rose' | 'fruit' | 'vegetable' | 'herb';
+  /** Annual, biennial or perennial (vegetables and herbs). */
+  lifecycle?: 'annual' | 'biennial' | 'perennial';
+  /** The edible part, e.g. "termés", "levél" (missing = not grown for food). */
+  edible?: string;
+  /** Months of harvest (1–12). */
+  harvestMonths?: number[];
+  /** Months of sowing (direct or under cover). */
+  sowMonths?: number[];
+  /** Months of planting out (seedlings, pot-grown plants). */
+  plantOutMonths?: number[];
+  /** Native to Hungary. */
+  native?: boolean;
+  /** Good source of nectar or pollen for bees. */
+  beeFriendly?: boolean;
+  /** Codes of species or cultivars needed for pollination (fruit). */
+  pollinators?: string[];
+  /** Fingerprint of the built-in data this copy was made from; a copy whose data still matches it is untouched. */
+  seedHash?: string;
+  /** The built-in data changed since this (edited) copy was made: an update can be adopted. */
+  seedUpdate?: boolean;
   /** Field names whose values still need checking ("ellenőrizendő"). */
   verify?: (keyof Plant)[];
   /** Where the data comes from (book, nursery catalogue, own observation…). */
@@ -250,7 +279,7 @@ export const ORIENTATION_LABEL: Record<Orientation, string> = labels({
   NW: ['északnyugat', 'north-west'],
 });
 
-export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 5 };
+export const DEFAULT_SETTINGS: Settings = { reservePct: 10, walnutRadiusCm: 1500, showMatureSize: true, seedVersion: 6 };
 
 export const AREA_KIND_LABEL: Record<AreaKind, string> = labels({
   bed: ['évelőágyás', 'perennial bed'],

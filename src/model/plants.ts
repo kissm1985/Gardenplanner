@@ -40,6 +40,13 @@ export const MONTHS = labelList([
   ['dec', 'Dec'],
 ]);
 
+/** The price used in lists: the nursery's own price (Pro), else the guide price. */
+export const plantPrice = (p: Pick<Plant, 'unitPriceHuf' | 'nurseryPrice'>) => p.nurseryPrice ?? p.unitPriceHuf ?? 0;
+
+/** Where the price comes from, for the list: nursery, typical retail price, or estimate. */
+export const priceKind = (p: Pick<Plant, 'priceSource' | 'nurseryPrice'>): 'nursery' | 'shop' | 'estimate' =>
+  p.nurseryPrice != null ? 'nursery' : p.priceSource === 'shop' ? 'shop' : 'estimate';
+
 export const plantMap = (db: Plant[]) => new Map(db.map((p) => [p.code, p]));
 
 /** Alphabetical order by the name in the current language. */
@@ -149,6 +156,16 @@ const CSV_COLS: { key: keyof Plant; head: string }[] = [
   { key: 'pot', head: 'kiszereles' },
   { key: 'unitPriceHuf', head: 'egysegar_ft' },
   { key: 'priceSource', head: 'ar_forras' },
+  { key: 'priceDate', head: 'ar_datum' },
+  { key: 'category', head: 'kategoria' },
+  { key: 'lifecycle', head: 'eletciklus' },
+  { key: 'edible', head: 'eheto_resz' },
+  { key: 'harvestMonths', head: 'betakaritas_honapok' },
+  { key: 'sowMonths', head: 'vetes_honapok' },
+  { key: 'plantOutMonths', head: 'kiultetes_honapok' },
+  { key: 'native', head: 'oshonos' },
+  { key: 'beeFriendly', head: 'mehbarat' },
+  { key: 'pollinators', head: 'porzo_partnerek' },
   { key: 'color', head: 'szin' },
   { key: 'symbol', head: 'szimbolum' },
   { key: 'isTree', head: 'fa' },
@@ -174,7 +191,7 @@ const EN_COLS: { key: 'bloomColor' | 'foliageColor' | 'notes'; head: string }[] 
 ];
 
 /** Readable names of the plant fields that can be marked "to check". */
-export const FIELD_LABEL: Partial<Record<keyof Plant, string>> = labels({
+export const FIELD_LABEL_PAIRS: Partial<Record<keyof Plant, [string, string]>> = {
   maxHeightCm: ['Magasság', 'Height'],
   spreadCm: ['Szélesség', 'Spread'],
   spacingCm: ['Tőtáv', 'Spacing'],
@@ -190,7 +207,13 @@ export const FIELD_LABEL: Partial<Record<keyof Plant, string>> = labels({
   pot: ['Kiszerelés', 'Pot size'],
   unitPriceHuf: ['Ár', 'Price'],
   winterInterest: ['Téli dísz', 'Winter interest'],
-});
+  native: ['Őshonos', 'Native'],
+  beeFriendly: ['Méhbarát', 'Bee-friendly'],
+  harvestMonths: ['Betakarítás', 'Harvest months'],
+  sowMonths: ['Vetés', 'Sowing months'],
+  plantOutMonths: ['Kiültetés', 'Planting-out months'],
+};
+export const FIELD_LABEL = labels(FIELD_LABEL_PAIRS as Record<keyof typeof FIELD_LABEL_PAIRS, [string, string]>) as Partial<Record<keyof Plant, string>>;
 
 /** The plants that still have values to check, as a CSV worksheet for an expert review. */
 export function reviewCsv(db: Plant[]): string {
@@ -298,6 +321,12 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
     const bool = (h: string) => ['igen', 'true', '1', 'x'].includes(get(h).toLowerCase());
     const base = blankPlant(get('kod').toUpperCase());
     const sc = list('evszak_szinek');
+    const months = (h: string) => {
+      const m = list(h)
+        .map(Number)
+        .filter((x) => x >= 1 && x <= 12);
+      return m.length ? m : undefined;
+    };
     const p: Plant = {
       ...base,
       nameHu: get('magyar_nev'),
@@ -322,6 +351,16 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       pot: get('kiszereles'),
       unitPriceHuf: num('egysegar_ft', 0),
       priceSource: get('ar_forras') === 'shop' ? 'shop' : 'estimate',
+      priceDate: /^\d{4}-\d{2}$/.test(get('ar_datum')) ? get('ar_datum') : undefined,
+      category: (['rose', 'fruit', 'vegetable', 'herb'] as const).find((x) => x === get('kategoria')),
+      lifecycle: (['annual', 'biennial', 'perennial'] as const).find((x) => x === get('eletciklus')),
+      edible: get('eheto_resz') || undefined,
+      harvestMonths: months('betakaritas_honapok'),
+      sowMonths: months('vetes_honapok'),
+      plantOutMonths: months('kiultetes_honapok'),
+      native: bool('oshonos') || undefined,
+      beeFriendly: bool('mehbarat') || undefined,
+      pollinators: list('porzo_partnerek').length ? list('porzo_partnerek') : undefined,
       color: /^#[0-9a-f]{6}$/i.test(get('szin')) ? get('szin') : base.color,
       symbol: enumOf(get('szimbolum'), ['circle', 'square', 'triangle', 'diamond'] as const, 'circle'),
       isTree: bool('fa') || undefined,
@@ -333,6 +372,8 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       dataSource: get('adat_forras') || undefined,
       checkedAt: /^\d{4}-\d{2}-\d{2}$/.test(get('ellenorizve')) ? get('ellenorizve') : undefined,
     };
+    for (const k of ['priceDate', 'category', 'lifecycle', 'edible', 'harvestMonths', 'sowMonths', 'plantOutMonths', 'native', 'beeFriendly', 'pollinators'] as const)
+      if (p[k] === undefined) delete p[k];
     if (p.dataSource === undefined) delete p.dataSource;
     if (p.pictogram === undefined) delete p.pictogram;
     if (p.checkedAt === undefined) delete p.checkedAt;

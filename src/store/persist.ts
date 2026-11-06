@@ -6,6 +6,9 @@ import { del, get, keys, set } from 'idb-keyval';
 import { validateProject } from '../engine/validate';
 import type { Project } from '../model/types';
 import { uid } from '../model/ids';
+import { hashString } from '../model/hash';
+
+export { hashString };
 
 /** Where 0.1–0.6 kept the single project. */
 const OLD_KEY = 'kerttervezo:project:v1';
@@ -111,18 +114,6 @@ async function migrateSingleProject() {
 }
 
 // ---------- images ----------
-/** FNV-1a (two 32-bit lanes) over the string, plus its length: a stable content key, no async crypto needed. */
-export function hashString(s: string): string {
-  let h1 = 0x811c9dc5,
-    h2 = 0x01000193 ^ s.length;
-  for (let i = 0; i < s.length; i++) {
-    const c = s.charCodeAt(i);
-    h1 = Math.imul(h1 ^ c, 16777619);
-    h2 = Math.imul(h2 ^ c, 0x5bd1e995);
-  }
-  return (h1 >>> 0).toString(36) + (h2 >>> 0).toString(36) + s.length.toString(36);
-}
-
 const isDataImage = (s: unknown): s is string => typeof s === 'string' && s.startsWith('data:image/');
 
 function dataUrlToBlob(u: string): Blob {

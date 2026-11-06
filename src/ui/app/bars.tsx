@@ -1,5 +1,7 @@
 // Small bars and choices around the plan: backup reminder, camera bar, quick toggles, plan style, theme, element bar.
 import { selectCurrentArea, useProject } from '../../store/projectStore';
+import { requireFeature } from '../Locked';
+import { hasFeature } from '../../model/tier';
 import { useUi } from '../../store/uiStore';
 import { getLang, setLang, t, type Lang } from '../../i18n';
 import { backupNow, needsReminder, snoozeReminder, useBackupState } from '../backup';
@@ -107,8 +109,14 @@ export function PlanStyleChoice() {
     <div className="plan-style">
       {opts.map(([v, label, hint]) => (
         <label key={v} className="check">
-          <input type="radio" name="plan-style" checked={style === v} onChange={() => useProject.getState().updateSettings({ planStyle: v })} />
+          <input
+            type="radio"
+            name="plan-style"
+            checked={style === v}
+            onChange={() => (v === 'symbol' || requireFeature('concept')) && useProject.getState().updateSettings({ planStyle: v })}
+          />
           <span>
+            {v === 'concept' && !hasFeature('concept') && '🔒 '}
             {label}
             <small className="mono muted"> – {hint}</small>
           </span>

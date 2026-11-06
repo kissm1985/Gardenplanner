@@ -15,6 +15,8 @@ import {
   TOXIC_LABEL,
 } from '../model/plants';
 import type { Plant } from '../model/types';
+import { applyReviewCsv } from '../model/review';
+import type { ReviewEntry } from '../data/plants.review';
 import { useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
 import { downloadText } from './download';
@@ -31,6 +33,9 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
   const [editing, setEditing] = useState<{ plant: Plant; isNew: boolean } | null>(null);
   const [msg, setMsg] = useState('');
   const fileRef = useRef<HTMLInputElement>(null);
+  const reviewRef = useRef<HTMLInputElement>(null);
+  const [overlay, setOverlay] = useState<Record<string, ReviewEntry> | null>(null);
+  const updates = db.filter((p) => p.seedUpdate).length;
 
   const usage = useMemo(() => {
     const m = new Map<string, number>();
@@ -166,6 +171,56 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
           }}
         />
       </div>
+      <fieldset className="field-group">
+        <legend>{t('Szakértői lektorálás', 'Expert review')}</legend>
+        <p className="mono muted">
+          {t(
+            'Az „Ellenőrizendők listája” kitöltve visszatölthető: az utolsó oszlopba „ok” (helyes) vagy a helyes érték kerül. A javított adatok ellenőrzési dátumot és forrást kapnak.',
+            'The filled-in “values to check” list can be loaded back: “ok” (correct) or the correct value goes into the last column. Corrected data gets a check date and source.',
+          )}
+        </p>
+        <div className="form-actions form-actions-start">
+          <button type="button" className="btn btn-small" onClick={() => reviewRef.current?.click()}>
+            {t('Lektorált lista visszatöltése (CSV)', 'Load the reviewed list (CSV)')}
+          </button>
+          {overlay && (
+            <button type="button" className="btn btn-small" onClick={() => downloadText('plants.review.json', JSON.stringify(overlay, null, 2), 'application/json')}>
+              {t('Lektorálás exportja (fejlesztőknek)', 'Export the review (for developers)')}
+            </button>
+          )}
+          <input
+            ref={reviewRef}
+            type="file"
+            accept=".csv,text/csv"
+            hidden
+            onChange={async (e) => {
+              const file = e.target.files?.[0];
+              e.target.value = '';
+              if (!file) return;
+              const res = applyReviewCsv(db, await file.text());
+              if (res.changed + res.confirmed) useProject.getState().importPlants(res.plants, 'merge');
+              setOverlay(res.overlay);
+              setMsg(
+                t(`${res.changed} érték javítva, ${res.confirmed} megerősítve.`, `${res.changed} values corrected, ${res.confirmed} confirmed.`) +
+                  (res.errors.length ? ` ${res.errors.slice(0, 3).join(' ')}` : ''),
+              );
+            }}
+          />
+        </div>
+        {updates > 0 && (
+          <div className="seed-update">
+            <p>
+              {t(
+                `${updates} faj beépített adatai frissültek, de te módosítottad őket, ezért megtartottuk a saját értékeidet.`,
+                `The built-in data of ${updates} species changed, but you had edited them, so your own values were kept.`,
+              )}
+            </p>
+            <button type="button" className="btn btn-small" onClick={() => useProject.getState().adoptSeedUpdates()}>
+              {t('Frissített adatok átvétele mindegyiknél', 'Take the updated data for all')}
+            </button>
+          </div>
+        )}
+      </fieldset>
       {msg && (
         <p className="toast" role="status">
           {msg}

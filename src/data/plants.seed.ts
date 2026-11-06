@@ -1,5 +1,7 @@
 import type { Plant, Soil } from '../model/types';
 import { PLANTS_EN } from './plants.en';
+import { BEE_CODES, EDIBLE_SEEDS, NATIVE_CODES } from './plants.edible';
+import { applyReview } from './plants.review';
 
 // Starting plant list. The first 19 species, heights, spreads, pots, juglone notes and
 // seasonal colours come from the K-07 sheet; unit prices and pot sizes from K-08
@@ -55,6 +57,7 @@ const mk = (s: Seed): Plant => {
     ...(en ? { nameEn: en[0], en: { bloomColor: en[1], foliageColor: en[2], ...(en[3] ? { notes: en[3] } : {}) } } : {}),
     soil: s.soil ?? SOIL[s.code] ?? [],
     spacingCm: s.spacingCm ?? s.spreadCm,
+    priceDate: s.priceDate ?? PRICE_DATE,
     color: s.color ?? s.seasonColors?.[1] ?? '#6f9a5a',
     symbol: s.symbol ?? 'circle',
     notes: s.notes ?? '',
@@ -62,9 +65,12 @@ const mk = (s: Seed): Plant => {
   };
 };
 
+/** When the guide prices were last checked. */
+export const PRICE_DATE = '2026-10';
+
 const EXTRA: (keyof Plant)[] = ['sun', 'water', 'soil', 'bloomMonths', 'maxHeightCm', 'spreadCm', 'pot'];
 
-export const SEED_PLANTS: Plant[] = [
+const BASE_PLANTS: Plant[] = [
   // ---- K-07 / K-08 ----
   mk({
     code: 'LA',
@@ -446,7 +452,7 @@ export const SEED_PLANTS: Plant[] = [
     priceSource: 'shop',
     isTree: true,
     symbol: 'diamond',
-    notes: "Az OBI a fajtát véletlenszerűen adja, a 'Shaina' nem garantált; faiskolában pontos fajta.",
+    notes: "Áruházi vásárlásnál a fajta nem mindig garantált ('Shaina'); faiskolában pontos fajta kapható.",
   }),
   mk({
     code: 'MG',
@@ -3595,10 +3601,23 @@ export const SEED_PLANTS: Plant[] = [
     verify: EXTRA,
     notes: 'Mély árnyékba talajtakarónak; falra, fára is felkúszik. Bogyója mérgező.',
   }),
+  ...EDIBLE_SEEDS.map(mk),
 ];
 
 /** Built-in list version in which a species was added (missing = 2 or earlier). */
+/**
+ * The built-in list: the base species, flags for native and bee-friendly ones, then the expert review overlay
+ * (plants.review.ts), which wins over everything above.
+ */
+export const SEED_PLANTS: Plant[] = BASE_PLANTS.map((p) => {
+  let q = p;
+  if (NATIVE_CODES.has(p.code)) q = { ...q, native: true, verify: [...(q.verify ?? []), 'native'] };
+  if (BEE_CODES.has(p.code) && q.beeFriendly === undefined) q = { ...q, beeFriendly: true };
+  return applyReview(q);
+});
+
 export const SEED_SINCE: Record<string, number> = Object.fromEntries([
+  ...EDIBLE_SEEDS.map((x) => [x.code, 6]),
   ...['PF', 'LO', 'LN', 'TB', 'TS', 'JH', 'JP', 'CD', 'MA', 'PY', 'VP', 'VO', 'LV', 'HS', 'BD', 'FO', 'PH', 'WF', 'CS', 'CM', 'FA', 'MJ', 'CB', 'HP', 'PM', 'SB', 'SV'].map((c) => [
     c,
     3,
@@ -3663,3 +3682,6 @@ export const SEED_SINCE: Record<string, number> = Object.fromEntries([
     'RE',
   ].map((c) => [c, 4]),
 ]);
+
+/** Codes of the built-in species. */
+export const SEED_CODES = new Set(SEED_PLANTS.map((p) => p.code));

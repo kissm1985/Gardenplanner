@@ -33,9 +33,10 @@ Planterra · Készítette: Kiss-Mihály István · © 2026 Kiss-Mihály István.
 ## Adatforrások
 
 - **Növényadatok:** a K-07 és K-08 munkaanyagokból összeállított, az alkalmazásban bővített kezdőlista. Az „ellenőrizendő” jelölésű értékek még nem estek át szakmai ellenőrzésen; a *Növényadatbázis → Ellenőrizendők listája* gombbal kigyűjthetők.
-- **Árak és kiszerelések:** a K-08 munkaanyag szerint, becsült, tájékoztató értékek; a „bolt” jelölésűek egy konkrét ajánlatból származnak.
+- **Árak és kiszerelések:** irányárak a megadott dátum szerint (jelenleg 2026. október): az „irányár” jelölésűek hazai bolti átlagárak, a „becsl.” jelölésűek becslések. A tényleges ár boltonként és kertészetenként eltér; konkrét üzlet vagy áruházlánc nevét az alkalmazás nem tünteti fel. A Profi csomagban a kertészet saját ára látszik („kertészet” jelölés).
 - **Gondozási naptár:** általános kertészeti gyakorlat, a projektben beállított éghajlatra igazítva.
-- **Fotók:** Wikipédia / Wikimedia Commons, a fotó alatt feltüntetett szerzővel, licenccel és forrással; vagy a saját feltöltésed.
+- **Fotók:** Wikipédia / Wikimedia Commons, a fotó alatt feltüntetett szerzővel, licenccel és forrással; vagy a saját feltöltésed. Fotó csak a növény kártyáján és adatlapján jelenik meg, ahol a megnevezés mindig mellette áll; a nyomtatásba, a PNG/SVG-exportba, a megosztott linkbe és a látványterv-csomagba fotó nem kerül.
+- **Piktogramok:** a 146 illusztrált felül- és oldalnézeti piktogramot (`src/assets/pictograms`) a készítő, Kiss-Mihály István bocsátotta az alkalmazás rendelkezésére, az alkalmazással együtt történő kereskedelmi felhasználásra; a 2026-ban felvett 25 faj (rózsák, gyümölcsök, zöldségek, fűszernövények) egyszerűsített piktogramjai az alkalmazás saját, programmal készített rajzai (`scripts/make-pictograms.ts`), amelyeket később illusztrált változat válthat fel. A piktogramok az alkalmazás részeként szerzői jogi védelem alatt állnak.
 
 ## Harmadik féltől származó összetevők
 

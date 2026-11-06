@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { roomForArea } from './Locked';
 import { AREA_TEMPLATES } from '../data/templates';
 import { SOIL_LABEL } from '../model/plants';
 import { AREA_KIND_LABEL, ORIENTATION_LABEL, type Area } from '../model/types';
@@ -24,6 +25,7 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
         submitLabel={t('Terület létrehozása', 'Create area')}
         onCancel={() => setMode({ kind: 'list' })}
         onSubmit={({ freeShape, round, ...d }) => {
+          if (!roomForArea()) return;
           const id = addArea({ ...d, round: round && !freeShape });
           if (freeShape) {
             useUi.getState().setTool('select');
@@ -51,7 +53,7 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
   }
 
   const addTemplate = (key: string) => {
-    useProject.getState().addTemplateArea(key);
+    if (roomForArea()) useProject.getState().addTemplateArea(key);
     onDone();
   };
 

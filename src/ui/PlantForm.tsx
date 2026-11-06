@@ -158,14 +158,25 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
           <L k="pot">{t('Kiszerelés', 'Pot size')}</L>
           <input value={p.pot} onChange={(e) => set('pot', e.target.value)} placeholder={t('pl. P9, 1–2 l', 'e.g. P9, 1–2 l')} />
         </label>
-        <Num label={<L k="unitPriceHuf">{t('Egységár (Ft)', 'Unit price (HUF)')}</L>} v={p.unitPriceHuf} on={(v) => set('unitPriceHuf', v)} />
+        <Num label={<L k="unitPriceHuf">{t('Irányár (Ft)', 'Guide price (HUF)')}</L>} v={p.unitPriceHuf} on={(v) => set('unitPriceHuf', v)} />
       </div>
-      <Sel
-        label={<span className="lbl">{t('Ár forrása', 'Price source')}</span>}
-        v={p.priceSource ?? 'estimate'}
-        opts={{ shop: t('boltlista', 'shop list'), estimate: t('becslés', 'estimate') }}
-        on={(v) => set('priceSource', v as 'shop' | 'estimate')}
-      />
+      <div className="field-row">
+        <Sel
+          label={<span className="lbl">{t('Ár forrása', 'Price source')}</span>}
+          v={p.priceSource ?? 'estimate'}
+          opts={{ shop: t('bolti átlagár', 'typical retail price'), estimate: t('becslés', 'estimate') }}
+          on={(v) => set('priceSource', v as 'shop' | 'estimate')}
+        />
+        <label className="field">
+          <span className="lbl">{t('Ár dátuma', 'Price date')}</span>
+          <input type="month" value={p.priceDate ?? ''} onChange={(e) => set('priceDate', e.target.value || undefined)} />
+        </label>
+      </div>
+      {p.nurseryPrice != null && (
+        <p className="mono muted">
+          {t(`A kertészet ára: ${p.nurseryPrice} Ft (a katalógusból, ez érvényes a listában).`, `Nursery price: ${p.nurseryPrice} HUF (from the catalogue; used in the list).`)}
+        </p>
+      )}
 
       <div className="field-row">
         <label className="field">

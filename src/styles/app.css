@@ -3213,3 +3213,52 @@ button.topbar-brand {
   flex: 0 0 168px;
   scroll-snap-align: start;
 }
+
+/* ---------- tiers ---------- */
+.tier-choices {
+  display: grid;
+  gap: 6px;
+}
+.tier-choice {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  column-gap: 10px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--panel);
+  cursor: pointer;
+}
+.tier-choice input {
+  grid-row: span 2;
+  accent-color: var(--accent);
+}
+.tier-choice small {
+  color: var(--mute);
+  font-size: 13px;
+}
+.tier-choice.is-on {
+  border-color: var(--accent);
+}
+.tier-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  margin-top: 6px;
+}
+.tier-table th,
+.tier-table td {
+  border-bottom: 1px solid var(--line);
+  padding: 5px 4px;
+  text-align: left;
+}
+.tier-table td.c {
+  text-align: center;
+}
+.is-locked {
+  opacity: 0.75;
+  border-style: dashed;
+}
+.locked-info p {
+  margin: 0 0 8px;
+}

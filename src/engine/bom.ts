@@ -1,5 +1,5 @@
 // Bill of materials (SPEC §4.6): planted and order quantities, prices, per area and overall.
-import { byPlantName, JUGLONE_LABEL, plantName, WATER_LABEL } from '../model/plants';
+import { byPlantName, JUGLONE_LABEL, plantName, WATER_LABEL, plantPrice, priceKind } from '../model/plants';
 import type { Area, ItemStatus, PlacedItem, Plant, Project } from '../model/types';
 import { itemCount } from './fill';
 import { safeCell } from './csvSafe';
@@ -28,6 +28,8 @@ export interface Bom {
   unpriced: number;
   /** Rows priced from estimates rather than shop listings. */
   estimated: number;
+  /** Oldest guide-price date in the list (YYYY-MM), if known. */
+  priceDate?: string;
   reservePct: number;
 }
 
@@ -80,7 +82,7 @@ export function bomFromEntries(entries: { area: Area; items: PlacedItem[] }[], p
   const list = [...rows.values()]
     .map((r) => {
       const order = orderQty(r.planted, reservePct, r.plant.isTree);
-      return { ...r, order, subtotal: order * (r.plant.unitPriceHuf || 0) };
+      return { ...r, order, subtotal: order * plantPrice(r.plant) };
     })
     // Trees last, then by Hungarian name.
     .sort((x, y) => Number(!!x.plant.isTree) - Number(!!y.plant.isTree) || byPlantName(x.plant, y.plant));
@@ -90,8 +92,13 @@ export function bomFromEntries(entries: { area: Area; items: PlacedItem[] }[], p
     planted: list.reduce((s, r) => s + r.planted, 0),
     order: list.reduce((s, r) => s + r.order, 0),
     total: list.reduce((s, r) => s + r.subtotal, 0),
-    unpriced: list.filter((r) => !r.plant.unitPriceHuf).length,
-    estimated: list.filter((r) => r.plant.priceSource !== 'shop').length,
+    unpriced: list.filter((r) => !plantPrice(r.plant)).length,
+    estimated: list.filter((r) => priceKind(r.plant) === 'estimate').length,
+    /** Oldest guide-price date in the list (YYYY-MM), if known. */
+    priceDate: list
+      .map((r) => (r.plant.nurseryPrice != null ? undefined : r.plant.priceDate))
+      .filter(Boolean)
+      .sort()[0] as string | undefined,
     reservePct,
   };
 }
@@ -134,8 +141,10 @@ export function bomTable(b: Bom): Cell[][] {
     r.plant.spacingCm,
     WATER_LABEL[r.plant.water],
     JUGLONE_LABEL[r.plant.juglone],
-    r.plant.unitPriceHuf || '',
-    r.plant.priceSource === 'shop' ? t('boltlista', 'shop list') : t('becslés', 'estimate'),
+    plantPrice(r.plant) || '',
+    { nursery: t('kertészet ára', 'nursery price'), shop: t('irányár (bolti átlag)', 'guide price (retail average)'), estimate: t('irányár (becslés)', 'guide price (estimate)') }[
+      priceKind(r.plant)
+    ],
     r.subtotal,
   ]);
   const total: Cell[] = [
@@ -185,7 +194,8 @@ export function toText(b: Bom, title: string): string {
     '',
   ];
   for (const r of b.rows) {
-    const price = r.plant.unitPriceHuf ? t(` – ${fmtFt(r.plant.unitPriceHuf)}/db – ${fmtFt(r.subtotal)}`, ` – ${fmtFt(r.plant.unitPriceHuf)} each – ${fmtFt(r.subtotal)}`) : '';
+    const up = plantPrice(r.plant);
+    const price = up ? t(` – ${fmtFt(up)}/db – ${fmtFt(r.subtotal)}`, ` – ${fmtFt(up)} each – ${fmtFt(r.subtotal)}`) : '';
     lines.push(
       t(
         `${r.plant.code} ${plantName(r.plant)} (${r.plant.nameLat}) – ültetés ${r.planted} db – rendelés ${r.order} db – ${r.plant.pot}${price}`,

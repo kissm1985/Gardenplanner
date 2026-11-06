@@ -1,4 +1,5 @@
 import { useRef, useState } from 'react';
+import { FeatureButton } from './Locked';
 import { polygonArea } from '../model/geometry';
 import { FIXTURE_LABEL, newFixture, retype } from '../model/fixtures';
 import type { Area, Fixture, FixtureType } from '../model/types';
@@ -228,9 +229,9 @@ function BackgroundSection({ area, onCalibrate }: { area: Area; onCalibrate: () 
     <fieldset className="field-group">
       <legend>{t('Háttérkép (fotó vagy tervrajz)', 'Background image (photo or drawing)')}</legend>
       <div className="form-actions form-actions-start">
-        <button type="button" className="btn btn-small" onClick={() => ref.current?.click()}>
+        <FeatureButton feature="background" onClick={() => ref.current?.click()}>
           {bg ? t('Csere', 'Replace') : t('Kép feltöltése', 'Upload image')}
-        </button>
+        </FeatureButton>
         {bg && (
           <>
             <button

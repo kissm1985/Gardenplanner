@@ -1,4 +1,6 @@
 import { useRef, useState } from 'react';
+import { FeatureButton } from './Locked';
+import { TierPanel } from './TierPanel';
 import { About } from './About';
 import { embedTopViews } from './pictograms';
 import { LocationField } from './LocationField';
@@ -127,6 +129,8 @@ export function ProjectPanel({
         <input defaultValue={localName(project.name)} onBlur={(e) => useProject.getState().renameProject(e.target.value)} />
       </label>
 
+      <TierPanel />
+
       <fieldset className="field-group">
         <legend>{t('Mentés és visszatöltés', 'Save and restore')}</legend>
         <BackupStatus />
@@ -197,9 +201,9 @@ export function ProjectPanel({
           <button type="button" className="btn btn-small" onClick={() => image('png')} disabled={!area}>
             PNG
           </button>
-          <button type="button" className="btn btn-small" onClick={() => image('svg')} disabled={!area}>
+          <FeatureButton feature="svg" onClick={() => image('svg')} disabled={!area}>
             SVG
-          </button>
+          </FeatureButton>
         </div>
         <label className="check">
           <input type="checkbox" checked={withLegend} onChange={(e) => setWithLegend(e.target.checked)} />
@@ -225,9 +229,9 @@ export function ProjectPanel({
             'Description and plan for ChatGPT in one step, with a viewpoint and style; the finished images stay with the variant.',
           )}
         </p>
-        <button type="button" className="btn btn-small btn-primary" onClick={onVisual} disabled={!area}>
+        <FeatureButton feature="visual" className="btn btn-small btn-primary" onClick={onVisual} disabled={!area}>
           {t('Látványterv megnyitása', 'Open visualisation')}
-        </button>
+        </FeatureButton>
       </fieldset>
 
       <fieldset className="field-group">
@@ -242,9 +246,9 @@ export function ProjectPanel({
             <span>{t('fekvő', 'landscape')}</span>
           </label>
         </div>
-        <button type="button" className="btn btn-primary" onClick={() => onPrint(orient)}>
+        <FeatureButton feature="print" className="btn btn-primary" onClick={() => onPrint(orient)}>
           {t('Nyomtatás / mentés PDF-be', 'Print / save as PDF')}
-        </button>
+        </FeatureButton>
         <p className="mono muted">
           {t(
             'Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A rajzon lévő változatokból.',

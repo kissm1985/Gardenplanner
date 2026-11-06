@@ -1,3 +1,5 @@
+import { ALAP_CODES, useFeature } from '../model/tier';
+import { SEED_CODES } from '../data/plants.seed';
 import { useMemo, useRef, useState, type PointerEvent } from 'react';
 import { activeFilterCount, filterPlants, NO_FILTER } from '../model/plantFilter';
 import type { Plant } from '../model/types';
@@ -22,7 +24,10 @@ const TOOL_HINT: Record<string, string> = labels({
  * or drag the plant upwards onto the plan.
  */
 export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void; onOpenFilters: () => void }) {
-  const plantDb = useProject((s) => s.project!.plantDb);
+  const fullDb = useProject((s) => s.project!.plantDb);
+  const allPlants = useFeature('allPlants');
+  // Basic tier: about 40 common species, plus the user's own plants.
+  const plantDb = useMemo(() => (allPlants ? fullDb : fullDb.filter((p) => ALAP_CODES.has(p.code) || !SEED_CODES.has(p.code))), [fullDb, allPlants]);
   const active = useUi((s) => s.activePlant);
   const tool = useUi((s) => s.tool);
   const rowMode = useUi((s) => s.rowMode);

@@ -1,3 +1,4 @@
+import type { Feature } from '../model/tier';
 import { create } from 'zustand';
 import type { MixPart } from '../engine/mix';
 import type { ZoneMode } from '../engine/zoneFill';
@@ -61,6 +62,9 @@ export interface UiState {
   /** The start page is showing (on every launch, and from the logo). */
   home: boolean;
   setHome: (v: boolean) => void;
+  /** A locked feature the user tried: explained in a small window. */
+  locked: Feature | null;
+  setLocked: (f: Feature | null) => void;
   /** The start screen asked for an own area: App opens the new-area form once. */
   startWithNewArea: boolean;
   setStartWithNewArea: (v: boolean) => void;
@@ -135,6 +139,8 @@ export const useUi = create<UiState>()((set) => ({
   ideaPrefer: [],
   setIdeaPrefer: (ideaPrefer) => set({ ideaPrefer }),
   setHome: (home) => set({ home, compare: false, page: null }),
+  locked: null,
+  setLocked: (locked) => set({ locked }),
   setStartWithNewArea: (startWithNewArea) => set({ startWithNewArea }),
   vizOptions: { season: 1, viewpoint: 'camera', lang: getLang(), mature: true, style: 'photo', time: 'afternoon', weather: 'sunny' },
   setVizOptions: (vizOptions) => set({ vizOptions }),

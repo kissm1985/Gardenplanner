@@ -164,5 +164,15 @@ export function careCalendar(project: Project): CareTask[][] {
     if (hit.length)
       for (const m of r.months) months[m - 1].push({ text: `${t(...r.text)} ${hit.map((p) => plantName(p).toLowerCase()).join(', ')}.`, codes: hit.map((p) => p.code) });
   }
+  // Food plants: sowing, planting out and harvest, from each species' own months.
+  const byMonth = (field: 'sowMonths' | 'plantOutMonths' | 'harvestMonths', text: [string, string]) => {
+    for (let m = 1; m <= 12; m++) {
+      const hit = plants.filter((p) => p[field]?.includes(m));
+      if (hit.length) months[m - 1].push({ text: `${t(...text)} ${hit.map((p) => plantName(p).toLowerCase()).join(', ')}.`, codes: hit.map((p) => p.code) });
+    }
+  };
+  byMonth('sowMonths', ['Vetés (szabadba vagy előnevelés):', 'Sowing (outdoors or under cover):']);
+  byMonth('plantOutMonths', ['Kiültetés:', 'Planting out:']);
+  byMonth('harvestMonths', ['Betakarítás, szedés:', 'Harvest:']);
   return months;
 }

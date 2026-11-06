@@ -19,7 +19,7 @@ export const PLANTS_EN: Record<string, [name: string, bloom: string, foliage: st
   GR: ['Cranesbill Rozanne', 'violet blue', 'green', ''],
   HH: ['Tall stonecrop', 'pink → rust', 'grey-green', ''],
   BE: ['Bergenia', 'pink', 'green, burgundy in winter', ''],
-  AC: ['Dwarf Japanese maple', '–', 'burgundy, scarlet in autumn', "OBI sells the cultivar at random, 'Shaina' is not guaranteed; a nursery gives the exact cultivar."],
+  AC: ['Dwarf Japanese maple', '–', 'burgundy, scarlet in autumn', "In DIY stores the cultivar is not always guaranteed ('Shaina'); nurseries sell the exact cultivar."],
   MG: ['Star magnolia', 'white', 'green', ''],
   SE: ['Houseleek', 'pink', 'green–burgundy rosette', ''],
   HO: ['Hosta', 'pale lilac', 'green / variegated', ''],

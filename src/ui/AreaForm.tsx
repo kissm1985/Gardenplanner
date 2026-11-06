@@ -1,4 +1,6 @@
 import { useState, type FormEvent } from 'react';
+import { requireFeature } from './Locked';
+import { hasFeature } from '../model/tier';
 import type { AreaInput } from '../data/templates';
 import { areaSunLevel } from '../engine/rules';
 import { SOIL_LABEL, SOILS, SUN_LABEL } from '../model/plants';
@@ -86,8 +88,11 @@ export function AreaForm({ initial, submitLabel, onSubmit, onCancel }: { initial
               <span>{t('kör / ellipszis', 'circle / oval')}</span>
             </label>
             <label className="seg-item">
-              <input type="radio" name="shape" checked={!!d.freeShape} onChange={() => setD((p) => ({ ...p, freeShape: true, round: false }))} />
-              <span>{t('szabad alak – a terven rajzolom', 'free shape – I draw it on the plan')}</span>
+              <input type="radio" name="shape" checked={!!d.freeShape} onChange={() => requireFeature('freeShape', () => setD((p) => ({ ...p, freeShape: true, round: false })))} />
+              <span>
+                {!hasFeature('freeShape') && '🔒 '}
+                {t('szabad alak – a terven rajzolom', 'free shape – I draw it on the plan')}
+              </span>
             </label>
           </div>
           {d.round && !d.freeShape && (

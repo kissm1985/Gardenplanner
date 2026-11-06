@@ -39,7 +39,7 @@ describe('round areas', () => {
 
 describe('pictograms', () => {
   it('every built-in species has a top and a side view; own plants can borrow one', () => {
-    expect(PICTOGRAM_CODES.length).toBe(146);
+    expect(PICTOGRAM_CODES.length).toBe(SEED_PLANTS.length);
     for (const p of SEED_PLANTS) {
       expect(topUrl(p)).toBeTruthy();
       expect(sideUrl(p)).toBeTruthy();

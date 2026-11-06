@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react';
+import { FeatureButton, requireFeature } from './Locked';
 import { fmtFt } from '../engine/bom';
 import { variantStats } from '../engine/compare';
 import { moveTargets, variantCount, variantTree, type TreeNode } from '../model/variantTree';
@@ -33,15 +34,15 @@ export function VariantsPanel({ onDone, onIdeas, onReplace, onVisual }: { onDone
         ))}
       </ul>
       <div className="form-actions">
-        <button type="button" className="btn" onClick={() => st.addEmptyVariant()}>
+        <FeatureButton feature="variants" className="btn" onClick={() => st.addEmptyVariant()}>
           {t('+ Üres változat', '+ Empty variant')}
-        </button>
+        </FeatureButton>
         <button
           type="button"
           className="btn"
           onClick={() => {
             const name = prompt(t('Az új mappa neve:', 'Name of the new folder:'), t('Mappa', 'Folder'));
-            if (name) st.addVariantFolder(name);
+            if (name && requireFeature('variants')) st.addVariantFolder(name);
           }}
         >
           {t('+ Mappa', '+ Folder')}
@@ -49,21 +50,23 @@ export function VariantsPanel({ onDone, onIdeas, onReplace, onVisual }: { onDone
         <button type="button" className="btn" onClick={onIdeas}>
           {t('✦ Ötlet generálása', '✦ Generate an idea')}
         </button>
-        <button type="button" className="btn" onClick={onReplace}>
+        <FeatureButton feature="advancedPlanting" className="btn" onClick={onReplace}>
           {t('⇄ Növény cseréje', '⇄ Replace plants')}
-        </button>
-        <button type="button" className="btn" onClick={onVisual}>
+        </FeatureButton>
+        <FeatureButton feature="visual" className="btn" onClick={onVisual}>
           {t('🖼 Látványterv', '🖼 Visualisation')}
-        </button>
+        </FeatureButton>
         <button
           type="button"
           className="btn btn-primary"
           disabled={area.variants.length < 2}
-          onClick={() => {
-            useUi.getState().setTool('select');
-            useUi.getState().setCompare(true);
-            onDone();
-          }}
+          onClick={() =>
+            requireFeature('compare', () => {
+              useUi.getState().setTool('select');
+              useUi.getState().setCompare(true);
+              onDone();
+            })
+          }
         >
           {t('Összehasonlítás', 'Compare')}
         </button>
@@ -218,9 +221,9 @@ function Node({ n, area, stats, onDone }: { n: TreeNode; area: Area; stats: Map<
         {move}
         {menu && (
           <div className="card-actions wrap">
-            <button type="button" className="btn btn-small" onClick={() => st.duplicateVariant(v.id)}>
+            <FeatureButton feature="variants" onClick={() => st.duplicateVariant(v.id)}>
               {t('Másolás', 'Copy')}
-            </button>
+            </FeatureButton>
             <button type="button" className="btn btn-small" onClick={() => setMode('rename')}>
               {t('Átnevezés', 'Rename')}
             </button>

@@ -23,6 +23,32 @@ export function PlantFilterForm() {
         {f.toxic && <ToxicNotice compact />}
       </label>
       <label className="field">
+        <span>{t('Csoport', 'Group')}</span>
+        <select value={f.group} onChange={(e) => set('group', e.target.value as PlantFilter['group'])}>
+          <option value="">{t('mind', 'all')}</option>
+          <option value="ornamental">{t('díszkerti', 'ornamental')}</option>
+          <option value="rose">{t('rózsa', 'rose')}</option>
+          <option value="fruit">{t('gyümölcs', 'fruit')}</option>
+          <option value="vegetable">{t('zöldség', 'vegetable')}</option>
+          <option value="herb">{t('fűszernövény', 'herb')}</option>
+        </select>
+      </label>
+      <div className="field filter-flags">
+        <span>{t('Csak', 'Only')}</span>
+        <label className="check">
+          <input type="checkbox" checked={f.edible === 'yes'} onChange={(e) => set('edible', e.target.checked ? 'yes' : '')} />
+          <span>{t('ehető', 'edible')}</span>
+        </label>
+        <label className="check">
+          <input type="checkbox" checked={f.native === 'yes'} onChange={(e) => set('native', e.target.checked ? 'yes' : '')} />
+          <span>{t('őshonos', 'native')}</span>
+        </label>
+        <label className="check">
+          <input type="checkbox" checked={f.bee === 'yes'} onChange={(e) => set('bee', e.target.checked ? 'yes' : '')} />
+          <span>{t('méhbarát', 'bee-friendly')}</span>
+        </label>
+      </div>
+      <label className="field">
         <span>{t('Fény', 'Light')}</span>
         <select value={f.sun} onChange={(e) => set('sun', e.target.value as PlantFilter['sun'])}>
           <option value="">{t('mind', 'all')}</option>

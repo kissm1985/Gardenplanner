@@ -1,7 +1,8 @@
 import { useMemo, useRef, useState, type ReactNode } from 'react';
+import { FeatureButton } from './Locked';
 import { bomTable, buildBom, fmtFt, fmtInt, STATUSES, toCsv, toHtmlTable, toText, toTsv } from '../engine/bom';
 import { buildXlsx } from '../engine/xlsx';
-import { JUGLONE_LABEL, plantName, WATER_LABEL } from '../model/plants';
+import { JUGLONE_LABEL, plantName, WATER_LABEL, plantPrice, priceKind } from '../model/plants';
 import type { ItemStatus } from '../model/types';
 import { activeVariant, selectCurrentArea, useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
@@ -77,9 +78,9 @@ export function ListView() {
     <div className="listview">
       <header className="lv-head">
         <div className="eyebrow">{eyebrow}</div>
-        <button type="button" className="btn btn-small" onClick={() => useUi.getState().setPage('schedule')}>
+        <FeatureButton feature="schedule" onClick={() => useUi.getState().setPage('schedule')}>
           {t('Ültetési menetrend és gondozás →', 'Planting schedule and care →')}
-        </button>
+        </FeatureButton>
         <div className="seg" role="group" aria-label={t('Terület', 'Area')}>
           <ScopeChip on={scope === 'all'} onClick={() => setScope('all')}>
             {t('Összesítve', 'Combined')}
@@ -130,6 +131,11 @@ export function ListView() {
         <div>
           <span className="k">{t('Becsült költség', 'Estimated cost')}</span>
           <span className="v">{fmtFt(bom.total)}</span>
+          <small className="mono muted price-note">
+            {t('Irányárak', 'Guide prices')}
+            {bom.priceDate ? ` (${bom.priceDate.replace('-', '. ')}.)` : ''}
+            {t(': a tényleges ár boltonként és kertészetenként eltér.', ': actual prices differ between shops and nurseries.')}
+          </small>
           {bom.estimated > 0 && <small className="mono muted">{t(`${bom.estimated} tétel ára becslés`, `${bom.estimated} prices are estimates`)}</small>}
           {bom.unpriced > 0 && <small className="mono warn-text">{t(`${bom.unpriced} tételnek nincs ára`, `${bom.unpriced} items have no price`)}</small>}
         </div>
@@ -142,12 +148,12 @@ export function ListView() {
         <button type="button" className="btn btn-small" onClick={() => doCopy(toTsv(table), t('A táblázat', 'The table'), toHtmlTable(table))}>
           {t('Másolás táblázatként (Excel)', 'Copy as table (Excel)')}
         </button>
-        <button type="button" className="btn btn-small" onClick={() => downloadText(`${fileBase}.csv`, toCsv(table), 'text/csv;charset=utf-8')}>
+        <FeatureButton feature="dataExport" onClick={() => downloadText(`${fileBase}.csv`, toCsv(table), 'text/csv;charset=utf-8')}>
           CSV
-        </button>
-        <button type="button" className="btn btn-small" onClick={xlsx}>
+        </FeatureButton>
+        <FeatureButton feature="dataExport" onClick={xlsx}>
           XLSX
-        </button>
+        </FeatureButton>
         {canShare && (
           <button type="button" className="btn btn-small" onClick={share}>
             {t('Megosztás', 'Share')}
@@ -217,8 +223,10 @@ export function ListView() {
                   <td>{WATER_LABEL[r.plant.water]}</td>
                   <td>{JUGLONE_LABEL[r.plant.juglone]}</td>
                   <td className="m">
-                    {r.plant.unitPriceHuf ? fmtInt(r.plant.unitPriceHuf) : '–'}
-                    <span className={`tag${r.plant.priceSource === 'shop' ? ' s' : ''}`}>{r.plant.priceSource === 'shop' ? t('bolt', 'shop') : t('becsl.', 'est.')}</span>
+                    {plantPrice(r.plant) ? fmtInt(plantPrice(r.plant)) : '–'}
+                    <span className={`tag${priceKind(r.plant) !== 'estimate' ? ' s' : ''}`}>
+                      {{ nursery: t('kertészet', 'nursery'), shop: t('irányár', 'guide'), estimate: t('becsl.', 'est.') }[priceKind(r.plant)]}
+                    </span>
                   </td>
                   <td className="m">{fmtInt(r.subtotal)}</td>
                   <td>

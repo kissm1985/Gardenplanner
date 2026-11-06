@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
+import { roomForArea, roomForProject } from './Locked';
 import { AREA_TEMPLATES } from '../data/templates';
 import { getLang, setLang, t } from '../i18n';
 import { localName } from '../i18n/names';
@@ -43,6 +44,7 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
     ui.setHome(false);
   };
   const newArea = () => {
+    if (project && !roomForArea()) return;
     ui.setStartWithNewArea(true);
     if (!project) st.createProject([]);
     ui.setHome(false);
@@ -141,6 +143,7 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
       <ExamplePlans
         strip={returning && !allExamples}
         onPick={(key) => {
+          if (project && !roomForArea()) return;
           const id = st.addExampleArea(key);
           if (id) open(id);
         }}
@@ -160,6 +163,7 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
               type="button"
               className="tpl"
               onClick={() => {
+                if (!roomForArea()) return;
                 const id = st.addTemplateArea(tp.key);
                 if (id) open(id);
               }}
@@ -311,6 +315,7 @@ function ProjectList({ list, currentId, onOpen }: { list: ProjectMeta[]; current
         type="button"
         className="btn btn-small home-new-project"
         onClick={async () => {
+          if (!roomForProject(list.length)) return;
           await newProject([]);
           useUi.getState().setStartWithNewArea(true);
           onOpen();

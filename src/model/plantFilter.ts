@@ -12,9 +12,30 @@ export interface PlantFilter {
   thorny: '' | 'yes' | 'no';
   juglone: '' | JugloneTolerance;
   color: string;
+  /** '' all · 'ornamental' (no category) · a category */
+  group: '' | 'ornamental' | 'rose' | 'fruit' | 'vegetable' | 'herb';
+  edible: '' | 'yes';
+  native: '' | 'yes';
+  bee: '' | 'yes';
 }
 
-export const NO_FILTER: PlantFilter = { q: '', toxic: '', hMin: '', hMax: '', sMin: '', sMax: '', sun: '', soil: '', thorny: '', juglone: '', color: '' };
+export const NO_FILTER: PlantFilter = {
+  q: '',
+  toxic: '',
+  hMin: '',
+  hMax: '',
+  sMin: '',
+  sMax: '',
+  sun: '',
+  soil: '',
+  thorny: '',
+  juglone: '',
+  color: '',
+  group: '',
+  edible: '',
+  native: '',
+  bee: '',
+};
 
 const num = (s: string) => {
   const n = parseFloat(s.replace(',', '.'));
@@ -47,6 +68,10 @@ export function filterPlants(db: Plant[], f: PlantFilter): Plant[] {
       (!f.soil || !!p.soil?.includes(f.soil)) &&
       (!f.thorny || p.thorny === (f.thorny === 'yes')) &&
       (!f.juglone || p.juglone === f.juglone) &&
+      (!f.group || (f.group === 'ornamental' ? !p.category || p.category === 'rose' : p.category === f.group)) &&
+      (!f.edible || !!p.edible) &&
+      (!f.native || !!p.native) &&
+      (!f.bee || !!p.beeFriendly) &&
       (!color || [p.bloomColor, p.foliageColor, p.en?.bloomColor ?? '', p.en?.foliageColor ?? ''].some((c) => c.toLowerCase().includes(color))),
   );
 }

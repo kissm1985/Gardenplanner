@@ -1,4 +1,6 @@
 import { useEffect, useState } from 'react';
+import { requireFeature } from './Locked';
+import { hasFeature, useFeature } from '../model/tier';
 import { DEFAULT_KINDS, generateIdea, KIND_LABEL, PALETTES, poolsFor, type Idea, type PaletteKey, type PlantKind } from '../engine/generator';
 import { areaSunLevel, evaluate } from '../engine/rules';
 import { byPlantName, plantBloom, plantFoliage, plantName, SOIL_LABEL, SUN_LABEL } from '../model/plants';
@@ -23,7 +25,15 @@ export function IdeaPanel({ onDone }: { onDone: () => void }) {
         <button type="button" role="tab" className="chip-btn" aria-selected={tab === 'whole'} aria-pressed={tab === 'whole'} onClick={() => setTab('whole')}>
           {t('Egész terület → új változat', 'Whole area → new variant')}
         </button>
-        <button type="button" role="tab" className="chip-btn" aria-selected={tab === 'zone'} aria-pressed={tab === 'zone'} onClick={() => setTab('zone')}>
+        <button
+          type="button"
+          role="tab"
+          className="chip-btn"
+          aria-selected={tab === 'zone'}
+          aria-pressed={tab === 'zone'}
+          onClick={() => requireFeature('advancedPlanting', () => setTab('zone'))}
+        >
+          {!hasFeature('advancedPlanting') && '🔒 '}
           {t('Kijelölt rész, saját listából', 'Selected region, my own list')}
         </button>
       </div>
@@ -195,6 +205,7 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
 
 /** Random planting ideas that fit the current area; each idea goes into its own variant. */
 function WholeAreaIdea({ onDone }: { onDone: () => void }) {
+  const advanced = useFeature('ideaAdvanced');
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
   const [palette, setPalette] = useState<PaletteKey | ''>('');
@@ -247,77 +258,85 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
           'a random but considered composition: one colour scheme, taller plants at the back, lower in front, in a repeating rhythm. Each idea goes into its own variant; the existing plan stays as it is.',
         )}
       </p>
-      <fieldset className="field-group">
-        <legend>{t('Preferált növények (nem kötelező)', 'Preferred plants (optional)')}</legend>
-        <PlantMultiPicker
-          area={area}
-          options={[...project.plantDb].sort(byPlantName).map((p, i) => ({ p, score: i / 10000 }))}
-          picked={prefer}
-          onChange={setPrefer}
-          label={t('Ezekből készüljön az ötlet', 'Make the idea from these')}
-          max={12}
-          weights={false}
-        />
-        <p className="mono muted">
-          {prefer.length
-            ? t(
-                'Az ötlet csak ezekből a növényekből készül: a magasabbak hátra, az alacsonyabbak előre kerülnek. A színvilág és a típusok ilyenkor nem számítanak; ha egy növény nem illik a területhez, a figyelmeztetések jelzik.',
-                'The idea is made from these plants only: taller ones at the back, lower ones in front. The colour scheme and the kinds do not apply then; the warnings flag a plant that does not suit the area.',
-              )
-            : t('Ha nem választasz, a program maga válogat a terület feltételeihez illő fajokból.', 'If you pick none, the app chooses from the species that suit the area.')}
-        </p>
-      </fieldset>
-      <label className="field">
-        <span className="lbl">{t('Színvilág', 'Colour scheme')}</span>
-        <select value={palette} disabled={prefer.length > 0} onChange={(e) => setPalette(e.target.value as PaletteKey | '')}>
-          <option value="">{t('Meglepetés', 'Surprise me')}</option>
-          {(Object.keys(PALETTES) as PaletteKey[]).map((k) => (
-            <option key={k} value={k}>
-              {PALETTES[k].label}
-            </option>
-          ))}
-        </select>
-      </label>
-      <fieldset className="field-group">
-        <legend>{t('Milyen növények kerüljenek a tervre?', 'Which kinds of plants?')}</legend>
-        <div className="seg kind-seg">
-          {(Object.keys(KIND_LABEL) as PlantKind[]).map((k) => {
-            const n = per(k);
-            return (
-              <label key={k} className="seg-item">
-                <input
-                  type="checkbox"
-                  checked={kinds.includes(k)}
-                  disabled={prefer.length > 0 || (!n && !kinds.includes(k))}
-                  onChange={(e) => setKinds(e.target.checked ? [...kinds, k] : kinds.filter((x) => x !== k))}
-                />
-                <span>
-                  {KIND_LABEL[k]} · {n}
-                </span>
-              </label>
-            );
-          })}
-        </div>
-        <p className="mono muted">
-          {t(
-            'Sövény a hátsó szélre kerül, a fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.',
-            'A hedge goes along the back edge, trees evenly spread with room around them; shrubs in rhythm in front of them, perennials in drifts at the front.',
-          )}
-        </p>
-      </fieldset>
-      <fieldset className="field-group">
-        <legend>{t('Változatosság és sűrűség', 'Variety and density')}</legend>
-        <label className="check">
-          <input type="checkbox" checked={mixed} onChange={(e) => setMixed(e.target.checked)} />
-          <span>
-            {t(
-              'Vegyes ültetés: azonos növény ne kerüljön egymás mellé (foltok helyett tövenként váltakozva)',
-              'Mixed planting: no two of the same plant side by side (alternating plant by plant instead of drifts)',
-            )}
-          </span>
-        </label>
-        <GapField value={gap} onChange={setGap} />
-      </fieldset>
+      {advanced ? (
+        <>
+          <fieldset className="field-group">
+            <legend>{t('Preferált növények (nem kötelező)', 'Preferred plants (optional)')}</legend>
+            <PlantMultiPicker
+              area={area}
+              options={[...project.plantDb].sort(byPlantName).map((p, i) => ({ p, score: i / 10000 }))}
+              picked={prefer}
+              onChange={setPrefer}
+              label={t('Ezekből készüljön az ötlet', 'Make the idea from these')}
+              max={12}
+              weights={false}
+            />
+            <p className="mono muted">
+              {prefer.length
+                ? t(
+                    'Az ötlet csak ezekből a növényekből készül: a magasabbak hátra, az alacsonyabbak előre kerülnek. A színvilág és a típusok ilyenkor nem számítanak; ha egy növény nem illik a területhez, a figyelmeztetések jelzik.',
+                    'The idea is made from these plants only: taller ones at the back, lower ones in front. The colour scheme and the kinds do not apply then; the warnings flag a plant that does not suit the area.',
+                  )
+                : t('Ha nem választasz, a program maga válogat a terület feltételeihez illő fajokból.', 'If you pick none, the app chooses from the species that suit the area.')}
+            </p>
+          </fieldset>
+          <label className="field">
+            <span className="lbl">{t('Színvilág', 'Colour scheme')}</span>
+            <select value={palette} disabled={prefer.length > 0} onChange={(e) => setPalette(e.target.value as PaletteKey | '')}>
+              <option value="">{t('Meglepetés', 'Surprise me')}</option>
+              {(Object.keys(PALETTES) as PaletteKey[]).map((k) => (
+                <option key={k} value={k}>
+                  {PALETTES[k].label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <fieldset className="field-group">
+            <legend>{t('Milyen növények kerüljenek a tervre?', 'Which kinds of plants?')}</legend>
+            <div className="seg kind-seg">
+              {(Object.keys(KIND_LABEL) as PlantKind[]).map((k) => {
+                const n = per(k);
+                return (
+                  <label key={k} className="seg-item">
+                    <input
+                      type="checkbox"
+                      checked={kinds.includes(k)}
+                      disabled={prefer.length > 0 || (!n && !kinds.includes(k))}
+                      onChange={(e) => setKinds(e.target.checked ? [...kinds, k] : kinds.filter((x) => x !== k))}
+                    />
+                    <span>
+                      {KIND_LABEL[k]} · {n}
+                    </span>
+                  </label>
+                );
+              })}
+            </div>
+            <p className="mono muted">
+              {t(
+                'Sövény a hátsó szélre kerül, a fák egyenletesen elosztva, szabad hellyel körülöttük; a cserjék ritmusban előttük, az évelők foltokban elöl.',
+                'A hedge goes along the back edge, trees evenly spread with room around them; shrubs in rhythm in front of them, perennials in drifts at the front.',
+              )}
+            </p>
+          </fieldset>
+          <fieldset className="field-group">
+            <legend>{t('Változatosság és sűrűség', 'Variety and density')}</legend>
+            <label className="check">
+              <input type="checkbox" checked={mixed} onChange={(e) => setMixed(e.target.checked)} />
+              <span>
+                {t(
+                  'Vegyes ültetés: azonos növény ne kerüljön egymás mellé (foltok helyett tövenként váltakozva)',
+                  'Mixed planting: no two of the same plant side by side (alternating plant by plant instead of drifts)',
+                )}
+              </span>
+            </label>
+            <GapField value={gap} onChange={setGap} />
+          </fieldset>
+        </>
+      ) : (
+        <button type="button" className="btn btn-small is-locked" onClick={() => requireFeature('ideaAdvanced')}>
+          🔒 {t('Beállítások: preferált növények, típusok, sűrűség', 'Options: preferred plants, kinds, density')}
+        </button>
+      )}
       <div className="form-actions form-actions-start">
         <button type="button" className="btn btn-primary" onClick={() => run(false)} disabled={!prefer.length && (!kinds.length || pool.length < 1)}>
           {shown ? t('Új ötlet új változatba', 'New idea in a new variant') : t('Ötlet generálása', 'Generate an idea')}

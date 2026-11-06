@@ -33,9 +33,10 @@ Planterra · Created by Kiss-Mihály István · © 2026 Kiss-Mihály István. Al
 ## Data sources
 
 - **Plant data:** a starting list compiled from the K-07 and K-08 working documents and extended in the app. Values marked “to be checked” have not been reviewed by an expert yet; *Plant database → List of values to check* collects them.
-- **Prices and pack sizes:** from the K-08 working document, estimated and for information only; those marked “shop” come from a specific offer.
+- **Prices and pack sizes:** guide prices as of the date shown (currently October 2026): those marked “guide” are typical Hungarian retail prices, those marked “est.” are estimates. Actual prices differ between shops and nurseries; the app names no specific shop or chain. In the Pro tier the nursery’s own price is shown (marked “nursery”).
 - **Care calendar:** general gardening practice, adjusted to the climate set for the project.
-- **Photos:** Wikipedia / Wikimedia Commons, with the author, licence and source shown under each photo; or your own upload.
+- **Photos:** Wikipedia / Wikimedia Commons, with the author, licence and source shown under each photo; or your own upload. Photos only appear on a plant’s card and page, always with their credit; printouts, PNG/SVG exports, shared links and the visualisation package contain no photos.
+- **Pictograms:** the 146 illustrated top and side pictograms (`src/assets/pictograms`) were provided by the author, Kiss-Mihály István, for commercial use as part of the app; the simplified pictograms of the 25 species added in 2026 (roses, fruit, vegetables, herbs) are the app’s own generated drawings (`scripts/make-pictograms.ts`), to be replaced by illustrated ones later. The pictograms are protected by copyright as part of the app.
 
 ## Third-party components
 

@@ -135,7 +135,8 @@ function treeFits(area: Area, p: Plant): boolean {
 
 /** Eligible species per requested type. */
 export function poolsFor(area: Area, plantDb: Plant[], kinds: PlantKind[] = DEFAULT_KINDS) {
-  const ok = plantDb.filter((p) => siteOk(area, p));
+  // Ideas are ornamental compositions: food plants (vegetables, herbs, fruit) only come in when chosen as preferred.
+  const ok = plantDb.filter((p) => siteOk(area, p) && (!p.category || p.category === 'rose'));
   const want = new Set(kinds);
   const has = (p: Plant, k: PlantKind) => want.has(k) && plantKinds(p).has(k);
   return {
