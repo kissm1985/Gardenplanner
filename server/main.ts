@@ -40,6 +40,10 @@ const app = createApp({
 purgeOld(db, Date.now());
 setInterval(() => purgeOld(db, Date.now()), 24 * 3600_000).unref();
 
+const NO_APP =
+  'A szerver fut (API: /api/v1/health), de nem talalja a buildelt alkalmazast (dist/index.html).\n' +
+  'Allitsd le (Ctrl+C), futtasd: npm run build, majd ugyanabbol a mappabol: npm run server\n\n' +
+  'The server is running, but the built app (dist/index.html) is missing: run npm run build, then npm run server.\n';
 const STATIC = env.STATIC_DIR ? resolve(env.STATIC_DIR) : !production && existsSync('dist/index.html') ? resolve('dist') : null;
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
@@ -68,7 +72,11 @@ function staticHeaders(dir: string) {
 
 createServer(async (req, res) => {
   if (await app.handle(req, res)) return;
-  if (!STATIC || (req.method !== 'GET' && req.method !== 'HEAD')) {
+  if (!STATIC) {
+    res.writeHead(404, { 'content-type': 'text/plain; charset=utf-8' }).end(NO_APP);
+    return;
+  }
+  if (req.method !== 'GET' && req.method !== 'HEAD') {
     res.writeHead(404).end();
     return;
   }
@@ -89,5 +97,6 @@ createServer(async (req, res) => {
   else createReadStream(file).pipe(res);
 }).listen(PORT, () => {
   log(`Planterra server on :${PORT}${STATIC ? ` serving ${STATIC}` : ''}`);
+  if (!STATIC && !production) log(`No app to serve: ${resolve('dist/index.html')} is missing. Run \`npm run build\`, then start the server again.`);
   if (!production && STATIC) log(`App: http://localhost:${PORT}/  ·  Admin: http://localhost:${PORT}/admin.html`);
 });
