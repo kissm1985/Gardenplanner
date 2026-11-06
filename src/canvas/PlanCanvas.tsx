@@ -1,6 +1,5 @@
-import { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from 'react';
-import { fillPath, fillPolygon } from '../engine/fill';
-import { bbox, centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
+import { useEffect, useMemo, useRef, useState, type KeyboardEvent, type PointerEvent, type WheelEvent } from 'react';
+import { centroid, dist, pointInPolygon, polygonArea, simplify, snap } from '../model/geometry';
 import { effectivePlant, plantMap } from '../model/plants';
 import { DRAG_DRAWN, dragFixture, FIXTURE_LABEL, MOVE_WHEN_SELECTED, newFixture } from '../model/fixtures';
 import type { Area, Camera, Fixture, FixtureType, Plant, Pt, Settings } from '../model/types';
@@ -16,8 +15,10 @@ import { CountLabel, GroupLabels, PlantsLayer, plantRadius, VertexHandles, type 
 import { Rulers, RULER } from './layers/Rulers';
 import { WarningsLayer } from './layers/Warnings';
 import { PlantTooltip } from '../ui/PlantTooltip';
-import { fitView, niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
+import { niceStep, pinchView, screenToWorld, zoomAt, type View } from './viewport';
 import { localName } from '../i18n/names';
+import { useViewport } from './useViewport';
+import { Dimensions, Draft, ShapeEditor } from './overlays';
 import { locale, t } from '../i18n';
 
 interface Props {
@@ -44,8 +45,6 @@ type Gesture =
   | { mode: 'camera'; at: Pt; start: P2; moved: boolean };
 
 const DOUBLE_TAP_MS = 300;
-/** Height of the floating tool row over the top of the plan; fitting keeps the area below it. */
-const OVERLAY_TOP = 52;
 const TAP_SLOP_PX = 8;
 export const SNAP_CM = 10;
 
@@ -53,11 +52,7 @@ export const SNAP_CM = 10;
 const spreadFromRadius = (r: number, mature: boolean) => Math.min(5000, Math.max(5, Math.round((mature ? r * 2 : r / 0.2) / 5) * 5));
 
 export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
-  const boxRef = useRef<HTMLDivElement>(null);
-  const [size, setSize] = useState({ w: 0, h: 0 });
-  const [view, setView] = useState<View | null>(null);
-  const viewRef = useRef(view);
-  viewRef.current = view;
+  const { boxRef, size, view, setView, viewRef, fit } = useViewport(area);
 
   const items = useProject(selectItems);
   const tool = useUi((s) => s.tool);
@@ -105,40 +100,6 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     if (sel.some((id) => !ids.has(id))) useUi.getState().select(sel.filter((id) => ids.has(id)));
   }, [items]);
   const selectedSet = useMemo(() => new Set(selected), [selected]);
-
-  const fit = useCallback(
-    (w = size.w, h = size.h) => {
-      if (!w || !h) return;
-      // Leave room for the rulers (top/left) and the floating tool row.
-      const v = fitView(area.widthCm, area.lengthCm, w - RULER, h - RULER - OVERLAY_TOP - 12, 18);
-      setView({ ...v, tx: v.tx + RULER, ty: v.ty + RULER + OVERLAY_TOP });
-    },
-    [area.widthCm, area.lengthCm, size.w, size.h],
-  );
-
-  useLayoutEffect(() => {
-    const el = boxRef.current;
-    if (!el) return;
-    const ro = new ResizeObserver(([e]) => setSize({ w: e.contentRect.width, h: e.contentRect.height }));
-    ro.observe(el);
-    // React's wheel listener is passive; stop browser page-zoom (ctrl+wheel) natively.
-    const stop = (e: globalThis.WheelEvent) => e.preventDefault();
-    el.addEventListener('wheel', stop, { passive: false });
-    return () => {
-      ro.disconnect();
-      el.removeEventListener('wheel', stop);
-    };
-  }, []);
-
-  // Re-fit when the area (or its size) changes, or on first layout.
-  const fittedFor = useRef('');
-  useEffect(() => {
-    const key = `${area.id}:${area.widthCm}x${area.lengthCm}`;
-    if (size.w && size.h && fittedFor.current !== key) {
-      fittedFor.current = key;
-      fit();
-    }
-  }, [area.id, area.widthCm, area.lengthCm, size.w, size.h, fit]);
 
   const local = (e: { clientX: number; clientY: number }): P2 => {
     const r = boxRef.current!.getBoundingClientRect();
@@ -827,97 +788,5 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
         </button>
       </div>
     </div>
-  );
-}
-
-/** Width/length dimension labels, placed outside edge strips (wall, fence, paving); font size is constant on screen. */
-function Dimensions({ area, s }: { area: Area; s: number }) {
-  const fs = 11 / s;
-  const off = 16 / s;
-  const strips = area.fixtures.filter((f) => f.type === 'wall' || f.type === 'fence' || f.type === 'paving');
-  const right = Math.max(area.widthCm, ...strips.map((f) => f.x + (f.w ?? 0)));
-  const bottom = Math.max(area.lengthCm, ...strips.map((f) => f.y + (f.h ?? 0)));
-  return (
-    <g className="dims" fontSize={fs}>
-      <text x={area.widthCm / 2} y={bottom + off + fs * 0.4} textAnchor="middle">
-        {area.widthCm} cm
-      </text>
-      <text transform={`translate(${right + off} ${area.lengthCm / 2}) rotate(90)`} textAnchor="middle" dominantBaseline="middle">
-        {area.lengthCm} cm
-      </text>
-    </g>
-  );
-}
-
-/** Live preview while drawing a drift / row: outline, planting positions and count. */
-function Draft({
-  draft,
-  plant,
-  pattern,
-  s,
-  mature,
-}: {
-  draft: { kind: 'drift' | 'curve' | 'line'; points: Pt[] };
-  plant: Plant;
-  pattern: 'grid' | 'staggered';
-  s: number;
-  mature: boolean;
-}) {
-  const pts = draft.points;
-  const isDrift = draft.kind === 'drift';
-  const positions = isDrift ? (pts.length >= 3 ? fillPolygon(pts, plant.spacingCm, pattern) : []) : fillPath(pts, plant.spacingCm);
-  const r = plantRadius(plant, mature);
-  const b = bbox(pts);
-  const line = pts.map((q) => q.join(',')).join(' ');
-  return (
-    <g className="draft" pointerEvents="none">
-      {isDrift ? (
-        <polygon className="draft-shape" points={line} vectorEffect="non-scaling-stroke" />
-      ) : (
-        <polyline className="draft-shape" points={line} vectorEffect="non-scaling-stroke" />
-      )}
-      {positions.map(([x, y], i) => (
-        <circle key={i} cx={x} cy={y} r={r} fill={plant.color} fillOpacity={0.55} />
-      ))}
-      <CountLabel x={(b.minX + b.maxX) / 2} y={b.minY - 6 / s} fs={12 / s} text={`${plant.code} × ${positions.length}`} />
-    </g>
-  );
-}
-
-/** Outline being drawn/edited: corners, edge midpoints (tap to insert), edge lengths in cm. */
-function ShapeEditor({ points, mode, selected, s, lawn, zone }: { points: Pt[]; mode: 'draw' | 'edit'; selected: number | null; s: number; lawn?: boolean; zone?: boolean }) {
-  const closed = mode === 'edit' && points.length >= 3;
-  const line = points.map((p) => p.join(',')).join(' ');
-  const edges = points.map((a, i) => [a, points[(i + 1) % points.length]] as const).slice(0, closed ? points.length : Math.max(0, points.length - 1));
-  const r = 10 / s;
-  return (
-    <g className={`shape-editor${lawn ? ' is-lawn' : ''}${zone ? ' is-zone' : ''}`}>
-      {closed ? (
-        <polygon className="shape-line" points={line} vectorEffect="non-scaling-stroke" />
-      ) : (
-        <polyline className="shape-line" points={line} vectorEffect="non-scaling-stroke" />
-      )}
-      {edges.map(([a, b], i) => {
-        const mx = (a[0] + b[0]) / 2;
-        const my = (a[1] + b[1]) / 2;
-        return (
-          <g key={`e${i}`}>
-            <CountLabel x={mx} y={my - 8 / s} fs={10 / s} text={`${Math.round(dist(a, b))} cm`} />
-            {mode === 'edit' && <circle className="shape-mid" data-shape-mid={i} cx={mx} cy={my} r={r * 0.7} vectorEffect="non-scaling-stroke" />}
-          </g>
-        );
-      })}
-      {points.map(([x, y], i) => (
-        <circle
-          key={i}
-          className={`shape-vertex${i === selected ? ' is-selected' : ''}${i === 0 && mode === 'draw' ? ' is-first' : ''}`}
-          data-shape-vertex={i}
-          cx={x}
-          cy={y}
-          r={r}
-          vectorEffect="non-scaling-stroke"
-        />
-      ))}
-    </g>
   );
 }
