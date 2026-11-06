@@ -29,6 +29,11 @@ import { toggleTheme } from './ui/theme';
 import { localName } from './i18n/names';
 import { Welcome } from './ui/Welcome';
 import { useFeature } from './model/tier';
+import { useSimpleMode } from './ui/simpleMode';
+import { CanopyChoice, ReadingChoices } from './ui/app/ReadingChoices';
+
+/** Tools in simple mode (the rest under More). */
+const SIMPLE_TOOLS = new Set(['select', 'plant', 'drift', 'list']);
 import { LockedSheet, requireFeature } from './ui/Locked';
 
 /** Rules the Basic tier checks. */
@@ -43,17 +48,34 @@ const IdeaPanel = lazy(() => import('./ui/IdeaPanel').then((m) => ({ default: m.
 const ReplacePanel = lazy(() => import('./ui/ReplacePanel').then((m) => ({ default: m.ReplacePanel })));
 const HelpPanel = lazy(() => import('./ui/HelpPanel').then((m) => ({ default: m.HelpPanel })));
 const VisualPanel = lazy(() => import('./ui/VisualPanel').then((m) => ({ default: m.VisualPanel })));
+const FeedbackPanel = lazy(() => import('./ui/FeedbackPanel').then((m) => ({ default: m.FeedbackPanel })));
 const LegalPanel = lazy(() => import('./ui/LegalPanel').then((m) => ({ default: m.LegalPanel })));
 const Loading = () => <p className="mono muted lazy-loading">{t('Betöltés…', 'Loading…')}</p>;
 /** Mounted only while open, so its code is fetched on first use. */
 const Lazy = ({ when, children }: { when: boolean; children: ReactNode }) => (when ? <Suspense fallback={<Loading />}>{children}</Suspense> : null);
 
-import { BackupReminder, CameraBar, FixtureBar, PlanStyleChoice, QuickToggles, ThemeChoice } from './ui/app/bars';
+import { BackupReminder, CameraBar, FixtureBar, PlanStyleChoice, QuickToggles, ThemeChoice, TopMenu } from './ui/app/bars';
 import { HELP_SECTION, LAYER_LABELS, TOOL_LABEL, TOOLS } from './ui/app/tools';
 export { ThemeChoice } from './ui/app/bars';
 
 type SheetId =
-  null | 'quick' | 'legal' | 'visual' | 'areas' | 'view' | 'plantdb' | 'props' | 'warnings' | 'fixtures' | 'variants' | 'project' | 'filters' | 'ideas' | 'replace' | 'help';
+  | null
+  | 'quick'
+  | 'feedback'
+  | 'legal'
+  | 'visual'
+  | 'areas'
+  | 'view'
+  | 'plantdb'
+  | 'props'
+  | 'warnings'
+  | 'fixtures'
+  | 'variants'
+  | 'project'
+  | 'filters'
+  | 'ideas'
+  | 'replace'
+  | 'help';
 
 export function App({ loading }: { loading: boolean }) {
   const project = useProject((s) => s.project);
@@ -140,6 +162,8 @@ export function App({ loading }: { loading: boolean }) {
   // Rule engine: re-runs after every change of the area, its items, plants or settings.
   // The Basic tier checks height, sun, spacing and placement only.
   const fullRules = useFeature('fullRules');
+  const simple = useSimpleMode();
+  const [moreTools, setMoreTools] = useState(false);
   const rowOk = useFeature('rowTool');
   const { active: warnings, muted } = useMemo(() => {
     if (!area || !project) return { active: [], muted: [] };
@@ -366,19 +390,17 @@ export function App({ loading }: { loading: boolean }) {
           <button type="button" className="icon-btn" onClick={() => useProject.getState().undo()} disabled={!canUndo} aria-label={t('Visszavonás', 'Undo')}>
             ↶
           </button>
-          <button type="button" className="icon-btn" onClick={() => useProject.getState().redo()} disabled={!canRedo} aria-label={t('Újra', 'Redo')}>
-            ↷
-          </button>
-          <button type="button" className="icon-btn" onClick={() => setSheet('view')} aria-label={t('Nézet és rétegek', 'View and layers')}>
-            ◫
-          </button>
-          <QuickToggles />
+          <QuickToggles langOnly />
           <button type="button" className="icon-btn help-btn" onClick={() => openHelp(HELP_SECTION[tool])} aria-label={t('Súgó: felhasználói útmutató', 'Help: user guide')}>
             ?
           </button>
-          <button type="button" className="icon-btn" onClick={() => setSheet('project')} aria-label={t('Projekt: mentés, megosztás, nyomtatás', 'Project: save, share, print')}>
-            ⋯
-          </button>
+          <TopMenu
+            canRedo={canRedo}
+            onView={() => setSheet('view')}
+            onProject={() => setSheet('project')}
+            onQuick={() => setSheet('quick')}
+            onFeedback={() => setSheet('feedback')}
+          />
           <button
             type="button"
             className={`warn-badge${warnings.length === 0 ? ' is-ok' : errors ? ' is-error' : ''}`}
@@ -511,12 +533,13 @@ export function App({ loading }: { loading: boolean }) {
       {tool === 'fixtures' && area && !page && !compare && !shapeEditing && <FixtureTools onList={() => setSheet('fixtures')} />}
       {tool === 'season' && area && !page && !compare && <SeasonPanel area={area} plantDb={project.plantDb} />}
 
-      <nav className="toolbar" aria-label={t('Eszközök', 'Tools')}>
-        {TOOLS.map((tb) => (
+      <nav className={`toolbar${simple && !moreTools ? ' is-simple' : ''}`} aria-label={t('Eszközök', 'Tools')}>
+        {TOOLS.filter((tb) => !simple || moreTools || SIMPLE_TOOLS.has(tb.id)).map((tb) => (
           <button
             key={tb.id}
             type="button"
             className={`tool${tb.id === 'row' && !rowOk ? ' is-locked' : ''}`}
+            data-tool={tb.id}
             aria-pressed={tool === tb.id}
             disabled={!tb.ready}
             title={TOOL_LABEL[tb.id]}
@@ -528,6 +551,30 @@ export function App({ loading }: { loading: boolean }) {
             <span className="tool-label">{TOOL_LABEL[tb.id]}</span>
           </button>
         ))}
+        {simple && (
+          <>
+            {!moreTools && (
+              <button type="button" className="tool" onClick={() => setSheet('ideas')} title={t('Ötlet', 'Idea')}>
+                <span className="tool-icon" aria-hidden="true">
+                  ✦
+                </span>
+                <span className="tool-label">{t('Ötlet', 'Idea')}</span>
+              </button>
+            )}
+            <button
+              type="button"
+              className="tool"
+              aria-expanded={moreTools}
+              onClick={() => setMoreTools((v) => !v)}
+              title={moreTools ? t('Kevesebb', 'Fewer') : t('Több eszköz', 'More tools')}
+            >
+              <span className="tool-icon" aria-hidden="true">
+                {moreTools ? '‹' : '…'}
+              </span>
+              <span className="tool-label">{moreTools ? t('Kevesebb', 'Fewer') : t('Több', 'More')}</span>
+            </button>
+          </>
+        )}
       </nav>
 
       <Sheet
@@ -689,10 +736,12 @@ export function App({ loading }: { loading: boolean }) {
           <fieldset className="field-group">
             <legend>{t('Tervező mód', 'Plan style')}</legend>
             <PlanStyleChoice />
+            <CanopyChoice />
           </fieldset>
           <fieldset className="field-group">
             <legend>{t('Megjelenés', 'Appearance')}</legend>
             <ThemeChoice />
+            <ReadingChoices />
           </fieldset>
           <fieldset className="field-group">
             <legend>{t('Nyelv', 'Language')}</legend>
@@ -706,6 +755,11 @@ export function App({ loading }: { loading: boolean }) {
             </div>
           </fieldset>
         </div>
+      </Sheet>
+      <Sheet open={sheet === 'feedback'} title={t('Visszajelzés', 'Feedback')} onClose={() => setSheet(null)}>
+        <Lazy when={sheet === 'feedback'}>
+          <FeedbackPanel onDone={() => setSheet(null)} />
+        </Lazy>
       </Sheet>
       <LockedSheet />
     </div>

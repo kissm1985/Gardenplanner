@@ -136,7 +136,7 @@ html[data-save-error] .topbar {
 }
 .area-meta {
   color: var(--mute);
-  font-size: 11px;
+  font-size: 12px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -208,7 +208,7 @@ html[data-save-error] .topbar {
 }
 .tool-label {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -273,7 +273,7 @@ html[data-save-error] .topbar {
   fill: var(--mute);
 }
 .ruler-label {
-  font-size: 9px;
+  font-size: 12px;
 }
 .ruler-bg,
 .ruler-corner {
@@ -442,7 +442,7 @@ html[data-save-error] .topbar {
 .field > span,
 .field-group legend {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--mute);
@@ -540,7 +540,7 @@ html[data-save-error] .topbar {
 }
 .chips li {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   background: var(--chip);
   padding: 3px 8px;
   border-radius: var(--radius-sm);
@@ -569,7 +569,7 @@ html[data-save-error] .topbar {
 }
 .tpl small {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--mute);
 }
 .tpl-check {
@@ -695,7 +695,7 @@ html[data-save-error] .topbar {
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   border-radius: 18px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   cursor: pointer;
@@ -796,7 +796,7 @@ html[data-save-error] .topbar {
   text-align: center;
 }
 .palette-meta {
-  font-size: 9px;
+  font-size: 12px;
   color: var(--mute);
 }
 .drag-ghost {
@@ -887,7 +887,7 @@ html[data-save-error] .topbar {
   display: block;
 }
 .plant-row-text .mono {
-  font-size: 10.5px;
+  font-size: 12px;
 }
 .verify-dot {
   flex: 0 0 auto;
@@ -908,7 +908,7 @@ html[data-save-error] .topbar {
   align-items: center;
   gap: 6px;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--mute);
@@ -925,7 +925,7 @@ html[data-save-error] .topbar {
   color: var(--warn);
   background: transparent;
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 12px;
   text-transform: none;
   letter-spacing: 0;
   padding: 1px 6px;
@@ -999,7 +999,7 @@ html[data-save-error] .topbar {
   border: 1px solid var(--line);
   background: var(--panel);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
 }
 .month input:checked + span {
   background: var(--lav);
@@ -1018,7 +1018,7 @@ html[data-save-error] .topbar {
   font-size: 18px;
 }
 .psum .mono {
-  font-size: 11px;
+  font-size: 12px;
   display: block;
 }
 .toast {
@@ -1161,7 +1161,7 @@ button.warn-badge {
   cursor: pointer;
 }
 .warn-tag {
-  font-size: 10.5px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--mute);
@@ -1390,7 +1390,7 @@ button.warn-badge {
 }
 .lv-sum .k {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
   color: var(--mute);
@@ -1442,7 +1442,7 @@ table.bom {
 }
 .bom th {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--mute);
@@ -1503,7 +1503,7 @@ table.bom {
   white-space: nowrap;
 }
 .status-cell .mono {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--mute);
 }
 .status-cell select {
@@ -1518,7 +1518,7 @@ table.bom {
   min-height: 110px;
 }
 .lv-note {
-  font-size: 11px;
+  font-size: 12px;
   margin: 0;
 }
 .lv-empty {
@@ -1597,7 +1597,7 @@ table.bom {
   line-height: 1.2;
 }
 .four-cell figcaption .mono {
-  font-size: 11px;
+  font-size: 12px;
 }
 .four-hint {
   margin: 0;
@@ -1638,7 +1638,7 @@ table.bom {
 }
 .variant-pill .mono {
   color: var(--mute);
-  font-size: 11px;
+  font-size: 12px;
 }
 .variant-list,
 .variant-tree {
@@ -1682,7 +1682,7 @@ table.bom {
 }
 .variant-tree .variant-card > .mono {
   padding-left: 36px;
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .variant-tree .variant-name {
   font-size: 16px;
@@ -1708,7 +1708,7 @@ table.bom {
   margin-left: auto;
 }
 .tree-hidden {
-  font-size: 11.5px;
+  font-size: 12px;
 }
 .tree-move select {
   white-space: pre;
@@ -1738,7 +1738,7 @@ table.bom {
 }
 .badge {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 12px;
   padding: 2px 7px;
   border-radius: 10px;
   background: var(--chip);
@@ -1803,7 +1803,7 @@ table.bom {
 }
 .cmp-stats dt {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   color: var(--mute);
   align-self: center;
@@ -1817,7 +1817,7 @@ table.bom {
   font-weight: 400;
   color: var(--mute);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
 }
 .cmp-warn {
   margin: 0;
@@ -1945,7 +1945,7 @@ table.cmp-table {
   line-height: 1.3;
 }
 .task small.mono {
-  font-size: 11px;
+  font-size: 12px;
 }
 .task.is-done b {
   text-decoration: line-through;
@@ -2198,7 +2198,7 @@ a.btn-primary {
 }
 .plant-tip dt {
   font-family: var(--mono);
-  font-size: 10px;
+  font-size: 12px;
   text-transform: uppercase;
   color: var(--mute);
   padding-top: 2px;
@@ -2208,7 +2208,7 @@ a.btn-primary {
 }
 .plant-tip-verify {
   margin: 6px 0 0;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--warn);
   font-family: var(--mono);
 }
@@ -2235,7 +2235,7 @@ a.btn-primary {
 }
 .range legend {
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.05em;
   color: var(--mute);
@@ -2368,7 +2368,7 @@ polyline.shape-line {
   display: grid;
   place-items: center;
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--mute);
 }
 .plant-tip.is-fixed {
@@ -2460,7 +2460,7 @@ polyline.shape-line {
 }
 .replace-bad {
   display: block;
-  font-size: 11px;
+  font-size: 12px;
   color: var(--warn);
 }
 .replace-list .plant-row {
@@ -2702,7 +2702,7 @@ polyline.shape-line {
   padding: 10px 4px;
   border-radius: var(--radius);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.04em;
   text-align: center;
@@ -2761,7 +2761,7 @@ polyline.shape-line {
 .welcome-credit {
   margin: 4px 0 0;
   text-align: center;
-  font-size: 11px;
+  font-size: 12px;
 }
 .about-head {
   display: flex;
@@ -2856,7 +2856,7 @@ polyline.shape-line {
   gap: 10px;
   color: var(--mute);
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.1em;
 }
@@ -2907,12 +2907,12 @@ polyline.shape-line {
 }
 .toxic-notice.is-compact {
   padding: 2px 6px;
-  font-size: 11px;
+  font-size: 12px;
 }
 .welcome-legal summary {
   text-align: center;
   font-family: var(--mono);
-  font-size: 11px;
+  font-size: 12px;
   color: var(--mute);
   cursor: pointer;
 }
@@ -3134,7 +3134,7 @@ button.topbar-brand {
 }
 .example-text small {
   font-family: var(--mono);
-  font-size: 10.5px;
+  font-size: 12px;
   color: var(--mute);
 }
 
@@ -3261,4 +3261,61 @@ button.topbar-brand {
 }
 .locked-info p {
   margin: 0 0 8px;
+}
+
+/* ---------- top bar menu ---------- */
+.top-menu {
+  position: relative;
+}
+.top-menu-list {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  z-index: 40;
+  min-width: 240px;
+  display: grid;
+  padding: 6px;
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: 0 8px 24px rgb(0 0 0 / 0.18);
+}
+.top-menu-list button {
+  font: inherit;
+  font-size: 14px;
+  color: inherit;
+  text-align: left;
+  padding: 10px 12px;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  cursor: pointer;
+}
+.top-menu-list button:hover,
+.top-menu-list button:focus-visible {
+  background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+.top-menu-list button:disabled {
+  opacity: 0.45;
+}
+
+/* ---------- larger text (device setting) ---------- */
+/* Interface text gets bigger (at least 15 px); the plan drawing keeps its own scale. */
+html[data-text='large'] body {
+  font-size: 17px;
+}
+html[data-text='large'] :is(small, .mono, .muted, .tool-label, .area-meta, .lbl, label, .chip-btn, .btn, input, select, textarea, td, th, p, li, .field span, .tpl small) {
+  font-size: max(15px, 1em) !important;
+}
+.count-leader {
+  stroke: var(--mute);
+  stroke-width: 1;
+}
+.pdf-logo-preview {
+  max-height: 40px;
+  max-width: 120px;
+  object-fit: contain;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: #fff;
 }

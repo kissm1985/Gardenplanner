@@ -9,6 +9,7 @@ import { duplicateProject, newProject, openProject, removeProject, renameProject
 import type { ProjectMeta } from '../store/persist';
 import { AUTHOR, copyrightLine } from './About';
 import { ExamplePlans } from './ExamplePlans';
+import { ExampleSizeSheet } from './ExampleSize';
 import { Logo } from './Logo';
 import { toggleTheme, useTheme } from './theme';
 
@@ -54,6 +55,7 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
     void useProjects.getState().refresh();
   }, []);
   const [allExamples, setAllExamples] = useState(false);
+  const [pickExample, setPickExample] = useState<string | null>(null);
   const currentArea = project?.areas.find((a) => a.id === st.currentAreaId) ?? project?.areas[0];
   const returning = !!currentArea;
 
@@ -144,7 +146,14 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         strip={returning && !allExamples}
         onPick={(key) => {
           if (project && !roomForArea()) return;
-          const id = st.addExampleArea(key);
+          setPickExample(key);
+        }}
+      />
+      <ExampleSizeSheet
+        exampleKey={pickExample}
+        onClose={() => setPickExample(null)}
+        onAdd={(key, size) => {
+          const id = st.addExampleArea(key, size);
           if (id) open(id);
         }}
       />

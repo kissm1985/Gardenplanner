@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('draw a lawn strip in an area; plants on it are warned about; reshape it later', async ({ page }) => {
@@ -28,7 +29,7 @@ test('draw a lawn strip in an area; plants on it are warned about; reshape it la
   await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
 
   // The fixture list shows its size and lets me reshape it on the plan.
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   await page.getByRole('button', { name: 'Rögzített elemek' }).click();
   const dlg = page.locator('dialog[open]');
   await expect(dlg).toContainText(/Gyep · x \d+ · y \d+ · 2,[3-6] m²/);

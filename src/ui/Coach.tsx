@@ -18,40 +18,41 @@ function markDone() {
   }
 }
 
+// Three steps to the first plant list (the goal that matters): area → plants → list.
 const STEPS: { target: string; readonly title: string; readonly text: string }[] = [
   {
     target: '.area-switch',
     get title() {
-      return t('Terület kiválasztása', 'Choose the area');
+      return t('1. Terület', '1. Area');
     },
     get text() {
       return t(
-        'Koppints a terület nevére: itt váltasz a Házoldali sáv és a Gyepsávos kert között, és itt hozol létre újat.',
-        'Tap the area name: this is where you switch between areas and create new ones.',
+        'Itt a terület, amit tervezel. A kezdőoldalon kész példatervből is indulhatsz, vagy itt rajzolhatsz újat.',
+        'This is the area you are planning. You can also start from a ready example on the start page, or draw a new one here.',
       );
     },
   },
   {
-    target: '.toolbar .tool:nth-child(2)',
+    target: '.toolbar [data-tool="plant"]',
     get title() {
-      return t('Növény elhelyezése', 'Place a plant');
+      return t('2. Növények', '2. Plants');
     },
     get text() {
       return t(
-        'Válaszd a Növény eszközt, koppints egy növényre a palettán, aztán a rajzra. Sok tőhöz a Folt és a Sor eszköz gyorsabb.',
-        'Choose the Plant tool, tap a plant in the palette, then tap the plan. For many plants the Drift and Row tools are faster.',
+        'Koppints a Növényre, válassz a palettáról, majd koppints a rajzra. Ha nem tudod, mit ültess, kérj ötletet (Változatok → Ötlet).',
+        'Tap Plant, pick one from the palette, then tap the plan. Not sure what to plant? Ask for an idea (Variants → Idea).',
       );
     },
   },
   {
-    target: '.toolbar .tool:last-child',
+    target: '.toolbar [data-tool="list"]',
     get title() {
-      return t('Lista megtekintése', 'See the list');
+      return t('3. Lista', '3. List');
     },
     get text() {
       return t(
-        'A Lista mutatja a darabszámot, a rendelendő mennyiséget és a költséget; innen másolhatod Excelbe is.',
-        'The List shows the counts, what to order and the cost; you can copy it to Excel from there.',
+        'A Lista megmutatja, mit és mennyit kell venni, irányárral. Ezt viheted a kertészetbe.',
+        'The List shows what to buy and how many, with guide prices. Take it to the nursery.',
       );
     },
   },

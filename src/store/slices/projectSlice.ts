@@ -1,5 +1,5 @@
 import { makeArea, AREA_TEMPLATES } from '../../data/templates';
-import { buildExample, EXAMPLE_PLANS, exampleCodes } from '../../data/examples';
+import { buildExample, EXAMPLE_PLANS, exampleCodes, scaleArea } from '../../data/examples';
 import { newProject, seedPlants, migrate } from '../projectModel';
 import type { Actions, StoreCtx } from '../projectState';
 
@@ -22,11 +22,12 @@ export const projectSlice = ({ set, get, commit, mapArea, insertArea, ensureCurr
       return t ? insertArea(t.build()) : null;
     },
 
-    addExampleArea: (key) => {
+    addExampleArea: (key, size) => {
       const ex = EXAMPLE_PLANS.find((x) => x.key === key);
       if (!ex) return null;
       if (!get().project) get().createProject([]);
-      const area = buildExample(ex);
+      const built = buildExample(ex);
+      const area = size ? scaleArea(built, size.widthCm, size.lengthCm) : built;
       // Species the user deleted from the database come back, so the example's list is complete.
       const have = new Set(get().project!.plantDb.map((x) => x.code));
       const missing = exampleCodes(area).filter((c) => !have.has(c));

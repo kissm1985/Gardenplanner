@@ -1,6 +1,7 @@
 import { useRef, useState } from 'react';
 import { FeatureButton } from './Locked';
 import { TierPanel } from './TierPanel';
+import { PdfHeaderPanel } from './PdfHeaderPanel';
 import { About } from './About';
 import { embedTopViews } from './pictograms';
 import { LocationField } from './LocationField';
@@ -246,6 +247,7 @@ export function ProjectPanel({
             <span>{t('fekvő', 'landscape')}</span>
           </label>
         </div>
+        <PdfHeaderPanel />
         <FeatureButton feature="print" className="btn btn-primary" onClick={() => onPrint(orient)}>
           {t('Nyomtatás / mentés PDF-be', 'Print / save as PDF')}
         </FeatureButton>

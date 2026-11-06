@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('first launch → templates → canvas → new area persists after reload', async ({ page }) => {
@@ -68,7 +69,7 @@ test('the built app runs under its Content Security Policy without violations', 
   await expect(page.locator('meta[http-equiv="Content-Security-Policy"]')).toHaveCount(1);
   await page.getByRole('button', { name: /Kezdés/ }).click();
   // Touch the parts that use blobs, data URLs and the service worker: a PNG export and the help.
-  await page.getByRole('button', { name: /Projekt: mentés/ }).click();
+  await menuItem(page, /Projekt: mentés/);
   await Promise.all([page.waitForEvent('download'), page.getByRole('button', { name: 'PNG', exact: true }).click()]);
   await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
   await page.getByRole('button', { name: /Súgó/ }).click();

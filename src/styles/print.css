@@ -231,3 +231,30 @@
     font-size: 16pt;
   }
 }
+
+/* Pro tier: nursery header */
+.print-brand {
+  display: flex;
+  align-items: center;
+  gap: 4mm;
+  padding-bottom: 3mm;
+  margin-bottom: 3mm;
+  border-bottom: 0.4mm solid #244b3c;
+}
+.print-brand img {
+  max-height: 16mm;
+  max-width: 40mm;
+  object-fit: contain;
+}
+.print-brand b,
+.print-brand small {
+  display: block;
+}
+.print-brand small {
+  font-size: 9pt;
+  color: #555;
+}
+.print-brand-quote {
+  margin-left: auto;
+  text-align: right;
+}

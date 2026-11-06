@@ -49,6 +49,8 @@ export function withShape(it: PlacedItem, shape: ShapeOverride | null): PlacedIt
 export const PlantsLayer = memo(function PlantsLayer({ items, plants, selected, drag, shape, showMature, showSpacing, month }: Props) {
   // Concept plan: top-view pictograms instead of coloured symbols (the season view keeps its colours).
   const concept = useProject((s) => s.project?.settings.planStyle === 'concept') && !month;
+  // Tree crowns: an outline by default, so the bed under a tree stays visible.
+  const canopy = useProject((s) => s.project?.settings.canopy ?? 'outline');
   return (
     <g className="plants">
       {items.map((raw) => {
@@ -79,6 +81,7 @@ export const PlantsLayer = memo(function PlantsLayer({ items, plants, selected, 
               spacing={showSpacing}
               planted={it.status === 'planted'}
               concept={concept}
+              canopy={canopy}
             />
           );
         return <GroupMark key={it.id} item={it} plant={p} r={r} fill={fill} opacity={op} dx={dx} dy={dy} selected={sel} spacing={showSpacing} concept={concept} />;
@@ -99,6 +102,7 @@ const PlantMark = memo(function PlantMark({
   spacing,
   planted,
   concept,
+  canopy = 'filled',
 }: {
   id: string;
   x: number;
@@ -111,10 +115,11 @@ const PlantMark = memo(function PlantMark({
   spacing: boolean;
   planted: boolean;
   concept: boolean;
+  canopy?: 'outline' | 'transparent' | 'filled';
 }) {
   return (
     <g className={`plant${selected ? ' is-selected' : ''}`} data-id={id} transform={`translate(${x} ${y})`}>
-      <Dot plant={plant} r={r} fill={fill} opacity={opacity} spacing={spacing} concept={concept} />
+      <Dot plant={plant} r={r} fill={fill} opacity={opacity} spacing={spacing} concept={concept} canopy={plant.isTree ? canopy : 'filled'} />
       {planted && <circle className="plant-planted" cx={r * 0.7} cy={-r * 0.7} r={Math.max(2, r * 0.18)} />}
       {selected && <circle className="select-ring" r={r + Math.max(2, r * 0.12)} vectorEffect="non-scaling-stroke" />}
     </g>
@@ -125,7 +130,23 @@ const PlantMark = memo(function PlantMark({
 const PICTO_SCALE = 1.1;
 
 /** One plant symbol at the origin: footprint, shape glyph, code – or its top-view pictogram on a concept plan. */
-function Dot({ plant, r, fill, opacity, spacing, concept = false }: { plant: Plant; r: number; fill: string; opacity: number; spacing: boolean; concept?: boolean }) {
+function Dot({
+  plant,
+  r,
+  fill,
+  opacity,
+  spacing,
+  concept = false,
+  canopy = 'filled',
+}: {
+  plant: Plant;
+  r: number;
+  fill: string;
+  opacity: number;
+  spacing: boolean;
+  concept?: boolean;
+  canopy?: 'outline' | 'transparent' | 'filled';
+}) {
   const href = concept ? topHref(plant) : null;
   if (href) {
     const h = r * PICTO_SCALE;
@@ -139,11 +160,24 @@ function Dot({ plant, r, fill, opacity, spacing, concept = false }: { plant: Pla
   }
   const fs = Math.max(3, Math.min(r * 0.75, 14));
   // Faded (winter) plants keep a readable dark code.
-  const tc = opacity < 0.6 ? 'var(--fg)' : textOn(fill);
+  const tc = opacity < 0.6 || canopy !== 'filled' ? 'var(--fg)' : textOn(fill);
   return (
     <>
       {spacing && <circle className="spacing-ring" r={plant.spacingCm / 2} vectorEffect="non-scaling-stroke" />}
-      <circle className="plant-body" r={r} fill={fill} fillOpacity={opacity} vectorEffect="non-scaling-stroke" />
+      {canopy === 'filled' ? (
+        <circle className="plant-body" r={r} fill={fill} fillOpacity={opacity} vectorEffect="non-scaling-stroke" />
+      ) : (
+        <>
+          <circle
+            className={`plant-body canopy-${canopy}`}
+            r={r}
+            fill={fill}
+            style={{ fillOpacity: canopy === 'transparent' ? opacity * 0.3 : 0.07, stroke: fill, strokeWidth: 2.5, strokeDasharray: canopy === 'outline' ? '7 5' : undefined }}
+            vectorEffect="non-scaling-stroke"
+          />
+          <circle className="plant-trunk" r={Math.max(2, Math.min(r * 0.06, 8))} fill={fill} />
+        </>
+      )}
       {plant.symbol && plant.symbol !== 'circle' && r >= 6 && <path className="plant-glyph" d={glyph(plant.symbol, r * 0.72)} stroke={tc} vectorEffect="non-scaling-stroke" />}
       {r >= 4 && (
         <text className="plant-code" fontSize={fs} fill={tc} textAnchor="middle" dominantBaseline="central">
@@ -220,31 +254,63 @@ export function GroupLabels({
   shape: ShapeOverride | null;
   s: number;
 }) {
-  const fs = 11 / s;
+  const fs = 13 / s;
+  const labels: { id: string; x: number; y: number; text: string }[] = [];
+  for (const raw of items) {
+    if (raw.kind === 'plant') continue;
+    const it = withShape(raw, shape) as Group;
+    const p = plants.get(it.plantId);
+    if (!p) continue;
+    const pts = it.kind === 'drift' ? it.polygon : it.path;
+    const moving = drag?.ids.has(it.id);
+    const [cx] = centroid(pts);
+    const top = bbox(pts).minY;
+    // Stored count is kept in sync by the store; recompute only during a live vertex drag.
+    const count = it === raw ? it.count : it.kind === 'drift' ? fillPolygon(it.polygon, it.spacingCm, it.pattern).length : fillPath(it.path, it.spacingCm).length;
+    labels.push({ id: it.id, x: cx + (moving ? drag!.dx : 0), y: top + (moving ? drag!.dy : 0) - 6 / s, text: `${p.code} × ${count}` });
+  }
+  const placed = placeLabels(labels, fs);
   return (
     <g className="group-labels" pointerEvents="none">
-      {items.map((raw) => {
-        if (raw.kind === 'plant') return null;
-        const it = withShape(raw, shape) as Group;
-        const p = plants.get(it.plantId);
-        if (!p) return null;
-        const pts = it.kind === 'drift' ? it.polygon : it.path;
-        const moving = drag?.ids.has(it.id);
-        const [cx] = centroid(pts);
-        const top = bbox(pts).minY;
-        const x = cx + (moving ? drag!.dx : 0);
-        const y = top + (moving ? drag!.dy : 0) - 6 / s;
-        // Stored count is kept in sync by the store; recompute only during a live vertex drag.
-        const count = it === raw ? it.count : it.kind === 'drift' ? fillPolygon(it.polygon, it.spacingCm, it.pattern).length : fillPath(it.path, it.spacingCm).length;
-        const text = `${p.code} × ${count}`;
-        return <CountLabel key={it.id} x={x} y={y} fs={fs} text={text} />;
-      })}
+      {placed.map((l) =>
+        l.hidden ? null : (
+          <g key={l.id}>
+            {l.moved && <line className="count-leader" x1={l.ax} y1={l.ay} x2={l.x} y2={l.y - fs * 0.45} vectorEffect="non-scaling-stroke" />}
+            <CountLabel x={l.x} y={l.y} fs={fs} text={l.text} />
+          </g>
+        ),
+      )}
     </g>
   );
 }
 
+const labelWidth = (text: string, fs: number) => text.length * fs * 0.62 + fs;
+
+/**
+ * Keeps group labels from covering each other: a label that would overlap one already placed moves up or down
+ * (with a leader line to its group); if no free place is near, it is hidden until the user zooms in.
+ */
+export function placeLabels<T extends { id: string; x: number; y: number; text: string }>(labels: T[], fs: number) {
+  const h = fs * 1.7;
+  const boxes: { x0: number; x1: number; y0: number; y1: number }[] = [];
+  const hit = (x: number, y: number, w: number) => boxes.some((b) => x - w / 2 < b.x1 && x + w / 2 > b.x0 && y - h < b.y1 && y > b.y0);
+  return [...labels]
+    .sort((a, b) => a.y - b.y || a.x - b.x)
+    .map((l) => {
+      const w = labelWidth(l.text, fs);
+      for (const dy of [0, -h, h, -2 * h, 2 * h]) {
+        const y = l.y + dy;
+        if (!hit(l.x, y, w)) {
+          boxes.push({ x0: l.x - w / 2, x1: l.x + w / 2, y0: y - h, y1: y });
+          return { ...l, y, ax: l.x, ay: l.y, moved: dy !== 0, hidden: false };
+        }
+      }
+      return { ...l, ax: l.x, ay: l.y, moved: false, hidden: true };
+    });
+}
+
 export function CountLabel({ x, y, fs, text }: { x: number; y: number; fs: number; text: string }) {
-  const w = text.length * fs * 0.62 + fs;
+  const w = labelWidth(text, fs);
   return (
     <g transform={`translate(${x} ${y})`}>
       <rect className="count-bg" x={-w / 2} y={-fs * 1.25} width={w} height={fs * 1.6} rx={fs * 0.3} />

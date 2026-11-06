@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('planting schedule: window, checklist ticks persist; care calendar and mulch', async ({ page }) => {
@@ -34,7 +35,7 @@ test('planting schedule: window, checklist ticks persist; care calendar and mulc
   await page.waitForTimeout(600);
   await page.reload();
   await page.locator('.home-area').first().click();
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   await page.getByRole('button', { name: 'Menetrend és gondozás' }).click();
   await expect(page.locator('.task').first().locator('input')).toBeChecked();
   await expect(page.getByLabel('Kezdés')).toHaveValue('2026-10-20');

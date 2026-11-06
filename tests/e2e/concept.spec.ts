@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('round area, concept plan with pictograms, idea from preferred plants', async ({ page }) => {
@@ -22,7 +23,7 @@ test('round area, concept plan with pictograms, idea from preferred plants', asy
   await expect(page.locator('.plants image.plant-picto')).toHaveCount(0);
 
   // Concept plan: the top-view drawing instead.
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   await dlg.getByLabel(/Koncepcióterv/).check();
   await dlg.locator('.sheet-head button[aria-label="Bezárás"]').click();
   await expect(page.locator('.plants image.plant-picto')).toHaveCount(1);

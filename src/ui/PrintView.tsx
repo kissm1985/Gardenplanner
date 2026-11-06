@@ -1,4 +1,6 @@
 import { StaticPlan } from '../canvas/StaticPlan';
+import { getPdfHeader, hasPdfHeader } from './pdfHeader';
+import { hasFeature } from '../model/tier';
 import { buildBom, chosenItems, fmtFt, fmtInt } from '../engine/bom';
 import { evaluate, partition, RULE_LABEL } from '../engine/rules';
 import { MONTH_LABEL, SEASON_LABEL, SEASON_MONTH, type Season } from '../engine/season';
@@ -21,6 +23,10 @@ export function PrintView({ project, orientation }: { project: Project; orientat
     day: 'numeric',
   });
   const total = buildBom(project);
+  // Pro tier: the nursery's own header and the quote validity.
+  const header = getPdfHeader();
+  const brand = hasFeature('pdfHeader') && hasPdfHeader(header);
+  const until = new Date(Date.now() + header.validDays * 864e5).toLocaleDateString(locale(), { year: 'numeric', month: 'long', day: 'numeric' });
   return (
     <div className={`print-root print-${orientation}`}>
       {/* The page size follows the chosen orientation. */}
@@ -32,6 +38,19 @@ export function PrintView({ project, orientation }: { project: Project; orientat
         const { active } = partition(evaluate(area, items, project.plantDb, project.settings), v.muted);
         return (
           <section key={area.id} className="print-page">
+            {brand && (
+              <div className="print-brand">
+                {header.logo && <img src={header.logo} alt="" />}
+                <div>
+                  <b>{header.company}</b>
+                  <small>{header.contact}</small>
+                </div>
+                <div className="print-brand-quote">
+                  {header.customer && <b>{header.customer}</b>}
+                  {header.validDays > 0 && <small>{t(`Ajánlat érvényes: ${until}`, `Quote valid until ${until}`)}</small>}
+                </div>
+              </div>
+            )}
             <header className="print-head">
               <div>
                 <div className="eyebrow">

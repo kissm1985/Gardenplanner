@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('a plant taller than 50 cm in the 50 cm strip warns at once; jump and mute', async ({ page }) => {
@@ -39,7 +40,7 @@ test('fixtures: add a tap, drag it under a plant, get a warning', async ({ page 
   await expect(page.locator('.warn-badge')).toHaveText('0');
 
   await page.getByRole('button', { name: 'Kijelölés' }).click();
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   await page.getByRole('button', { name: 'Rögzített elemek' }).click();
   await page.getByRole('button', { name: '+ Csap' }).click();
   await expect(page.locator('.selbar-count')).toHaveText('Csap');

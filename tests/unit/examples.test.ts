@@ -74,3 +74,22 @@ describe('adding an example', () => {
     expect(useProject.getState().project!.areas[0].shape.kind).toBe('ellipse');
   });
 });
+
+describe('example fitted to my size', () => {
+  it('stretches beds and elements, keeps spacing, recounts, keeps trees', async () => {
+    const { scaleArea, buildExample, EXAMPLE_PLANS } = await import('../../src/data/examples');
+    const { itemCount } = await import('../../src/engine/fill');
+    const a = buildExample(EXAMPLE_PLANS.find((e) => e.key === 'english')!);
+    const s = scaleArea(a, 500, 700);
+    expect([s.widthCm, s.lengthCm]).toEqual([500, 700]);
+    const n = (x: typeof a) => x.variants[0].items.reduce((t, it) => t + itemCount(it), 0);
+    expect(n(s)).toBeLessThan(n(a));
+    const drift = s.variants[0].items.find((it) => it.kind === 'drift')!;
+    const orig = a.variants[0].items.find((it) => it.id === drift.id)!;
+    expect(drift.kind === 'drift' && orig.kind === 'drift' && drift.spacingCm === orig.spacingCm).toBe(true);
+    expect(drift.kind === 'drift' && drift.count === itemCount(drift)).toBe(true);
+    const tree = a.fixtures.find((f) => f.radius != null);
+    if (tree) expect(s.fixtures.find((f) => f.id === tree.id)?.radius).toBe(tree.radius);
+    expect(scaleArea(a, a.widthCm, a.lengthCm)).toBe(a);
+  });
+});

@@ -602,3 +602,39 @@ export const EXAMPLE_NAME_PAIRS: [string, string][] = [
   ['Kültéri pad', 'Outdoor bench'],
   ['Madáritató', 'Bird bath'],
 ];
+
+/**
+ * The example fitted to the user's own size: beds, rows, paths and elements stretch with the area, spacing stays,
+ * so plant counts are recounted; trees and large shrubs (single plants, round elements) keep their size, only move.
+ */
+export function scaleArea(area: Area, widthCm: number, lengthCm: number): Area {
+  const sx = widthCm / area.widthCm;
+  const sy = lengthCm / area.lengthCm;
+  if (!(sx > 0 && sy > 0) || (sx === 1 && sy === 1)) return area;
+  const pt = ([x, y]: Pt): Pt => [r1(x * sx), r1(y * sy)];
+  const items = (list: PlacedItem[]) =>
+    list
+      .map((it): PlacedItem => {
+        if (it.kind === 'plant') return { ...it, x: r1(it.x * sx), y: r1(it.y * sy) };
+        if (it.kind === 'drift') {
+          const polygon = it.polygon.map(pt);
+          return { ...it, polygon, count: fillPolygon(polygon, it.spacingCm, it.pattern).length };
+        }
+        const path = it.path.map(pt);
+        return { ...it, path, count: fillPath(path, it.spacingCm).length };
+      })
+      .filter((it) => it.kind === 'plant' || it.count > 0);
+  const fixtures = area.fixtures.map((f): Fixture => {
+    if (f.radius != null) return { ...f, x: r1(f.x * sx), y: r1(f.y * sy) };
+    return {
+      ...f,
+      x: r1(f.x * sx),
+      y: r1(f.y * sy),
+      ...(f.w != null ? { w: r1(f.w * sx) } : {}),
+      ...(f.h != null ? { h: r1(f.h * sy) } : {}),
+      ...(f.polygon ? { polygon: f.polygon.map(pt) } : {}),
+    };
+  });
+  const shape = area.shape.kind === 'polygon' ? { kind: 'polygon' as const, points: area.shape.points.map(pt) } : area.shape;
+  return { ...area, widthCm, lengthCm, shape, fixtures, variants: area.variants.map((v) => ({ ...v, items: items(v.items) })) };
+}

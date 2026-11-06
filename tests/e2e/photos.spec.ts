@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test, type Page } from '@playwright/test';
 
 // Wikipedia / Commons are mocked: the card must show the photo with author and licence.
@@ -42,7 +43,7 @@ async function mockWiki(page: Page) {
 
 /** Wikipedia photos are off by default (privacy); the first test turns them on from a plant card hint, the others in View. */
 async function photosOn(page: Page) {
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   const dlg = page.locator('dialog[open]');
   await dlg.getByLabel(/Növényfotók a Wikipédiáról/).check();
   await dlg.locator('.sheet-head button[aria-label="Bezárás"]').click();

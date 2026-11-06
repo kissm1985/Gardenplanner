@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('switch to English and back: interface, plant names, warnings, help', async ({ page }) => {
@@ -26,7 +27,7 @@ test('switch to English and back: interface, plant names, warnings, help', async
   await page.locator('dialog[open] .sheet-head button[aria-label="Close"]').click();
 
   // Back to Hungarian from the View menu; the choice is remembered.
-  await page.getByRole('button', { name: 'View and layers' }).click();
+  await menuItem(page, 'View and layers');
   await page.locator('dialog[open]').getByLabel('Magyar').click();
   await expect(page.getByRole('button', { name: 'Kijelölés', exact: true })).toBeVisible();
   await page.reload();

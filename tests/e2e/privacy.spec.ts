@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('Wikipedia photos stay off until turned on: no request to Wikimedia before', async ({ page }) => {
@@ -22,7 +23,7 @@ test('the share link warns about its content and can leave notes out; served wit
   expect(h['content-security-policy']).toContain("frame-ancestors 'none'");
   expect(h['x-content-type-options']).toBe('nosniff');
   await page.getByRole('button', { name: /Kezdés/ }).click();
-  await page.getByRole('button', { name: 'Projekt: mentés, megosztás, nyomtatás' }).click();
+  await menuItem(page, 'Projekt: mentés, megosztás, nyomtatás');
   const dlg = page.locator('dialog[open]');
   await expect(dlg.locator('.share-notice')).toContainText('csevegőkben');
   await expect(dlg.getByLabel('Jegyzetek nélkül')).toBeVisible();

@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { expect, test } from '@playwright/test';
 
 test('one-tap language and dark mode in the top bar; author and rights notice', async ({ page }) => {
@@ -5,12 +6,12 @@ test('one-tap language and dark mode in the top bar; author and rights notice', 
   await expect(page.locator('.welcome-credit')).toContainText('Kiss-Mihály István');
   await page.getByRole('button', { name: /Kezdés/ }).click();
 
-  await page.getByRole('button', { name: 'Sötét mód' }).click();
+  await menuItem(page, 'Sötét mód');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.reload();
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
   await page.locator('.home-area').first().click();
-  await page.getByRole('button', { name: 'Világos mód' }).click();
+  await menuItem(page, 'Világos mód');
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
 
   await page.getByRole('button', { name: 'Switch to English' }).click();
@@ -18,7 +19,7 @@ test('one-tap language and dark mode in the top bar; author and rights notice', 
   await page.getByRole('button', { name: 'Váltás magyarra' }).click();
   await expect(page.getByRole('button', { name: 'Kijelölés', exact: true })).toBeVisible();
 
-  await page.getByRole('button', { name: /Projekt: mentés/ }).click();
+  await menuItem(page, /Projekt: mentés/);
   const about = page.locator('dialog[open] .about');
   await expect(about).toContainText('Készítette: Kiss-Mihály István');
   await expect(about).toContainText('Minden jog fenntartva');

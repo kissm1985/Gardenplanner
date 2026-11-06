@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 // Small bars and choices around the plan: backup reminder, camera bar, quick toggles, plan style, theme, element bar.
 import { selectCurrentArea, useProject } from '../../store/projectStore';
 import { requireFeature } from '../Locked';
@@ -62,7 +63,7 @@ export function CameraBar({ onDone }: { onDone: () => void }) {
 }
 
 /** One-tap language and light/dark switches in the top bar. */
-export function QuickToggles() {
+export function QuickToggles({ langOnly = false }: { langOnly?: boolean }) {
   const { dark } = useTheme();
   const other: Lang = getLang() === 'hu' ? 'en' : 'hu';
   return (
@@ -77,15 +78,17 @@ export function QuickToggles() {
       >
         {other.toUpperCase()}
       </button>
-      <button
-        type="button"
-        className="icon-btn quick-btn"
-        onClick={toggleTheme}
-        aria-label={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
-        title={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
-      >
-        {dark ? '☀' : '☾'}
-      </button>
+      {!langOnly && (
+        <button
+          type="button"
+          className="icon-btn quick-btn"
+          onClick={toggleTheme}
+          aria-label={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
+          title={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
+        >
+          {dark ? '☀' : '☾'}
+        </button>
+      )}
     </>
   );
 }
@@ -166,6 +169,68 @@ export function FixtureBar({ id, label, onProps }: { id: string; label: string; 
       <button type="button" className="icon-btn" onClick={() => useUi.getState().selectFixture(null)} aria-label={t('Kijelölés megszüntetése', 'Clear selection')}>
         ×
       </button>
+    </div>
+  );
+}
+
+/** The ⋯ menu of the top bar: the less frequent actions, so the area name stays readable on phones. */
+export function TopMenu({
+  canRedo,
+  onView,
+  onProject,
+  onQuick,
+  onFeedback,
+}: {
+  canRedo: boolean;
+  onView: () => void;
+  onProject: () => void;
+  onQuick: () => void;
+  onFeedback: () => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const { dark } = useTheme();
+  const run = (f: () => void) => () => {
+    setOpen(false);
+    f();
+  };
+  useEffect(() => {
+    if (!open) return;
+    const close = (e: Event) => !(e.target as Element).closest?.('.top-menu') && setOpen(false);
+    const esc = (e: KeyboardEvent) => e.key === 'Escape' && setOpen(false);
+    document.addEventListener('pointerdown', close);
+    document.addEventListener('keydown', esc);
+    return () => {
+      document.removeEventListener('pointerdown', close);
+      document.removeEventListener('keydown', esc);
+    };
+  }, [open]);
+  return (
+    <div className="top-menu">
+      <button type="button" className="icon-btn" aria-label={t('Menü', 'Menu')} aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((v) => !v)}>
+        ⋯
+      </button>
+      {open && (
+        <div className="top-menu-list" role="menu">
+          <button type="button" role="menuitem" onClick={run(onProject)} aria-label={t('Projekt: mentés, megosztás, nyomtatás', 'Project: save, share, print')}>
+            {t('Projekt: mentés, megosztás, nyomtatás', 'Project: save, share, print')}
+          </button>
+          <button type="button" role="menuitem" onClick={run(onView)} aria-label={t('Nézet és rétegek', 'View and layers')}>
+            ◫ {t('Nézet és rétegek', 'View and layers')}
+          </button>
+          <button type="button" role="menuitem" disabled={!canRedo} onClick={run(() => useProject.getState().redo())} aria-label={t('Újra', 'Redo')}>
+            ↷ {t('Újra', 'Redo')}
+          </button>
+          <button type="button" role="menuitem" onClick={run(toggleTheme)} aria-label={dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}>
+            {dark ? '☀' : '☾'} {dark ? t('Világos mód', 'Light mode') : t('Sötét mód', 'Dark mode')}
+          </button>
+          <button type="button" role="menuitem" onClick={run(onQuick)} aria-label={t('Gyors műveletek', 'Quick actions')}>
+            ⚡ {t('Gyors műveletek', 'Quick actions')}
+          </button>
+          <button type="button" role="menuitem" onClick={run(onFeedback)} aria-label={t('Visszajelzés', 'Feedback')}>
+            ✉ {t('Visszajelzés', 'Feedback')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

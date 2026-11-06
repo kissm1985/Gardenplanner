@@ -243,6 +243,8 @@ export interface Settings {
   showMatureSize: boolean;
   /** Look up plant photos on Wikipedia. Off until the user turns it on: the look-up sends the IP address to Wikimedia. */
   wikiPhotos?: boolean;
+  /** How tree crowns are drawn: an outline (default), see-through, or filled (as before 0.7). */
+  canopy?: 'outline' | 'transparent' | 'filled';
   /** Version of the built-in plant list last merged into this project. */
   seedVersion?: number;
   /** How plants are drawn: coloured symbols with codes (default) or the concept plan's top-view pictograms. */

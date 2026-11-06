@@ -1,3 +1,4 @@
+import { menuItem } from './helpers';
 import { readFileSync } from 'node:fs';
 import { expect, test, type Page } from '@playwright/test';
 
@@ -15,7 +16,7 @@ async function setup(page: Page) {
   await page.getByRole('button', { name: 'Kijelölés' }).click();
   return { b, cm };
 }
-const menu = (page: Page) => page.getByRole('button', { name: /Projekt: mentés/ }).click();
+const menu = (page: Page) => menuItem(page, /Projekt: mentés/);
 
 test('acceptance: JSON backup restores the project exactly', async ({ page }) => {
   await setup(page);
@@ -83,7 +84,7 @@ test('print document: one page per area plus summary; images download', async ({
 
 test('background image: upload, then set the scale with two points', async ({ page }) => {
   const { b, cm } = await setup(page);
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   await page.getByRole('button', { name: 'Rögzített elemek' }).click();
   await page.locator('dialog[open] input[type=file][accept="image/*"]').setInputFiles('public/icon-512.png');
   await expect(page.locator('.bg-image')).toHaveAttribute('width', '120');
@@ -163,7 +164,7 @@ test('Látványterv: camera on the plan, style and mood, send in one step, finis
   await dlg.locator('.sheet-head button[aria-label="Bezárás"]').click();
   // Back on the plan the camera is hidden; the View layer can show it.
   await expect(page.locator('.camera')).toHaveCount(0);
-  await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
+  await menuItem(page, 'Nézet és rétegek');
   await page
     .locator('dialog[open]')
     .getByLabel(/Látványterv nézőpontja/)
