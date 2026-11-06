@@ -19,10 +19,30 @@ const PALETTE_LABEL = labels<PaletteKey>({
   'pink-purple': ['Rózsaszín–lila', 'Pink–purple'],
 });
 export const PALETTES: Record<PaletteKey, { readonly label: string; families: string[] }> = {
-  'purple-silver': { get label() { return PALETTE_LABEL['purple-silver']; }, families: ['purple', 'blue', 'silver'] },
-  warm: { get label() { return PALETTE_LABEL.warm; }, families: ['yellow', 'orange', 'red', 'bronze'] },
-  'white-blue': { get label() { return PALETTE_LABEL['white-blue']; }, families: ['white', 'blue', 'green'] },
-  'pink-purple': { get label() { return PALETTE_LABEL['pink-purple']; }, families: ['pink', 'purple', 'silver'] },
+  'purple-silver': {
+    get label() {
+      return PALETTE_LABEL['purple-silver'];
+    },
+    families: ['purple', 'blue', 'silver'],
+  },
+  warm: {
+    get label() {
+      return PALETTE_LABEL.warm;
+    },
+    families: ['yellow', 'orange', 'red', 'bronze'],
+  },
+  'white-blue': {
+    get label() {
+      return PALETTE_LABEL['white-blue'];
+    },
+    families: ['white', 'blue', 'green'],
+  },
+  'pink-purple': {
+    get label() {
+      return PALETTE_LABEL['pink-purple'];
+    },
+    families: ['pink', 'purple', 'silver'],
+  },
 };
 
 // Hungarian colour words → colour family.
@@ -243,7 +263,16 @@ type Interval = [number, number];
 function subtract(base: Interval, cuts: Interval[]): Interval[] {
   let out: Interval[] = [base];
   for (const [a, b] of cuts)
-    out = out.flatMap(([s, e]) => (b <= s || a >= e ? [[s, e] as Interval] : ([[s, a], [b, e]] as Interval[]).filter(([x, y]) => y - x > 0)));
+    out = out.flatMap(([s, e]) =>
+      b <= s || a >= e
+        ? [[s, e] as Interval]
+        : (
+            [
+              [s, a],
+              [b, e],
+            ] as Interval[]
+          ).filter(([x, y]) => y - x > 0),
+    );
   return out;
 }
 
@@ -294,7 +323,12 @@ export function generateIdea(
   const underWalnut = !preferred && total > 0 && inZone / total > 0.4 && all.filter((p) => p.juglone === 'tolerant').length >= 3;
   const tol = (xs: Plant[]) => (underWalnut ? xs.filter((p) => p.juglone === 'tolerant') : xs);
   if (underWalnut)
-    notes.push(t('A terület nagy része a diófa zónájában van, ezért csak juglone-tűrő fajokból válogattam.', 'Most of the area is in the walnut zone, so only juglone-tolerant species were used.'));
+    notes.push(
+      t(
+        'A terület nagy része a diófa zónájában van, ezért csak juglone-tűrő fajokból válogattam.',
+        'Most of the area is in the walnut zone, so only juglone-tolerant species were used.',
+      ),
+    );
 
   // One water band for everything (low+medium or medium+high), so neighbours don't clash.
   const lowSide = all.filter((p) => p.water !== 'high').length >= all.filter((p) => p.water !== 'low').length;
@@ -302,10 +336,22 @@ export function generateIdea(
   const wb = (xs: Plant[]) => (preferred ? xs : tol(xs).filter((p) => (lowSide ? p.water !== 'high' : p.water !== 'low')));
 
   const hedge = preferred ? pools.hedge[0] : pickSpecies(wb(pools.hedge), palette, 1, r)[0];
-  const trees = preferred ? pools.tree.filter((p) => p !== hedge).slice(0, 1) : pickSpecies(wb(pools.tree).filter((p) => p !== hedge), palette, 1, r);
+  const trees = preferred
+    ? pools.tree.filter((p) => p !== hedge).slice(0, 1)
+    : pickSpecies(
+        wb(pools.tree).filter((p) => p !== hedge),
+        palette,
+        1,
+        r,
+      );
   const shrubs = preferred
     ? pools.shrub.filter((p) => p !== hedge && !trees.includes(p))
-    : pickSpecies(wb(pools.shrub).filter((p) => p !== hedge), palette, m2 > 20 ? 2 : 1, r);
+    : pickSpecies(
+        wb(pools.shrub).filter((p) => p !== hedge),
+        palette,
+        m2 > 20 ? 2 : 1,
+        r,
+      );
   const woody = !!hedge || trees.length > 0 || shrubs.length > 0;
   const nDrift = (m2 < 4 ? 3 : m2 < 12 ? 4 : 5) - (woody ? 1 : 0);
   // On large areas tiny plants would mean hundreds of pots per patch.
@@ -329,7 +375,14 @@ export function generateIdea(
         ),
       );
   }
-  if (!species.length && !woody) return { seed, palette, species: [], items: [], notes: [...notes, t('Nincs a terület feltételeinek megfelelő faj az adatbázisban.', 'No species in the database fits the area.')] };
+  if (!species.length && !woody)
+    return {
+      seed,
+      palette,
+      species: [],
+      items: [],
+      notes: [...notes, t('Nincs a terület feltételeinek megfelelő faj az adatbázisban.', 'No species in the database fits the area.')],
+    };
 
   // Long axis u, short axis v.
   const alongY = bb.maxY - bb.minY >= bb.maxX - bb.minX;
@@ -403,7 +456,15 @@ export function generateIdea(
           const path: Pt[] = ub - ua < 1 ? [U(ua, V(hw / 2))] : [U(ua, V(hw / 2)), U(ub, V(hw / 2))];
           const ps = fillPath(path, hedge.spacingCm);
           if (ps.every(inside)) {
-            add({ kind: 'row', id: uid(), plantId: hedge.code, path: path.map(([x, y]) => [Math.round(x), Math.round(y)] as Pt), spacingCm: hedge.spacingCm, count: ps.length, status: 'needed' });
+            add({
+              kind: 'row',
+              id: uid(),
+              plantId: hedge.code,
+              path: path.map(([x, y]) => [Math.round(x), Math.round(y)] as Pt),
+              spacingCm: hedge.spacingCm,
+              count: ps.length,
+              status: 'needed',
+            });
             depth = hw;
           }
         }
@@ -557,7 +618,12 @@ export function generateIdea(
     );
   const sh = shrubs.filter((p) => usedCodes.has(p.code));
   if (sh.length)
-    parts.push(t(`előtte cserjék ritmusban (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`, `shrubs in rhythm in front (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`));
+    parts.push(
+      t(
+        `előtte cserjék ritmusban (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`,
+        `shrubs in rhythm in front (${sh.map((p) => plantName(p).toLowerCase()).join(', ')})`,
+      ),
+    );
   const dr = species.filter((p) => usedCodes.has(p.code));
   if (dr.length)
     parts.push(
@@ -565,7 +631,10 @@ export function generateIdea(
         ? t(`${dr.length} faj vegyesen, tövenként váltakozva – azonos faj nem kerül egymás mellé`, `${dr.length} species mixed plant by plant – no two of the same side by side`)
         : t(`${dr.length} faj ismétlődő foltokban, elöl az alacsonyabbak`, `${dr.length} species in repeated drifts, lower ones in front`),
     );
-  if (extra) notes.push(t(`A tövek között ${extra} cm-rel nagyobb a távolság a javasoltnál (ritkább ültetés).`, `Plants are ${extra} cm further apart than recommended (sparser planting).`));
+  if (extra)
+    notes.push(
+      t(`A tövek között ${extra} cm-rel nagyobb a távolság a javasoltnál (ritkább ültetés).`, `Plants are ${extra} cm further apart than recommended (sparser planting).`),
+    );
   if (parts.length) notes.push(`${parts.join('; ')}.`.replace(/^./, (c) => c.toUpperCase()));
   const seasons = new Set(used.flatMap((p) => [...seasonsOf(p)]));
   const sName = [t('tavasz', 'spring'), t('nyár', 'summer'), t('ősz', 'autumn')].filter((_, i) => seasons.has(i as 0 | 1 | 2));

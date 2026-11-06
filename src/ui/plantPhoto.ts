@@ -33,7 +33,16 @@ const key = (nameLat: string) => `photo:${nameLat.trim().toLowerCase()}`;
 
 function fromCache(c: Cached): PhotoState {
   if (!c.found || !c.src) return { state: 'none' };
-  return { state: 'ok', src: c.blob ? URL.createObjectURL(c.blob) : c.src, credit: c.credit ?? '', pageUrl: c.pageUrl, filePage: c.filePage, license: c.license, licenseUrl: c.licenseUrl, own: false };
+  return {
+    state: 'ok',
+    src: c.blob ? URL.createObjectURL(c.blob) : c.src,
+    credit: c.credit ?? '',
+    pageUrl: c.pageUrl,
+    filePage: c.filePage,
+    license: c.license,
+    licenseUrl: c.licenseUrl,
+    own: false,
+  };
 }
 
 async function load(nameLat: string): Promise<PhotoState> {

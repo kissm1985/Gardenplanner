@@ -26,10 +26,14 @@ export function ListView() {
   const taRef = useRef<HTMLTextAreaElement>(null);
 
   const areaIds = scope === 'all' ? project.areas.map((a) => a.id) : [scope];
-  const bom = useMemo(() => buildBom(project, areaIds, status), [project, scope, status]);
+  const bom = useMemo(() => buildBom(project, scope === 'all' ? project.areas.map((a) => a.id) : [scope], status), [project, scope, status]);
   const table = useMemo(() => bomTable(bom), [bom]);
   const title = scope === 'all' ? localName(project.name) : localName(project.areas.find((a) => a.id === scope)?.name);
-  const fileBase = `${t('novenylista', 'plant-list')}-${title.normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/[^a-zA-Z0-9]+/g, '-').toLowerCase()}`;
+  const fileBase = `${t('novenylista', 'plant-list')}-${title
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .replace(/[^a-zA-Z0-9]+/g, '-')
+    .toLowerCase()}`;
 
   const say = (msg: string) => {
     setToast(msg);
@@ -38,13 +42,16 @@ export function ListView() {
   const doCopy = async (text: string, label: string, html?: string) => {
     setFallback(text);
     const ok = await copy(text, taRef.current, html);
-    say(ok ? t(`${label} kimásolva.`, `${label} copied.`) : t('A másolás itt nem működik: jelöld ki a lenti mezőt, és másold kézzel.', 'Copying does not work here: select the box below and copy by hand.'));
+    say(
+      ok
+        ? t(`${label} kimásolva.`, `${label} copied.`)
+        : t('A másolás itt nem működik: jelöld ki a lenti mezőt, és másold kézzel.', 'Copying does not work here: select the box below and copy by hand.'),
+    );
   };
 
   const xlsx = () => {
     const sheets = [{ name: scope === 'all' ? t('Összesen', 'Total') : title, rows: table }];
-    if (scope === 'all' && project.areas.length > 1)
-      for (const a of project.areas) sheets.push({ name: localName(a.name), rows: bomTable(buildBom(project, [a.id], status)) });
+    if (scope === 'all' && project.areas.length > 1) for (const a of project.areas) sheets.push({ name: localName(a.name), rows: bomTable(buildBom(project, [a.id], status)) });
     downloadBlob(`${fileBase}.xlsx`, buildXlsx(sheets), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   };
 
@@ -163,7 +170,12 @@ export function ListView() {
             <thead>
               <tr>
                 <th>{t('Növény', 'Plant')}</th>
-                {perArea && bom.areas.map((a) => <th key={a.id} className="m">{localName(a.name)}</th>)}
+                {perArea &&
+                  bom.areas.map((a) => (
+                    <th key={a.id} className="m">
+                      {localName(a.name)}
+                    </th>
+                  ))}
                 <th className="m">{t('Ültetés', 'Plant')}</th>
                 <th className="m">{t('Rendelés', 'Order')}</th>
                 <th>{t('Kiszerelés', 'Pot size')}</th>
@@ -189,7 +201,12 @@ export function ListView() {
                       </span>
                     </span>
                   </td>
-                  {perArea && bom.areas.map((a) => <td key={a.id} className="m">{r.byArea[a.id] ?? '–'}</td>)}
+                  {perArea &&
+                    bom.areas.map((a) => (
+                      <td key={a.id} className="m">
+                        {r.byArea[a.id] ?? '–'}
+                      </td>
+                    ))}
                   <td className="m">{r.planted}</td>
                   <td className="m">
                     <b>{r.order}</b>
@@ -205,17 +222,18 @@ export function ListView() {
                   </td>
                   <td className="m">{fmtInt(r.subtotal)}</td>
                   <td>
-                    <StatusCell
-                      counts={r.byStatus}
-                      onSet={(s) => useProject.getState().setSpeciesStatus(r.plant.code, s, areaIds, status)}
-                      label={plantName(r.plant)}
-                    />
+                    <StatusCell counts={r.byStatus} onSet={(s) => useProject.getState().setSpeciesStatus(r.plant.code, s, areaIds, status)} label={plantName(r.plant)} />
                   </td>
                 </tr>
               ))}
               <tr className="tot">
                 <td>{t('Összesen', 'Total')}</td>
-                {perArea && bom.areas.map((a) => <td key={a.id} className="m">{bom.rows.reduce((s, r) => s + (r.byArea[a.id] ?? 0), 0)}</td>)}
+                {perArea &&
+                  bom.areas.map((a) => (
+                    <td key={a.id} className="m">
+                      {bom.rows.reduce((s, r) => s + (r.byArea[a.id] ?? 0), 0)}
+                    </td>
+                  ))}
                 <td className="m">{bom.planted}</td>
                 <td className="m">{bom.order}</td>
                 <td colSpan={5} />
@@ -229,7 +247,9 @@ export function ListView() {
       )}
 
       <label className="field lv-fallback">
-        <span>{t('Tartalék szövegmező: ha a másolás gomb nem működik, jelöld ki és másold innen', 'Fallback text box: if the copy button does not work, select and copy from here')}</span>
+        <span>
+          {t('Tartalék szövegmező: ha a másolás gomb nem működik, jelöld ki és másold innen', 'Fallback text box: if the copy button does not work, select and copy from here')}
+        </span>
         <textarea ref={taRef} readOnly rows={6} value={fallback || toText(bom, title)} onFocus={(e) => e.currentTarget.select()} spellCheck={false} />
       </label>
       <p className="mono muted lv-note">

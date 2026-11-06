@@ -22,7 +22,10 @@ test('shared plant filters in the palette and the database; area soil', async ({
   await page.getByRole('button', { name: 'Adatbázis' }).click();
   await expect(page.locator('.filters summary')).toContainText('3 aktív');
   await expect(page.locator('.plant-row')).toHaveCount(names.length);
-  await page.locator('dialog[open]').getByRole('button', { name: /Szűrők törlése/ }).click();
+  await page
+    .locator('dialog[open]')
+    .getByRole('button', { name: /Szűrők törlése/ })
+    .click();
   await expect(page.locator('.plant-row')).toHaveCount(all);
   await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
 

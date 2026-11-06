@@ -61,8 +61,7 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
 
   const toggleSoil = (x: Soil) => set('soil', p.soil?.includes(x) ? p.soil.filter((y) => y !== x) : [...(p.soil ?? []), x]);
   const toggleSun = (s: SunNeed) => set('sun', p.sun.includes(s) ? p.sun.filter((x) => x !== s) : [...p.sun, s]);
-  const toggleMonth = (m: number) =>
-    set('bloomMonths', p.bloomMonths.includes(m) ? p.bloomMonths.filter((x) => x !== m) : [...p.bloomMonths, m].sort((a, b) => a - b));
+  const toggleMonth = (m: number) => set('bloomMonths', p.bloomMonths.includes(m) ? p.bloomMonths.filter((x) => x !== m) : [...p.bloomMonths, m].sort((a, b) => a - b));
 
   return (
     <form className="form" onSubmit={submit} noValidate>
@@ -446,7 +445,9 @@ function PictogramField({ p, set, others }: { p: Plant; set: <K extends keyof Pl
       <div className="picto-field">
         <PlantIcon p={p} size={64} />
         <label className="field">
-          <span className="lbl">{own && !p.pictogram ? t('Saját piktogram (a kód szerint)', 'Own pictogram (by its code)') : t('Ezt a piktogramot használja', 'Uses this pictogram')}</span>
+          <span className="lbl">
+            {own && !p.pictogram ? t('Saját piktogram (a kód szerint)', 'Own pictogram (by its code)') : t('Ezt a piktogramot használja', 'Uses this pictogram')}
+          </span>
           <select value={p.pictogram ?? (own ? p.code : '')} onChange={(e) => set('pictogram', e.target.value && e.target.value !== p.code ? e.target.value : undefined)}>
             {!own && <option value="">{t('— nincs: színes jel —', '— none: coloured symbol —')}</option>}
             {PICTOGRAM_CODES.map((c) => (

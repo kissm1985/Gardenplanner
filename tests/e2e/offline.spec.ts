@@ -3,10 +3,12 @@ import { expect, test } from '@playwright/test';
 test('acceptance: after the first visit the app opens and saves without internet', async ({ page, context }) => {
   await page.goto('/');
   // Wait until the service worker controls the page (precache done).
-  await page.waitForFunction(() => navigator.serviceWorker?.controller != null, null, { timeout: 15_000 }).catch(async () => {
-    await page.reload();
-    await page.waitForFunction(() => navigator.serviceWorker?.controller != null, null, { timeout: 15_000 });
-  });
+  await page
+    .waitForFunction(() => navigator.serviceWorker?.controller != null, null, { timeout: 15_000 })
+    .catch(async () => {
+      await page.reload();
+      await page.waitForFunction(() => navigator.serviceWorker?.controller != null, null, { timeout: 15_000 });
+    });
   await page.getByRole('button', { name: /Kezdés/ }).click();
 
   await context.setOffline(true);

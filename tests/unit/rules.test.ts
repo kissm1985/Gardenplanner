@@ -66,7 +66,16 @@ describe('rules on the house strip (max 50 cm, no thorns, non-toxic)', () => {
   });
 
   it('a drift laid out at its own spacing does not warn; a squeezed one does', () => {
-    const id = st().addDrift('LA', [[0, 0], [120, 0], [120, 200], [0, 200]], 'staggered')!;
+    const id = st().addDrift(
+      'LA',
+      [
+        [0, 0],
+        [120, 0],
+        [120, 200],
+        [0, 200],
+      ],
+      'staggered',
+    )!;
     expect(rules()).toEqual([]);
     st().updateItems([id], { spacingCm: 15 });
     expect(rules()).toContain('spacing');
@@ -75,7 +84,10 @@ describe('rules on the house strip (max 50 cm, no thorns, non-toxic)', () => {
   it('species limit', () => {
     const a = selectCurrentArea(st())!;
     st().updateArea(a.id, { constraints: { ...a.constraints, speciesLimits: { LA: 5 } } });
-    st().addRow('LA', [[60, 0], [60, 400]]); // 11 plants
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]); // 11 plants
     expect(run().find((w) => w.rule === 'species-limit')?.message).toContain('11');
   });
 
@@ -151,7 +163,17 @@ describe('walnut and juglone (lawn garden)', () => {
   });
 
   it('stays fast with 1000+ positions', () => {
-    st().addDrift('TH', [[0, 0], [500, 0], [500, 1200], [0, 1200]], 'staggered', 25);
+    st().addDrift(
+      'TH',
+      [
+        [0, 0],
+        [500, 0],
+        [500, 1200],
+        [0, 1200],
+      ],
+      'staggered',
+      25,
+    );
     const t = performance.now();
     run();
     expect(performance.now() - t).toBeLessThan(300);
@@ -167,7 +189,18 @@ describe('lawn', () => {
     useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
     st().createProject(['house-strip']);
     const before = bedAreaM2(selectCurrentArea(st())!);
-    st().addFixture({ type: 'lawn', label: 'Gyepsáv', x: 0, y: 600, polygon: [[0, 600], [120, 600], [120, 800], [0, 800]] });
+    st().addFixture({
+      type: 'lawn',
+      label: 'Gyepsáv',
+      x: 0,
+      y: 600,
+      polygon: [
+        [0, 600],
+        [120, 600],
+        [120, 800],
+        [0, 800],
+      ],
+    });
     st().placePlant('LA', 60, 700); // on the lawn
     st().placePlant('LA', 60, 300); // in the bed
     const a = selectCurrentArea(st())!;

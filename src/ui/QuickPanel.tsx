@@ -18,11 +18,7 @@ export interface Step {
   run: () => void;
 }
 
-const norm = (s: string) =>
-  s
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .toLowerCase();
+const norm = (s: string) => s.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
 
 /** Every feature in one searchable list, and the first-plan checklist until it is done. */
 export function QuickPanel({ actions, steps }: { actions: QuickAction[]; steps: Step[] }) {
@@ -55,7 +51,15 @@ export function QuickPanel({ actions, steps }: { actions: QuickAction[]; steps: 
           </ol>
         </fieldset>
       )}
-      <input type="search" className="palette-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Mit szeretnél csinálni? (pl. csere, kép, mentés)', 'What do you want to do? (e.g. replace, image, backup)')} aria-label={t('Művelet keresése', 'Search actions')} autoFocus />
+      <input
+        type="search"
+        className="palette-search"
+        value={q}
+        onChange={(e) => setQ(e.target.value)}
+        placeholder={t('Mit szeretnél csinálni? (pl. csere, kép, mentés)', 'What do you want to do? (e.g. replace, image, backup)')}
+        aria-label={t('Művelet keresése', 'Search actions')}
+        autoFocus
+      />
       <ul className="quick-list">
         {shown.map((a) => (
           <li key={a.id}>
@@ -65,7 +69,9 @@ export function QuickPanel({ actions, steps }: { actions: QuickAction[]; steps: 
             </button>
           </li>
         ))}
-        {!shown.length && <li className="mono muted">{t('Nincs ilyen művelet. Próbálj más szót, vagy nézd meg a súgót.', 'No such action. Try another word, or see the help.')}</li>}
+        {!shown.length && (
+          <li className="mono muted">{t('Nincs ilyen művelet. Próbálj más szót, vagy nézd meg a súgót.', 'No such action. Try another word, or see the help.')}</li>
+        )}
       </ul>
     </div>
   );

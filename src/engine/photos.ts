@@ -61,9 +61,7 @@ async function commonsInfo(fetchFn: Fetch, file: string): Promise<Omit<PhotoInfo
   const res = await fetchFn(url);
   if (!res.ok) return null;
   const data = (await res.json()) as Pages;
-  const info = Object.values(data.query?.pages ?? {})[0]?.imageinfo?.[0] as
-    | { thumburl?: string; url?: string; extmetadata?: Record<string, { value?: string }> }
-    | undefined;
+  const info = Object.values(data.query?.pages ?? {})[0]?.imageinfo?.[0] as { thumburl?: string; url?: string; extmetadata?: Record<string, { value?: string }> } | undefined;
   const src = info?.thumburl ?? info?.url;
   if (!src) return null;
   const meta = info?.extmetadata ?? {};

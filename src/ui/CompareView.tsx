@@ -37,7 +37,9 @@ export function CompareView({ area }: { area: Area }) {
   return (
     <div className="compare">
       <header className="cmp-head">
-        <div className="eyebrow">{t('Változatok összehasonlítása', 'Comparing variants')} · {localName(area.name)}</div>
+        <div className="eyebrow">
+          {t('Változatok összehasonlítása', 'Comparing variants')} · {localName(area.name)}
+        </div>
         <div className="seg" role="group" aria-label={t('Évszak', 'Season')}>
           {([0, 1, 2, 3] as Season[]).map((s) => (
             <button key={s} type="button" className="chip-btn" aria-pressed={seasonOf(month) === s} onClick={() => ui.setMonth(SEASON_MONTH[s])}>
@@ -53,7 +55,14 @@ export function CompareView({ area }: { area: Area }) {
 
       <div className="cmp-cols">
         <Column stats={cmp.a} other={cmp.b} area={area} month={month} picker={pick(aId, setA, t('Bal oldali változat', 'Left variant'))} chosen={a.id === area.chosenVariantId} />
-        <Column stats={cmp.b} other={cmp.a} area={area} month={month} picker={pick(b.id, setB, t('Jobb oldali változat', 'Right variant'))} chosen={b.id === area.chosenVariantId} />
+        <Column
+          stats={cmp.b}
+          other={cmp.a}
+          area={area}
+          month={month}
+          picker={pick(b.id, setB, t('Jobb oldali változat', 'Right variant'))}
+          chosen={b.id === area.chosenVariantId}
+        />
       </div>
 
       <div className="tw">
@@ -90,14 +99,7 @@ export function CompareView({ area }: { area: Area }) {
   );
 }
 
-function Column({ stats, other, area, month, picker, chosen }: {
-  stats: VariantStats;
-  other: VariantStats;
-  area: Area;
-  month: number;
-  picker: ReactNode;
-  chosen: boolean;
-}) {
+function Column({ stats, other, area, month, picker, chosen }: { stats: VariantStats; other: VariantStats; area: Area; month: number; picker: ReactNode; chosen: boolean }) {
   const project = useProject((s) => s.project)!;
   const diff = (x: number, y: number, unit = '') => (x === y ? '' : ` (${x > y ? '+' : '−'}${fmtInt(Math.abs(x - y))}${unit})`);
   return (
@@ -106,7 +108,15 @@ function Column({ stats, other, area, month, picker, chosen }: {
         {picker}
         {chosen && <span className="badge badge-chosen">{t('választott', 'chosen')}</span>}
       </div>
-      <StaticPlan area={area} items={stats.variant.items} plantDb={project.plantDb} month={month} showMature={project.settings.showMatureSize} labelPx={170} title={localName(stats.variant.name)} />
+      <StaticPlan
+        area={area}
+        items={stats.variant.items}
+        plantDb={project.plantDb}
+        month={month}
+        showMature={project.settings.showMatureSize}
+        labelPx={170}
+        title={localName(stats.variant.name)}
+      />
       {(stats.variant.renders?.length ?? 0) > 0 && (
         <div className="cmp-renders" aria-label={t('Látványképek', 'Visualisations')}>
           {stats.variant.renders!.map((r) => (

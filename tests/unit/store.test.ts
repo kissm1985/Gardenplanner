@@ -134,7 +134,12 @@ describe('drifts and rows', () => {
     st().createProject(['house-strip']);
   });
   const items = () => selectItems(st());
-  const sq: [number, number][] = [[0, 0], [100, 0], [100, 100], [0, 100]];
+  const sq: [number, number][] = [
+    [0, 0],
+    [100, 0],
+    [100, 100],
+    [0, 100],
+  ];
 
   it('a drift stores its count, using the plant spacing by default', () => {
     const id = st().addDrift('FE', sq, 'grid')!; // Festuca, 25 cm
@@ -147,19 +152,38 @@ describe('drifts and rows', () => {
     expect(items()[0]).toMatchObject({ count: 4 });
     st().updateItems([id], { pattern: 'staggered' });
     expect((items()[0] as { count: number }).count).toBeGreaterThan(0);
-    st().updateShape(id, [[0, 0], [200, 0], [200, 100], [0, 100]]);
+    st().updateShape(id, [
+      [0, 0],
+      [200, 0],
+      [200, 100],
+      [0, 100],
+    ]);
     expect(items()[0]).toMatchObject({ kind: 'drift' });
     st().updateItems([id], { plantId: 'LA', pattern: 'grid' }); // lavender 40 cm: 5 × 2
     expect(items()[0]).toMatchObject({ plantId: 'LA', spacingCm: 40, count: 10 });
   });
 
   it('a row along 1200 cm of lavender at 40 cm has 31 plants; moving keeps the count', () => {
-    const id = st().addRow('LA', [[60, 0], [60, 1200]])!;
+    const id = st().addRow('LA', [
+      [60, 0],
+      [60, 1200],
+    ])!;
     expect(items()[0]).toMatchObject({ count: 31 });
     st().moveItems([id], 5, 5);
-    expect(items()[0]).toMatchObject({ count: 31, path: [[65, 5], [65, 1205]] });
+    expect(items()[0]).toMatchObject({
+      count: 31,
+      path: [
+        [65, 5],
+        [65, 1205],
+      ],
+    });
     st().undo();
-    expect(items()[0]).toMatchObject({ path: [[60, 0], [60, 1200]] });
+    expect(items()[0]).toMatchObject({
+      path: [
+        [60, 0],
+        [60, 1200],
+      ],
+    });
   });
 });
 
@@ -201,7 +225,16 @@ describe('replace species', () => {
   it('swaps every plant of a species; drifts take the new spacing; scope and undo', () => {
     useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
     st().createProject(['house-strip']);
-    st().addDrift('LA', [[0, 0], [120, 0], [120, 200], [0, 200]], 'staggered');
+    st().addDrift(
+      'LA',
+      [
+        [0, 0],
+        [120, 0],
+        [120, 200],
+        [0, 200],
+      ],
+      'staggered',
+    );
     st().placePlant('LA', 60, 500);
     st().placePlant('SA', 60, 700);
     const a = st().project!.areas[0];
@@ -231,18 +264,45 @@ describe('replace species', () => {
 
 describe('mixed replacement', () => {
   it('mixCounts follows the weights exactly', () => {
-    expect(mixCounts(100, [{ code: 'A', weight: 1 }, { code: 'B', weight: 1 }])).toEqual([50, 50]);
-    expect(mixCounts(10, [{ code: 'A', weight: 2 }, { code: 'B', weight: 1 }])).toEqual([7, 3]);
-    expect(mixAssign(9, [{ code: 'A', weight: 1 }, { code: 'B', weight: 2 }]).filter((c) => c === 'B')).toHaveLength(6);
+    expect(
+      mixCounts(100, [
+        { code: 'A', weight: 1 },
+        { code: 'B', weight: 1 },
+      ]),
+    ).toEqual([50, 50]);
+    expect(
+      mixCounts(10, [
+        { code: 'A', weight: 2 },
+        { code: 'B', weight: 1 },
+      ]),
+    ).toEqual([7, 3]);
+    expect(
+      mixAssign(9, [
+        { code: 'A', weight: 1 },
+        { code: 'B', weight: 2 },
+      ]).filter((c) => c === 'B'),
+    ).toHaveLength(6);
   });
 
   it('a row of cherry laurel becomes a random mix of photinia and forsythia, per plant', () => {
     useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
     st().createProject(['lawn-garden']);
-    st().addRow('LN', [[100, 100], [100, 1100]]); // one row, many plants
+    st().addRow('LN', [
+      [100, 100],
+      [100, 1100],
+    ]); // one row, many plants
     st().placePlant('LN', 300, 300);
     const before = selectItems(st()).reduce((s, it) => s + (it.kind === 'plant' ? 1 : it.count), 0);
-    const n = st().replaceSpecies('LN', [{ code: 'PF', weight: 1 }, { code: 'FO', weight: 1 }], 'variant', false, 'plant');
+    const n = st().replaceSpecies(
+      'LN',
+      [
+        { code: 'PF', weight: 1 },
+        { code: 'FO', weight: 1 },
+      ],
+      'variant',
+      false,
+      'plant',
+    );
     expect(n).toBe(before);
     const items = selectItems(st());
     expect(items.every((it) => it.kind === 'plant')).toBe(true);
@@ -256,8 +316,27 @@ describe('mixed replacement', () => {
   it('per item: each drift or row gets one of the targets, with its spacing', () => {
     useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
     st().createProject(['house-strip']);
-    for (let i = 0; i < 6; i++) st().addDrift('LA', [[0, i * 200], [120, i * 200], [120, i * 200 + 150], [0, i * 200 + 150]], 'grid');
-    expect(st().replaceSpecies('LA', [{ code: 'SA', weight: 1 }, { code: 'NE', weight: 2 }], 'variant')).toBe(6);
+    for (let i = 0; i < 6; i++)
+      st().addDrift(
+        'LA',
+        [
+          [0, i * 200],
+          [120, i * 200],
+          [120, i * 200 + 150],
+          [0, i * 200 + 150],
+        ],
+        'grid',
+      );
+    expect(
+      st().replaceSpecies(
+        'LA',
+        [
+          { code: 'SA', weight: 1 },
+          { code: 'NE', weight: 2 },
+        ],
+        'variant',
+      ),
+    ).toBe(6);
     const items = selectItems(st());
     expect(items.filter((it) => it.plantId === 'NE')).toHaveLength(4);
     for (const it of items) if (it.kind === 'drift') expect(it.spacingCm).toBe(st().project!.plantDb.find((p) => p.code === it.plantId)!.spacingCm);
@@ -268,7 +347,16 @@ describe('split groups', () => {
   it('a drift becomes single plants at the same positions, with its status', () => {
     useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
     st().createProject(['house-strip']);
-    const id = st().addDrift('LA', [[0, 0], [120, 0], [120, 200], [0, 200]], 'staggered')!;
+    const id = st().addDrift(
+      'LA',
+      [
+        [0, 0],
+        [120, 0],
+        [120, 200],
+        [0, 200],
+      ],
+      'staggered',
+    )!;
     st().updateItems([id], { status: 'ordered' });
     const drift = selectItems(st())[0];
     const n = drift.kind === 'drift' ? drift.count : 0;

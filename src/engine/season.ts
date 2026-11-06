@@ -56,7 +56,7 @@ export function plantLook(p: Plant, month: number): Look {
     // K-07 season colours: the bloom season's entry is the flower colour; outside the
     // bloom months of that season show the neighbouring season's foliage instead.
     if (blooming && bs != null) color = p.seasonColors[bs];
-    else if (s === bs) color = p.seasonColors[s === 0 ? 2 : s - 1 as Season];
+    else if (s === bs) color = p.seasonColors[s === 0 ? 2 : ((s - 1) as Season)];
     else color = p.seasonColors[s];
   } else {
     color = blooming ? p.color : s === 3 ? (p.winterInterest ? p.color : DORMANT) : GREEN;

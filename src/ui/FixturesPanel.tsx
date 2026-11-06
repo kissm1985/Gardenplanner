@@ -11,7 +11,26 @@ import { loadImage } from './imageFile';
 
 export { FIXTURE_LABEL };
 
-const ADDABLE: FixtureType[] = ['walnut', 'tree', 'window', 'tap', 'manhole', 'paving', 'wall', 'fence', 'gravel', 'path', 'pond', 'well', 'shed', 'compost', 'rainBarrel', 'bench', 'raisedBed', 'other'];
+const ADDABLE: FixtureType[] = [
+  'walnut',
+  'tree',
+  'window',
+  'tap',
+  'manhole',
+  'paving',
+  'wall',
+  'fence',
+  'gravel',
+  'path',
+  'pond',
+  'well',
+  'shed',
+  'compost',
+  'rainBarrel',
+  'bench',
+  'raisedBed',
+  'other',
+];
 
 /** List, add and edit fixed elements; walnut juglone radius setting. */
 export function FixturesPanel({ onDone }: { onDone: () => void }) {

@@ -46,15 +46,43 @@ export function PlantFilterForm() {
       </label>
       <fieldset className="range">
         <legend>{t('Magasság (cm)', 'Height (cm)')}</legend>
-        <input type="number" inputMode="numeric" placeholder={t('tól', 'from')} value={f.hMin} onChange={(e) => set('hMin', e.target.value)} aria-label={t('Magasság legalább (cm)', 'Height at least (cm)')} />
+        <input
+          type="number"
+          inputMode="numeric"
+          placeholder={t('tól', 'from')}
+          value={f.hMin}
+          onChange={(e) => set('hMin', e.target.value)}
+          aria-label={t('Magasság legalább (cm)', 'Height at least (cm)')}
+        />
         <span>–</span>
-        <input type="number" inputMode="numeric" placeholder={t('ig', 'to')} value={f.hMax} onChange={(e) => set('hMax', e.target.value)} aria-label={t('Magasság legfeljebb (cm)', 'Height at most (cm)')} />
+        <input
+          type="number"
+          inputMode="numeric"
+          placeholder={t('ig', 'to')}
+          value={f.hMax}
+          onChange={(e) => set('hMax', e.target.value)}
+          aria-label={t('Magasság legfeljebb (cm)', 'Height at most (cm)')}
+        />
       </fieldset>
       <fieldset className="range">
         <legend>{t('Terjedelem (cm)', 'Spread (cm)')}</legend>
-        <input type="number" inputMode="numeric" placeholder={t('tól', 'from')} value={f.sMin} onChange={(e) => set('sMin', e.target.value)} aria-label={t('Terjedelem legalább (cm)', 'Spread at least (cm)')} />
+        <input
+          type="number"
+          inputMode="numeric"
+          placeholder={t('tól', 'from')}
+          value={f.sMin}
+          onChange={(e) => set('sMin', e.target.value)}
+          aria-label={t('Terjedelem legalább (cm)', 'Spread at least (cm)')}
+        />
         <span>–</span>
-        <input type="number" inputMode="numeric" placeholder={t('ig', 'to')} value={f.sMax} onChange={(e) => set('sMax', e.target.value)} aria-label={t('Terjedelem legfeljebb (cm)', 'Spread at most (cm)')} />
+        <input
+          type="number"
+          inputMode="numeric"
+          placeholder={t('ig', 'to')}
+          value={f.sMax}
+          onChange={(e) => set('sMax', e.target.value)}
+          aria-label={t('Terjedelem legfeljebb (cm)', 'Spread at most (cm)')}
+        />
       </fieldset>
       <label className="field">
         <span>{t('Tüske', 'Thorns')}</span>
@@ -86,4 +114,3 @@ export function PlantFilterForm() {
     </div>
   );
 }
-

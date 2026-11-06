@@ -10,7 +10,7 @@ import { labels, t } from '../i18n';
 export function monthRanges(ms: number[]): string {
   const s = [...new Set(ms)].sort((a, b) => a - b);
   const out: string[] = [];
-  for (let i = 0; i < s.length; ) {
+  for (let i = 0; i < s.length;) {
     let j = i;
     while (j + 1 < s.length && s[j + 1] === s[j] + 1) j++;
     out.push(i === j ? MONTHS[s[i] - 1] : `${MONTHS[s[i] - 1]}–${MONTHS[s[j] - 1]}`);
@@ -69,7 +69,11 @@ export function PlantCard({ plant, item }: { plant: Plant; item?: PlacedItem }) 
         </figure>
       )}
       {photo.state === 'loading' && <div className="plant-tip-photo is-empty">{t('fotó betöltése…', 'loading photo…')}</div>}
-      {photo.state === 'ask' && <div className="plant-tip-photo is-empty">{t('Fotó: Nézet → Növényfotók a Wikipédiáról, vagy a növény adatlapján.', 'Photo: View → Plant photos from Wikipedia, or on the plant’s page.')}</div>}
+      {photo.state === 'ask' && (
+        <div className="plant-tip-photo is-empty">
+          {t('Fotó: Nézet → Növényfotók a Wikipédiáról, vagy a növény adatlapján.', 'Photo: View → Plant photos from Wikipedia, or on the plant’s page.')}
+        </div>
+      )}
       {photo.state === 'offline' && <div className="plant-tip-photo is-empty">{t('A fotóhoz internet kell (első alkalommal).', 'The photo needs internet (the first time).')}</div>}
       <div className="plant-tip-head">
         <PlantIcon p={plant} size={48} />

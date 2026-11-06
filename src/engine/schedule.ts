@@ -24,7 +24,6 @@ export interface Day {
   tasks: Task[];
 }
 
-
 const PLANTS_PER_HOUR = 12; // P9 / 1 l pots into prepared, fabric-covered soil
 
 export const toIso = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -122,7 +121,10 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
           `Ültetés: ${plantName(x.p)} ${n} tő${parts > 1 ? ` (${i + 1}/${parts})` : ''} – ${localName(a.name)}`,
           `Planting: ${plantName(x.p)} ${n} plants${parts > 1 ? ` (${i + 1}/${parts})` : ''} – ${localName(a.name)}`,
         ),
-        detail: i === 0 ? t(`Tőtáv ${x.p.spacingCm} cm, a terv szerint; az agrotextilen kereszt alakú vágás.`, `Spacing ${x.p.spacingCm} cm as planned; cross-shaped cut in the fabric.`) : undefined,
+        detail:
+          i === 0
+            ? t(`Tőtáv ${x.p.spacingCm} cm, a terv szerint; az agrotextilen kereszt alakú vágás.`, `Spacing ${x.p.spacingCm} cm as planned; cross-shaped cut in the fabric.`)
+            : undefined,
         areaId: a.id,
         hours: n / PLANTS_PER_HOUR,
       });
@@ -133,14 +135,15 @@ export function areaTasks(a: Area, plantDb: Plant[]): Task[] {
     out.push({
       id: id('mulch'),
       title: t(`Mulcsozás – ${localName(a.name)}`, `Mulching – ${localName(a.name)}`),
-      detail: a.kind === 'gravel'
-        ? t('Világos 4–8 mm-es kavics az egész kőkertre, ~4–5 cm vastagon, agrotextilen.', 'Light 4–8 mm gravel over the whole rock garden, ~4–5 cm deep, on fabric.')
-        : m.gravel.length
-        ? t(
-            `Világos 4–8 mm-es kavics (~4–5 cm) ${m.bark.length ? `a szárazságtűrők körül (${m.gravel.map((p) => plantName(p).toLowerCase()).join(', ')}), máshol kéreg is lehet` : 'az egész ágyásra'}.`,
-            `Light 4–8 mm gravel (~4–5 cm) ${m.bark.length ? `around the drought-tolerant plants (${m.gravel.map((p) => plantName(p).toLowerCase()).join(', ')}), bark elsewhere` : 'over the whole bed'}.`,
-          )
-        : t('Fenyőkéreg vagy komposztált kéreg ~5 cm vastagon, a tövektől 3–5 cm-re.', 'Pine or composted bark ~5 cm deep, 3–5 cm away from the stems.'),
+      detail:
+        a.kind === 'gravel'
+          ? t('Világos 4–8 mm-es kavics az egész kőkertre, ~4–5 cm vastagon, agrotextilen.', 'Light 4–8 mm gravel over the whole rock garden, ~4–5 cm deep, on fabric.')
+          : m.gravel.length
+            ? t(
+                `Világos 4–8 mm-es kavics (~4–5 cm) ${m.bark.length ? `a szárazságtűrők körül (${m.gravel.map((p) => plantName(p).toLowerCase()).join(', ')}), máshol kéreg is lehet` : 'az egész ágyásra'}.`,
+                `Light 4–8 mm gravel (~4–5 cm) ${m.bark.length ? `around the drought-tolerant plants (${m.gravel.map((p) => plantName(p).toLowerCase()).join(', ')}), bark elsewhere` : 'over the whole bed'}.`,
+              )
+            : t('Fenyőkéreg vagy komposztált kéreg ~5 cm vastagon, a tövektől 3–5 cm-re.', 'Pine or composted bark ~5 cm deep, 3–5 cm away from the stems.'),
       areaId: a.id,
       hours: Math.max(0.5, m2 * 0.1),
     });
@@ -178,7 +181,8 @@ export function buildSchedule(project: Project, start: string, end: string): { d
     days[d].tasks.push(t);
     load += t.hours;
   }
-  if (hours / dates.length > 6) notes.push(
+  if (hours / dates.length > 6)
+    notes.push(
       t(
         `Kb. ${hu(hours)} munkaóra jut ${dates.length} napra – ez napi ${hu(hours / dates.length)} óra; érdemes hosszabb időablakot vagy segítséget tervezni.`,
         `About ${hu(hours)} working hours over ${dates.length} days – ${hu(hours / dates.length)} hours a day; plan a longer window or get help.`,
@@ -205,8 +209,15 @@ export function buildSchedule(project: Project, start: string, end: string): { d
         `${loc.name}: the first frost is expected around ${fmtMd(loc.firstFrost)}. Water in well before it; mulch protects the roots. Trees and perennials can still go in for 1–2 weeks while the soil is not frozen.`,
       ),
     );
-  if (e.getMonth() >= 5 && e.getMonth() <= 7) notes.push(t('Nyári ültetésnél az első hetekben naponta öntözz, és árnyékold a délutáni napon.', 'When planting in summer, water daily for the first weeks and shade from the afternoon sun.'));
-  if (!tasks.length) notes.push(t('Még nincs növény a választott változatokban, ezért nincs mit ütemezni.', 'There are no plants in the chosen variants yet, so nothing to schedule.'));
+  if (e.getMonth() >= 5 && e.getMonth() <= 7)
+    notes.push(
+      t(
+        'Nyári ültetésnél az első hetekben naponta öntözz, és árnyékold a délutáni napon.',
+        'When planting in summer, water daily for the first weeks and shade from the afternoon sun.',
+      ),
+    );
+  if (!tasks.length)
+    notes.push(t('Még nincs növény a választott változatokban, ezért nincs mit ütemezni.', 'There are no plants in the chosen variants yet, so nothing to schedule.'));
   // Days left empty at the end stay as spare days (rain, delivery delays).
   return { days, notes, hours };
 }

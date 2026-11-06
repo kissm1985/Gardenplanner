@@ -10,7 +10,13 @@ test('planting schedule: window, checklist ticks persist; care calendar and mulc
   const cm = b.width / 120;
   await page.mouse.move(b.x + 5 * cm, b.y + 100 * cm);
   await page.mouse.down();
-  for (const [x, y] of [[115, 100], [115, 400], [5, 400], [6, 102]]) await page.mouse.move(b.x + x * cm, b.y + y * cm, { steps: 8 });
+  for (const [x, y] of [
+    [115, 100],
+    [115, 400],
+    [5, 400],
+    [6, 102],
+  ])
+    await page.mouse.move(b.x + x * cm, b.y + y * cm, { steps: 8 });
   await page.mouse.up();
 
   await page.getByRole('button', { name: 'Lista', exact: true }).click();

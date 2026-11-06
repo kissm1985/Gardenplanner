@@ -27,7 +27,16 @@ describe('planting schedule', () => {
 
   it('tasks follow the K-07 order: soil, drip, fabric, trees, perennials, mulch, water', () => {
     st().selectArea(st().project!.areas[1].id);
-    st().addDrift('LA', [[0, 0], [120, 0], [120, 300], [0, 300]], 'grid');
+    st().addDrift(
+      'LA',
+      [
+        [0, 0],
+        [120, 0],
+        [120, 300],
+        [0, 300],
+      ],
+      'grid',
+    );
     st().placePlant('AC', 450, 200);
     const t = areaTasks(selectCurrentArea(st())!, st().project!.plantDb).map((x) => x.id.split(':')[1]);
     expect(t).toEqual(['soil', 'drip', 'fabric', 'tree', 'plant', 'mulch', 'water']);
@@ -35,7 +44,17 @@ describe('planting schedule', () => {
 
   it('spreads the work over the window and keeps the order', () => {
     st().selectArea(st().project!.areas[0].id);
-    st().addDrift('TH', [[0, 0], [120, 0], [120, 1200], [0, 1200]], 'staggered', 25); // lots of thyme
+    st().addDrift(
+      'TH',
+      [
+        [0, 0],
+        [120, 0],
+        [120, 1200],
+        [0, 1200],
+      ],
+      'staggered',
+      25,
+    ); // lots of thyme
     const { days, hours } = buildSchedule(st().project!, '2026-10-20', '2026-11-03');
     expect(days).toHaveLength(15);
     const flat = days.flatMap((d) => d.tasks.map((t) => t.id));

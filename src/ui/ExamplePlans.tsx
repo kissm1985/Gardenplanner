@@ -9,6 +9,7 @@ import { getLang, t } from '../i18n';
 export const ExamplePlans = memo(function ExamplePlans({ onPick }: { onPick: (key: string) => void }) {
   const lang = getLang();
   // Built once per language: names and element labels are stored in the language of the moment.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- rebuilt on purpose when the language changes
   const built = useMemo(() => EXAMPLE_PLANS.map((ex) => ({ ex, area: buildExample(ex) })), [lang]);
   return (
     <ul className="example-list">

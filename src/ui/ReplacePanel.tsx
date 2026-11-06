@@ -25,7 +25,10 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
   const used = useMemo(() => {
     const m = new Map<string, number>();
     for (const it of items) m.set(it.plantId, (m.get(it.plantId) ?? 0) + plants(it));
-    return [...m].map(([code, n]) => ({ plant: project.plantDb.find((p) => p.code === code)!, n })).filter((x) => x.plant).sort((a, b) => b.n - a.n);
+    return [...m]
+      .map(([code, n]) => ({ plant: project.plantDb.find((p) => p.code === code)!, n }))
+      .filter((x) => x.plant)
+      .sort((a, b) => b.n - a.n);
   }, [items, project.plantDb]);
   const [from, setFrom] = useState(initial && used.some((u) => u.plant.code === initial) ? initial : (used[0]?.plant.code ?? ''));
   const [to, setTo] = useState<MixPart[]>([]);
@@ -141,7 +144,12 @@ export function ReplacePanel({ from: initial, onDone }: { from?: string; onDone:
         ))}
         <label className="check">
           <input type="checkbox" checked={!keepSpacing} onChange={(e) => setKeepSpacing(!e.target.checked)} />
-          <span>{t('A megmaradó foltok és sorok az új növény tőtávját kapják (a darabszám újraszámolódik)', 'Remaining drifts and rows take the new plant’s spacing (the count is recalculated)')}</span>
+          <span>
+            {t(
+              'A megmaradó foltok és sorok az új növény tőtávját kapják (a darabszám újraszámolódik)',
+              'Remaining drifts and rows take the new plant’s spacing (the count is recalculated)',
+            )}
+          </span>
         </label>
       </fieldset>
 

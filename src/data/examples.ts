@@ -110,7 +110,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'sun',
       soil: 'sandy',
       kind: 'gravel',
-      notes: L('Napos, száraz, jó vízelvezetésű kert kavicsmulccsal; öntözés csak a beállásig.', 'Sunny, dry, free-draining garden with gravel mulch; water only until established.'),
+      notes: L(
+        'Napos, száraz, jó vízelvezetésű kert kavicsmulccsal; öntözés csak a beállásig.',
+        'Sunny, dry, free-draining garden with gravel mulch; water only until established.',
+      ),
       constraints: { mulchCover: true },
       fixtures: [
         fx('paving', L('Terasz', 'Terrace'), 0, 830, 800, 170),
@@ -126,8 +129,14 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       p.one('EE', 160, 170);
       p.one('EE', 640, 170);
       // Lavender lines the path on both sides.
-      p.row('LA', [[330, 140], [330, 800]]);
-      p.row('LA', [[470, 140], [470, 800]]);
+      p.row('LA', [
+        [330, 140],
+        [330, 800],
+      ]);
+      p.row('LA', [
+        [470, 140],
+        [470, 800],
+      ]);
       p.drift('HB', rect(20, 20, 220, 90));
       p.drift('HB', rect(560, 20, 220, 90));
       p.drift('ST', rect(20, 270, 120, 220));
@@ -162,7 +171,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'sun',
       soil: 'loam',
       kind: 'bed',
-      notes: L('Szimmetrikus, formális kert: tengelyes kavicsutak, középen szökőkút, nyírt puszpáng.', 'Symmetrical formal garden: axial gravel walks, a fountain in the middle, clipped box.'),
+      notes: L(
+        'Szimmetrikus, formális kert: tengelyes kavicsutak, középen szökőkút, nyírt puszpáng.',
+        'Symmetrical formal garden: axial gravel walks, a fountain in the middle, clipped box.',
+      ),
       fixtures: [
         fx('path', L('Főtengely', 'Main axis'), 560, 0, 80, 1600),
         fx('path', L('Keresztút', 'Cross walk'), 0, 760, 1200, 80),
@@ -209,7 +221,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'sun',
       soil: 'loam',
       kind: 'bed',
-      notes: L('Hagyományos falusi udvar: középen gyep és kút, hátul tároló és komposzt, a kerítés mentén virágzó cserjék.', 'Traditional village yard: lawn and well in the middle, shed and compost at the back, flowering shrubs along the fence.'),
+      notes: L(
+        'Hagyományos falusi udvar: középen gyep és kút, hátul tároló és komposzt, a kerítés mentén virágzó cserjék.',
+        'Traditional village yard: lawn and well in the middle, shed and compost at the back, flowering shrubs along the fence.',
+      ),
       fixtures: [
         fx('fence', L('Kerítés', 'Fence'), -6, 0, 6, 1200),
         { id: uid('f'), type: 'lawn', label: L('Gyep', 'Lawn'), x: 0, y: 0, polygon: rect(160, 300, 560, 640) },
@@ -306,7 +321,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'sun',
       soil: 'loam',
       kind: 'border',
-      notes: L('Kanyargó gyep két mély, rétegzett évelőágyás között, a végén pad a cseresznyefa alatt.', 'A winding lawn between two deep layered borders, with a seat under the cherry at the far end.'),
+      notes: L(
+        'Kanyargó gyep két mély, rétegzett évelőágyás között, a végén pad a cseresznyefa alatt.',
+        'A winding lawn between two deep layered borders, with a seat under the cherry at the far end.',
+      ),
       fixtures: [
         { id: uid('f'), type: 'lawn', label: L('Gyep', 'Lawn'), x: 0, y: 0, polygon: curvedLawn(1000, 1400, 320, 70, 1400, 0.4) },
         fx('bench', L('Pad', 'Bench'), 430, 30, 150, 50),
@@ -353,7 +371,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'part',
       soil: 'acidic',
       kind: 'shade',
-      notes: L('Csendes, félárnyékos kert: tó, gereblyézett kavicsfelület, lépőkövek, kőlámpás.', 'A quiet, part-shaded garden: pond, raked gravel, stepping stones and a stone lantern.'),
+      notes: L(
+        'Csendes, félárnyékos kert: tó, gereblyézett kavicsfelület, lépőkövek, kőlámpás.',
+        'A quiet, part-shaded garden: pond, raked gravel, stepping stones and a stone lantern.',
+      ),
       fixtures: [
         fx('pond', L('Kerti tó', 'Pond'), 420, 120, 300, 200),
         fx('gravel', L('Gereblyézett kavics', 'Raked gravel'), 60, 560, 340, 260),
@@ -397,7 +418,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'sun',
       soil: 'loam',
       kind: 'bed',
-      notes: L('Naturalisztikus ültetés: egy év alatt beáll, alig kell öntözni, télen is szép. Kora tavasszal egyszer vágjuk vissza.', 'Naturalistic planting: settles in a year, needs little water, beautiful in winter too. Cut back once in early spring.'),
+      notes: L(
+        'Naturalisztikus ültetés: egy év alatt beáll, alig kell öntözni, télen is szép. Kora tavasszal egyszer vágjuk vissza.',
+        'Naturalistic planting: settles in a year, needs little water, beautiful in winter too. Cut back once in early spring.',
+      ),
       fixtures: [fx('path', L('Nyírt ösvény', 'Mown path'), 360, 0, 80, 1000)],
     }),
     plant: (p) => {
@@ -438,7 +462,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'shade',
       soil: 'loam',
       kind: 'shade',
-      notes: L('Nagy lombos fa alatti, hűvös, humuszos sarok. Lombmulcs, nyáron öntözés.', 'A cool, humus-rich corner under a large deciduous tree. Leaf-mould mulch, summer watering.'),
+      notes: L(
+        'Nagy lombos fa alatti, hűvös, humuszos sarok. Lombmulcs, nyáron öntözés.',
+        'A cool, humus-rich corner under a large deciduous tree. Leaf-mould mulch, summer watering.',
+      ),
       fixtures: [
         tree(L('Meglévő fa', 'Existing tree'), 350, 380, 320),
         fx('path', L('Kéregmulcsos ösvény', 'Bark path'), 0, 620, 700, 70),
@@ -520,7 +547,10 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       sunLevel: 'sun',
       soil: 'loam',
       kind: 'bed',
-      notes: L('Kör alakú ágyás a gyep közepén, középen madáritató; méheknek és lepkéknek márciustól októberig.', 'A round bed in the lawn with a bird bath in the centre; for bees and butterflies from March to October.'),
+      notes: L(
+        'Kör alakú ágyás a gyep közepén, középen madáritató; méheknek és lepkéknek márciustól októberig.',
+        'A round bed in the lawn with a bird bath in the centre; for bees and butterflies from March to October.',
+      ),
       constraints: { nonToxic: false },
       fixtures: [fx('well', L('Madáritató', 'Bird bath'), 310, 310, 80, 80)],
     }),

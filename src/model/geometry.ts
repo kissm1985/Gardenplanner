@@ -34,7 +34,10 @@ export function centroid(poly: Pt[]): Pt {
 }
 
 export function bbox(pts: Pt[]) {
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+  let minX = Infinity,
+    minY = Infinity,
+    maxX = -Infinity,
+    maxY = -Infinity;
   for (const [x, y] of pts) {
     if (x < minX) minX = x;
     if (y < minY) minY = y;

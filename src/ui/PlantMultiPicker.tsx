@@ -64,7 +64,13 @@ export function PlantMultiPicker({
     <div className="multi-picker">
       <label className="field">
         <span className="lbl">{label}</span>
-        <input type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Keresés: név, latin név, kód', 'Search: name, Latin name, code')} aria-label={t('Növény keresése a listában', 'Search plants in the list')} />
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          placeholder={t('Keresés: név, latin név, kód', 'Search: name, Latin name, code')}
+          aria-label={t('Növény keresése a listában', 'Search plants in the list')}
+        />
       </label>
       {picked.length > 0 && (
         <ul className="picked-list" aria-label={t('Kiválasztott növények', 'Chosen plants')}>

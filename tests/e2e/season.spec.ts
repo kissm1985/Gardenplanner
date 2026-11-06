@@ -6,7 +6,10 @@ test('season view: colours follow the month; four seasons side by side', async (
   await page.getByRole('button', { name: 'Növény', exact: true }).click();
   const b = (await page.locator('.area-outline').boundingBox())!;
   const cm = b.width / 120;
-  for (const [q, y] of [['levendula', 150], ['ligeti', 300]] as const) {
+  for (const [q, y] of [
+    ['levendula', 150],
+    ['ligeti', 300],
+  ] as const) {
     await page.getByLabel('Növény keresése').fill(q);
     await page.locator('.palette-item').first().click();
     await page.mouse.click(b.x + 60 * cm, b.y + y * cm);

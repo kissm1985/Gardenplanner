@@ -37,8 +37,14 @@ const STYLE_TASK: Record<VizStyle, { hu: string; en: string }> = {
 };
 const STYLE_DESC: Record<VizStyle, { hu: string; en: string }> = {
   photo: { hu: 'fotórealisztikus, természetes színek', en: 'photorealistic, natural colours' },
-  watercolor: { hu: 'akvarell festmény: lágy, áttetsző színek, finom papírtextúra, de pontos elrendezés és arányok', en: 'watercolour painting: soft, translucent colours, fine paper texture, but accurate layout and proportions' },
-  sketch: { hu: 'tervezői vázlat: tus kontúrok, színes ceruza vagy marker színezés, világos papír háttér', en: 'design sketch: ink outlines, coloured pencil or marker shading, light paper background' },
+  watercolor: {
+    hu: 'akvarell festmény: lágy, áttetsző színek, finom papírtextúra, de pontos elrendezés és arányok',
+    en: 'watercolour painting: soft, translucent colours, fine paper texture, but accurate layout and proportions',
+  },
+  sketch: {
+    hu: 'tervezői vázlat: tus kontúrok, színes ceruza vagy marker színezés, világos papír háttér',
+    en: 'design sketch: ink outlines, coloured pencil or marker shading, light paper background',
+  },
 };
 const TIME_DESC: Record<TimeOfDay, { hu: string; en: string }> = {
   morning: { hu: 'reggel, alacsony szögű lágy napfény, hosszú árnyékok, friss, harmatos hangulat', en: 'morning, low soft sunlight, long shadows, fresh dewy mood' },
@@ -55,8 +61,26 @@ const OVERCAST_TIME: Record<TimeOfDay, { hu: string; en: string }> = {
   sunset: { hu: 'alkonyat, halványuló fény', en: 'dusk, fading light' },
 };
 
-const DIR_HU = ['jobbra (x növekvő irányába)', 'jobbra lefelé', 'lefelé (y növekvő irányába)', 'balra lefelé', 'balra (x csökkenő irányába)', 'balra felfelé', 'felfelé (y csökkenő irányába)', 'jobbra felfelé'];
-const DIR_EN = ['to the right (towards larger x)', 'down and to the right', 'down (towards larger y)', 'down and to the left', 'to the left (towards smaller x)', 'up and to the left', 'up (towards smaller y)', 'up and to the right'];
+const DIR_HU = [
+  'jobbra (x növekvő irányába)',
+  'jobbra lefelé',
+  'lefelé (y növekvő irányába)',
+  'balra lefelé',
+  'balra (x csökkenő irányába)',
+  'balra felfelé',
+  'felfelé (y csökkenő irányába)',
+  'jobbra felfelé',
+];
+const DIR_EN = [
+  'to the right (towards larger x)',
+  'down and to the right',
+  'down (towards larger y)',
+  'down and to the left',
+  'to the left (towards smaller x)',
+  'up and to the left',
+  'up (towards smaller y)',
+  'up and to the right',
+];
 const sector = (deg: number) => Math.round((((deg % 360) + 360) % 360) / 45) % 8;
 
 /** What the camera sees, nearest first: plants and elements inside the field of view, as foreground / middle / background. */
@@ -105,15 +129,24 @@ function cameraLines(area: Area, items: PlacedItem[], plants: Map<string, Plant>
   const where = (s: Seen) => (Math.abs(s.side) < 10 ? (hu ? 'középen' : 'centre') : s.side < 0 ? (hu ? 'balra' : 'left') : hu ? 'jobbra' : 'right');
   const band = (lo: number, hi: number) => {
     const names: string[] = [];
-    for (const s of seen) if (s.d > lo && s.d <= hi) {
-      const n = `${s.name} (${where(s)}, ${fmt(s.d)} m)`;
-      if (!names.includes(n) && names.length < 8) names.push(n);
-    }
+    for (const s of seen)
+      if (s.d > lo && s.d <= hi) {
+        const n = `${s.name} (${where(s)}, ${fmt(s.d)} m)`;
+        if (!names.includes(n) && names.length < 8) names.push(n);
+      }
     return names;
   };
   const bands: [string, string[]][] = hu
-    ? [['Előtér', band(-1, 250)], ['Középtér', band(250, 600)], ['Háttér', band(600, Infinity)]]
-    : [['Foreground', band(-1, 250)], ['Middle ground', band(250, 600)], ['Background', band(600, Infinity)]];
+    ? [
+        ['Előtér', band(-1, 250)],
+        ['Középtér', band(250, 600)],
+        ['Háttér', band(600, Infinity)],
+      ]
+    : [
+        ['Foreground', band(-1, 250)],
+        ['Middle ground', band(250, 600)],
+        ['Background', band(600, Infinity)],
+      ];
   for (const [label, names] of bands) if (names.length) out.push(`${label}: ${names.join('; ')}.`);
   return out;
 }
@@ -143,7 +176,10 @@ function placement(it: PlacedItem, lang: Lang): string {
   const pts: Pt[] = it.kind === 'drift' ? it.polygon : it.path;
   const b = bbox(pts);
   const box = `x ${fmt(b.minX)}–${fmt(b.maxX)} m, y ${fmt(b.minY)}–${fmt(b.maxY)} m`;
-  if (it.kind === 'drift') return lang === 'hu' ? `folt: ${box}, ${it.pattern === 'staggered' ? 'eltolt' : 'négyzetes'} kiosztás, ${it.spacingCm} cm tőtáv` : `drift: ${box}, ${it.pattern === 'staggered' ? 'staggered' : 'grid'} layout, ${it.spacingCm} cm apart`;
+  if (it.kind === 'drift')
+    return lang === 'hu'
+      ? `folt: ${box}, ${it.pattern === 'staggered' ? 'eltolt' : 'négyzetes'} kiosztás, ${it.spacingCm} cm tőtáv`
+      : `drift: ${box}, ${it.pattern === 'staggered' ? 'staggered' : 'grid'} layout, ${it.spacingCm} cm apart`;
   const [a, z] = [it.path[0], it.path[it.path.length - 1]];
   return lang === 'hu'
     ? `${it.path.length > 2 ? 'íves sor' : 'egyenes sor'} (${fmt(a[0])}; ${fmt(a[1])}) m-től (${fmt(z[0])}; ${fmt(z[1])}) m-ig, ${it.spacingCm} cm tőtáv`
@@ -267,7 +303,11 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
           : `The bed is oval (${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m), centred at (${fmt(area.widthCm / 2)}, ${fmt(area.lengthCm / 2)}) m.`,
     );
   if (area.shape.kind === 'polygon')
-    L.push(hu ? `Az ágyás alakja (sarokpontok, m): ${pts.map(([x, y]) => `(${fmt(x)}; ${fmt(y)})`).join(', ')}.` : `Bed outline (corners, m): ${pts.map(([x, y]) => `(${fmt(x)}, ${fmt(y)})`).join(', ')}.`);
+    L.push(
+      hu
+        ? `Az ágyás alakja (sarokpontok, m): ${pts.map(([x, y]) => `(${fmt(x)}; ${fmt(y)})`).join(', ')}.`
+        : `Bed outline (corners, m): ${pts.map(([x, y]) => `(${fmt(x)}, ${fmt(y)})`).join(', ')}.`,
+    );
   for (const f of fixtureLines(area, opt.lang)) L.push(`- ${f}`);
   L.push('');
 
@@ -288,7 +328,13 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
           : 'large tree (may be shown as a young planted tree)'
         : FORM.diamond[opt.lang]
       : p.maxHeightCm >= 120 && p.symbol !== 'triangle'
-        ? (opt.lang === 'hu' ? (p.winterInterest ? 'cserje (télen is lombos / örökzöld)' : 'lombhullató cserje') : p.winterInterest ? 'shrub (evergreen / keeps winter structure)' : 'deciduous shrub')
+        ? opt.lang === 'hu'
+          ? p.winterInterest
+            ? 'cserje (télen is lombos / örökzöld)'
+            : 'lombhullató cserje'
+          : p.winterInterest
+            ? 'shrub (evergreen / keeps winter structure)'
+            : 'deciduous shrub'
         : FORM[p.symbol ?? 'circle'][opt.lang];
     const form = f[0].toUpperCase() + f.slice(1);
     const state = hu

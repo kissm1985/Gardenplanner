@@ -6,7 +6,20 @@ import { makeArea, type AreaInput, AREA_TEMPLATES } from '../data/templates';
 import { buildExample, EXAMPLE_PLANS, exampleCodes } from '../data/examples';
 import { uid } from '../model/ids';
 import { isAncestor } from '../model/variantTree';
-import { DEFAULT_SETTINGS, type Area, type Camera, type Fixture, type ItemStatus, type PlacedItem, type Plant, type Project, type Pt, type Render, type Settings, type Variant } from '../model/types';
+import {
+  DEFAULT_SETTINGS,
+  type Area,
+  type Camera,
+  type Fixture,
+  type ItemStatus,
+  type PlacedItem,
+  type Plant,
+  type Project,
+  type Pt,
+  type Render,
+  type Settings,
+  type Variant,
+} from '../model/types';
 import { t } from '../i18n';
 
 export const HISTORY_LIMIT = 100;
@@ -148,8 +161,7 @@ function withParent<T extends { parentId?: string }>(x: T, parentId: string | un
   return (parentId ? { ...rest, parentId } : rest) as T;
 }
 
-export const activeVariant = (a: Area): Variant =>
-  a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0];
+export const activeVariant = (a: Area): Variant => a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0];
 
 /** Next free plan name: "A terv", "B terv", … ("Plan A", "Plan B" in English). */
 export function nextVariantName(vs: Variant[]): string {
@@ -181,8 +193,7 @@ export const useProject = create<ProjectState>()((set, get) => {
     if (next === project) return;
     set({ project: next, past: [...past, project].slice(-HISTORY_LIMIT), future: [] });
   };
-  const mapArea = (id: string, fn: (a: Area) => Area) =>
-    commit((p) => ({ ...p, areas: p.areas.map((a) => (a.id === id ? onePlan(fn(a)) : a)) }));
+  const mapArea = (id: string, fn: (a: Area) => Area) => commit((p) => ({ ...p, areas: p.areas.map((a) => (a.id === id ? onePlan(fn(a)) : a)) }));
   /** Change the item list of the active variant of the current area. */
   const mapItems = (fn: (items: PlacedItem[]) => PlacedItem[]) => {
     const id = get().currentAreaId;
@@ -366,9 +377,7 @@ export const useProject = create<ProjectState>()((set, get) => {
       const perPlant = parts.length > 1 && mode === 'plant';
       const inScope = (a: Area, v: Variant) => (scope === 'project' || a.id === areaId) && (scope !== 'variant' || v.id === activeVariant(a).id);
       let slots = 0;
-      for (const a of p0.areas)
-        for (const v of a.variants)
-          if (inScope(a, v)) for (const it of v.items) if (it.plantId === from) slots += perPlant ? itemPositions(it).length : 1;
+      for (const a of p0.areas) for (const v of a.variants) if (inScope(a, v)) for (const it of v.items) if (it.plantId === from) slots += perPlant ? itemPositions(it).length : 1;
       if (!slots) return 0;
       const assign = mixAssign(slots, parts);
       let k = 0;
@@ -376,7 +385,15 @@ export const useProject = create<ProjectState>()((set, get) => {
         items.flatMap((it): PlacedItem[] => {
           if (it.plantId !== from) return [it];
           if (perPlant && it.kind !== 'plant')
-            return itemPositions(it).map(([x, y]) => ({ kind: 'plant', id: uid('i'), plantId: assign[k++], x: round1(x), y: round1(y), status: it.status, ...(it.note ? { note: it.note } : {}) }));
+            return itemPositions(it).map(([x, y]) => ({
+              kind: 'plant',
+              id: uid('i'),
+              plantId: assign[k++],
+              x: round1(x),
+              y: round1(y),
+              status: it.status,
+              ...(it.note ? { note: it.note } : {}),
+            }));
           const code = assign[k++];
           if (it.kind === 'plant') return [{ ...it, plantId: code }];
           return [withCount({ ...it, plantId: code, spacingCm: keepSpacing ? it.spacingCm : byCode.get(code)!.spacingCm })];
@@ -462,9 +479,7 @@ export const useProject = create<ProjectState>()((set, get) => {
                     ? v
                     : {
                         ...v,
-                        items: v.items.map((it) =>
-                          it.plantId === code && (!onlyFrom || it.status === onlyFrom) && it.status !== status ? { ...it, status } : it,
-                        ),
+                        items: v.items.map((it) => (it.plantId === code && (!onlyFrom || it.status === onlyFrom) && it.status !== status ? { ...it, status } : it)),
                       },
                 ),
               },
@@ -566,8 +581,7 @@ export const useProject = create<ProjectState>()((set, get) => {
       if (n) commit((p) => (p.name === n ? p : { ...p, name: n }));
     },
 
-    setScheduleWindow: (start, end) =>
-      commit((p) => ({ ...p, schedule: { start, end, done: p.schedule?.done ?? [] } })),
+    setScheduleWindow: (start, end) => commit((p) => ({ ...p, schedule: { start, end, done: p.schedule?.done ?? [] } })),
 
     toggleTask: (tid) =>
       commit((p) => {
@@ -744,8 +758,7 @@ function roundItem(it: PlacedItem): PlacedItem {
   return { ...it, path: it.path.map(([x, y]) => [round1(x), round1(y)]) };
 }
 
-export const selectCurrentArea = (s: ProjectState): Area | null =>
-  s.project?.areas.find((a) => a.id === s.currentAreaId) ?? null;
+export const selectCurrentArea = (s: ProjectState): Area | null => s.project?.areas.find((a) => a.id === s.currentAreaId) ?? null;
 
 const EMPTY: PlacedItem[] = [];
 export const selectItems = (s: ProjectState): PlacedItem[] => {

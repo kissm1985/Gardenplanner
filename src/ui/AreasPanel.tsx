@@ -57,7 +57,9 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
 
   return (
     <div className="areas">
-      {project.areas.length === 0 && <p className="empty">{t('Még nincs területed. Hozz létre egyet, vagy indulj egy sablonból.', 'You have no area yet. Create one, or start from a template.')}</p>}
+      {project.areas.length === 0 && (
+        <p className="empty">{t('Még nincs területed. Hozz létre egyet, vagy indulj egy sablonból.', 'You have no area yet. Create one, or start from a template.')}</p>
+      )}
       <ul className="area-list">
         {project.areas.map((a) => (
           <AreaCard
@@ -80,7 +82,10 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
               onDone();
             }}
             onDelete={() => {
-              if (confirm(t(`Biztosan törlöd a(z) „${localName(a.name)}” területet? Visszavonással visszahozható.`, `Delete the area “${localName(a.name)}”? Undo brings it back.`))) deleteArea(a.id);
+              if (
+                confirm(t(`Biztosan törlöd a(z) „${localName(a.name)}” területet? Visszavonással visszahozható.`, `Delete the area “${localName(a.name)}”? Undo brings it back.`))
+              )
+                deleteArea(a.id);
             }}
           />
         ))}
@@ -103,7 +108,15 @@ export function AreasPanel({ onDone, startNew = false }: { onDone: () => void; s
   );
 }
 
-function AreaCard({ a, current, onOpen, onEdit, onShape, onLawn, onDelete }: {
+function AreaCard({
+  a,
+  current,
+  onOpen,
+  onEdit,
+  onShape,
+  onLawn,
+  onDelete,
+}: {
   a: Area;
   current: boolean;
   onOpen: () => void;

@@ -13,7 +13,16 @@ const NO_SELECTION = new Set<string>();
  * Non-interactive, self-fitting drawing of an area (season side-by-side view, print, export).
  * The viewBox covers the area and its edge strips (wall, fence, paving), not far-away trees.
  */
-export function StaticPlan({ area, items, plantDb, month, showMature = true, labelPx = 160, title, camera }: {
+export function StaticPlan({
+  area,
+  items,
+  plantDb,
+  month,
+  showMature = true,
+  labelPx = 160,
+  title,
+  camera,
+}: {
   area: Area;
   items: PlacedItem[];
   plantDb: Plant[];
@@ -37,7 +46,14 @@ export function StaticPlan({ area, items, plantDb, month, showMature = true, lab
   const w = maxX - minX;
   const h = maxY - minY;
   return (
-    <svg className="static-plan" viewBox={`${minX} ${minY} ${w} ${h}`} style={{ aspectRatio: `${w} / ${h}` }} role="img" aria-label={title ?? localName(area.name)} preserveAspectRatio="xMidYMid meet">
+    <svg
+      className="static-plan"
+      viewBox={`${minX} ${minY} ${w} ${h}`}
+      style={{ aspectRatio: `${w} / ${h}` }}
+      role="img"
+      aria-label={title ?? localName(area.name)}
+      preserveAspectRatio="xMidYMid meet"
+    >
       <AreaShapeEl area={area} className={`area-bed kind-${area.kind ?? 'bed'}`} />
       <FixturesLayer area={area} scale={labelPx / w} drag={null} selected={null} interactive={false} />
       <AreaShapeEl area={area} className="area-outline" />

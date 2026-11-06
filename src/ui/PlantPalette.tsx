@@ -31,10 +31,7 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
   // The palette has its own search box but shares the database filters.
   const filter = useUi((s) => s.plantFilter);
   const nFilters = activeFilterCount(filter);
-  const list = useMemo(
-    () => filterPlants(plantDb, { ...filter, q }).sort(byPlantName),
-    [plantDb, filter, q],
-  );
+  const list = useMemo(() => filterPlants(plantDb, { ...filter, q }).sort(byPlantName), [plantDb, filter, q]);
   const activePlant = plantDb.find((p) => p.code === active);
 
   const drag = useRef<{ id: number; x: number; y: number; code: string; dragging: boolean } | null>(null);
@@ -87,7 +84,13 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
   return (
     <section className={`palette${open ? '' : ' is-collapsed'}`} aria-label={t('Növénypaletta', 'Plant palette')}>
       <div className="palette-head">
-        <button type="button" className="icon-btn palette-toggle" onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-label={open ? t('Paletta becsukása', 'Collapse palette') : t('Paletta kinyitása', 'Expand palette')}>
+        <button
+          type="button"
+          className="icon-btn palette-toggle"
+          onClick={() => setOpen((o) => !o)}
+          aria-expanded={open}
+          aria-label={open ? t('Paletta becsukása', 'Collapse palette') : t('Paletta kinyitása', 'Expand palette')}
+        >
           {open ? '▾' : '▴'}
         </button>
         <p className="palette-hint" role="status">
@@ -108,19 +111,37 @@ export function PlantPalette({ onOpenDb, onOpenFilters }: { onOpenDb: () => void
       {open && (
         <>
           <div className="palette-searchrow">
-            <input className="palette-search" type="search" value={q} onChange={(e) => setQ(e.target.value)} placeholder={t('Keresés: név, latin név, kód', 'Search: name, Latin name, code')} aria-label={t('Növény keresése', 'Search plants')} />
+            <input
+              className="palette-search"
+              type="search"
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder={t('Keresés: név, latin név, kód', 'Search: name, Latin name, code')}
+              aria-label={t('Növény keresése', 'Search plants')}
+            />
             <button type="button" className={`btn btn-small${nFilters ? ' btn-primary' : ''}`} onClick={onOpenFilters}>
               {t('Szűrők', 'Filters')}
               {nFilters ? ` (${nFilters})` : ''}
             </button>
             {nFilters > 0 && (
-              <button type="button" className="icon-btn" aria-label={t('Szűrők törlése', 'Clear filters')} onClick={() => useUi.getState().setPlantFilter({ ...NO_FILTER, q: filter.q })}>
+              <button
+                type="button"
+                className="icon-btn"
+                aria-label={t('Szűrők törlése', 'Clear filters')}
+                onClick={() => useUi.getState().setPlantFilter({ ...NO_FILTER, q: filter.q })}
+              >
                 ×
               </button>
             )}
           </div>
           <div className="palette-strip" role="listbox" aria-label={t('Növények', 'Plants')}>
-            {list.length === 0 && <p className="empty">{nFilters ? t('A szűrőknek egy növény sem felel meg.', 'No plant matches the filters.') : t('Nincs találat. Próbálj rövidebb keresőszót.', 'No match. Try a shorter search.')}</p>}
+            {list.length === 0 && (
+              <p className="empty">
+                {nFilters
+                  ? t('A szűrőknek egy növény sem felel meg.', 'No plant matches the filters.')
+                  : t('Nincs találat. Próbálj rövidebb keresőszót.', 'No match. Try a shorter search.')}
+              </p>
+            )}
             {list.map((p) => (
               <button
                 key={p.code}

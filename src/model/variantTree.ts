@@ -4,8 +4,7 @@ import type { Area, Variant, VariantFolder } from './types';
 import { t } from '../i18n';
 
 export type TreeNode =
-  | { kind: 'folder'; id: string; name: string; folder: VariantFolder; children: TreeNode[] }
-  | { kind: 'variant'; id: string; name: string; variant: Variant; children: TreeNode[] };
+  { kind: 'folder'; id: string; name: string; folder: VariantFolder; children: TreeNode[] } | { kind: 'variant'; id: string; name: string; variant: Variant; children: TreeNode[] };
 
 export function variantTree(area: Area): TreeNode[] {
   const folders = area.variantFolders ?? [];

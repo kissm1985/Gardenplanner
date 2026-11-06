@@ -70,6 +70,10 @@ export function labelList(m: [hu: string, en: string][]): readonly string[] {
     },
     has: (_, prop) => prop in m,
     ownKeys: () => Reflect.ownKeys(m),
-    getOwnPropertyDescriptor: (_, prop) => Reflect.getOwnPropertyDescriptor(m.map(([hu, en]) => t(hu, en)), prop),
+    getOwnPropertyDescriptor: (_, prop) =>
+      Reflect.getOwnPropertyDescriptor(
+        m.map(([hu, en]) => t(hu, en)),
+        prop,
+      ),
   });
 }

@@ -10,7 +10,16 @@ describe('visualisation prompt for ChatGPT', () => {
   beforeEach(() => {
     useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
     st().createProject(['lawn-garden']);
-    st().addDrift('LA', [[10, 280], [110, 280], [110, 480], [10, 480]], 'staggered');
+    st().addDrift(
+      'LA',
+      [
+        [10, 280],
+        [110, 280],
+        [110, 480],
+        [10, 480],
+      ],
+      'staggered',
+    );
     st().placePlant('AC', 440, 150);
   });
 

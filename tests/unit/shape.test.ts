@@ -14,9 +14,26 @@ describe('free-shape areas', () => {
 
   it('a drawn L shape is normalised to start at 0,0 with its bounding size', () => {
     const id = st().addArea({ name: 'L-ágyás', widthCm: 600, lengthCm: 600, orientation: 'S', sunUntil: '', notes: '', kind: 'bed' });
-    st().setAreaShape(id, [[100, 50], [500, 50], [500, 250], [250, 250], [250, 450], [100, 450]]);
+    st().setAreaShape(id, [
+      [100, 50],
+      [500, 50],
+      [500, 250],
+      [250, 250],
+      [250, 450],
+      [100, 450],
+    ]);
     const a = area();
-    expect(a.shape).toEqual({ kind: 'polygon', points: [[0, 0], [400, 0], [400, 200], [150, 200], [150, 400], [0, 400]] });
+    expect(a.shape).toEqual({
+      kind: 'polygon',
+      points: [
+        [0, 0],
+        [400, 0],
+        [400, 200],
+        [150, 200],
+        [150, 400],
+        [0, 400],
+      ],
+    });
     expect([a.widthCm, a.lengthCm]).toEqual([400, 400]);
     // 400×200 + 150×200 = 11 m²
     expect(bedAreaM2(a)).toBeCloseTo(11);
@@ -25,7 +42,11 @@ describe('free-shape areas', () => {
   it('plants keep their place when the outline is redrawn; outside the polygon warns', () => {
     const id = st().addArea({ name: 'Sarok', widthCm: 400, lengthCm: 400, orientation: 'S', sunUntil: '', notes: '' });
     st().placePlant('LA', 150, 150);
-    st().setAreaShape(id, [[100, 100], [400, 100], [100, 400]]); // triangle, shifted by -100
+    st().setAreaShape(id, [
+      [100, 100],
+      [400, 100],
+      [100, 400],
+    ]); // triangle, shifted by -100
     expect(selectItems(st())[0]).toMatchObject({ x: 50, y: 50 });
     const run = () => evaluate(area(), selectItems(st()), st().project!.plantDb, st().project!.settings);
     expect(run().some((w) => w.rule === 'outside')).toBe(false);
@@ -35,7 +56,11 @@ describe('free-shape areas', () => {
 
   it('undo restores the rectangle', () => {
     const id = st().addArea({ name: 'X', widthCm: 300, lengthCm: 200, orientation: 'S', sunUntil: '', notes: '' });
-    st().setAreaShape(id, [[0, 0], [300, 0], [150, 200]]);
+    st().setAreaShape(id, [
+      [0, 0],
+      [300, 0],
+      [150, 200],
+    ]);
     st().undo();
     expect(area().shape).toEqual({ kind: 'rect' });
   });

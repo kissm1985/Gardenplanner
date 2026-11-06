@@ -20,4 +20,3 @@ export async function loadImage(file: File, maxPx = 1600): Promise<{ dataUrl: st
     URL.revokeObjectURL(url);
   }
 }
-

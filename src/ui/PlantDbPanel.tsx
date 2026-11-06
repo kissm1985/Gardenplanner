@@ -1,6 +1,19 @@
 import { useMemo, useRef, useState } from 'react';
 import { activeFilterCount, filterPlants } from '../model/plantFilter';
-import { blankPlant, byPlantName, JUGLONE_LABEL, plantName, plantsFromCsv, plantsFromJson, plantsToCsv, reviewCsv, SOIL_LABEL, suggestCode, SUN_LABEL, TOXIC_LABEL } from '../model/plants';
+import {
+  blankPlant,
+  byPlantName,
+  JUGLONE_LABEL,
+  plantName,
+  plantsFromCsv,
+  plantsFromJson,
+  plantsToCsv,
+  reviewCsv,
+  SOIL_LABEL,
+  suggestCode,
+  SUN_LABEL,
+  TOXIC_LABEL,
+} from '../model/plants';
 import type { Plant } from '../model/types';
 import { useProject } from '../store/projectStore';
 import { useUi } from '../store/uiStore';
@@ -62,7 +75,14 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
 
   return (
     <div className="plantdb">
-      <input className="palette-search" type="search" value={f.q} onChange={(e) => useUi.getState().setPlantFilter({ ...f, q: e.target.value })} placeholder={t('Keresés: név, latin név, kód', 'Search: name, Latin name, code')} aria-label={t('Keresés az adatbázisban', 'Search the database')} />
+      <input
+        className="palette-search"
+        type="search"
+        value={f.q}
+        onChange={(e) => useUi.getState().setPlantFilter({ ...f, q: e.target.value })}
+        placeholder={t('Keresés: név, latin név, kód', 'Search: name, Latin name, code')}
+        aria-label={t('Keresés az adatbázisban', 'Search the database')}
+      />
       <details className="filters" open={nFilters > 0 || undefined}>
         <summary>
           {t('Szűrők', 'Filters')}
@@ -86,8 +106,7 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
                 <i>{p.nameLat}</i>
                 <span className="mono muted">
                   {t(`${p.maxHeightCm} cm magas · ${p.spreadCm} cm széles`, `${p.maxHeightCm} cm tall · ${p.spreadCm} cm wide`)} · {p.sun.map((s) => SUN_LABEL[s]).join('/')}
-                  {p.soil?.length ? ` · ${p.soil.map((x) => SOIL_LABEL[x]).join('/')}` : ''} · {t('mérgező', 'toxic')}: {TOXIC_LABEL[p.toxic]} · juglone:{' '}
-                  {JUGLONE_LABEL[p.juglone]}
+                  {p.soil?.length ? ` · ${p.soil.map((x) => SOIL_LABEL[x]).join('/')}` : ''} · {t('mérgező', 'toxic')}: {TOXIC_LABEL[p.toxic]} · juglone: {JUGLONE_LABEL[p.juglone]}
                   {p.thorny ? t(' · tüskés', ' · thorny') : ''}
                   {usage.get(p.code) ? t(` · ${usage.get(p.code)} tő`, ` · ${usage.get(p.code)} plants`) : ''}
                 </span>
@@ -108,11 +127,7 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
       </ul>
 
       <div className="form-actions">
-        <button
-          type="button"
-          className="btn btn-primary"
-          onClick={() => setEditing({ plant: blankPlant(suggestCode('', new Set(db.map((p) => p.code)))), isNew: true })}
-        >
+        <button type="button" className="btn btn-primary" onClick={() => setEditing({ plant: blankPlant(suggestCode('', new Set(db.map((p) => p.code)))), isNew: true })}>
           {t('+ Új növény', '+ New plant')}
         </button>
       </div>
@@ -129,7 +144,10 @@ export function PlantDbPanel({ onPick }: { onPick?: (code: string) => void }) {
           className="btn btn-small"
           disabled={!unchecked}
           onClick={() => downloadText(t('ellenorizendo-adatok.csv', 'data-to-check.csv'), '\ufeff' + reviewCsv(db), 'text/csv;charset=utf-8')}
-          title={t('Szakértői átnézéshez: fajonként és adatonként, a jelenlegi értékkel és egy üres „helyes érték” oszloppal.', 'For an expert review: per species and field, with the current value and an empty “correct value” column.')}
+          title={t(
+            'Szakértői átnézéshez: fajonként és adatonként, a jelenlegi értékkel és egy üres „helyes érték” oszloppal.',
+            'For an expert review: per species and field, with the current value and an empty “correct value” column.',
+          )}
         >
           {t('Ellenőrizendők listája (CSV)', 'List of values to check (CSV)')}
         </button>

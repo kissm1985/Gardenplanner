@@ -4,7 +4,14 @@ import { t } from '../i18n';
 const SWIPE_CLOSE_PX = 80;
 
 /** Bottom sheet on phones, centred dialog on wider screens. Uses <dialog> for focus trapping and Esc. */
-export function Sheet({ open, title, onClose, children, wide, onHelp }: {
+export function Sheet({
+  open,
+  title,
+  onClose,
+  children,
+  wide,
+  onHelp,
+}: {
   open: boolean;
   title: string;
   onClose: () => void;

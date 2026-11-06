@@ -55,7 +55,11 @@ export function ShapeEditBar() {
     ui.setShapeEdit(null);
   };
   return (
-    <div className={`shape-bar${lawn ? ' is-lawn' : ''}${zone ? ' is-zone' : ''}`} role="toolbar" aria-label={zone ? t('Kitöltendő rész', 'Region to fill') : lawn ? t('Gyepsáv alakja', 'Lawn shape') : t('Terület alakja', 'Area shape')}>
+    <div
+      className={`shape-bar${lawn ? ' is-lawn' : ''}${zone ? ' is-zone' : ''}`}
+      role="toolbar"
+      aria-label={zone ? t('Kitöltendő rész', 'Region to fill') : lawn ? t('Gyepsáv alakja', 'Lawn shape') : t('Terület alakja', 'Area shape')}
+    >
       <p className="shape-hint">
         {lawn && <b>{t('Gyepsáv: ', 'Lawn strip: ')}</b>}
         {zone && <b>{t('Kitöltendő rész: ', 'Region to fill: ')}</b>}
@@ -64,8 +68,8 @@ export function ShapeEditBar() {
             ? zone
               ? t('Koppints a rész első sarkára; ide kerülnek a listádból a növények.', 'Tap the first corner of the region; plants from your list go here.')
               : lawn
-              ? t('Koppints a gyep első sarkára (ide nem kerül növény).', 'Tap the first corner of the lawn (no plants go here).')
-              : t('Koppints a terület első sarkára.', 'Tap the first corner of the area.')
+                ? t('Koppints a gyep első sarkára (ide nem kerül növény).', 'Tap the first corner of the lawn (no plants go here).')
+                : t('Koppints a terület első sarkára.', 'Tap the first corner of the area.')
             : n < 3
               ? t(`Következő sarok… (${n} pont)`, `Next corner… (${n} points)`)
               : t('Folytasd, vagy koppints az első pontra / a Kész gombra a lezáráshoz.', 'Go on, or tap the first point / Done to close the shape.')

@@ -9,21 +9,7 @@ import { localName } from '../i18n/names';
 import { labels, t } from '../i18n';
 
 export type Severity = 'error' | 'warn' | 'info';
-export type RuleId =
-  | 'height'
-  | 'thorny'
-  | 'toxic'
-  | 'juglone'
-  | 'spacing'
-  | 'outside'
-  | 'species-limit'
-  | 'trees'
-  | 'water-mix'
-  | 'sun'
-  | 'soil'
-  | 'fixture'
-  | 'window'
-  | 'lawn';
+export type RuleId = 'height' | 'thorny' | 'toxic' | 'juglone' | 'spacing' | 'outside' | 'species-limit' | 'trees' | 'water-mix' | 'sun' | 'soil' | 'fixture' | 'window' | 'lawn';
 
 export interface Warning {
   id: string;
@@ -100,11 +86,10 @@ const inArea = (area: Area, [x, y]: Pt, tol = 1) =>
   area.shape.kind === 'ellipse'
     ? ((x - area.widthCm / 2) / (area.widthCm / 2 + tol)) ** 2 + ((y - area.lengthCm / 2) / (area.lengthCm / 2 + tol)) ** 2 <= 1
     : area.shape.kind === 'polygon'
-    ? pointInPolygon([x, y], area.shape.points)
-    : x >= -tol && y >= -tol && x <= area.widthCm + tol && y <= area.lengthCm + tol;
+      ? pointInPolygon([x, y], area.shape.points)
+      : x >= -tol && y >= -tol && x <= area.widthCm + tol && y <= area.lengthCm + tol;
 
-const inRect = (f: Fixture, [x, y]: Pt, pad = 0) =>
-  x >= f.x - pad && y >= f.y - pad && x <= f.x + (f.w ?? 0) + pad && y <= f.y + (f.h ?? 0) + pad;
+const inRect = (f: Fixture, [x, y]: Pt, pad = 0) => x >= f.x - pad && y >= f.y - pad && x <= f.x + (f.w ?? 0) + pad && y <= f.y + (f.h ?? 0) + pad;
 
 const anchorOf = (it: PlacedItem): Pt => (it.kind === 'plant' ? [it.x, it.y] : centroid(it.kind === 'drift' ? it.polygon : it.path));
 
@@ -128,8 +113,7 @@ function neighbours(pos: Pos[], cell: number, fn: (a: Pos, b: Pos) => void) {
         if (dx === 0 && dy < 0) continue; // visit each neighbouring cell pair once
         const other = dx === 0 && dy === 0 ? arr : grid.get(key(cx + dx, cy + dy));
         if (!other) continue;
-        for (let i = 0; i < arr.length; i++)
-          for (let j = other === arr ? i + 1 : 0; j < other.length; j++) fn(arr[i], other[j]);
+        for (let i = 0; i < arr.length; i++) for (let j = other === arr ? i + 1 : 0; j < other.length; j++) fn(arr[i], other[j]);
       }
   }
 }
@@ -186,7 +170,12 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
           t(`${name}: a mérgező hatás nem ismert, a terület nem mérgező növényt kér.`, `${name}: toxicity unknown; the area asks for non-toxic plants.`),
           t('Nézz utána, vagy jelöld tudatos kivételnek.', 'Look it up, or mute it as a deliberate exception.'),
         );
-      else add('toxic', 'error', t(`${name} mérgező (${TOXIC_LABEL[p.toxic]}), a terület nem mérgező növényt kér.`, `${name} is toxic (${TOXIC_LABEL[p.toxic]}); the area asks for non-toxic plants.`));
+      else
+        add(
+          'toxic',
+          'error',
+          t(`${name} mérgező (${TOXIC_LABEL[p.toxic]}), a terület nem mérgező növényt kér.`, `${name} is toxic (${TOXIC_LABEL[p.toxic]}); the area asks for non-toxic plants.`),
+        );
     }
 
     if (!p.sun.includes(sunLevel))
@@ -211,7 +200,10 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
           `${name}: less suited to ${SOIL_LABEL[area.soil]} soil (prefers ${p.soil.map((x) => SOIL_LABEL[x]).join(', ')}).`,
         ),
         area.soil === 'clay'
-          ? t('Agyagos talajba homokot, apró kavicsot keverj az ültetőgödörbe, vagy válassz más fajt.', 'Mix sand and fine gravel into the planting hole in clay, or choose another species.')
+          ? t(
+              'Agyagos talajba homokot, apró kavicsot keverj az ültetőgödörbe, vagy válassz más fajt.',
+              'Mix sand and fine gravel into the planting hole in clay, or choose another species.',
+            )
           : t('Javítsd a talajt az ültetőgödörben, vagy válassz más fajt.', 'Improve the soil in the planting hole, or choose another species.'),
       );
 
@@ -221,7 +213,10 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
       const inZone = its.filter((it) => (posByItem.get(it.id) ?? []).some((q) => walnuts.some((w) => dist(q, [w.x, w.y]) <= r)));
       if (inZone.length) {
         const zoneIds = inZone.map((i) => i.id);
-        const label = `${plantName(p)}${plural(inZone, inZone.reduce((s, it) => s + (posByItem.get(it.id)?.length ?? 0), 0))}`;
+        const label = `${plantName(p)}${plural(
+          inZone,
+          inZone.reduce((s, it) => s + (posByItem.get(it.id)?.length ?? 0), 0),
+        )}`;
         if (p.juglone === 'sensitive')
           add(
             'juglone',
@@ -235,7 +230,10 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
           add(
             'juglone',
             'warn',
-            t(`${label}: juglone-tűrése ${JUGLONE_LABEL[p.juglone]}, a diófa ${r / 100} m-es zónájában van.`, `${label}: juglone tolerance ${JUGLONE_LABEL[p.juglone]}, in the walnut's ${r / 100} m zone.`),
+            t(
+              `${label}: juglone-tűrése ${JUGLONE_LABEL[p.juglone]}, a diófa ${r / 100} m-es zónájában van.`,
+              `${label}: juglone tolerance ${JUGLONE_LABEL[p.juglone]}, in the walnut's ${r / 100} m zone.`,
+            ),
             t(
               'Javaslat: jól dokumentált tűrő fajt tegyél a dió felőli oldalra (pl. ligeti zsálya, macskamenta, bergénia, kék gólyaorr), ezt pedig kezeld próbaültetésként.',
               'Tip: put well-documented tolerant species on the walnut side (e.g. woodland sage, catmint, bergenia, Rozanne cranesbill) and treat this one as a trial.',
@@ -395,7 +393,10 @@ export function evaluate(area: Area, items: PlacedItem[], plantDb: Plant[], sett
         `Eltérő vízigény egymás mellett: ${plantName(a.plant)} (${WATER_LABEL[a.plant.water]}) és ${plantName(b.plant)} (${WATER_LABEL[b.plant.water]}).`,
         `Different water needs side by side: ${plantName(a.plant)} (${WATER_LABEL[a.plant.water]}) and ${plantName(b.plant)} (${WATER_LABEL[b.plant.water]}).`,
       ),
-      hint: t('Csepegtetőnél a két csoport ugyanannyi vizet kap; tedd őket külön öntözési zónába.', 'With drip irrigation both groups get the same water; put them in separate zones.'),
+      hint: t(
+        'Csepegtetőnél a két csoport ugyanannyi vizet kap; tedd őket külön öntözési zónába.',
+        'With drip irrigation both groups get the same water; put them in separate zones.',
+      ),
     });
 
   return out.sort((x, y) => SEVERITY_ORDER[x.severity] - SEVERITY_ORDER[y.severity]);

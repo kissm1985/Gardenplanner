@@ -32,15 +32,13 @@ export interface Bom {
 }
 
 /** Order quantity: planted + reserve, rounded up. Trees get no reserve (as in K-07). */
-export const orderQty = (planted: number, reservePct: number, isTree?: boolean) =>
-  isTree || planted === 0 ? planted : Math.ceil((planted * (100 + reservePct)) / 100 - 1e-9);
+export const orderQty = (planted: number, reservePct: number, isTree?: boolean) => (isTree || planted === 0 ? planted : Math.ceil((planted * (100 + reservePct)) / 100 - 1e-9));
 
 /** Items of the chosen variant of an area – the plan the list and print are made from. */
 export const chosenItems = (a: Area): PlacedItem[] => (a.variants.find((v) => v.id === a.chosenVariantId) ?? a.variants[0])?.items ?? [];
 
 /** Items of the variant shown on the plan (the edited one). */
-export const shownItems = (a: Area): PlacedItem[] =>
-  (a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0])?.items ?? [];
+export const shownItems = (a: Area): PlacedItem[] => (a.variants.find((v) => v.id === (a.activeVariantId ?? a.chosenVariantId)) ?? a.variants[0])?.items ?? [];
 
 /**
  * @param areaIds areas in scope (all when omitted)
@@ -140,7 +138,22 @@ export function bomTable(b: Bom): Cell[][] {
     r.plant.priceSource === 'shop' ? t('boltlista', 'shop list') : t('becslés', 'estimate'),
     r.subtotal,
   ]);
-  const total: Cell[] = ['', t('Összesen', 'Total'), '', ...(perArea ? b.areas.map((a) => b.rows.reduce((s, r) => s + (r.byArea[a.id] ?? 0), 0)) : []), b.planted, b.order, '', '', '', '', '', '', '', b.total];
+  const total: Cell[] = [
+    '',
+    t('Összesen', 'Total'),
+    '',
+    ...(perArea ? b.areas.map((a) => b.rows.reduce((s, r) => s + (r.byArea[a.id] ?? 0), 0)) : []),
+    b.planted,
+    b.order,
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    '',
+    b.total,
+  ];
   return [head, ...rows, total];
 }
 
@@ -181,6 +194,7 @@ export function toText(b: Bom, title: string): string {
     );
   }
   lines.push('', t(`Összesen: ${b.planted} tő, rendelés ${b.order} db, kb. ${fmtFt(b.total)}`, `Total: ${b.planted} plants, order ${b.order}, about ${fmtFt(b.total)}`));
-  if (b.estimated) lines.push(t(`${b.estimated} tétel ára becslés – vásárlás előtt kérj pontos árat.`, `${b.estimated} prices are estimates – ask for exact prices before buying.`));
+  if (b.estimated)
+    lines.push(t(`${b.estimated} tétel ára becslés – vásárlás előtt kérj pontos árat.`, `${b.estimated} prices are estimates – ask for exact prices before buying.`));
   return lines.join('\n');
 }

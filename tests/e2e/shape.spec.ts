@@ -28,7 +28,11 @@ test('draw a new free-shape area, then move a corner; templates keep their groun
   await page.getByRole('button', { name: 'Kész' }).click();
   await expect(page.locator('.shape-bar')).toHaveCount(0);
   await expect(page.locator('polygon.area-outline')).toHaveCount(1);
-  const size = async () => (await page.locator('.area-meta').textContent())!.match(/(\d+) × (\d+) cm/)!.slice(1).map(Number);
+  const size = async () =>
+    (await page.locator('.area-meta').textContent())!
+      .match(/(\d+) × (\d+) cm/)!
+      .slice(1)
+      .map(Number);
   const [w0, l0] = await size();
   expect(Math.abs(w0 - 360)).toBeLessThan(8);
   expect(Math.abs(l0 - 360)).toBeLessThan(8);

@@ -87,7 +87,19 @@ export const PlantsLayer = memo(function PlantsLayer({ items, plants, selected, 
   );
 });
 
-const PlantMark = memo(function PlantMark({ id, x, y, plant, r, fill, opacity, selected, spacing, planted, concept }: {
+const PlantMark = memo(function PlantMark({
+  id,
+  x,
+  y,
+  plant,
+  r,
+  fill,
+  opacity,
+  selected,
+  spacing,
+  planted,
+  concept,
+}: {
   id: string;
   x: number;
   y: number;
@@ -132,9 +144,7 @@ function Dot({ plant, r, fill, opacity, spacing, concept = false }: { plant: Pla
     <>
       {spacing && <circle className="spacing-ring" r={plant.spacingCm / 2} vectorEffect="non-scaling-stroke" />}
       <circle className="plant-body" r={r} fill={fill} fillOpacity={opacity} vectorEffect="non-scaling-stroke" />
-      {plant.symbol && plant.symbol !== 'circle' && r >= 6 && (
-        <path className="plant-glyph" d={glyph(plant.symbol, r * 0.72)} stroke={tc} vectorEffect="non-scaling-stroke" />
-      )}
+      {plant.symbol && plant.symbol !== 'circle' && r >= 6 && <path className="plant-glyph" d={glyph(plant.symbol, r * 0.72)} stroke={tc} vectorEffect="non-scaling-stroke" />}
       {r >= 4 && (
         <text className="plant-code" fontSize={fs} fill={tc} textAnchor="middle" dominantBaseline="central">
           {plant.code}
@@ -146,7 +156,18 @@ function Dot({ plant, r, fill, opacity, spacing, concept = false }: { plant: Pla
 
 type Group = Extract<PlacedItem, { kind: 'drift' | 'row' }>;
 
-const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, dy, selected, spacing, concept }: {
+const GroupMark = memo(function GroupMark({
+  item,
+  plant,
+  r,
+  fill,
+  opacity,
+  dx,
+  dy,
+  selected,
+  spacing,
+  concept,
+}: {
   item: Group;
   plant: Plant;
   r: number;
@@ -158,10 +179,7 @@ const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, d
   spacing: boolean;
   concept: boolean;
 }) {
-  const pts = useMemo(
-    () => (item.kind === 'drift' ? fillPolygon(item.polygon, item.spacingCm, item.pattern) : fillPath(item.path, item.spacingCm)),
-    [item],
-  );
+  const pts = useMemo(() => (item.kind === 'drift' ? fillPolygon(item.polygon, item.spacingCm, item.pattern) : fillPath(item.path, item.spacingCm)), [item]);
   const outline = (item.kind === 'drift' ? item.polygon : item.path).map((q) => q.join(',')).join(' ');
   return (
     <g className={`group group-${item.kind}${selected ? ' is-selected' : ''}`} data-id={item.id} transform={`translate(${dx} ${dy})`}>
@@ -189,7 +207,13 @@ const GroupMark = memo(function GroupMark({ item, plant, r, fill, opacity, dx, d
 });
 
 /** Screen-sized "LA × 12" labels for drifts and rows (re-rendered on zoom; one text per group). */
-export function GroupLabels({ items, plants, drag, shape, s }: {
+export function GroupLabels({
+  items,
+  plants,
+  drag,
+  shape,
+  s,
+}: {
   items: PlacedItem[];
   plants: Map<string, Plant>;
   drag: DragOffset | null;
@@ -211,8 +235,7 @@ export function GroupLabels({ items, plants, drag, shape, s }: {
         const x = cx + (moving ? drag!.dx : 0);
         const y = top + (moving ? drag!.dy : 0) - 6 / s;
         // Stored count is kept in sync by the store; recompute only during a live vertex drag.
-        const count =
-          it === raw ? it.count : it.kind === 'drift' ? fillPolygon(it.polygon, it.spacingCm, it.pattern).length : fillPath(it.path, it.spacingCm).length;
+        const count = it === raw ? it.count : it.kind === 'drift' ? fillPolygon(it.polygon, it.spacingCm, it.pattern).length : fillPath(it.path, it.spacingCm).length;
         const text = `${p.code} × ${count}`;
         return <CountLabel key={it.id} x={x} y={y} fs={fs} text={text} />;
       })}

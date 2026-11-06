@@ -18,7 +18,13 @@ test('zone fill: pick plants, draw a region, it is planted at random; again repl
 
   const b = (await page.locator('.area-outline').boundingBox())!;
   const cm = b.width / 120;
-  for (const [x, y] of [[0, 100], [120, 100], [120, 500], [0, 500]]) await page.mouse.click(b.x + x * cm, b.y + y * cm);
+  for (const [x, y] of [
+    [0, 100],
+    [120, 100],
+    [120, 500],
+    [0, 500],
+  ])
+    await page.mouse.click(b.x + x * cm, b.y + y * cm);
   await page.getByRole('button', { name: 'Kész' }).click();
 
   dlg = page.locator('dialog[open]');

@@ -28,10 +28,22 @@ describe('bill of materials', () => {
 
   it('sums plants, drifts and rows per area and overall, with prices', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]); // 11 lavender
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]); // 11 lavender
     st().placePlant('TH', 20, 20);
     st().selectArea(areaId(garden));
-    st().addDrift('LA', [[0, 0], [120, 0], [120, 80], [0, 80]], 'grid'); // 3 × 2 = 6
+    st().addDrift(
+      'LA',
+      [
+        [0, 0],
+        [120, 0],
+        [120, 80],
+        [0, 80],
+      ],
+      'grid',
+    ); // 3 × 2 = 6
     st().placePlant('AC', 450, 200);
     const b = buildBom(st().project!);
     const la = b.rows.find((r) => r.plant.code === 'LA')!;
@@ -47,7 +59,10 @@ describe('bill of materials', () => {
 
   it('the plan on screen is the chosen one: opening a variant chooses it', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]); // 11 in A
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]); // 11 in A
     const area = () => st().project!.areas[strip];
     const va = area().variants[0].id;
     const vb = st().duplicateVariant(va)!; // the copy opens, and so becomes the chosen one
@@ -62,7 +77,10 @@ describe('bill of materials', () => {
 
   it('filters by status and bulk-sets a species status', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]);
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]);
     st().placePlant('TH', 20, 20);
     st().setSpeciesStatus('LA', 'ordered', [areaId(strip)]);
     expect(buildBom(st().project!, undefined, 'ordered').rows.map((r) => r.plant.code)).toEqual(['LA']);
@@ -71,17 +89,25 @@ describe('bill of materials', () => {
 
   it('reserve setting changes the order', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]);
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]);
     st().updateSettings({ reservePct: 20 });
     expect(buildBom(st().project!).rows[0].order).toBe(14);
   });
 
   it('acceptance: the TSV pasted into Excel gives the right columns', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]);
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]);
     st().placePlant('EF', 30, 500);
     const t = bomTable(buildBom(st().project!, [areaId(strip)]));
-    const lines = toTsv(t).split('\r\n').map((l) => l.split('\t'));
+    const lines = toTsv(t)
+      .split('\r\n')
+      .map((l) => l.split('\t'));
     const w = lines[0].length;
     expect(lines.every((l) => l.length === w)).toBe(true);
     expect(lines[0].slice(0, 5)).toEqual(['Kód', 'Magyar név', 'Latin név', 'Ültetett (db)', 'Rendelendő (db, +10%)']);
@@ -102,7 +128,10 @@ describe('bill of materials', () => {
 
   it('readable text list', () => {
     st().selectArea(areaId(strip));
-    st().addRow('LA', [[60, 0], [60, 400]]);
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]);
     const txt = toText(buildBom(st().project!), 'Kertem');
     expect(txt).toContain('LA Levendula (Lavandula angustifolia');
     expect(txt).toContain('ültetés 11 db – rendelés 13 db');
@@ -112,13 +141,18 @@ describe('bill of materials', () => {
 describe('xlsx', () => {
   it('writes a valid workbook with numeric cells and one sheet per table', () => {
     const data = buildXlsx([
-      { name: 'Összesen', rows: [['Kód', 'Db'], ['LA', 17], ['<&>', 3]] },
+      {
+        name: 'Összesen',
+        rows: [
+          ['Kód', 'Db'],
+          ['LA', 17],
+          ['<&>', 3],
+        ],
+      },
       { name: 'Házoldali sáv: [teszt]', rows: [['Kód'], ['TH']] },
     ]);
     const files = unzipSync(data);
-    expect(Object.keys(files)).toEqual(
-      expect.arrayContaining(['[Content_Types].xml', 'xl/workbook.xml', 'xl/worksheets/sheet1.xml', 'xl/worksheets/sheet2.xml', 'xl/styles.xml']),
-    );
+    expect(Object.keys(files)).toEqual(expect.arrayContaining(['[Content_Types].xml', 'xl/workbook.xml', 'xl/worksheets/sheet1.xml', 'xl/worksheets/sheet2.xml', 'xl/styles.xml']));
     const wb = strFromU8(files['xl/workbook.xml']);
     expect(wb).toContain('name="Összesen"');
     expect(wb).toContain('name="Házoldali sáv   teszt"');

@@ -156,7 +156,15 @@ export function fillZone(inp: ZoneFillInput): ZoneFillResult {
     const sp = byCode.get(code)!.spacingCm;
     // Half a spacing inside the area's edge, so the plant does not hang over the wall or path.
     const m = sp / 2;
-    if (![[m, 0], [-m, 0], [0, m], [0, -m]].every(([dx, dy]) => pointInPolygon([x + dx, y + dy], areaPts))) continue;
+    if (
+      ![
+        [m, 0],
+        [-m, 0],
+        [0, m],
+        [0, -m],
+      ].every(([dx, dy]) => pointInPolygon([x + dx, y + dy], areaPts))
+    )
+      continue;
     if (!free(q, sp)) continue;
     put(q, sp, code);
     counts[code] = (counts[code] ?? 0) + 1;

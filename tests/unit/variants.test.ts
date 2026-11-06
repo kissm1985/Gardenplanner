@@ -14,7 +14,10 @@ describe('variants', () => {
   });
 
   it('copy makes "B terv" with fresh item ids and switches editing to it', () => {
-    st().addRow('LA', [[60, 0], [60, 400]]);
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]);
     const a = area().variants[0];
     const bId = st().duplicateVariant(a.id)!;
     const b = area().variants.find((v) => v.id === bId)!;
@@ -52,11 +55,19 @@ describe('variants', () => {
   });
 
   it('names continue alphabetically', () => {
-    expect(nextVariantName([{ id: '1', name: 'A terv', items: [], notes: '' }, { id: '2', name: 'C terv', items: [], notes: '' }])).toBe('B terv');
+    expect(
+      nextVariantName([
+        { id: '1', name: 'A terv', items: [], notes: '' },
+        { id: '2', name: 'C terv', items: [], notes: '' },
+      ]),
+    ).toBe('B terv');
   });
 
   it('comparison: counts, cost difference, warnings', () => {
-    st().addRow('LA', [[60, 0], [60, 400]]); // 11 lavender
+    st().addRow('LA', [
+      [60, 0],
+      [60, 400],
+    ]); // 11 lavender
     const a = area().variants[0];
     st().duplicateVariant(a.id);
     st().placePlant('NE', 60, 600); // catmint 60 cm → height error in B

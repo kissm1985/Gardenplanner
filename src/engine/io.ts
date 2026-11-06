@@ -21,7 +21,8 @@ export function parseProject(text: string): Project {
   }
   const p = data as Project;
   if (!p || typeof p !== 'object' || p.schemaVersion !== 1) throw new Error(NOT_A_BACKUP());
-  if (!Array.isArray(p.areas) || !Array.isArray(p.plantDb)) throw new Error(t('A mentésből hiányoznak a területek vagy a növénylista.', 'The backup has no areas or no plant list.'));
+  if (!Array.isArray(p.areas) || !Array.isArray(p.plantDb))
+    throw new Error(t('A mentésből hiányoznak a területek vagy a növénylista.', 'The backup has no areas or no plant list.'));
   validateProject(p);
   return p;
 }
@@ -100,8 +101,10 @@ export function decodeShare(code: string): Project {
   try {
     return parseProject(strFromU8(inflateLimited(unb64url(code), SHARE_MAX_BYTES)));
   } catch (e) {
-    if (e instanceof TooLarge) throw new Error(tooLarge());
-    throw new Error(e instanceof Error && e.message === NOT_A_BACKUP() ? e.message : t('A megosztott link sérült vagy hiányos.', 'The shared link is damaged or incomplete.'));
+    if (e instanceof TooLarge) throw new Error(tooLarge(), { cause: e });
+    throw new Error(e instanceof Error && e.message === NOT_A_BACKUP() ? e.message : t('A megosztott link sérült vagy hiányos.', 'The shared link is damaged or incomplete.'), {
+      cause: e,
+    });
   }
 }
 

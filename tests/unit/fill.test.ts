@@ -3,7 +3,12 @@ import { fillPath, fillPolygon, itemCount, spacingForCount } from '../../src/eng
 import { dist, pointInPolygon, polylineLength, simplify } from '../../src/model/geometry';
 import type { Pt } from '../../src/model/types';
 
-const rect = (w: number, h: number, x = 0, y = 0): Pt[] => [[x, y], [x + w, y], [x + w, y + h], [x, y + h]];
+const rect = (w: number, h: number, x = 0, y = 0): Pt[] => [
+  [x, y],
+  [x + w, y],
+  [x + w, y + h],
+  [x, y + h],
+];
 
 describe('drift fill', () => {
   it('square grid: 100×100 cm at 25 cm spacing gives 4×4', () => {
@@ -23,7 +28,13 @@ describe('drift fill', () => {
   });
 
   it('all positions lie inside an irregular polygon', () => {
-    const poly: Pt[] = [[0, 0], [200, 30], [160, 180], [40, 140], [10, 80]];
+    const poly: Pt[] = [
+      [0, 0],
+      [200, 30],
+      [160, 180],
+      [40, 140],
+      [10, 80],
+    ];
     const pts = fillPolygon(poly, 25, 'staggered');
     expect(pts.length).toBeGreaterThan(20);
     for (const p of pts) expect(pointInPolygon(p, poly)).toBe(true);
@@ -40,14 +51,36 @@ describe('drift fill', () => {
 
 describe('row and curve', () => {
   it('straight row: both ends included, evenly spaced', () => {
-    const pts = fillPath([[0, 0], [100, 0]], 25);
+    const pts = fillPath(
+      [
+        [0, 0],
+        [100, 0],
+      ],
+      25,
+    );
     expect(pts).toHaveLength(5);
     expect(pts[4]).toEqual([100, 0]);
   });
 
   it('length that does not divide evenly is rounded to the nearest count', () => {
-    expect(fillPath([[0, 0], [110, 0]], 25)).toHaveLength(5); // 27.5 cm step
-    expect(fillPath([[0, 0], [10, 0]], 25)).toHaveLength(1);
+    expect(
+      fillPath(
+        [
+          [0, 0],
+          [110, 0],
+        ],
+        25,
+      ),
+    ).toHaveLength(5); // 27.5 cm step
+    expect(
+      fillPath(
+        [
+          [0, 0],
+          [10, 0],
+        ],
+        25,
+      ),
+    ).toHaveLength(1);
   });
 
   it('follows a curve with equal arc-length steps', () => {
@@ -71,8 +104,26 @@ describe('counts', () => {
     const poly = rect(200, 100);
     const s = spacingForCount((sp) => fillPolygon(poly, sp, 'grid').length, 32);
     expect(fillPolygon(poly, s, 'grid').length).toBe(32);
-    const r = spacingForCount((sp) => fillPath([[0, 0], [300, 0]], sp).length, 7);
-    expect(fillPath([[0, 0], [300, 0]], r)).toHaveLength(7);
+    const r = spacingForCount(
+      (sp) =>
+        fillPath(
+          [
+            [0, 0],
+            [300, 0],
+          ],
+          sp,
+        ).length,
+      7,
+    );
+    expect(
+      fillPath(
+        [
+          [0, 0],
+          [300, 0],
+        ],
+        r,
+      ),
+    ).toHaveLength(7);
   });
 
   it('simplify keeps the shape of a freehand stroke', () => {

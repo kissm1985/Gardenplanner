@@ -406,8 +406,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     if (g.mode === 'pinch') {
       // Continue panning with the remaining finger without a jump.
       const rest = [...pointers.current.values()][0];
-      gesture.current =
-        rest && viewRef.current ? { mode: 'pan', view: viewRef.current, start: rest, moved: true, onEmpty: false, additive: false } : null;
+      gesture.current = rest && viewRef.current ? { mode: 'pan', view: viewRef.current, start: rest, moved: true, onEmpty: false, additive: false } : null;
       return;
     }
     gesture.current = null;
@@ -559,7 +558,10 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const measured = dist(pts[0], pts[1]);
     if (!bg || measured < 1) return;
     const input = prompt(
-      t(`Mekkora a valódi távolság a két pont között (cm)? A kép szerint most ${Math.round(measured)} cm.`, `What is the real distance between the two points (cm)? The image now says ${Math.round(measured)} cm.`),
+      t(
+        `Mekkora a valódi távolság a két pont között (cm)? A kép szerint most ${Math.round(measured)} cm.`,
+        `What is the real distance between the two points (cm)? The image now says ${Math.round(measured)} cm.`,
+      ),
     );
     const real = input ? parseFloat(input.replace(',', '.')) : NaN;
     if (!(real > 0)) return hint(t('A méretarány nem változott.', 'The scale did not change.'));
@@ -576,7 +578,12 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     const id = useProject.getState().addFixture(f);
     if (id) {
       useUi.getState().selectFixture(id);
-      hint(t(`${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod, a sarkánál méretezheted; pontos adatok az Adatok gombbal.`, `${FIXTURE_LABEL[f.type]} added. Drag to move it, resize it at its corner; exact values under Details.`));
+      hint(
+        t(
+          `${FIXTURE_LABEL[f.type]} hozzáadva. Húzással mozgathatod, a sarkánál méretezheted; pontos adatok az Adatok gombbal.`,
+          `${FIXTURE_LABEL[f.type]} added. Drag to move it, resize it at its corner; exact values under Details.`,
+        ),
+      );
     }
   };
 
@@ -647,8 +654,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
     else if (k === 'Escape') {
       useUi.getState().select([]);
       useUi.getState().selectFixture(null);
-    }
-    else if (mod && k.toLowerCase() === 'a') useUi.getState().select(items.map((i) => i.id));
+    } else if (mod && k.toLowerCase() === 'a') useUi.getState().select(items.map((i) => i.id));
     else if (mod && k.toLowerCase() === 'd' && sel.length) useUi.getState().select(useProject.getState().duplicateItems(sel, 20, 20));
     else return;
     e.preventDefault();
@@ -727,9 +733,7 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
                 <GridLayer w={area.widthCm} h={area.lengthCm} step={niceStep(view.s, 14)} />
               </g>
             )}
-            {layers.fixtures && (
-              <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select' || tool === 'fixtures'} />
-            )}
+            {layers.fixtures && <FixturesLayer area={area} scale={view.s} drag={fxDrag} selected={selectedFixture} interactive={tool === 'select' || tool === 'fixtures'} />}
             {fxDraft && <rect className={`fx-draft fx-draft-${fxDraft.type}`} x={fxDraft.x} y={fxDraft.y} width={fxDraft.w} height={fxDraft.h} vectorEffect="non-scaling-stroke" />}
             <AreaShapeEl area={area} className={`area-outline${shapeEdit && !shapeEdit.target ? ' is-editing' : ''}`} />
             {layers.plants && (
@@ -751,10 +755,23 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
             )}
             {pendingStart && <circle className="pending-start" cx={pendingStart[0]} cy={pendingStart[1]} r={7 / view.s} vectorEffect="non-scaling-stroke" />}
             {layers.dimensions && !shapeEdit && <Dimensions area={area} s={view.s} />}
-            {shapeEdit && <ShapeEditor points={shapeEdit.points} mode={shapeEdit.mode} selected={shapeEdit.selected} s={view.s} lawn={shapeEdit.target?.kind === 'lawn'} zone={shapeEdit.target?.kind === 'zone'} />}
+            {shapeEdit && (
+              <ShapeEditor
+                points={shapeEdit.points}
+                mode={shapeEdit.mode}
+                selected={shapeEdit.selected}
+                s={view.s}
+                lawn={shapeEdit.target?.kind === 'lawn'}
+                zone={shapeEdit.target?.kind === 'zone'}
+              />
+            )}
             {layers.warnings && !month && !drag && !fxDrag && <WarningsLayer warnings={warnings} s={view.s} />}
-            {(cameraEdit || visualOpen || layers.camera) && (camDraft ?? area.camera) && <CameraMark cam={(camDraft ?? area.camera)!} area={area} scale={view.s} editing={cameraEdit} />}
-            {calibrate?.map(([x, y], i) => <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />)}
+            {(cameraEdit || visualOpen || layers.camera) && (camDraft ?? area.camera) && (
+              <CameraMark cam={(camDraft ?? area.camera)!} area={area} scale={view.s} editing={cameraEdit} />
+            )}
+            {calibrate?.map(([x, y], i) => (
+              <circle key={i} className="pending-start" cx={x} cy={y} r={7 / view.s} vectorEffect="non-scaling-stroke" />
+            ))}
             {lassoPts && <polygon className="lasso" points={lassoPts.map((q) => q.join(',')).join(' ')} vectorEffect="non-scaling-stroke" />}
           </g>
           <Rulers view={view} w={size.w} h={size.h} />
@@ -774,14 +791,23 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
       )}
       {cameraEdit && !toast && (
         <p className="canvas-toast" role="status">
-          {t('Nézőpont: nyomd meg ott, ahol állsz (pl. a teraszon), és húzd a nézés irányába.', 'Viewpoint: press where you stand (e.g. on the terrace) and drag towards where you look.')}
+          {t(
+            'Nézőpont: nyomd meg ott, ahol állsz (pl. a teraszon), és húzd a nézés irányába.',
+            'Viewpoint: press where you stand (e.g. on the terrace) and drag towards where you look.',
+          )}
         </p>
       )}
       {calibrate && !toast && (
         <p className="canvas-toast" role="status">
           {calibrate.length
-            ? t('Méretarány: koppints a kép második pontjára (pl. egy ismert hosszúságú fal két végére).', 'Scale: tap the second point on the image (e.g. both ends of a wall of known length).')
-            : t('Méretarány: koppints a kép első pontjára (pl. egy ismert hosszúságú fal két végére).', 'Scale: tap the first point on the image (e.g. both ends of a wall of known length).')}
+            ? t(
+                'Méretarány: koppints a kép második pontjára (pl. egy ismert hosszúságú fal két végére).',
+                'Scale: tap the second point on the image (e.g. both ends of a wall of known length).',
+              )
+            : t(
+                'Méretarány: koppints a kép első pontjára (pl. egy ismert hosszúságú fal két végére).',
+                'Scale: tap the first point on the image (e.g. both ends of a wall of known length).',
+              )}
         </p>
       )}
       {pendingStart && !toast && (
@@ -790,9 +816,15 @@ export function PlanCanvas({ area, settings, plantDb, warnings }: Props) {
         </p>
       )}
       <div className="zoom-ctl" aria-label={t('Nagyítás', 'Zoom')}>
-        <button type="button" onClick={() => zoomBtn(1.25)} aria-label={t('Nagyítás', 'Zoom in')}>+</button>
-        <button type="button" onClick={() => zoomBtn(0.8)} aria-label={t('Kicsinyítés', 'Zoom out')}>−</button>
-        <button type="button" onClick={() => fit()} aria-label={t('Illesztés a képernyőhöz', 'Fit to screen')}>⤢</button>
+        <button type="button" onClick={() => zoomBtn(1.25)} aria-label={t('Nagyítás', 'Zoom in')}>
+          +
+        </button>
+        <button type="button" onClick={() => zoomBtn(0.8)} aria-label={t('Kicsinyítés', 'Zoom out')}>
+          −
+        </button>
+        <button type="button" onClick={() => fit()} aria-label={t('Illesztés a képernyőhöz', 'Fit to screen')}>
+          ⤢
+        </button>
       </div>
     </div>
   );
@@ -818,7 +850,13 @@ function Dimensions({ area, s }: { area: Area; s: number }) {
 }
 
 /** Live preview while drawing a drift / row: outline, planting positions and count. */
-function Draft({ draft, plant, pattern, s, mature }: {
+function Draft({
+  draft,
+  plant,
+  pattern,
+  s,
+  mature,
+}: {
   draft: { kind: 'drift' | 'curve' | 'line'; points: Pt[] };
   plant: Plant;
   pattern: 'grid' | 'staggered';
@@ -854,7 +892,11 @@ function ShapeEditor({ points, mode, selected, s, lawn, zone }: { points: Pt[]; 
   const r = 10 / s;
   return (
     <g className={`shape-editor${lawn ? ' is-lawn' : ''}${zone ? ' is-zone' : ''}`}>
-      {closed ? <polygon className="shape-line" points={line} vectorEffect="non-scaling-stroke" /> : <polyline className="shape-line" points={line} vectorEffect="non-scaling-stroke" />}
+      {closed ? (
+        <polygon className="shape-line" points={line} vectorEffect="non-scaling-stroke" />
+      ) : (
+        <polyline className="shape-line" points={line} vectorEffect="non-scaling-stroke" />
+      )}
       {edges.map(([a, b], i) => {
         const mx = (a[0] + b[0]) / 2;
         const my = (a[1] + b[1]) / 2;
@@ -866,7 +908,15 @@ function ShapeEditor({ points, mode, selected, s, lawn, zone }: { points: Pt[]; 
         );
       })}
       {points.map(([x, y], i) => (
-        <circle key={i} className={`shape-vertex${i === selected ? ' is-selected' : ''}${i === 0 && mode === 'draw' ? ' is-first' : ''}`} data-shape-vertex={i} cx={x} cy={y} r={r} vectorEffect="non-scaling-stroke" />
+        <circle
+          key={i}
+          className={`shape-vertex${i === selected ? ' is-selected' : ''}${i === 0 && mode === 'draw' ? ' is-first' : ''}`}
+          data-shape-vertex={i}
+          cx={x}
+          cy={y}
+          r={r}
+          vectorEffect="non-scaling-stroke"
+        />
       ))}
     </g>
   );

@@ -7,20 +7,38 @@ async function mockWiki(page: Page) {
     lookups++;
     const hit = r.request().url().includes('Lavandula%20angustifolia');
     return r.fulfill({
-      json: hit ? { query: { pages: { '1': { pageimage: 'Lavender.jpg', fullurl: 'https://en.wikipedia.org/wiki/Lavandula_angustifolia' } } } } : { query: { pages: { '-1': { missing: '' } } } },
+      json: hit
+        ? { query: { pages: { '1': { pageimage: 'Lavender.jpg', fullurl: 'https://en.wikipedia.org/wiki/Lavandula_angustifolia' } } } }
+        : { query: { pages: { '-1': { missing: '' } } } },
     });
   });
   await page.route(/commons\.wikimedia\.org\/w\/api\.php/, (r) =>
     r.fulfill({
       json: {
-        query: { pages: { '2': { imageinfo: [{ thumburl: 'https://upload.wikimedia.org/lavender-480.png', extmetadata: { Artist: { value: 'Jane Doe' }, LicenseShortName: { value: 'CC BY-SA 4.0' }, LicenseUrl: { value: 'https://creativecommons.org/licenses/by-sa/4.0' } } }] } } },
+        query: {
+          pages: {
+            '2': {
+              imageinfo: [
+                {
+                  thumburl: 'https://upload.wikimedia.org/lavender-480.png',
+                  extmetadata: {
+                    Artist: { value: 'Jane Doe' },
+                    LicenseShortName: { value: 'CC BY-SA 4.0' },
+                    LicenseUrl: { value: 'https://creativecommons.org/licenses/by-sa/4.0' },
+                  },
+                },
+              ],
+            },
+          },
+        },
       },
     }),
   );
-  await page.route(/upload\.wikimedia\.org/, (r) => r.fulfill({ path: 'tests/e2e/fixtures-lavender.png', contentType: 'image/png', headers: { 'access-control-allow-origin': '*' } }));
+  await page.route(/upload\.wikimedia\.org/, (r) =>
+    r.fulfill({ path: 'tests/e2e/fixtures-lavender.png', contentType: 'image/png', headers: { 'access-control-allow-origin': '*' } }),
+  );
   return () => lookups;
 }
-
 
 /** Wikipedia photos are off by default (privacy); the first test turns them on from a plant card hint, the others in View. */
 async function photosOn(page: Page) {
@@ -68,7 +86,10 @@ test('own photo overrides Wikipedia and can be switched off again', async ({ pag
   await page.getByRole('button', { name: 'Növény', exact: true }).click();
   await page.getByRole('button', { name: 'Adatbázis' }).click();
   const dlg = page.locator('dialog[open]');
-  await dlg.getByLabel(/Keresés/).first().fill('levendula');
+  await dlg
+    .getByLabel(/Keresés/)
+    .first()
+    .fill('levendula');
   await dlg.locator('.plant-row').first().click();
   await expect(dlg.locator('.photo-field figcaption')).toContainText('Wikipédia · Jane Doe');
   await dlg.locator('input[type=file][accept="image/*"]').setInputFiles('tests/e2e/fixtures-lavender.png');

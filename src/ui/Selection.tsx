@@ -114,9 +114,7 @@ export function ItemProps({ plantDb, onDone, onReplace }: { plantDb: Plant[]; on
           ))}
         </div>
       </fieldset>
-      {single && single.kind !== 'plant' && (
-        <GroupFields key={`${single.id}:${single.spacingCm}:${single.count}`} item={single} onNote={setNote} />
-      )}
+      {single && single.kind !== 'plant' && <GroupFields key={`${single.id}:${single.spacingCm}:${single.count}`} item={single} onNote={setNote} />}
       {note && (
         <p className="mono warn-text" role="status">
           {note}
@@ -139,7 +137,11 @@ function SpreadField({ item, plant }: { item: Extract<PlacedItem, { kind: 'plant
   const own = item.spreadCm != null && item.spreadCm !== plant.spreadCm;
   return (
     <div className="field-row spread-row">
-      <NumField label={t('Kiterjedés (cm)', 'Spread (cm)')} v={item.spreadCm ?? plant.spreadCm} on={(v) => v >= 5 && v <= 5000 && upd([item.id], { spreadCm: Math.round(v) === plant.spreadCm ? undefined : Math.round(v) })} />
+      <NumField
+        label={t('Kiterjedés (cm)', 'Spread (cm)')}
+        v={item.spreadCm ?? plant.spreadCm}
+        on={(v) => v >= 5 && v <= 5000 && upd([item.id], { spreadCm: Math.round(v) === plant.spreadCm ? undefined : Math.round(v) })}
+      />
       <div className="field">
         <span className="mono muted">{own ? t(`egyedi méret (a faj: ${plant.spreadCm} cm)`, `own size (species: ${plant.spreadCm} cm)`) : t('a faj mérete', 'species size')}</span>
         {own && (
@@ -191,16 +193,11 @@ function GroupFields({ item, onNote }: { item: Group; onNote: (s: string) => voi
           ),
     );
   };
-  const countFor = (sp: number) =>
-    item.kind === 'drift' ? fillPolygon(item.polygon, sp, item.pattern).length : fillPath(item.path, sp).length;
+  const countFor = (sp: number) => (item.kind === 'drift' ? fillPolygon(item.polygon, sp, item.pattern).length : fillPath(item.path, sp).length);
   return (
     <>
       <div className="field-row">
-        <NumField
-          label={t('Darabszám', 'Count')}
-          v={item.count}
-          on={(n) => n >= 1 && setCount(n)}
-        />
+        <NumField label={t('Darabszám', 'Count')} v={item.count} on={(n) => n >= 1 && setCount(n)} />
         <NumField label={t('Tőtáv (cm)', 'Spacing (cm)')} v={item.spacingCm} on={(sp) => sp >= 3 && (onNote(''), upd([item.id], { spacingCm: sp }))} />
       </div>
       {item.kind === 'drift' && (
@@ -271,9 +268,11 @@ function PlantSummary({ p, count }: { p: Plant; count: number }) {
           {TOXIC_LABEL[p.toxic]}
           {p.thorny ? t(' · tüskés', ' · thorny') : ''}
         </span>
-        {!!p.verify?.length && <span className="mono warn-text">
+        {!!p.verify?.length && (
+          <span className="mono warn-text">
             {t('Ellenőrizendő adat', 'Data to check')}: {p.verify.length}
-          </span>}
+          </span>
+        )}
       </div>
     </div>
   );

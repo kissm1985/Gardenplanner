@@ -25,7 +25,19 @@ const slug = (s: string) =>
     .replace(/^-|-$/g, '');
 
 /** Project menu: name, backup/restore, share link, images, print, intro. */
-export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { onPrint: (o: Orientation) => void; onIntro: () => void; onDone: () => void; onVisual: () => void; onLegal: () => void }) {
+export function ProjectPanel({
+  onPrint,
+  onIntro,
+  onDone,
+  onVisual,
+  onLegal,
+}: {
+  onPrint: (o: Orientation) => void;
+  onIntro: () => void;
+  onDone: () => void;
+  onVisual: () => void;
+  onLegal: () => void;
+}) {
   const project = useProject((s) => s.project)!;
   const area = useProject(selectCurrentArea);
   const [msg, setMsg] = useState('');
@@ -61,17 +73,25 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
     const v = activeVariant(area);
     // Concept plan: embed the pictograms, so the file shows them outside the app too.
     if (project.settings.planStyle === 'concept') await embedTopViews(project.plantDb.filter((p) => v.items.some((it) => it.plantId === p.code)));
-    const legend: LegendRow[] = (opts.legend ?? withLegend)
-      ? bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
-          code: r.plant.code,
-          nameHu: plantName(r.plant),
-          nameLat: r.plant.nameLat,
-          color: r.plant.color,
-          symbol: r.plant.symbol,
-          count: r.planted,
-        }))
-      : [];
-    const svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: opts.month !== undefined ? opts.month : month, legend, caption: `${localName(area.name)} – ${localName(v.name)} · ${area.widthCm} × ${area.lengthCm} cm` });
+    const legend: LegendRow[] =
+      (opts.legend ?? withLegend)
+        ? bomFromEntries([{ area, items: v.items }], project.plantDb, project.settings.reservePct).rows.map((r) => ({
+            code: r.plant.code,
+            nameHu: plantName(r.plant),
+            nameLat: r.plant.nameLat,
+            color: r.plant.color,
+            symbol: r.plant.symbol,
+            count: r.planted,
+          }))
+        : [];
+    const svg = planSvg({
+      area,
+      items: v.items,
+      plantDb: project.plantDb,
+      month: opts.month !== undefined ? opts.month : month,
+      legend,
+      caption: `${localName(area.name)} – ${localName(v.name)} · ${area.widthCm} × ${area.lengthCm} cm`,
+    });
     const name = `${slug(localName(area.name))}-${slug(localName(v.name))}${opts.suffix ?? ''}`;
     try {
       if (kind === 'svg') downloadText(`${name}.svg`, svg, 'image/svg+xml');
@@ -129,7 +149,9 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
             }}
           />
         </div>
-        <p className="mono muted">{t('Minden adat ezen a készüléken van; a JSON-mentéssel viheted át másik eszközre.', 'All data is on this device; move it to another one with the JSON backup.')}</p>
+        <p className="mono muted">
+          {t('Minden adat ezen a készüléken van; a JSON-mentéssel viheted át másik eszközre.', 'All data is on this device; move it to another one with the JSON backup.')}
+        </p>
       </fieldset>
 
       <fieldset className="field-group">
@@ -147,8 +169,23 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
         <button type="button" className="btn btn-small" onClick={makeLink}>
           {t('Csak olvasható link', 'Read-only link')}
         </button>
-        {link && <textarea ref={linkRef} className="sched-text" readOnly rows={3} value={link} onFocus={(e) => e.currentTarget.select()} aria-label={t('Megosztható link', 'Shareable link')} />}
-        <p className="mono muted">{t('A terv a link végében, kódolva utazik – nincs szerver. A rajzon lévő változatokat mutatja.', 'The plan travels encoded at the end of the link – no server. It shows the variants on the plan.')}</p>
+        {link && (
+          <textarea
+            ref={linkRef}
+            className="sched-text"
+            readOnly
+            rows={3}
+            value={link}
+            onFocus={(e) => e.currentTarget.select()}
+            aria-label={t('Megosztható link', 'Shareable link')}
+          />
+        )}
+        <p className="mono muted">
+          {t(
+            'A terv a link végében, kódolva utazik – nincs szerver. A rajzon lévő változatokat mutatja.',
+            'The plan travels encoded at the end of the link – no server. It shows the variants on the plan.',
+          )}
+        </p>
       </fieldset>
 
       <fieldset className="field-group">
@@ -171,7 +208,10 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
         <p className="mono muted">
           {month
             ? t('Az évszaknézet színeivel.', 'With the season view colours.')
-            : t('A szerkesztett változat, alapszínekkel. Évszaknézetből az adott hónap színeit kapod.', 'The edited variant in base colours. From the season view you get that month’s colours.')}
+            : t(
+                'A szerkesztett változat, alapszínekkel. Évszaknézetből az adott hónap színeit kapod.',
+                'The edited variant in base colours. From the season view you get that month’s colours.',
+              )}
         </p>
       </fieldset>
 
@@ -179,7 +219,12 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
 
       <fieldset className="field-group">
         <legend>{t('Látványterv ChatGPT-nek', 'Visualisation with ChatGPT')}</legend>
-        <p className="mono muted">{t('Leírás és rajz a ChatGPT-nek egy lépésben, nézőponttal, stílussal; a kész képek a változat mellett maradnak.', 'Description and plan for ChatGPT in one step, with a viewpoint and style; the finished images stay with the variant.')}</p>
+        <p className="mono muted">
+          {t(
+            'Leírás és rajz a ChatGPT-nek egy lépésben, nézőponttal, stílussal; a kész képek a változat mellett maradnak.',
+            'Description and plan for ChatGPT in one step, with a viewpoint and style; the finished images stay with the variant.',
+          )}
+        </p>
         <button type="button" className="btn btn-small btn-primary" onClick={onVisual} disabled={!area}>
           {t('Látványterv megnyitása', 'Open visualisation')}
         </button>
@@ -200,7 +245,12 @@ export function ProjectPanel({ onPrint, onIntro, onDone, onVisual, onLegal }: { 
         <button type="button" className="btn btn-primary" onClick={() => onPrint(orient)}>
           {t('Nyomtatás / mentés PDF-be', 'Print / save as PDF')}
         </button>
-        <p className="mono muted">{t('Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A rajzon lévő változatokból.', 'One page per area: plan view, four seasons, plant list, warnings. From the variants on the plan.')}</p>
+        <p className="mono muted">
+          {t(
+            'Területenként egy oldal: felülnézet, négy évszak, növénylista, figyelmeztetések. A rajzon lévő változatokból.',
+            'One page per area: plan view, four seasons, plant list, warnings. From the variants on the plan.',
+          )}
+        </p>
       </fieldset>
 
       <div className="form-actions form-actions-start">

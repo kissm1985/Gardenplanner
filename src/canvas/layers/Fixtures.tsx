@@ -35,7 +35,13 @@ const shifted = (f: Fixture, d: FixtureDrag | null): Fixture =>
     : f;
 
 /** Fixed (non-plant) elements: lawn, wall, fence, paving, tap, trees, pond, shed… All can be selected on the plan. */
-export const FixturesLayer = memo(function FixturesLayer({ area, scale, drag, selected, interactive }: {
+export const FixturesLayer = memo(function FixturesLayer({
+  area,
+  scale,
+  drag,
+  selected,
+  interactive,
+}: {
   area: Area;
   scale: number;
   drag: FixtureDrag | null;
@@ -47,9 +53,7 @@ export const FixturesLayer = memo(function FixturesLayer({ area, scale, drag, se
   // The lawn being reshaped is drawn by the shape editor instead.
   const editingLawn = useUi((s) => (s.shapeEdit?.target?.kind === 'lawn' ? s.shapeEdit.target.fixtureId : undefined));
   // Lawn first, then larger elements beneath smaller ones, so every element stays reachable with a tap.
-  const sorted = [...area.fixtures]
-    .filter((f) => f.id !== editingLawn)
-    .sort((a, b) => (a.type === 'lawn' ? -1 : 0) - (b.type === 'lawn' ? -1 : 0) || footprint(b) - footprint(a));
+  const sorted = [...area.fixtures].filter((f) => f.id !== editingLawn).sort((a, b) => (a.type === 'lawn' ? -1 : 0) - (b.type === 'lawn' ? -1 : 0) || footprint(b) - footprint(a));
   const sel = interactive && selected ? sorted.find((f) => f.id === selected) : undefined;
   return (
     <g className="fixtures">

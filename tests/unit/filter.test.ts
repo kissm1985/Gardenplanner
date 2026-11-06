@@ -18,7 +18,10 @@ describe('plant filters', () => {
   });
 
   it('height and spread ranges', () => {
-    for (const p of filterPlants(SEED_PLANTS, { ...NO_FILTER, hMin: '30', hMax: '50' })) expect(p.maxHeightCm).toBeGreaterThanOrEqual(30), expect(p.maxHeightCm).toBeLessThanOrEqual(50);
+    for (const p of filterPlants(SEED_PLANTS, { ...NO_FILTER, hMin: '30', hMax: '50' })) {
+      expect(p.maxHeightCm).toBeGreaterThanOrEqual(30);
+      expect(p.maxHeightCm).toBeLessThanOrEqual(50);
+    }
     for (const p of filterPlants(SEED_PLANTS, { ...NO_FILTER, sMin: '50' })) expect(p.spreadCm).toBeGreaterThanOrEqual(50);
     expect(codes({ hMax: '50' })).toContain('LA');
     expect(codes({ hMax: '50' })).not.toContain('NE');

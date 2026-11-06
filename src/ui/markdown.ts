@@ -28,6 +28,7 @@ function inline(s: string, img: (src: string) => string): string {
   t = t.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (_, label, href) =>
     href.startsWith('#') ? `<a href="${href}" data-anchor="${href.slice(1)}">${label}</a>` : `<a href="${href}" target="_blank" rel="noopener">${label}</a>`,
   );
+  // eslint-disable-next-line no-control-regex -- NUL marks protected tags, it never occurs in the guide text
   return t.replace(/\u0000(\d+)\u0000/g, (_, i) => tags[+i]);
 }
 
@@ -63,7 +64,14 @@ export function markdownToHtml(md: string, img: (src: string) => string = (s) =>
     if (/^\s*\|/.test(line)) {
       flush();
       const rows: string[][] = [];
-      for (; i < lines.length && /^\s*\|/.test(lines[i]); i++) rows.push(lines[i].trim().replace(/^\||\|$/g, '').split('|').map((c) => c.trim()));
+      for (; i < lines.length && /^\s*\|/.test(lines[i]); i++)
+        rows.push(
+          lines[i]
+            .trim()
+            .replace(/^\||\|$/g, '')
+            .split('|')
+            .map((c) => c.trim()),
+        );
       i--;
       const body = rows.filter((r) => !r.every((c) => /^:?-+:?$/.test(c)));
       const [head, ...rest] = body;

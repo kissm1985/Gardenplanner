@@ -11,8 +11,20 @@ const st = () => useProject.getState();
 function richProject() {
   useProject.setState({ project: null, currentAreaId: null, past: [], future: [] });
   st().createProject(['house-strip', 'lawn-garden']);
-  st().addRow('LA', [[60, 0], [60, 400]]);
-  st().addDrift('TH', [[0, 500], [120, 500], [120, 900], [0, 900]], 'staggered');
+  st().addRow('LA', [
+    [60, 0],
+    [60, 400],
+  ]);
+  st().addDrift(
+    'TH',
+    [
+      [0, 500],
+      [120, 500],
+      [120, 900],
+      [0, 900],
+    ],
+    'staggered',
+  );
   st().placePlant('NE', 60, 1000);
   st().duplicateVariant(st().project!.areas[0].variants[0].id);
   st().placePlant('SE', 30, 1100);
@@ -54,7 +66,23 @@ describe('JSON backup', () => {
     };
     expect(bad((q) => (q.areas[0].widthCm = 'széles'))).toThrow('1. terület');
     expect(bad((q) => (q.areas[0].variants[0].items = [{ kind: 'drift', id: 'a', plantId: 'LA', polygon: [[0, 0]], spacingCm: 30 }]))).toThrow('hibás pontlista');
-    expect(bad((q) => (q.areas[0].variants[0].items = [{ kind: 'row', id: 'a', plantId: 'LA', path: [[0, 0], [9, 9]], spacingCm: 0 }]))).toThrow('túl kicsi tőtáv');
+    expect(
+      bad(
+        (q) =>
+          (q.areas[0].variants[0].items = [
+            {
+              kind: 'row',
+              id: 'a',
+              plantId: 'LA',
+              path: [
+                [0, 0],
+                [9, 9],
+              ],
+              spacingCm: 0,
+            },
+          ]),
+      ),
+    ).toThrow('túl kicsi tőtáv');
     expect(bad((q) => (q.areas[0].variants[0].items = [{ kind: 'bomb', id: 'a' }]))).toThrow('ismeretlen elemtípus');
     expect(bad((q) => (q.plantDb[0].photoUrl = 'javascript:alert(1)'))).toThrow('1. növény');
     expect(bad((q) => (q.areas[0].background = { dataUrl: 'https://evil.example/x.svg' }))).toThrow('hibás háttérkép');
@@ -88,7 +116,11 @@ describe('share link', () => {
 
   it('never carries own plant photos; notes can be left out', () => {
     const p = richProject();
-    const withPhoto = { ...p, plantDb: p.plantDb.map((x) => (x.code === 'LA' ? { ...x, photoUrl: 'https://tracker.example/x.png', photoCredit: 'me' } : x)), areas: p.areas.map((a) => ({ ...a, notes: 'Fő utca 1.' })) };
+    const withPhoto = {
+      ...p,
+      plantDb: p.plantDb.map((x) => (x.code === 'LA' ? { ...x, photoUrl: 'https://tracker.example/x.png', photoCredit: 'me' } : x)),
+      areas: p.areas.map((a) => ({ ...a, notes: 'Fő utca 1.' })),
+    };
     const back = decodeShare(encodeShare(withPhoto));
     expect(back.plantDb.find((x) => x.code === 'LA')?.photoUrl).toBeUndefined();
     expect(back.plantDb.find((x) => x.code === 'LA')?.photoCredit).toBeUndefined();

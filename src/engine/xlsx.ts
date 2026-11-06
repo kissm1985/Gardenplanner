@@ -15,6 +15,7 @@ const esc = (s: string) =>
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     // Strip control characters XML 1.0 forbids.
+    // eslint-disable-next-line no-control-regex -- strips characters XML 1.0 does not allow
     .replace(/[\u0000-\u0008\u000B\u000C\u000E-\u001F]/g, '');
 
 function colName(i: number): string {
@@ -25,7 +26,11 @@ function colName(i: number): string {
 
 /** Excel sheet names: ≤31 chars, no []:*?/\ and unique. */
 export function sheetName(name: string, taken: Set<string>): string {
-  const base = name.replace(/[[\]:*?/\\]/g, ' ').trim().slice(0, 31) || 'Munkalap';
+  const base =
+    name
+      .replace(/[[\]:*?/\\]/g, ' ')
+      .trim()
+      .slice(0, 31) || 'Munkalap';
   let n = base;
   for (let i = 2; taken.has(n.toLowerCase()); i++) n = `${base.slice(0, 28)} ${i}`;
   taken.add(n.toLowerCase());
@@ -71,8 +76,12 @@ export function buildXlsx(sheets: Sheet[]): Uint8Array {
     ),
     'xl/_rels/workbook.xml.rels': strToU8(
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">${sheets
-        .map((_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`)
-        .join('')}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
+        .map(
+          (_, i) => `<Relationship Id="rId${i + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet${i + 1}.xml"/>`,
+        )
+        .join(
+          '',
+        )}<Relationship Id="rId${sheets.length + 1}" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>`,
     ),
     'xl/styles.xml': strToU8(
       `<?xml version="1.0" encoding="UTF-8" standalone="yes"?><styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>`,

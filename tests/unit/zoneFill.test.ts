@@ -9,8 +9,17 @@ import { newProject } from '../../src/store/projectStore';
 const proj = newProject(['house-strip', 'lawn-garden']);
 const [strip, lawn] = proj.areas;
 const db = SEED_PLANTS;
-const zone: Pt[] = [[0, 100], [120, 100], [120, 500], [0, 500]];
-const parts = [{ code: 'LA', weight: 1 }, { code: 'SA', weight: 1 }, { code: 'CO', weight: 1 }];
+const zone: Pt[] = [
+  [0, 100],
+  [120, 100],
+  [120, 500],
+  [0, 500],
+];
+const parts = [
+  { code: 'LA', weight: 1 },
+  { code: 'SA', weight: 1 },
+  { code: 'CO', weight: 1 },
+];
 
 describe('zone fill', () => {
   it('fills only the drawn region, from the list, without spacing warnings', () => {
@@ -37,7 +46,12 @@ describe('zone fill', () => {
   });
 
   it('groups: neighbours are mostly the same species; no plants on the lawn', () => {
-    const big: Pt[] = [[0, 0], [500, 0], [500, 1200], [0, 1200]];
+    const big: Pt[] = [
+      [0, 0],
+      [500, 0],
+      [500, 1200],
+      [0, 1200],
+    ];
     const res = fillZone({ area: lawn, polygon: big, parts, plantDb: db, existing: [], mode: 'groups', seed: 4 });
     const lawnFx = lawn.fixtures.find((f) => f.type === 'lawn')!;
     for (const it of res.items) if (it.kind === 'plant') expect(pointInPolygon([it.x, it.y], lawnFx.polygon!)).toBe(false);
@@ -59,8 +73,7 @@ describe('zone fill', () => {
       const sp = new Map(db.map((p) => [p.code, p.spacingCm]));
       // Two of the same species are never side by side: at least 1.6 × the planting gap apart.
       for (const a of ps)
-        for (const b of ps)
-          if (a !== b && a.c === b.c) expect(Math.hypot(a.q[0] - b.q[0], a.q[1] - b.q[1])).toBeGreaterThanOrEqual(1.6 * 0.95 * sp.get(a.c)! - 1);
+        for (const b of ps) if (a !== b && a.c === b.c) expect(Math.hypot(a.q[0] - b.q[0], a.q[1] - b.q[1])).toBeGreaterThanOrEqual(1.6 * 0.95 * sp.get(a.c)! - 1);
       const sparse = fillZone({ area: strip, polygon: zone, parts, plantDb: db, existing: [], mode: 'mix', seed, extraGapCm: 30 });
       expect(sparse.items.length).toBeLessThan(res.items.length * 0.7);
       const pts = sparse.items.flatMap((it) => (it.kind === 'plant' ? [[it.x, it.y]] : []));

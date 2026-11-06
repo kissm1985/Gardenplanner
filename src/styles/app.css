@@ -99,8 +99,7 @@ textarea {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: calc(env(safe-area-inset-top, 0px) + 4px) max(8px, env(safe-area-inset-right, 0px)) 4px
-    max(8px, env(safe-area-inset-left, 0px));
+  padding: calc(env(safe-area-inset-top, 0px) + 4px) max(8px, env(safe-area-inset-right, 0px)) 4px max(8px, env(safe-area-inset-left, 0px));
   border-bottom: 1px solid var(--line);
   background: var(--bg);
 }
@@ -3091,7 +3090,9 @@ button.topbar-brand {
   border-radius: var(--radius);
   overflow: hidden;
   cursor: pointer;
-  transition: border-color 0.15s, transform 0.15s;
+  transition:
+    border-color 0.15s,
+    transform 0.15s;
 }
 .example-card:hover,
 .example-card:focus-visible {

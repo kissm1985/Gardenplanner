@@ -13,8 +13,7 @@ import { plantName } from '../model/plants';
 
 type Tab = 'plant' | 'care' | 'mulch';
 
-const dayLabel = (iso: string) =>
-  fromIso(iso).toLocaleDateString(locale(), { month: 'short', day: 'numeric', weekday: 'long' });
+const dayLabel = (iso: string) => fromIso(iso).toLocaleDateString(locale(), { month: 'short', day: 'numeric', weekday: 'long' });
 
 /** Planting schedule, monthly care calendar and mulch advice (SPEC §4.7). */
 export function SchedulePage() {
@@ -145,7 +144,15 @@ function PlantingTab() {
           {t('Menetrend másolása szövegként', 'Copy the schedule as text')}
         </button>
       </div>
-      <textarea ref={taRef} className="sched-text" readOnly rows={4} value={text} aria-label={t('Menetrend szövegként', 'Schedule as text')} onFocus={(e) => e.currentTarget.select()} />
+      <textarea
+        ref={taRef}
+        className="sched-text"
+        readOnly
+        rows={4}
+        value={text}
+        aria-label={t('Menetrend szövegként', 'Schedule as text')}
+        onFocus={(e) => e.currentTarget.select()}
+      />
     </section>
   );
 }
@@ -183,9 +190,7 @@ function CareTab() {
               {cal[m].map((tk) => (
                 <li key={tk.text}>
                   {tk.codes.length > 0 && (
-                    <span className="care-chips">
-                      {tk.codes.slice(0, 6).map((c) => byCode.get(c) && <PlantChip key={c} p={byCode.get(c)!} size={22} />)}
-                    </span>
+                    <span className="care-chips">{tk.codes.slice(0, 6).map((c) => byCode.get(c) && <PlantChip key={c} p={byCode.get(c)!} size={22} />)}</span>
                   )}
                   <span>{tk.text}</span>
                 </li>
@@ -240,7 +245,12 @@ function MulchTab() {
       {m.trees.length > 0 && (
         <article className="mulch-card">
           <h3>{t('Fák', 'Trees')}</h3>
-          <p>{t('A törzs körül 60 cm átmérőben agrotextil nélkül; kéreggyűrű, ami nem ér a törzshöz.', 'No fabric within 60 cm around the trunk; a ring of bark that does not touch the trunk.')}</p>
+          <p>
+            {t(
+              'A törzs körül 60 cm átmérőben agrotextil nélkül; kéreggyűrű, ami nem ér a törzshöz.',
+              'No fabric within 60 cm around the trunk; a ring of bark that does not touch the trunk.',
+            )}
+          </p>
           {list(m.trees)}
         </article>
       )}

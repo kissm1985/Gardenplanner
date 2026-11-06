@@ -17,7 +17,20 @@ describe('idea generator', () => {
   });
 
   it('clips a polygon to a rectangle', () => {
-    const c = clipRect([[0, 0], [100, 0], [100, 100], [0, 100]], 50, -10, 200, 40).map(String).sort();
+    const c = clipRect(
+      [
+        [0, 0],
+        [100, 0],
+        [100, 100],
+        [0, 100],
+      ],
+      50,
+      -10,
+      200,
+      40,
+    )
+      .map(String)
+      .sort();
     expect(c).toEqual(['100,0', '100,40', '50,0', '50,40']);
   });
 
@@ -32,7 +45,10 @@ describe('idea generator', () => {
     }
   });
 
-  for (const [name, area] of [['house strip', strip], ['lawn garden', lawn]] as const)
+  for (const [name, area] of [
+    ['house strip', strip],
+    ['lawn garden', lawn],
+  ] as const)
     it(`${name}: 20 random ideas, no errors or warnings from the rule engine`, () => {
       for (let seed = 1; seed <= 20; seed++) {
         const idea = generateIdea(area, db, proj.settings, { seed });
@@ -89,7 +105,13 @@ describe('idea generator: plant types', () => {
     expect(k('PH')).toContain('shrub');
   });
 
-  for (const set of [['hedge', 'shrub', 'perennial'], ['tree', 'shrub', 'groundcover'], ['hedge', 'tree', 'shrub', 'perennial', 'grass', 'groundcover'], ['shrub'], ['hedge']] as PlantKind[][])
+  for (const set of [
+    ['hedge', 'shrub', 'perennial'],
+    ['tree', 'shrub', 'groundcover'],
+    ['hedge', 'tree', 'shrub', 'perennial', 'grass', 'groundcover'],
+    ['shrub'],
+    ['hedge'],
+  ] as PlantKind[][])
     it(`back garden with ${set.join(' + ')}: requested types appear, no warnings`, () => {
       for (let seed = 1; seed <= 12; seed++) {
         const idea = generateIdea(back, db, proj.settings, { seed, kinds: set });
@@ -122,9 +144,7 @@ describe('idea generator: plant types', () => {
       expect(idea.items.some((it) => it.kind === 'drift')).toBe(false);
       expect(singles.length).toBeGreaterThan(20);
       const sp = new Map(db.map((p) => [p.code, p.spacingCm]));
-      for (const a of singles)
-        for (const b of singles)
-          if (a !== b && a.plantId === b.plantId) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(sp.get(a.plantId)! * 1.05);
+      for (const a of singles) for (const b of singles) if (a !== b && a.plantId === b.plantId) expect(Math.hypot(a.x - b.x, a.y - b.y)).toBeGreaterThan(sp.get(a.plantId)! * 1.05);
       const bad = evaluate(lawn, idea.items, db, proj.settings).filter((w) => w.rule === 'spacing' || w.rule === 'outside');
       expect(bad).toEqual([]);
     }

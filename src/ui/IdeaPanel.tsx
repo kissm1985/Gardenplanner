@@ -178,7 +178,9 @@ function ZoneFillPanel({ onDone }: { onDone: () => void }) {
               ) : null;
             })}
           </ul>
-          {total === 0 && <p className="mono muted">{t('Nem fért el egy tő sem: a rész túl kicsi, vagy már tele van.', 'Not a single plant fitted: the region is too small or already full.')}</p>}
+          {total === 0 && (
+            <p className="mono muted">{t('Nem fért el egy tő sem: a rész túl kicsi, vagy már tele van.', 'Not a single plant fitted: the region is too small or already full.')}</p>
+          )}
           <div className="form-actions">
             <span className="spacer" />
             <button type="button" className="btn btn-primary" onClick={onDone}>
@@ -307,7 +309,12 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
         <legend>{t('Változatosság és sűrűség', 'Variety and density')}</legend>
         <label className="check">
           <input type="checkbox" checked={mixed} onChange={(e) => setMixed(e.target.checked)} />
-          <span>{t('Vegyes ültetés: azonos növény ne kerüljön egymás mellé (foltok helyett tövenként váltakozva)', 'Mixed planting: no two of the same plant side by side (alternating plant by plant instead of drifts)')}</span>
+          <span>
+            {t(
+              'Vegyes ültetés: azonos növény ne kerüljön egymás mellé (foltok helyett tövenként váltakozva)',
+              'Mixed planting: no two of the same plant side by side (alternating plant by plant instead of drifts)',
+            )}
+          </span>
         </label>
         <GapField value={gap} onChange={setGap} />
       </fieldset>
@@ -321,7 +328,14 @@ function WholeAreaIdea({ onDone }: { onDone: () => void }) {
           </button>
         )}
       </div>
-      {!prefer.length && kinds.length > 0 && pool.length < 1 && <p className="form-error">{t('Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.', 'Too few species fit the area. Relax the limits or extend the database.')}</p>}
+      {!prefer.length && kinds.length > 0 && pool.length < 1 && (
+        <p className="form-error">
+          {t(
+            'Túl kevés faj felel meg a terület feltételeinek. Lazíts a korlátokon, vagy bővítsd az adatbázist.',
+            'Too few species fit the area. Relax the limits or extend the database.',
+          )}
+        </p>
+      )}
 
       {shown && (
         <div className="idea-result" aria-live="polite">

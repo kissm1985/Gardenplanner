@@ -13,7 +13,14 @@ const fmt = (d: MonthDay) => new Date(2000, d.month - 1, d.day).toLocaleDateStri
 export function LocationField() {
   const settings = useProject((s) => s.project!.settings);
   const loc = gardenLocation(settings);
-  const preset = LOCATION_PRESETS.find((p) => p.name === loc.name && p.lastFrost.month === loc.lastFrost.month && p.lastFrost.day === loc.lastFrost.day && p.firstFrost.month === loc.firstFrost.month && p.firstFrost.day === loc.firstFrost.day);
+  const preset = LOCATION_PRESETS.find(
+    (p) =>
+      p.name === loc.name &&
+      p.lastFrost.month === loc.lastFrost.month &&
+      p.lastFrost.day === loc.lastFrost.day &&
+      p.firstFrost.month === loc.firstFrost.month &&
+      p.firstFrost.day === loc.firstFrost.day,
+  );
   const save = (l: GardenLocation) => useProject.getState().updateSettings({ location: l });
   return (
     <fieldset className="field-group">

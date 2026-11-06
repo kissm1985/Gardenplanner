@@ -164,7 +164,10 @@ test('Látványterv: camera on the plan, style and mood, send in one step, finis
   // Back on the plan the camera is hidden; the View layer can show it.
   await expect(page.locator('.camera')).toHaveCount(0);
   await page.getByRole('button', { name: 'Nézet és rétegek' }).click();
-  await page.locator('dialog[open]').getByLabel(/Látványterv nézőpontja/).check();
+  await page
+    .locator('dialog[open]')
+    .getByLabel(/Látványterv nézőpontja/)
+    .check();
   await expect(page.locator('.camera')).toHaveCount(1);
   await page.locator('dialog[open] .sheet-head button[aria-label="Bezárás"]').click();
   await page.getByRole('button', { name: /Változat: A terv/ }).click();

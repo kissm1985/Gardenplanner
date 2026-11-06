@@ -14,7 +14,13 @@ test('fill a drift on the 120 × 1200 cm strip and see the count', async ({ page
   const b = await setup(page, 'Folt', 'csenkesz');
   const cm = b.width / 120;
   // Freehand loop around 10…110 × 50…250 cm.
-  const loop = [[10, 50], [110, 50], [110, 250], [10, 250], [10, 52]];
+  const loop = [
+    [10, 50],
+    [110, 50],
+    [110, 250],
+    [10, 250],
+    [10, 52],
+  ];
   await page.mouse.move(b.x + loop[0][0] * cm, b.y + loop[0][1] * cm);
   await page.mouse.down();
   for (const [x, y] of loop.slice(1)) await page.mouse.move(b.x + x * cm, b.y + y * cm, { steps: 10 });

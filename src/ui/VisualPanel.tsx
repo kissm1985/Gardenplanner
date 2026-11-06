@@ -41,7 +41,15 @@ export async function vizPng(project: Project, area: Area, v: Variant, season: S
   root.dataset.theme = 'light';
   let svg: string;
   try {
-    svg = planSvg({ area, items: v.items, plantDb: project.plantDb, month: SEASON_MONTH[season], legend, camera: area.camera, caption: `${localName(area.name)} – ${localName(v.name)} · ${area.widthCm} × ${area.lengthCm} cm` });
+    svg = planSvg({
+      area,
+      items: v.items,
+      plantDb: project.plantDb,
+      month: SEASON_MONTH[season],
+      legend,
+      camera: area.camera,
+      caption: `${localName(area.name)} – ${localName(v.name)} · ${area.widthCm} × ${area.lengthCm} cm`,
+    });
   } finally {
     if (theme) root.dataset.theme = theme;
     else delete root.dataset.theme;
@@ -72,7 +80,10 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
     let live = true;
     setPng(null);
     const id = window.setTimeout(() => {
-      vizPng(project, area, v, opt.season).then((b) => live && setPng(b), () => {});
+      vizPng(project, area, v, opt.season).then(
+        (b) => live && setPng(b),
+        () => {},
+      );
     }, 250);
     return () => {
       live = false;
@@ -98,7 +109,12 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
       navigator.clipboard?.writeText(s).catch(() => {});
       try {
         await navigator.share({ files: [file], text: s, title: t('Látványterv', 'Visualisation') });
-        setMsg(t('Elküldve. Ha a ChatGPT csak a képet kapta meg, a leírás a vágólapon van: illeszd be mellé.', 'Sent. If ChatGPT only got the picture, the description is on the clipboard: paste it next to it.'));
+        setMsg(
+          t(
+            'Elküldve. Ha a ChatGPT csak a képet kapta meg, a leírás a vágólapon van: illeszd be mellé.',
+            'Sent. If ChatGPT only got the picture, the description is on the clipboard: paste it next to it.',
+          ),
+        );
       } catch (e) {
         if ((e as Error).name === 'AbortError') return;
         setMsg(t('A megosztás nem indult el. Koppints újra, vagy használd a lenti gombokat.', 'Sharing did not start. Tap again, or use the buttons below.'));
@@ -110,9 +126,14 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
     downloadBlob(fileName, blob, 'image/png');
     const w = window.open(CHATGPT_URL, '_blank', 'noopener');
     setMsg(
-      (ok ? t('A leírás a vágólapon, a rajz letöltve. ', 'The description is on the clipboard and the plan downloaded. ') : t('A rajz letöltve; a leírást másold ki a lenti mezőből. ', 'The plan downloaded; copy the description from the box below. ')) +
+      (ok
+        ? t('A leírás a vágólapon, a rajz letöltve. ', 'The description is on the clipboard and the plan downloaded. ')
+        : t('A rajz letöltve; a leírást másold ki a lenti mezőből. ', 'The plan downloaded; copy the description from the box below. ')) +
         (w
-          ? t('A ChatGPT új lapon nyílt meg: illeszd be a szöveget (Ctrl+V), és húzd mellé a letöltött képet.', 'ChatGPT opened in a new tab: paste the text (Ctrl+V) and drop the downloaded image next to it.')
+          ? t(
+              'A ChatGPT új lapon nyílt meg: illeszd be a szöveget (Ctrl+V), és húzd mellé a letöltött képet.',
+              'ChatGPT opened in a new tab: paste the text (Ctrl+V) and drop the downloaded image next to it.',
+            )
           : t('Nyisd meg a chatgpt.com-ot, illeszd be a szöveget, és csatold a képet.', 'Open chatgpt.com, paste the text and attach the image.')),
     );
   };
@@ -167,8 +188,14 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
         <legend>{t('Nézőpont', 'Viewpoint')}</legend>
         <p className="mono muted">
           {cam
-            ? t(`Kamera a rajzon: (${m1(cam.x)}; ${m1(cam.y)}) m, a narancssárga látómező felé néz.`, `Camera on the plan: (${m1(cam.x)}, ${m1(cam.y)}) m, looking along the orange view cone.`)
-            : t('Tedd le a kamerát oda, ahonnan nézni fogod a kertet (pl. a teraszra), és húzd a nézés irányába.', 'Put the camera where you will look at the garden from (e.g. the terrace) and drag towards where you look.')}
+            ? t(
+                `Kamera a rajzon: (${m1(cam.x)}; ${m1(cam.y)}) m, a narancssárga látómező felé néz.`,
+                `Camera on the plan: (${m1(cam.x)}, ${m1(cam.y)}) m, looking along the orange view cone.`,
+              )
+            : t(
+                'Tedd le a kamerát oda, ahonnan nézni fogod a kertet (pl. a teraszra), és húzd a nézés irányába.',
+                'Put the camera where you will look at the garden from (e.g. the terrace) and drag towards where you look.',
+              )}
         </p>
         <div className="form-actions form-actions-start">
           <button type="button" className="btn btn-small" onClick={onPickCamera}>
@@ -196,7 +223,11 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
             ['watercolor', t('akvarell', 'watercolour')],
             ['sketch', t('tervezői vázlat', 'design sketch')],
           ] as [VizStyle, string][])}
-          {sel('season', t('Évszak', 'Season'), SEASON_LABEL.map((l, i) => [i as Season, l]))}
+          {sel(
+            'season',
+            t('Évszak', 'Season'),
+            SEASON_LABEL.map((l, i) => [i as Season, l]),
+          )}
         </div>
         <div className="field-row">
           {sel('time', t('Napszak', 'Time of day'), [
@@ -249,7 +280,17 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
           {msg}
         </p>
       )}
-      {text && <textarea ref={taRef} className="sched-text" readOnly rows={8} value={text} onFocus={(e) => e.currentTarget.select()} aria-label={t('Leírás a látványtervhez', 'Visualisation description')} />}
+      {text && (
+        <textarea
+          ref={taRef}
+          className="sched-text"
+          readOnly
+          rows={8}
+          value={text}
+          onFocus={(e) => e.currentTarget.select()}
+          aria-label={t('Leírás a látványtervhez', 'Visualisation description')}
+        />
+      )}
 
       <fieldset className="field-group">
         <legend>{t(`Kész látványképek – ${localName(v.name)}`, `Finished images – ${localName(v.name)}`)}</legend>
@@ -282,14 +323,20 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
               <ul className="render-grid" aria-label={t('Látványképek', 'Visualisations')}>
                 {renders.map((r) => (
                   <li key={r.id}>
-                    <button type="button" onClick={() => setViewing(r)} aria-label={t(`Kép: ${new Date(r.addedAt).toLocaleDateString(locale())}`, `Image: ${new Date(r.addedAt).toLocaleDateString(locale())}`)}>
+                    <button
+                      type="button"
+                      onClick={() => setViewing(r)}
+                      aria-label={t(`Kép: ${new Date(r.addedAt).toLocaleDateString(locale())}`, `Image: ${new Date(r.addedAt).toLocaleDateString(locale())}`)}
+                    >
                       <img src={r.dataUrl} alt="" />
                     </button>
                   </li>
                 ))}
               </ul>
             ) : (
-              <p className="mono muted">{t('Még nincs kép. A ChatGPT-ben mentsd le a kapott képet, majd töltsd fel ide.', 'No image yet. Save the image ChatGPT made, then upload it here.')}</p>
+              <p className="mono muted">
+                {t('Még nincs kép. A ChatGPT-ben mentsd le a kapott képet, majd töltsd fel ide.', 'No image yet. Save the image ChatGPT made, then upload it here.')}
+              </p>
             )}
             <div className="form-actions form-actions-start">
               <button type="button" className="btn btn-small" onClick={() => fileRef.current?.click()}>

@@ -26,7 +26,10 @@ describe('example plans', () => {
     for (const ex of EXAMPLE_PLANS) {
       const a = buildExample(ex);
       const ws = evaluate(a, a.variants[0].items, SEED_PLANTS, DEFAULT_SETTINGS);
-      expect(ws.filter((w) => w.severity !== 'info').map((w) => w.message), ex.key).toEqual([]);
+      expect(
+        ws.filter((w) => w.severity !== 'info').map((w) => w.message),
+        ex.key,
+      ).toEqual([]);
     }
   });
 

@@ -49,7 +49,10 @@ const STEPS: { target: string; readonly title: string; readonly text: string }[]
       return t('Lista megtekintése', 'See the list');
     },
     get text() {
-      return t('A Lista mutatja a darabszámot, a rendelendő mennyiséget és a költséget; innen másolhatod Excelbe is.', 'The List shows the counts, what to order and the cost; you can copy it to Excel from there.');
+      return t(
+        'A Lista mutatja a darabszámot, a rendelendő mennyiséget és a költséget; innen másolhatod Excelbe is.',
+        'The List shows the counts, what to order and the cost; you can copy it to Excel from there.',
+      );
     },
   },
 ];

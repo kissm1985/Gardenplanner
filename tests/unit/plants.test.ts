@@ -21,7 +21,18 @@ describe('seed plant list', () => {
 
   it('contains the species the spec names, with Latin names', () => {
     const lat = SEED_PLANTS.map((p) => p.nameLat).join(' | ');
-    for (const n of ['Lavandula angustifolia', 'Salvia nemorosa', 'Coreopsis', 'Festuca glauca', 'Armeria maritima', 'Sempervivum', 'Thymus', 'Stachys byzantina', 'Bergenia', 'Hosta'])
+    for (const n of [
+      'Lavandula angustifolia',
+      'Salvia nemorosa',
+      'Coreopsis',
+      'Festuca glauca',
+      'Armeria maritima',
+      'Sempervivum',
+      'Thymus',
+      'Stachys byzantina',
+      'Bergenia',
+      'Hosta',
+    ])
       expect(lat).toContain(n);
   });
 
@@ -74,7 +85,12 @@ describe('plant CSV / JSON', () => {
 
 describe('geometry', () => {
   it('point in polygon', () => {
-    const sq: [number, number][] = [[0, 0], [10, 0], [10, 10], [0, 10]];
+    const sq: [number, number][] = [
+      [0, 0],
+      [10, 0],
+      [10, 10],
+      [0, 10],
+    ];
     expect(pointInPolygon([5, 5], sq)).toBe(true);
     expect(pointInPolygon([15, 5], sq)).toBe(false);
   });

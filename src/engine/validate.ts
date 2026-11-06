@@ -97,7 +97,8 @@ function area(a: unknown, i: number) {
   }
   str(a, 'chosenVariantId', where);
   if (a.background !== undefined) {
-    if (!isObj(a.background) || typeof a.background.dataUrl !== 'string' || !a.background.dataUrl.startsWith('data:image/')) fail(where, t('hibás háttérkép', 'bad background image'));
+    if (!isObj(a.background) || typeof a.background.dataUrl !== 'string' || !a.background.dataUrl.startsWith('data:image/'))
+      fail(where, t('hibás háttérkép', 'bad background image'));
   }
   if (a.camera !== undefined && (!isObj(a.camera) || !num(a.camera.x) || !num(a.camera.y) || !num(a.camera.dir))) fail(where, t('hibás nézőpont', 'bad viewpoint'));
 }
@@ -111,7 +112,8 @@ function plant(p: unknown, i: number) {
   for (const k of ['spacingCm', 'spreadCm', 'maxHeightCm']) n(p, k, where);
   if (!((p.spacingCm as number) >= 1)) fail(where, t('túl kicsi tőtáv', 'spacing too small'));
   if (!Array.isArray(p.sun)) fail(where, t('hiányzó fényigény', 'missing light need'));
-  if (p.photoUrl !== undefined && typeof p.photoUrl === 'string' && p.photoUrl && !/^(https?:|data:image\/)/.test(p.photoUrl)) fail(where, t('a fotó címe nem webcím vagy beágyazott kép', 'the photo address is not a web address or an embedded image'));
+  if (p.photoUrl !== undefined && typeof p.photoUrl === 'string' && p.photoUrl && !/^(https?:|data:image\/)/.test(p.photoUrl))
+    fail(where, t('a fotó címe nem webcím vagy beágyazott kép', 'the photo address is not a web address or an embedded image'));
 }
 
 /** Throws a readable error if the data is not a usable project; returns nothing otherwise. */
@@ -129,7 +131,7 @@ export function validateProject(data: unknown): void {
       if (!isObj(loc) || typeof loc.name !== 'string' || !md(loc.lastFrost) || !md(loc.firstFrost)) fail(t('beállítások', 'settings'), t('hibás helyszín', 'bad location'));
     }
   } catch (e) {
-    if (e instanceof Invalid) throw new Error(e.message);
-    throw new Error(t('A mentés szerkezete hibás.', 'The backup has a broken structure.'));
+    if (e instanceof Invalid) throw new Error(e.message, { cause: e });
+    throw new Error(t('A mentés szerkezete hibás.', 'The backup has a broken structure.'), { cause: e });
   }
 }

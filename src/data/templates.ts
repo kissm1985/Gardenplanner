@@ -81,7 +81,10 @@ export const AREA_TEMPLATES: AreaTemplate[] = [
         orientation: 'S',
         sunUntil: t('13:00-ig', 'until 13:00'),
         kind: 'gravel',
-        notes: t('Kőkert a ház mellett (K-06 / K-07). Felül a hátsó kerítés, alul a járda.', 'Rock garden along the house (K-06 / K-07). Back fence at the top, pavement at the bottom.'),
+        notes: t(
+          'Kőkert a ház mellett (K-06 / K-07). Felül a hátsó kerítés, alul a járda.',
+          'Rock garden along the house (K-06 / K-07). Back fence at the top, pavement at the bottom.',
+        ),
         constraints: { maxHeightCm: 50, noThorns: true, nonToxic: true, drip: true, mulchCover: true },
         fixtures: [
           { id: uid('f'), type: 'wall', label: t('Ház', 'House'), x: -16, y: 0, w: 16, h: 1200 },
@@ -105,7 +108,10 @@ export const AREA_TEMPLATES: AreaTemplate[] = [
         orientation: 'E',
         sunUntil: t('12:00-ig', 'until 12:00'),
         kind: 'bed',
-        notes: t('Előkert (K-05 / K-07): középen ívelt gyepsáv, két oldalán ágyás. Legfeljebb 2 fa, 150–200 cm.', 'Front garden (K-05 / K-07): curved lawn strip in the middle, beds on both sides. At most 2 trees, 150–200 cm.'),
+        notes: t(
+          'Előkert (K-05 / K-07): középen ívelt gyepsáv, két oldalán ágyás. Legfeljebb 2 fa, 150–200 cm.',
+          'Front garden (K-05 / K-07): curved lawn strip in the middle, beds on both sides. At most 2 trees, 150–200 cm.',
+        ),
         constraints: { noThorns: true, nonToxic: true, drip: true, mulchCover: true, maxTrees: 2 },
         fixtures: [
           { id: uid('f'), type: 'wall', label: t('Ház', 'House'), x: -16, y: 0, w: 16, h: 1200 },

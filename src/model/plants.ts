@@ -20,7 +20,11 @@ export const TOXIC_LABEL: Record<Toxicity, string> = labels({
   both: ['emberre és háziállatra', 'to people and pets'],
   unknown: ['nem ismert', 'unknown'],
 });
-export const JUGLONE_LABEL: Record<JugloneTolerance, string> = labels({ tolerant: ['tűri', 'tolerant'], sensitive: ['érzékeny', 'sensitive'], unknown: ['nem dokumentált', 'not documented'] });
+export const JUGLONE_LABEL: Record<JugloneTolerance, string> = labels({
+  tolerant: ['tűri', 'tolerant'],
+  sensitive: ['érzékeny', 'sensitive'],
+  unknown: ['nem dokumentált', 'not documented'],
+});
 export const MONTHS = labelList([
   ['jan', 'Jan'],
   ['feb', 'Feb'],
@@ -190,12 +194,30 @@ export const FIELD_LABEL: Partial<Record<keyof Plant, string>> = labels({
 
 /** The plants that still have values to check, as a CSV worksheet for an expert review. */
 export function reviewCsv(db: Plant[]): string {
-  const head = [t('Kód', 'Code'), t('Név', 'Name'), t('Latin név', 'Latin name'), t('Ellenőrizendő adat', 'Field to check'), t('Jelenlegi érték', 'Current value'), t('Forrás', 'Source'), t('Utolsó ellenőrzés', 'Last checked'), t('Helyes érték / megjegyzés', 'Correct value / note')];
+  const head = [
+    t('Kód', 'Code'),
+    t('Név', 'Name'),
+    t('Latin név', 'Latin name'),
+    t('Ellenőrizendő adat', 'Field to check'),
+    t('Jelenlegi érték', 'Current value'),
+    t('Forrás', 'Source'),
+    t('Utolsó ellenőrzés', 'Last checked'),
+    t('Helyes érték / megjegyzés', 'Correct value / note'),
+  ];
   const rows: string[][] = [head];
   for (const p of db)
     for (const k of p.verify ?? []) {
       const v = p[k];
-      rows.push([p.code, plantName(p), p.nameLat, FIELD_LABEL[k] ?? String(k), Array.isArray(v) ? v.join(', ') : v == null ? '' : String(v), p.dataSource ?? '', p.checkedAt ?? '', '']);
+      rows.push([
+        p.code,
+        plantName(p),
+        p.nameLat,
+        FIELD_LABEL[k] ?? String(k),
+        Array.isArray(v) ? v.join(', ') : v == null ? '' : String(v),
+        p.dataSource ?? '',
+        p.checkedAt ?? '',
+        '',
+      ]);
     }
   return rows.map((r) => r.map(esc).join(';')).join('\r\n');
 }
@@ -223,7 +245,7 @@ export function parseCsv(text: string, sep = ';'): string[][] {
   let row: string[] = [];
   let cell = '';
   let q = false;
-  const t = text.replace(/^﻿/, '');
+  const t = text.replace(/^\uFEFF/, ''); // byte order mark
   for (let i = 0; i < t.length; i++) {
     const ch = t[i];
     if (q) {
@@ -251,8 +273,7 @@ export function parseCsv(text: string, sep = ';'): string[][] {
   return out.filter((r) => r.some((c) => c.trim() !== '')).map((r) => r.map(unsafeCell));
 }
 
-const enumOf = <T extends string>(v: string, allowed: readonly T[], fallback: T): T =>
-  (allowed as readonly string[]).includes(v) ? (v as T) : fallback;
+const enumOf = <T extends string>(v: string, allowed: readonly T[], fallback: T): T => ((allowed as readonly string[]).includes(v) ? (v as T) : fallback);
 
 export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[] } {
   const rows = parseCsv(text);
@@ -260,7 +281,8 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
   if (!rows.length) return { plants: [], errors: [t('Üres fájl.', 'Empty file.')] };
   const head = rows[0].map((h) => h.trim());
   const idx = (h: string) => head.indexOf(h);
-  if (idx('kod') < 0 || (idx('magyar_nev') < 0 && idx('angol_nev') < 0)) return { plants: [], errors: [t('Hiányzik a „kod” vagy a „magyar_nev” oszlop.', 'The “kod” or “angol_nev” (English name) column is missing.')] };
+  if (idx('kod') < 0 || (idx('magyar_nev') < 0 && idx('angol_nev') < 0))
+    return { plants: [], errors: [t('Hiányzik a „kod” vagy a „magyar_nev” oszlop.', 'The “kod” or “angol_nev” (English name) column is missing.')] };
   const plants: Plant[] = [];
   rows.slice(1).forEach((r, n) => {
     const get = (h: string) => (idx(h) >= 0 ? (r[idx(h)] ?? '').trim() : '');
@@ -268,7 +290,11 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       const v = parseFloat(get(h).replace(',', '.'));
       return Number.isFinite(v) ? v : d;
     };
-    const list = (h: string) => get(h).split(',').map((s) => s.trim()).filter(Boolean);
+    const list = (h: string) =>
+      get(h)
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean);
     const bool = (h: string) => ['igen', 'true', '1', 'x'].includes(get(h).toLowerCase());
     const base = blankPlant(get('kod').toUpperCase());
     const sc = list('evszak_szinek');
@@ -286,7 +312,9 @@ export function plantsFromCsv(text: string): { plants: Plant[]; errors: string[]
       toxic: enumOf(get('mergezo'), ['no', 'human', 'pet', 'both', 'unknown'] as const, 'unknown'),
       thorny: bool('tuskes'),
       juglone: enumOf(get('juglone'), ['tolerant', 'sensitive', 'unknown'] as const, 'unknown'),
-      bloomMonths: list('viragzas_honapok').map(Number).filter((m) => m >= 1 && m <= 12),
+      bloomMonths: list('viragzas_honapok')
+        .map(Number)
+        .filter((m) => m >= 1 && m <= 12),
       bloomColor: get('viragszin'),
       foliageColor: get('lombszin'),
       winterInterest: bool('teli_disz'),

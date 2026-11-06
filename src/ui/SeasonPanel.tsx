@@ -22,7 +22,11 @@ function hint(ps: Plant[], month: number): string {
   if (blooming.length) parts.push(t(`Virágzik: ${names(blooming)}.`, `In bloom: ${names(blooming)}.`));
   if (winter.length) parts.push(t(`Télen is díszít: ${names(winter)}.`, `Winter interest: ${names(winter)}.`));
   if (!parts.length)
-    parts.push(ps.length ? t('Ebben a hónapban nincs virágzó faj a területen.', 'Nothing in the area flowers this month.') : t('Még nincs növény a területen.', 'No plants in the area yet.'));
+    parts.push(
+      ps.length
+        ? t('Ebben a hónapban nincs virágzó faj a területen.', 'Nothing in the area flowers this month.')
+        : t('Még nincs növény a területen.', 'No plants in the area yet.'),
+    );
   return parts.join(' ');
 }
 
