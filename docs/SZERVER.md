@@ -16,7 +16,7 @@ NODE_ENV=production SERVER_SECRET=… PUBLIC_URL=https://katalogus.zoldkert.hu \
   STATIC_DIR=dist DB_PATH=/var/lib/planterra/planterra.db npm run server
 ```
 
-Fejlesztéshez elég: `npm run server` (alapértelmezett fejlesztői titokkal, a belépési kódokat a konzolra írja), és `npm run server:cli -- outbox` mutatja az utolsó kiküldött kódokat.
+Fejlesztéshez (Windows, macOS, Linux) elég `npm run build`, majd `npm run server`: beállítás nélkül a `dist/` mappát szolgálja ki a http://localhost:8787 címen, fejlesztői titokkal, és a belépési kódokat a konzolra írja, és `npm run server:cli -- outbox` mutatja az utolsó kiküldött kódokat.
 
 ## Beállítások (környezeti változók)
 

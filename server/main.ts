@@ -18,7 +18,11 @@ if (secret.length < 32) {
   process.exit(1);
 }
 const db = openDb(env.DB_PATH ?? 'planterra.db');
-const origins = [env.PUBLIC_URL, ...(env.ALLOWED_ORIGINS ?? '').split(',')]
+const PORT = Number(env.PORT ?? 8787);
+// Outside production the defaults work on any OS without setting variables: this computer's address, and the
+// built app from dist/ if it exists.
+const publicUrl = env.PUBLIC_URL ?? (production ? undefined : `http://localhost:${PORT}`);
+const origins = [publicUrl, ...(env.ALLOWED_ORIGINS ?? '').split(',')]
   .map((s) => s?.trim())
   .filter((s): s is string => !!s)
   .map((u) => new URL(u).origin);
@@ -36,7 +40,7 @@ const app = createApp({
 purgeOld(db, Date.now());
 setInterval(() => purgeOld(db, Date.now()), 24 * 3600_000).unref();
 
-const STATIC = env.STATIC_DIR ? resolve(env.STATIC_DIR) : null;
+const STATIC = env.STATIC_DIR ? resolve(env.STATIC_DIR) : !production && existsSync('dist/index.html') ? resolve('dist') : null;
 const TYPES: Record<string, string> = {
   '.html': 'text/html; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8',
@@ -83,4 +87,7 @@ createServer(async (req, res) => {
   });
   if (req.method === 'HEAD') res.end();
   else createReadStream(file).pipe(res);
-}).listen(Number(env.PORT ?? 8787), () => log(`Planterra server on :${env.PORT ?? 8787}${STATIC ? ` serving ${STATIC}` : ''}`));
+}).listen(PORT, () => {
+  log(`Planterra server on :${PORT}${STATIC ? ` serving ${STATIC}` : ''}`);
+  if (!production && STATIC) log(`App: http://localhost:${PORT}/  ·  Admin: http://localhost:${PORT}/admin.html`);
+});
