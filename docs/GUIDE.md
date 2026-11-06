@@ -41,7 +41,7 @@ All data stays on your own device, there is no sign-up, and after the first visi
 The app opens with the **start page** every time, and the **Planterra logo** at the left of the top bar brings you back to it at any time. From the top:
 
 1. **+ Create a new area**: start with an empty area; the form opens at once (name, size, facing, sun; a rectangle, a circle or a free shape drawn on the plan, see [chapter 3](#3-areas)).
-2. **Your areas**: the areas already planned (size, the plan on screen, plant count). Tap one to open it.
+2. **Your areas** (below the project list): the areas already planned, as cards with a small drawing of the plan on screen, size and plant count, in a row you can swipe. Tap one to open it.
 3. **Example plans**: ten finished, planted plans for inspiration, each with a small drawing: *Mediterranean garden, Château garden, Country yard, Alpine rock garden, English garden, Japanese garden, Prairie garden, Shade garden, Modern city garden, Round pollinator garden*. Tap one and it is added to your project as a new area with its planted **Plan A** and design notes; then change, copy or generate ideas for it freely. They use built-in species only, at the recommended spacing; a species you deleted from the database comes back.
 4. **Templates** (empty, only the area's data and elements):
    - **House-side strip**: a 120 × 1200 cm gravel strip between the house wall and the pavement, for plants up to 50 cm;

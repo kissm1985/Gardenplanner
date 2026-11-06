@@ -2993,31 +2993,11 @@ polyline.shape-line {
   background: var(--accent);
   color: var(--accent-fg);
 }
-.home-areas {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.home-area {
-  width: 100%;
-  font: inherit;
-  color: inherit;
-}
 button.topbar-brand {
   border: 0;
   background: transparent;
   padding: 0;
   cursor: pointer;
-}
-.home-areas {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-.home-area {
-  width: 100%;
-  font: inherit;
-  color: inherit;
 }
 button.topbar-brand {
   border: 0;

@@ -41,7 +41,7 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
 Az alkalmazás minden indításkor a **kezdőoldallal** nyílik, és a felső sáv bal szélén lévő **Planterra-logóval** bármikor ide jutsz vissza. Fentről lefelé:
 
 1. **+ Új terület létrehozása**: üres területtel kezdesz; azonnal megnyílik az űrlap (név, méret, fekvés, napsütés; téglalap, kör vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)).
-2. **Területeid**: a már megtervezett területek (méret, a rajzon lévő terv, tőszám). Koppintásra megnyílik.
+2. **Területeid** (a projektlista alatt): a már megtervezett területek kártyákon, a rajzon lévő terv kis képével, mérettel és tőszámmal, vízszintesen lapozható sávban. Koppintásra megnyílik.
 3. **Példatervek**: tíz kész, beültetett terv ötletnek, kis rajzzal: *Mediterrán kert, Kastélykert, Vidéki udvar, Alpesi sziklakert, Angolkert, Japánkert, Prérikert, Árnyékkert, Modern városi kert, Kerek pillangókert*. Koppintásra új területként kerül a projektedbe a beültetett **A tervvel** és a tervezési jegyzettel; ezután szabadon átalakíthatod, lemásolhatod, ötletet generálhatsz hozzá. Csak a beépített fajokat használják, ajánlott tőtávval; ha egy fajt korábban törölted az adatbázisból, visszakerül.
 4. **Sablonok** (üres, csak a terület adataival és elemeivel):
    - **Házoldali sáv**: 120 × 1200 cm-es kavicsos sáv a ház fala és a járda között, legfeljebb 50 cm magas növényekkel;

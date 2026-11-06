@@ -16,6 +16,7 @@ import { toggleTheme, useTheme } from './theme';
 // The example plans (data and thumbnails) load right after the start page.
 const ExamplePlans = lazy(() => import('./ExamplePlans').then((m) => ({ default: m.ExamplePlans })));
 const ExampleSizeSheet = lazy(() => import('./ExampleSize').then((m) => ({ default: m.ExampleSizeSheet })));
+const AreaCards = lazy(() => import('./AreaCards').then((m) => ({ default: m.AreaCards })));
 const LegalPanel = lazy(() => import('./LegalPanel').then((m) => ({ default: m.LegalPanel })));
 
 const plants = (n: number) => t(`${n} tő`, `${n} plants`);
@@ -115,30 +116,16 @@ export function Welcome({ onHelp }: { onHelp: () => void }) {
         </small>
       </button>
 
+      {projects.length > 0 && <ProjectList list={projects} currentId={project?.id} onOpen={() => ui.setHome(false)} />}
+
       {project && project.areas.length > 0 && (
         <>
           <h2 className="sub-h">{t('Területeid', 'Your areas')}</h2>
-          <ul className="tpl-list home-areas">
-            {project.areas.map((a) => {
-              const v = activeVariant(a);
-              const n = v.items.reduce((s, it) => s + (it.kind === 'plant' ? 1 : it.count), 0);
-              return (
-                <li key={a.id}>
-                  <button type="button" className="tpl home-area" onClick={() => open(a.id)}>
-                    <b>{localName(a.name)}</b>
-                    <small>
-                      {a.widthCm} × {a.lengthCm} cm · {localName(v.name)} · {plants(n)}
-                      {a.variants.length > 1 ? t(` · ${a.variants.length} változat`, ` · ${a.variants.length} variants`) : ''}
-                    </small>
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+          <Suspense fallback={<p className="mono muted">{t('Területek betöltése…', 'Loading areas…')}</p>}>
+            <AreaCards project={project} onOpen={open} />
+          </Suspense>
         </>
       )}
-
-      {projects.length > 0 && <ProjectList list={projects} currentId={project?.id} onOpen={() => ui.setHome(false)} />}
 
       <h2 className="sub-h">{t('Példatervek', 'Example plans')}</h2>
       <p className="muted example-lead">
