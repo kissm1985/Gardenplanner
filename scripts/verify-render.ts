@@ -2,7 +2,7 @@
 // the ID buffer and the manifest, checks the manifest against the plan and writes a per-plant test report and a
 // run log. Then repeats three deliberately broken renders (+30 cm, missing plant, wrong species) that must FAIL.
 // Exit code 0 only if every example PASSes and every negative run FAILs.
-//   options: --threshold=0.1 (visibility, % of the image) --tol=20 (cm) --only=key1,key2 --width=2400 --height=1700
+//   options: --threshold=0.005 (visibility, % of the image) --tol=20 (cm) --only=key1,key2 --width=2400 --height=1700
 import { execSync } from 'node:child_process';
 import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
@@ -15,7 +15,7 @@ import { checkManifest, reportCsv, reportMd, type CheckResult, type Visibility }
 
 const arg = (k: string, d: string) => process.argv.find((a) => a.startsWith(`--${k}=`))?.slice(k.length + 3) ?? d;
 const TOL = Number(arg('tol', '20'));
-const THRESHOLD_PCT = Number(arg('threshold', '0.1'));
+const THRESHOLD_PCT = Number(arg('threshold', '0.005'));
 const WIDTH = Number(arg('width', '2400'));
 const HEIGHT = Number(arg('height', '1700'));
 const ONLY = arg('only', '').split(',').filter(Boolean);

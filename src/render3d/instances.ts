@@ -16,6 +16,47 @@ export interface PlantInstance {
   spreadCm: number;
   color: string;
   isTree: boolean;
+  /** Body form of the 3D model (from the species: tree flag, genus, proportions). */
+  form: PlantForm;
+}
+
+export type PlantForm = 'tree' | 'conifer' | 'columnar' | 'grass' | 'spike' | 'cushion' | 'shrub' | 'mound';
+
+const CONIFERS = new Set(['Taxus', 'Thuja', 'Picea', 'Pinus', 'Juniperus', 'Chamaecyparis', 'Cedrus', 'Taxodium', 'Microbiota']);
+const GRASSES = new Set(['Miscanthus', 'Pennisetum', 'Stipa', 'Calamagrostis', 'Festuca', 'Carex', 'Molinia', 'Hakonechloa', 'Helictotrichon']);
+/** Perennials that flower in upright spikes or tall stems. */
+const SPIKES = new Set([
+  'Salvia',
+  'Veronica',
+  'Lavandula',
+  'Agastache',
+  'Allium',
+  'Iris',
+  'Gaura',
+  'Astilbe',
+  'Hemerocallis',
+  'Nepeta',
+  'Stachys',
+  'Echinacea',
+  'Rudbeckia',
+  'Leucanthemum',
+  'Achillea',
+  'Phlox',
+  'Coreopsis',
+  'Narcissus',
+]);
+
+/** The model's form: a data-driven choice (no species is hard-coded by code, only genera by habit). */
+export function plantForm(p: Pick<Plant, 'isTree' | 'nameLat' | 'maxHeightCm' | 'spreadCm'>): PlantForm {
+  const genus = p.nameLat.trim().split(/\s+/)[0];
+  const slender = p.maxHeightCm > p.spreadCm * 2.2;
+  if (CONIFERS.has(genus)) return p.isTree || slender ? (slender ? 'columnar' : 'conifer') : p.maxHeightCm < 60 ? 'cushion' : 'shrub';
+  if (p.isTree) return 'tree'; // a slender deciduous tree gets a tall, narrow crown (from its own height and spread)
+  if (GRASSES.has(genus)) return 'grass';
+  if (p.maxHeightCm <= 25 && p.spreadCm >= p.maxHeightCm) return 'cushion';
+  if (SPIKES.has(genus)) return 'spike';
+  if (p.maxHeightCm >= 100) return 'shrub';
+  return 'mound';
 }
 
 export function plantInstances(items: PlacedItem[], plantDb: Plant[]): PlantInstance[] {
@@ -36,6 +77,7 @@ export function plantInstances(items: PlacedItem[], plantDb: Plant[]): PlantInst
         spreadCm: it.kind === 'plant' && it.spreadCm ? it.spreadCm : p.spreadCm,
         color: p.color,
         isTree: !!p.isTree,
+        form: plantForm(p),
       }),
     );
   }

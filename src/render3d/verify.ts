@@ -54,6 +54,8 @@ export function buildManifest(project: string, area: string, instances: PlantIns
 
 /** Pixels a plant shows in the ID buffer; potentialShare = the share it covers when rendered alone (nothing in front). */
 export type Visibility = { pixels: number; share: number; potentialShare?: number };
+/** Visibility threshold: 0.005% of the image (about 200 px at 2400×1700), as decided for spec v0.2 (was 0.1%). */
+export const DEFAULT_MIN_SHARE = 0.00005;
 export const VISIBLE = 'LÁTHATÓ' as const;
 export const NOT_PROVABLE = 'NEM IGAZOLHATÓ – takarás' as const;
 /** Even unhidden it would be smaller than the threshold at this image size and viewpoint. */
@@ -98,7 +100,7 @@ export function checkManifest(
   opts: { tolCm?: number; visibility?: Map<string, Visibility>; minShare?: number } = {},
 ): CheckResult {
   const tol = opts.tolCm ?? 20;
-  const minShare = opts.minShare ?? 0.001;
+  const minShare = opts.minShare ?? DEFAULT_MIN_SHARE;
   const found = new Map<string, ManifestEntry[]>();
   for (const e of manifest.plants) found.set(e.plant_id, [...(found.get(e.plant_id) ?? []), e]);
   const rows: CheckRow[] = instances.map((p) => {

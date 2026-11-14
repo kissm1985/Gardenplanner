@@ -2,7 +2,9 @@
 // (every plant in its own flat colour, no lighting, no smoothing) to count the pixels each plant really shows.
 import * as THREE from 'three';
 import type { Area, Plant } from '../model/types';
-import { plantInstances, type PlantInstance } from './instances';
+import { areaOutline, plantInstances, type PlantInstance } from './instances';
+import { t } from '../i18n';
+import { localName } from '../i18n/names';
 import { buildScene, type Fault, type PlanScene } from './scene';
 import { dimensionLines } from './decor';
 import { buildManifest, type Manifest, type Visibility } from './verify';
@@ -20,6 +22,8 @@ export interface RenderResult {
   strayPixels: number;
   width: number;
   height: number;
+  /** The viewing direction chosen (degrees). */
+  azimuth: number;
 }
 
 export interface RenderOptions {
@@ -27,16 +31,22 @@ export interface RenderOptions {
   height?: number;
   fault?: Fault;
   project?: string;
+  /** Fixed viewing direction (degrees); default: the diagonal where the plants show best. */
+  azimuth?: number;
+  /** Title in the title block (default: the area name). */
+  title?: string;
 }
 
-/** Isometric orthographic camera that frames the whole area (with room for the tallest plant). */
-function isoCamera(ps: PlanScene, aspect: number, maxH: number): THREE.OrthographicCamera {
+/** Aerial (axonometric) orthographic camera from the given azimuth (degrees), framing the whole area and the tallest plant. */
+function isoCamera(ps: PlanScene, aspect: number, maxH: number, azimuth = 45, elevation = 38): THREE.OrthographicCamera {
   const [x0, z0, x1, z1] = ps.bounds;
   const cx = (x0 + x1) / 2;
   const cz = (z0 + z1) / 2;
   const box = new THREE.Box3(new THREE.Vector3(x0 - 0.6, 0, z0 - 0.6), new THREE.Vector3(x1 + 0.6, Math.max(1, maxH), z1 + 0.6));
   const cam = new THREE.OrthographicCamera(-1, 1, 1, -1, 0.1, 1000);
-  const dir = new THREE.Vector3(1, 1.15, 1.35).normalize();
+  const az = (azimuth * Math.PI) / 180;
+  const el = (elevation * Math.PI) / 180;
+  const dir = new THREE.Vector3(Math.sin(az) * Math.cos(el), Math.sin(el), Math.cos(az) * Math.cos(el));
   const d = 100;
   cam.position.set(cx + dir.x * d, dir.y * d, cz + dir.z * d);
   cam.lookAt(cx, 0, cz);
@@ -71,27 +81,30 @@ function isoCamera(ps: PlanScene, aspect: number, maxH: number): THREE.Orthograp
   return cam;
 }
 
-function lights(scene: THREE.Scene, ps: PlanScene) {
+/** Soft daylight: sky light plus a low sun from the viewer's left, so the shadows fall long and to the right. */
+function lights(scene: THREE.Scene, ps: PlanScene, azimuth: number) {
   const [x0, z0, x1, z1] = ps.bounds;
   const span = Math.max(x1 - x0, z1 - z0);
-  scene.add(new THREE.HemisphereLight('#ffffff', '#b9a98f', 1.6));
-  const sun = new THREE.DirectionalLight('#fff4e0', 2.2);
-  sun.position.set((x0 + x1) / 2 - span * 0.6, span * 1.2, (z0 + z1) / 2 - span * 0.4);
+  scene.add(new THREE.HemisphereLight('#ffffff', '#c9bea6', 1.9));
+  const sun = new THREE.DirectionalLight('#fff3dc', 2.1);
+  const a = ((azimuth + 75) * Math.PI) / 180;
+  sun.position.set((x0 + x1) / 2 + Math.sin(a) * span, span * 0.9, (z0 + z1) / 2 + Math.cos(a) * span);
   sun.target.position.set((x0 + x1) / 2, 0, (z0 + z1) / 2);
   sun.castShadow = true;
-  sun.shadow.mapSize.set(2048, 2048);
+  sun.shadow.mapSize.set(4096, 4096);
+  sun.shadow.bias = -0.0004;
   const s = sun.shadow.camera;
   s.left = -span;
   s.right = span;
   s.top = span;
   s.bottom = -span;
   s.far = span * 4;
-  sun.shadow.radius = 4;
+  sun.shadow.radius = 6;
   scene.add(sun, sun.target);
 }
 
 /** ID-buffer pass: plant i in colour i+1, everything else black (it still hides what is behind it). */
-function idPass(renderer: THREE.WebGLRenderer, ps: PlanScene, cam: THREE.Camera, width: number, height: number) {
+function idPass(renderer: THREE.WebGLRenderer, ps: PlanScene, cam: THREE.Camera, width: number, height: number, full = true) {
   const target = new THREE.WebGLRenderTarget(width, height, { type: THREE.UnsignedByteType, depthBuffer: true });
   const saved = new Map<THREE.Mesh, THREE.Material | THREE.Material[]>();
   const hidden: THREE.Object3D[] = [];
@@ -133,9 +146,9 @@ function idPass(renderer: THREE.WebGLRenderer, ps: PlanScene, cam: THREE.Camera,
   // Each plant alone (nothing in front of it): the pixels it would show unhidden. Rendered only inside its projected
   // rectangle (scissor), so this stays fast even with hundreds of plants.
   const alone = new Map<number, number>();
-  const shown = [...ps.rest, ...ps.plants].filter((o) => o.visible);
+  const shown = full ? [...ps.rest, ...ps.plants].filter((o) => o.visible) : [];
   shown.forEach((o) => (o.visible = false));
-  ps.plants.forEach((o, i) => {
+  (full ? ps.plants : []).forEach((o, i) => {
     const r = screenRect(o, cam, width, height);
     if (!r) return alone.set(i + 1, 0);
     o.visible = true;
@@ -217,6 +230,9 @@ function screenRect(o: THREE.Object3D, cam: THREE.Camera, width: number, height:
   return w > 0 && h > 0 ? { x, y, w, h } : null;
 }
 
+/** The four diagonal views; the one where the plants show the most (fewest hidden behind walls or each other) wins. */
+const AZIMUTHS = [45, 135, 225, 315];
+
 export function renderPlan(area: Area, plantDb: Plant[], items = area.variants.find((v) => v.id === area.chosenVariantId)?.items ?? [], opts: RenderOptions = {}): RenderResult {
   const width = opts.width ?? 2400;
   const height = opts.height ?? 1700;
@@ -226,19 +242,35 @@ export function renderPlan(area: Area, plantDb: Plant[], items = area.variants.f
     ps.scene.add(o);
     ps.rest.push(o);
   }
-  ps.scene.background = new THREE.Color('#f4f1ea');
-  lights(ps.scene, ps);
+  ps.scene.background = new THREE.Color('#ffffff');
   const maxH = Math.max(1, ...instances.map((p) => p.heightCm / 100));
-  const cam = isoCamera(ps, width / height, maxH);
 
   const canvas = document.createElement('canvas');
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, preserveDrawingBuffer: true });
   renderer.setPixelRatio(1);
   renderer.setSize(width, height, false);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.05;
+
+  // Viewpoint: deterministic choice among the four diagonals, by the plant pixels a small ID buffer shows.
+  let azimuth = opts.azimuth ?? AZIMUTHS[0];
+  if (opts.azimuth == null) {
+    let best = -1;
+    for (const az of AZIMUTHS) {
+      const probe = idPass(renderer, ps, isoCamera(ps, width / height, maxH, az), 480, Math.round((480 * height) / width), false);
+      const shown = [...probe.counts.values()].reduce((x, y) => x + y, 0);
+      if (shown > best) {
+        best = shown;
+        azimuth = az;
+      }
+    }
+  }
+  const cam = isoCamera(ps, width / height, maxH, azimuth);
+  lights(ps.scene, ps, azimuth);
   renderer.shadowMap.enabled = true;
   renderer.shadowMap.type = THREE.PCFSoftShadowMap;
   renderer.render(ps.scene, cam);
-  const png = canvas.toDataURL('image/png');
+  const png = withTitleBlock(canvas, area, instances, opts.title);
 
   const { counts, alone, stray, idPng } = idPass(renderer, ps, cam, width, height);
   const total = width * height;
@@ -249,5 +281,43 @@ export function renderPlan(area: Area, plantDb: Plant[], items = area.variants.f
   });
   renderer.dispose();
   const manifest = buildManifest(opts.project ?? area.id, area.name, instances, ps.plants);
-  return { instances, manifest, png, idPng, visibility, strayPixels: stray, width, height };
+  return { instances, manifest, png, idPng, visibility, strayPixels: stray, width, height, azimuth };
+}
+
+/** The render with a title block in a band below it (the band never covers the drawing). */
+function withTitleBlock(gl: HTMLCanvasElement, area: Area, instances: PlantInstance[], title?: string): string {
+  const w = gl.width;
+  const band = Math.round(w * 0.065);
+  const c = document.createElement('canvas');
+  c.width = w;
+  c.height = gl.height + band;
+  const ctx = c.getContext('2d')!;
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, 0, c.width, c.height);
+  ctx.drawImage(gl, 0, 0);
+  ctx.fillStyle = '#ffffff';
+  ctx.fillRect(0, gl.height, w, band);
+  ctx.fillStyle = '#244b3c';
+  ctx.fillRect(0, gl.height, w, Math.max(3, band * 0.05));
+  const pad = band * 0.32;
+  const species = new Set(instances.map((p) => p.species_id)).size;
+  const outline = areaOutline(area);
+  const xs = outline.map((q) => q[0]);
+  const ys = outline.map((q) => q[1]);
+  const size = `${((Math.max(...xs) - Math.min(...xs)) / 100).toFixed(2).replace('.', ',')} × ${((Math.max(...ys) - Math.min(...ys)) / 100).toFixed(2).replace('.', ',')} m`;
+  ctx.textBaseline = 'middle';
+  const y1 = gl.height + band * 0.42;
+  const y2 = gl.height + band * 0.74;
+  ctx.fillStyle = '#1f2a22';
+  ctx.font = `600 ${Math.round(band * 0.3)}px sans-serif`;
+  ctx.fillText(localName(title ?? area.name), pad, y1);
+  ctx.fillStyle = '#5b6359';
+  ctx.font = `${Math.round(band * 0.19)}px sans-serif`;
+  ctx.fillText(t(`Látványterv · ${instances.length} növény · ${species} faj · ${size}`, `Visualisation · ${instances.length} plants · ${species} species · ${size}`), pad, y2);
+  ctx.textAlign = 'right';
+  ctx.fillText(t('A terv adataiból számítva, nem fotó', 'Computed from the plan data, not a photo'), w - pad, y2);
+  ctx.fillStyle = '#244b3c';
+  ctx.font = `600 ${Math.round(band * 0.24)}px sans-serif`;
+  ctx.fillText(`Planterra · ${new Date().toISOString().slice(0, 10)}`, w - pad, y1);
+  return c.toDataURL('image/png');
 }

@@ -30,8 +30,9 @@ function label(text: string, heightM: number): THREE.Sprite {
 }
 
 function line(points: THREE.Vector3[]): THREE.Line {
-  const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: '#2b3a30' }));
+  const l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(points), new THREE.LineBasicMaterial({ color: '#2b3a30', depthTest: false }));
   l.name = 'dim-line';
+  l.renderOrder = 9;
   return l;
 }
 
