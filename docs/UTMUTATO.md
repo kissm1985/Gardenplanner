@@ -26,7 +26,7 @@ Minden adat a saját készülékeden marad, nincs regisztráció, és első megn
 13. [Növénylista, rendelés, költség](#13-növénylista-rendelés-költség)
 14. [Ültetési menetrend és gondozás](#14-ültetési-menetrend-és-gondozás)
 15. [Mentés, megosztás, nyomtatás, képek](#15-mentés-megosztás-nyomtatás-képek)
-16. [Látványterv ChatGPT-vel](#16-látványterv-chatgpt-vel)
+16. [Látványterv (3D és ChatGPT)](#16-látványterv-3d-és-chatgpt)
 17. [Telepítés a telefonra, offline használat](#17-telepítés-a-telefonra-offline-használat)
 18. [Tippek és gyakori kérdések](#18-tippek-és-gyakori-kérdések)
 19. [Projektek, csomagok, egyszerű mód](#19-projektek-csomagok-egyszerű-mód)
@@ -323,7 +323,11 @@ Egy területre több tervet is készíthetsz (A terv, B terv, ötletek), és ös
 
 **A fa kezelése**
 
-- **Megnyitás**: az adott változatot szerkeszted.
+- <br clear="right">
+
+<img src="img/17-chatgpt.png" width="280" align="right" alt="Látványterv ChatGPT-nek">
+
+**Megnyitás**: az adott változatot szerkeszted.
 - **⋯** a sor végén: *Másolás*, *Átnevezés*, *Áthelyezés*, *Törlés*.
 - **Másolás**: a másolat az eredeti alá kerül.
 - **+ Mappa**: a változatok csoportosítása. Az **Áthelyezés** bármely mappa vagy változat alá, illetve a legfelső szintre visz.
@@ -461,9 +465,9 @@ A felső sáv **⋯** (Menü) gombja → **Projekt: mentés, megosztás, nyomtat
 
 <br clear="right">
 
-## 16. Látványterv ChatGPT-vel
+## 16. Látványterv (3D és ChatGPT)
 
-<img src="img/17-chatgpt.png" width="280" align="right" alt="Látványterv ChatGPT-nek">
+<img src="img/18-latvanyterv-3d.png" width="280" align="right" alt="3D látványterv a tervből">
 
 A **Látványterv** ablakban kétféle látványterv készülhet:
 
