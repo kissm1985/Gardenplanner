@@ -16,6 +16,8 @@ export interface AreaInput {
   fixtures?: Fixture[];
   /** Round (ellipse inscribed in width × length; a circle when they are equal). */
   round?: boolean;
+  /** Free outline (polygon inside width × length, cm from the top-left corner). */
+  outline?: Pt[];
 }
 
 export function makeArea(input: AreaInput): Area {
@@ -31,7 +33,7 @@ export function makeArea(input: AreaInput): Area {
     ...(input.soil ? { soil: input.soil } : {}),
     ...(input.kind ? { kind: input.kind } : {}),
     notes: input.notes,
-    shape: input.round ? { kind: 'ellipse' } : { kind: 'rect' },
+    shape: input.outline ? { kind: 'polygon', points: input.outline } : input.round ? { kind: 'ellipse' } : { kind: 'rect' },
     constraints: { ...DEFAULT_CONSTRAINTS, ...input.constraints, speciesLimits: { ...input.constraints?.speciesLimits } },
     fixtures: input.fixtures ?? [],
     variants: [{ id: variantId, name: t('A terv', 'Plan A'), items: [], notes: '' }],

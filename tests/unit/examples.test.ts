@@ -11,9 +11,9 @@ import { addExampleArea } from '../../src/store/exampleActions';
 import { EXAMPLE_NAME_PAIRS } from '../../src/data/exampleNames';
 
 describe('example plans', () => {
-  it('ten distinct, planted examples', () => {
-    expect(EXAMPLE_PLANS).toHaveLength(10);
-    expect(new Set(EXAMPLE_PLANS.map((e) => e.key)).size).toBe(10);
+  it('eleven distinct, planted examples', () => {
+    expect(EXAMPLE_PLANS).toHaveLength(11);
+    expect(new Set(EXAMPLE_PLANS.map((e) => e.key)).size).toBe(11);
     for (const ex of EXAMPLE_PLANS) {
       const a = buildExample(ex);
       const n = a.variants[0].items.reduce((s, it) => s + itemCount(it), 0);
@@ -37,7 +37,7 @@ describe('example plans', () => {
 
   it('use built-in species only and pass the backup check', () => {
     const codes = new Set(SEED_PLANTS.map((p) => p.code));
-    const areas = EXAMPLE_PLANS.map(buildExample);
+    const areas = EXAMPLE_PLANS.map((ex) => buildExample(ex));
     for (const a of areas) for (const c of exampleCodes(a)) expect(codes.has(c), c).toBe(true);
     expect(() => validateProject({ id: 'p', name: 'x', areas, plantDb: SEED_PLANTS, settings: DEFAULT_SETTINGS })).not.toThrow();
   });
@@ -74,6 +74,21 @@ describe('adding an example', () => {
   it('the round example is round', () => {
     addExampleArea('pollinator');
     expect(useProject.getState().project!.areas[0].shape.kind).toBe('ellipse');
+  });
+
+  it('the curving example has a free outline', () => {
+    addExampleArea('curving');
+    const a = useProject.getState().project!.areas[0];
+    expect(a.shape.kind).toBe('polygon');
+    expect(a.shape.kind === 'polygon' && a.shape.points.length).toBeGreaterThan(20);
+  });
+
+  it('stable ids: the same example gives the same item ids every time', () => {
+    const ex = EXAMPLE_PLANS.find((e) => e.key === 'modern')!;
+    const ids = (a: ReturnType<typeof buildExample>) => a.variants[0].items.map((it) => it.id);
+    expect(ids(buildExample(ex, { stableIds: true }))).toEqual(ids(buildExample(ex, { stableIds: true })));
+    expect(ids(buildExample(ex, { stableIds: true }))[0]).toBe('modern-1');
+    expect(ids(buildExample(ex))).not.toEqual(ids(buildExample(ex)));
   });
 });
 

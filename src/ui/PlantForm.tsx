@@ -2,6 +2,7 @@ import { useRef, useState, type FormEvent, type ReactNode } from 'react';
 import { JUGLONE_LABEL, MONTHS, plantName, SOIL_LABEL, SOILS, SUN_LABEL, TOXIC_LABEL, validatePlant, WATER_LABEL, FIELD_LABEL } from '../model/plants';
 import type { JugloneTolerance, Plant, Soil, SunNeed, Toxicity, WaterNeed } from '../model/types';
 import { usePlantPhoto } from './plantPhoto';
+import { useShowPrices } from '../model/prices';
 import { useProject } from '../store/projectStore';
 import { PICTOGRAM_CODES } from './pictograms';
 import { PlantIcon } from './PlantIcon';
@@ -18,6 +19,7 @@ interface Props {
 }
 
 export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete, onCancel }: Props) {
+  const prices = useShowPrices();
   const [p, setP] = useState<Plant>(initial);
   const [errors, setErrors] = useState<string[]>([]);
   const set = <K extends keyof Plant>(k: K, v: Plant[K]) => setP((x) => ({ ...x, [k]: v }));
@@ -158,21 +160,23 @@ export function PlantForm({ initial, others, usedCount, isNew, onSave, onDelete,
           <L k="pot">{t('Kiszerelés', 'Pot size')}</L>
           <input value={p.pot} onChange={(e) => set('pot', e.target.value)} placeholder={t('pl. P9, 1–2 l', 'e.g. P9, 1–2 l')} />
         </label>
-        <Num label={<L k="unitPriceHuf">{t('Irányár (Ft)', 'Guide price (HUF)')}</L>} v={p.unitPriceHuf} on={(v) => set('unitPriceHuf', v)} />
+        {prices && <Num label={<L k="unitPriceHuf">{t('Irányár (Ft)', 'Guide price (HUF)')}</L>} v={p.unitPriceHuf} on={(v) => set('unitPriceHuf', v)} />}
       </div>
-      <div className="field-row">
-        <Sel
-          label={<span className="lbl">{t('Ár forrása', 'Price source')}</span>}
-          v={p.priceSource ?? 'estimate'}
-          opts={{ shop: t('bolti átlagár', 'typical retail price'), estimate: t('becslés', 'estimate') }}
-          on={(v) => set('priceSource', v as 'shop' | 'estimate')}
-        />
-        <label className="field">
-          <span className="lbl">{t('Ár dátuma', 'Price date')}</span>
-          <input type="month" value={p.priceDate ?? ''} onChange={(e) => set('priceDate', e.target.value || undefined)} />
-        </label>
-      </div>
-      {p.nurseryPrice != null && (
+      {prices && (
+        <div className="field-row">
+          <Sel
+            label={<span className="lbl">{t('Ár forrása', 'Price source')}</span>}
+            v={p.priceSource ?? 'estimate'}
+            opts={{ shop: t('bolti átlagár', 'typical retail price'), estimate: t('becslés', 'estimate') }}
+            on={(v) => set('priceSource', v as 'shop' | 'estimate')}
+          />
+          <label className="field">
+            <span className="lbl">{t('Ár dátuma', 'Price date')}</span>
+            <input type="month" value={p.priceDate ?? ''} onChange={(e) => set('priceDate', e.target.value || undefined)} />
+          </label>
+        </div>
+      )}
+      {prices && p.nurseryPrice != null && (
         <p className="mono muted">
           {t(`A kertészet ára: ${p.nurseryPrice} Ft (a katalógusból, ez érvényes a listában).`, `Nursery price: ${p.nurseryPrice} HUF (from the catalogue; used in the list).`)}
         </p>

@@ -1,6 +1,7 @@
 import { useMemo, useState, type ReactNode } from 'react';
 import { StaticPlan } from '../canvas/StaticPlan';
 import { fmtFt, fmtInt } from '../engine/bom';
+import { useShowPrices } from '../model/prices';
 import { compareVariants, type VariantStats } from '../engine/compare';
 import { MONTH_LABEL, SEASON_LABEL, SEASON_MONTH, seasonOf, type Season } from '../engine/season';
 import type { Area } from '../model/types';
@@ -100,6 +101,7 @@ export function CompareView({ area }: { area: Area }) {
 }
 
 function Column({ stats, other, area, month, picker, chosen }: { stats: VariantStats; other: VariantStats; area: Area; month: number; picker: ReactNode; chosen: boolean }) {
+  const prices = useShowPrices();
   const project = useProject((s) => s.project)!;
   const diff = (x: number, y: number, unit = '') => (x === y ? '' : ` (${x > y ? '+' : '−'}${fmtInt(Math.abs(x - y))}${unit})`);
   return (
@@ -130,11 +132,13 @@ function Column({ stats, other, area, month, picker, chosen }: { stats: VariantS
           {stats.bom.planted}
           <small>{diff(stats.bom.planted, other.bom.planted)}</small>
         </dd>
-        <dt>{t('Költség', 'Cost')}</dt>
-        <dd>
-          {fmtFt(stats.bom.total)}
-          <small>{diff(stats.bom.total, other.bom.total, t(' Ft', ' HUF'))}</small>
-        </dd>
+        {prices && <dt>{t('Költség', 'Cost')}</dt>}
+        {prices && (
+          <dd>
+            {fmtFt(stats.bom.total)}
+            <small>{diff(stats.bom.total, other.bom.total, t(' Ft', ' HUF'))}</small>
+          </dd>
+        )}
         <dt>{t('Figyelm.', 'Warnings')}</dt>
         <dd className={stats.errors ? 'warn-text' : ''}>
           {stats.warnings.length}

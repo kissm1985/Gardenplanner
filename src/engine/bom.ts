@@ -1,4 +1,5 @@
 // Bill of materials (SPEC §4.6): planted and order quantities, prices, per area and overall.
+import { getShowPrices } from '../model/prices';
 import { byPlantName, JUGLONE_LABEL, plantName, WATER_LABEL, plantPrice, priceKind } from '../model/plants';
 import type { Area, ItemStatus, PlacedItem, Plant, Project } from '../model/types';
 import { itemCount } from './fill';
@@ -110,8 +111,8 @@ export const fmtFt = (n: number) => t(`${fmtInt(n)} Ft`, `${fmtInt(n)} HUF`);
 
 type Cell = string | number;
 
-/** Header + rows + total row; numbers stay numbers (for XLSX), text for the rest. */
-export function bomTable(b: Bom): Cell[][] {
+/** Header + rows + total row; numbers stay numbers (for XLSX), text for the rest. Price columns only when prices are shown. */
+export function bomTable(b: Bom, prices = getShowPrices()): Cell[][] {
   const perArea = b.areas.length > 1;
   const head: Cell[] = [
     t('Kód', 'Code'),
@@ -125,9 +126,7 @@ export function bomTable(b: Bom): Cell[][] {
     t('Tőtáv (cm)', 'Spacing (cm)'),
     t('Vízigény', 'Water'),
     'Juglone',
-    t('Egységár (Ft)', 'Unit price (HUF)'),
-    t('Ár forrása', 'Price source'),
-    t('Részösszeg (Ft)', 'Subtotal (HUF)'),
+    ...(prices ? [t('Egységár (Ft)', 'Unit price (HUF)'), t('Ár forrása', 'Price source'), t('Részösszeg (Ft)', 'Subtotal (HUF)')] : []),
   ];
   const rows: Cell[][] = b.rows.map((r) => [
     r.plant.code,
@@ -141,11 +140,17 @@ export function bomTable(b: Bom): Cell[][] {
     r.plant.spacingCm,
     WATER_LABEL[r.plant.water],
     JUGLONE_LABEL[r.plant.juglone],
-    plantPrice(r.plant) || '',
-    { nursery: t('kertészet ára', 'nursery price'), shop: t('irányár (bolti átlag)', 'guide price (retail average)'), estimate: t('irányár (becslés)', 'guide price (estimate)') }[
-      priceKind(r.plant)
-    ],
-    r.subtotal,
+    ...(prices
+      ? [
+          plantPrice(r.plant) || '',
+          {
+            nursery: t('kertészet ára', 'nursery price'),
+            shop: t('irányár (bolti átlag)', 'guide price (retail average)'),
+            estimate: t('irányár (becslés)', 'guide price (estimate)'),
+          }[priceKind(r.plant)],
+          r.subtotal,
+        ]
+      : []),
   ]);
   const total: Cell[] = [
     '',
@@ -159,9 +164,7 @@ export function bomTable(b: Bom): Cell[][] {
     '',
     '',
     '',
-    '',
-    '',
-    b.total,
+    ...(prices ? ['', '', b.total] : []),
   ];
   return [head, ...rows, total];
 }
@@ -188,13 +191,13 @@ export const toHtmlTable = (t: Cell[][]) =>
   `<table>${t.map((r, i) => `<tr>${r.map((c) => (i === 0 ? `<th>${escHtml(String(c))}</th>` : `<td>${escHtml(String(c))}</td>`)).join('')}</tr>`).join('')}</table>`;
 
 /** Readable shopping list for messages / notes. */
-export function toText(b: Bom, title: string): string {
+export function toText(b: Bom, title: string, prices = getShowPrices()): string {
   const lines = [
     t(`${title} – növénylista (rendelés +${b.reservePct}% tartalékkal, fák tartalék nélkül)`, `${title} – plant list (order +${b.reservePct}% spare, trees without spare)`),
     '',
   ];
   for (const r of b.rows) {
-    const up = plantPrice(r.plant);
+    const up = prices ? plantPrice(r.plant) : 0;
     const price = up ? t(` – ${fmtFt(up)}/db – ${fmtFt(r.subtotal)}`, ` – ${fmtFt(up)} each – ${fmtFt(r.subtotal)}`) : '';
     lines.push(
       t(
@@ -203,8 +206,13 @@ export function toText(b: Bom, title: string): string {
       ),
     );
   }
-  lines.push('', t(`Összesen: ${b.planted} tő, rendelés ${b.order} db, kb. ${fmtFt(b.total)}`, `Total: ${b.planted} plants, order ${b.order}, about ${fmtFt(b.total)}`));
-  if (b.estimated)
+  lines.push(
+    '',
+    prices
+      ? t(`Összesen: ${b.planted} tő, rendelés ${b.order} db, kb. ${fmtFt(b.total)}`, `Total: ${b.planted} plants, order ${b.order}, about ${fmtFt(b.total)}`)
+      : t(`Összesen: ${b.planted} tő, rendelés ${b.order} db`, `Total: ${b.planted} plants, order ${b.order}`),
+  );
+  if (prices && b.estimated)
     lines.push(t(`${b.estimated} tétel ára becslés – vásárlás előtt kérj pontos árat.`, `${b.estimated} prices are estimates – ask for exact prices before buying.`));
   return lines.join('\n');
 }

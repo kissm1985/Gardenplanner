@@ -35,6 +35,16 @@ jobs:
         run: npx playwright install --with-deps chromium
       - name: End-to-end tests (Pixel 7 profile)
         run: npx playwright test
+      # Spec v0.2 F1: every example plan rendered in 3D and checked plant by plant (dist is already built).
+      - name: 3D render verification (verify:render)
+        run: npx tsx scripts/verify-render.ts
+      - name: Keep the verify:render output (renders, manifests, test reports)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: verify-render
+          path: out
+          retention-days: 30
       - name: Keep the Playwright report on failure
         if: failure()
         uses: actions/upload-artifact@v4

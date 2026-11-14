@@ -8,3 +8,5 @@ playwright-report
 public/third-party-licenses.txt
 # Local backend database (npm run server)
 planterra.db*
+# verify:render output (renders, manifests, test reports)
+out

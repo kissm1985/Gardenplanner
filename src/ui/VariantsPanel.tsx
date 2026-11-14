@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { FeatureButton, requireFeature } from './Locked';
 import { fmtFt } from '../engine/bom';
+import { useShowPrices } from '../model/prices';
 import { variantStats } from '../engine/compare';
 import { moveTargets, variantCount, variantTree, type TreeNode } from '../model/variantTree';
 import type { Area } from '../model/types';
@@ -76,6 +77,7 @@ export function VariantsPanel({ onDone, onIdeas, onReplace, onVisual }: { onDone
 }
 
 function Node({ n, area, stats, onDone }: { n: TreeNode; area: Area; stats: Map<string, Stats>; onDone: () => void }) {
+  const prices = useShowPrices();
   const collapsed = useUi((s) => s.collapsed.includes(n.id));
   const toggle = useUi((s) => s.toggleCollapsed);
   const [mode, setMode] = useState<null | 'rename' | 'move'>(null);
@@ -211,7 +213,8 @@ function Node({ n, area, stats, onDone }: { n: TreeNode; area: Area; stats: Map<
         </div>
         {s && (
           <span className="mono muted">
-            {t(`${s.bom.planted} tő`, `${s.bom.planted} plants`)} · {fmtFt(s.bom.total)} · {t(`${s.warnings.length} figyelmeztetés`, `${s.warnings.length} warnings`)}
+            {t(`${s.bom.planted} tő`, `${s.bom.planted} plants`)} · {prices ? `${fmtFt(s.bom.total)} · ` : ''}
+            {t(`${s.warnings.length} figyelmeztetés`, `${s.warnings.length} warnings`)}
             {s.errors ? t(` (${s.errors} hiba)`, ` (${s.errors} errors)`) : ''}
             {v.renders?.length ? ` · 🖼 ${v.renders.length}` : ''}
             {hidden && <> · </>}

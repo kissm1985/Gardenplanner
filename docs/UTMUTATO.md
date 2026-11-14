@@ -42,7 +42,7 @@ Az alkalmazás minden indításkor a **kezdőoldallal** nyílik, és a felső s�
 
 1. **+ Új terület létrehozása**: üres területtel kezdesz; azonnal megnyílik az űrlap (név, méret, fekvés, napsütés; téglalap, kör vagy a rajzon körberajzolt szabad alak, lásd [3. fejezet](#3-területek)).
 2. **Területeid** (a projektlista alatt): a már megtervezett területek kártyákon, a rajzon lévő terv kis képével, mérettel és tőszámmal, vízszintesen lapozható sávban. Koppintásra megnyílik.
-3. **Példatervek**: tíz kész, beültetett terv ötletnek, kis rajzzal: *Mediterrán kert, Kastélykert, Vidéki udvar, Alpesi sziklakert, Angolkert, Japánkert, Prérikert, Árnyékkert, Modern városi kert, Kerek pillangókert*. Koppintásra új területként kerül a projektedbe a beültetett **A tervvel** és a tervezési jegyzettel; ezután szabadon átalakíthatod, lemásolhatod, ötletet generálhatsz hozzá. Csak a beépített fajokat használják, ajánlott tőtávval; ha egy fajt korábban törölted az adatbázisból, visszakerül.
+3. **Példatervek**: tizenegy kész, beültetett terv ötletnek, kis rajzzal: *Mediterrán kert, Kastélykert, Vidéki udvar, Alpesi sziklakert, Angolkert, Japánkert, Prérikert, Árnyékkert, Modern városi kert, Kerek pillangókert, Kanyargó előkerti ágyás* (ez utóbbi szabad alakú). Koppintásra új területként kerül a projektedbe a beültetett **A tervvel** és a tervezési jegyzettel; ezután szabadon átalakíthatod, lemásolhatod, ötletet generálhatsz hozzá. Csak a beépített fajokat használják, ajánlott tőtávval; ha egy fajt korábban törölted az adatbázisból, visszakerül.
 4. **Sablonok** (üres, csak a terület adataival és elemeivel):
    - **Házoldali sáv**: 120 × 1200 cm-es kavicsos sáv a ház fala és a járda között, legfeljebb 50 cm magas növényekkel;
    - **Gyepsávos kert**: 500 × 1200 cm, ívelt gyepsáv a közepén, ágyások két oldalt, diófával a szomszédban.
@@ -416,7 +416,7 @@ A **Lista** eszköz azt a tervet összesíti, **amelyik a rajzon látszik** (ez 
 
 - **Ültetés**: hány tő kerül a földbe.
 - **Rendelés**: hány darabot rendelj, **tartalékkal**. A tartalék %-a állítható; a fák nem kapnak tartalékot.
-- **Becsült költség**: a „becsl.” jelölésű árak becslések, a „bolt” jelölésűek valós ajánlatból származnak.
+- **Becsült költség**: alapból rejtve. Az árakat a *Menü → Nézet és rétegek → Árak megjelenítése* kapcsolja be; ekkor a lista, az összesítés, az exportok és a nyomtatás is mutatja őket. A „becsl.” jelölésű árak becslések, a „bolt” jelölésűek valós ajánlatból származnak. A beállítást a böngésző megjegyzi.
 - **Szűrés**: *Összesítve* vagy területenként; állapot szerint (*kell, megrendelve, megvan, beültetve*).
 - **Állapot**: a táblázatban fajonként egyszerre állítható.
 - **Másolás szövegként**: üzenetbe, e-mailbe.
@@ -465,7 +465,10 @@ A felső sáv **⋯** (Menü) gombja → **Projekt: mentés, megosztás, nyomtat
 
 <img src="img/17-chatgpt.png" width="280" align="right" alt="Látványterv ChatGPT-nek">
 
-A program elkészít egy részletes leírást és egy rajzot, amiből egy képgeneráló mesterséges intelligencia (pl. ChatGPT) valósághű látványtervet tud rajzolni.
+A **Látványterv** ablakban kétféle látványterv készülhet:
+
+- **3D látványterv a tervből**: a **Látványterv készítése** gomb a rajzon látható változatot légi nézetben, a terv adataiból számolva rajzolja meg (nem fotó, nem MI-kép): minden növény a helyén, fajonként saját formával (lombos fa, tűlevelű, díszfű, virágfüzér, párna, bokor) és színnel, kerítéssel a terület szélén, méretvonalakkal és címblokkal. Szabad alakú területen is működik. Letölthető **PNG**-ben (2400 px széles), **PDF**-ben (A4 fekvő: a kép, a fajok összesítése és a teljes növénylista azonosítóval, fajjal és koordinátával), és **manifest.json**-ként (növényenként azonosító, faj, előírt és ténylegesen létrehozott pozíció). Telefonon is működik, internet nélkül is.
+- **Látványterv ChatGPT-vel**: a program részletes leírást és rajzot készít, amiből egy képgeneráló mesterséges intelligencia valósághű képet tud rajzolni (lásd lent).
 
 **Megnyitás**: a **Változatok** ablak **🖼 Látványterv** gombjával, vagy a **⋯ Projekt → Látványterv megnyitása** gombbal. A rajzon éppen szerkesztett változatról készül.
 
@@ -476,6 +479,8 @@ A program elkészít egy részletes leírást és egy rajzot, amiből egy képge
    - **telefonon** megnyílik a megosztó menü: válaszd a ChatGPT-t, és a leírás a rajzzal együtt érkezik (a leírás a vágólapra is kerül, ha az app csak a képet venné át);
    - **számítógépen** a leírás a vágólapra kerül, a rajz letöltődik, és új lapon megnyílik a chatgpt.com: illeszd be a szöveget, és húzd mellé a képet.
 5. A **Leírás másolása** és a **Rajz PNG-ben** gomb külön is elvégzi a két lépést.
+
+A leírás szerkezete: **1. szerep és cél**, **2. telek** (körvonal-koordináták, méretek, tájolás, kerítés, burkolatok), **3. növénytábla** (minden növény egy sor: azonosító, faj, x és y méterben, magasság, szélesség – ugyanazok az azonosítók, mint a 3D látványterv manifestjében), **4. fajok** (kinézet az évszakban, foltok és sorok), **5. stílus**, **6. kamera és fény**, **7. tiltások** (ne adjon hozzá és ne hagyjon el növényt), **8. ellenőrzés** (a jóváhagyott ellenőrző blokk, a terv tényleges növényszámával). A képgenerálás koordinátát nem mér, ezért ott az ellenőrzés eredménye kódfuttatás nélkül „NEM IGAZOLT”; a valódi ellenőrzést a 3D látványterv végzi.
 
 A leírásban benne vannak a méretek, az elemek, minden folt helye méterben, minden faj színe, formája, magassága az adott évszakban, és a kamerából látható növények és elemek előtér, középtér és háttér szerint (balra, középen, jobbra). A PNG-n a kamera és a látómező is látszik.
 

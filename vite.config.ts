@@ -67,7 +67,7 @@ export default defineConfig({
   build: {
     target: ['es2020', 'safari15'],
     // The nursery catalogue admin (Pro) is its own page.
-    rollupOptions: { input: { main: 'index.html', admin: 'admin.html' } },
+    rollupOptions: { input: { main: 'index.html', admin: 'admin.html', render: 'render.html' } },
     assetsInlineLimit: (file: string) => (file.includes('/pictograms/') ? false : undefined),
   },
   plugins: [
@@ -96,7 +96,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,ttf}'],
+        // The PDF font (DejaVu Sans, ~1.4 MB for both weights) is cached too, so the PDF works offline.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/admin\.html/, /\/api\//],
       },

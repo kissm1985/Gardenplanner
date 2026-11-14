@@ -1,3 +1,4 @@
+import { Render3DPanel } from './Render3DPanel';
 import { useEffect, useRef, useState } from 'react';
 import { track } from '../engine/analytics';
 import { bomFromEntries } from '../engine/bom';
@@ -179,6 +180,7 @@ export function VisualPanel({ onPickCamera }: { onPickCamera: () => void }) {
 
   return (
     <div className="form visual-panel">
+      <Render3DPanel />
       <p className="mono muted">
         {t(
           `A(z) „${localName(area.name)}” terület „${localName(v.name)}” változatáról készül leírás és rajz a ChatGPT-nek. A kész képet töltsd vissza ide: a változat mellett marad, és az összehasonlításban is látszik.`,

@@ -42,7 +42,7 @@ The app opens with the **start page** every time, and the **Planterra logo** at 
 
 1. **+ Create a new area**: start with an empty area; the form opens at once (name, size, facing, sun; a rectangle, a circle or a free shape drawn on the plan, see [chapter 3](#3-areas)).
 2. **Your areas** (below the project list): the areas already planned, as cards with a small drawing of the plan on screen, size and plant count, in a row you can swipe. Tap one to open it.
-3. **Example plans**: ten finished, planted plans for inspiration, each with a small drawing: *Mediterranean garden, Château garden, Country yard, Alpine rock garden, English garden, Japanese garden, Prairie garden, Shade garden, Modern city garden, Round pollinator garden*. Tap one and it is added to your project as a new area with its planted **Plan A** and design notes; then change, copy or generate ideas for it freely. They use built-in species only, at the recommended spacing; a species you deleted from the database comes back.
+3. **Example plans**: eleven finished, planted plans for inspiration, each with a small drawing: *Mediterranean garden, Château garden, Country yard, Alpine rock garden, English garden, Japanese garden, Prairie garden, Shade garden, Modern city garden, Round pollinator garden, Curving front-garden bed* (the last one has a free shape). Tap one and it is added to your project as a new area with its planted **Plan A** and design notes; then change, copy or generate ideas for it freely. They use built-in species only, at the recommended spacing; a species you deleted from the database comes back.
 4. **Templates** (empty, only the area's data and elements):
    - **House-side strip**: a 120 × 1200 cm gravel strip between the house wall and the pavement, for plants up to 50 cm;
    - **Garden with lawn strip**: 500 × 1200 cm, a curved lawn strip in the middle, beds on both sides, a walnut tree next door.
@@ -416,7 +416,7 @@ The **List** tool totals **the plan on screen** (which is also the chosen varian
 
 - **Planting**: how many plants go in the ground.
 - **Order**: how many to order, with a **spare**. The spare % can be set; trees get none.
-- **Estimated cost**: prices marked “est.” are estimates, those marked “shop” come from real offers. Prices are in HUF.
+- **Estimated cost**: hidden by default. Switch prices on in *Menu → View and layers → Show prices*; then the list, the totals, the exports and the print show them. Prices marked “est.” are estimates, “shop” ones come from real offers. The browser remembers the setting.
 - **Filter**: *Combined* or per area; by status (*needed, ordered, have it, planted*).
 - **Status**: can be set for a whole species at once in the table.
 - **Copy as text**: for messages and e-mail.
@@ -465,7 +465,10 @@ The **⋯** (Menu) button in the top bar → **Project: save, share, print**:
 
 <img src="img/en/17-chatgpt.png" width="280" align="right" alt="Visualisation with ChatGPT">
 
-The app writes a detailed description and a plan from which an image AI (e.g. ChatGPT) can draw a realistic visualisation.
+The **Visualisation** window makes two kinds of visualisation:
+
+- **3D visualisation from the plan**: **Make the visualisation** draws the variant on the plan as an aerial view computed from the plan data (not a photo, not an AI image): every plant in its place, each species with its own form (tree, conifer, grass, flower spike, cushion, shrub) and colour, a fence along the edge, dimension lines and a title block. It works for free-shape areas too. Download it as **PNG** (2400 px wide), **PDF** (A4 landscape: the image, the species summary and the full plant list with id, species and coordinates) and **manifest.json** (per plant: id, species, required and actually created position). It works on phones and offline.
+- **Visualisation with ChatGPT**: the app writes a detailed description and a plan from which an image AI can draw a realistic picture (see below).
 
 **Opening it**: the **🖼 Visualisation** button in the **Variants** window, or **⋯ Project → Open visualisation**. It is made for the variant being edited on the plan.
 
@@ -476,6 +479,8 @@ The app writes a detailed description and a plan from which an image AI (e.g. Ch
    - **on a phone** the share sheet opens: pick ChatGPT and the description arrives with the plan (the description also goes to the clipboard, in case the app only takes the picture);
    - **on a computer** the description goes to the clipboard, the plan downloads and chatgpt.com opens in a new tab: paste the text and drop the image next to it.
 5. **Copy description** and **Plan as PNG** do the two steps separately too.
+
+The description has these parts: **1. role and goal**, **2. site** (outline coordinates, size, aspect, fence, paving), **3. plant table** (one row per plant: id, species, x and y in metres, height, spread – the same ids as in the 3D manifest), **4. species** (look in the season, drifts and rows), **5. style**, **6. camera and light**, **7. do not** (no plants added or left out), **8. verification** (the approved verification block, with the plan's real plant count). An image generator measures no coordinates, so there the verification is “NOT VERIFIED” without running code; the 3D visualisation does the real check.
 
 The description has the sizes, the elements, every drift’s position in metres, each species’ colour, form and height in that season, and what the camera sees as foreground, middle ground and background (left, centre, right). The PNG shows the camera and its view cone too.
 

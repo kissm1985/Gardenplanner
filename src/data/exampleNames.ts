@@ -12,6 +12,7 @@ export const EXAMPLE_NAME_PAIRS: [string, string][] = [
   ['Árnyékkert', 'Shade garden'],
   ['Modern városi kert', 'Modern city garden'],
   ['Kerek pillangókert', 'Round pollinator garden'],
+  ['Kanyargó előkerti ágyás', 'Curving front-garden bed'],
   ['Terasz', 'Terrace'],
   ['Kavicsos út', 'Gravel path'],
   ['Agyagkorsó', 'Terracotta urn'],

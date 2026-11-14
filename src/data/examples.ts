@@ -46,11 +46,23 @@ export function sector(cx: number, cy: number, r0: number, r1_: number, a0: numb
   return [...arc(r1_, a0, a1), ...arc(r0, a1, a0)];
 }
 
+/** Front edge of the curving bed (example 11): from 650 cm at the left to 300 cm at the right, with a wave. */
+export const curvingEdge = (x: number) => 650 - (x / 900) * 350 + 40 * Math.sin((x / 900) * Math.PI * 3);
+
+/** Outline of the curving bed: straight back and side edges, the wavy front edge sampled every 30 cm. */
+function curvingOutline(): Pt[] {
+  const front = Array.from({ length: 31 }, (_, i) => {
+    const x = 900 - i * 30;
+    return [x, curvingEdge(x)] as Pt;
+  });
+  return rp([[0, 0], [900, 0], ...front]);
+}
+
 /** Closed rectangle outline as a path (for a clipped hedge around a bed). */
 const loop = (x: number, y: number, w: number, h: number): Pt[] => [...rect(x, y, w, h), [x, y]];
 
 // ---------- planting helpers ----------
-function planter() {
+function planter(newId: () => string = () => uid('i')) {
   const items: PlacedItem[] = [];
   const spacing = (code: string) => {
     const p = SEED.get(code);
@@ -61,15 +73,15 @@ function planter() {
     items,
     drift(code: string, poly: Pt[], pattern: Pattern = 'staggered', spacingCm = spacing(code)) {
       const polygon = rp(poly);
-      items.push({ kind: 'drift', id: uid('i'), plantId: code, polygon, pattern, spacingCm, count: fillPolygon(polygon, spacingCm, pattern).length, status: 'needed' });
+      items.push({ kind: 'drift', id: newId(), plantId: code, polygon, pattern, spacingCm, count: fillPolygon(polygon, spacingCm, pattern).length, status: 'needed' });
     },
     row(code: string, path: Pt[], spacingCm = spacing(code)) {
       const p = rp(path);
-      items.push({ kind: 'row', id: uid('i'), plantId: code, path: p, spacingCm, count: fillPath(p, spacingCm).length, status: 'needed' });
+      items.push({ kind: 'row', id: newId(), plantId: code, path: p, spacingCm, count: fillPath(p, spacingCm).length, status: 'needed' });
     },
     one(code: string, x: number, y: number) {
       spacing(code);
-      items.push({ kind: 'plant', id: uid('i'), plantId: code, x: r1(x), y: r1(y), status: 'needed' });
+      items.push({ kind: 'plant', id: newId(), plantId: code, x: r1(x), y: r1(y), status: 'needed' });
     },
   };
 }
@@ -565,12 +577,61 @@ export const EXAMPLE_PLANS: ExamplePlan[] = [
       'Eight nectar-rich wedges in alternating colours, with thyme in the inner ring. The order keeps something in flower from spring to autumn.',
     ],
   },
+
+  // 11 ─ Free-shape front-garden bed: straight back edge along the fence, a curving front edge to the lawn.
+  {
+    key: 'curving',
+    name: ['Kanyargó előkerti ágyás', 'Curving front-garden bed'],
+    blurb: ['Szabad alakú ágyás hullámzó szegéllyel', 'A free-shape bed with a wavy edge'],
+    accent: '#b5843c',
+    area: () => ({
+      name: L('Kanyargó előkerti ágyás', 'Curving front-garden bed'),
+      widthCm: 900,
+      lengthCm: 700,
+      outline: curvingOutline(),
+      orientation: 'S',
+      sunUntil: L('egész nap', 'all day'),
+      sunLevel: 'sun',
+      soil: 'loam',
+      kind: 'border',
+      notes: L(
+        'Szabad alakú előkerti ágyás: a hátsó, egyenes szél a kerítés mentén fut, az elülső szegély hullámzik a gyep felé.',
+        'A free-shape front-garden bed: the straight back edge runs along the fence, the front edge curves towards the lawn.',
+      ),
+      fixtures: [fx('fence', L('Kerítés', 'Fence'), 0, -10, 900, 10)],
+    }),
+    plant: (p) => {
+      p.one('BX', 60, 60);
+      p.one('BX', 840, 60);
+      p.drift('MI', blob(250, 115, 150, 60, 0.1, 18, 0.4));
+      p.drift('PN', blob(620, 110, 170, 60, 0.1, 18, 1.1));
+      p.drift('EC', blob(170, 320, 110, 70, 0.12, 18, 0.7));
+      p.drift('RU', blob(420, 280, 110, 60, 0.12, 18, 2.1));
+      p.drift('SA', blob(690, 225, 100, 45, 0.12, 18, 1.6));
+      p.drift('NE', blob(130, 500, 80, 50, 0.1, 18, 0.3));
+      p.row(
+        'LA',
+        Array.from({ length: 17 }, (_, i) => {
+          const x = 70 + i * 45;
+          return [x, curvingEdge(x) - 55] as Pt;
+        }),
+      );
+    },
+    notes: [
+      'Hátul magas díszfüvek, középen évelőfoltok, elöl a hullámzó szegélyt levendulasor kíséri. Két puszpánggömb keretezi a kerítés sarkait.',
+      'Tall grasses at the back, perennial drifts in the middle, a lavender row following the wavy front edge. Two box balls frame the fence corners.',
+    ],
+  },
 ];
 
-/** A new area for the example, with its planted "Plan A" and design notes. */
-export function buildExample(ex: ExamplePlan): Area {
+/**
+ * A new area for the example, with its planted "Plan A" and design notes. With stableIds the plantings get fixed ids
+ * (`<key>-1`, `<key>-2`, …) so renders, manifests and test reports name the same plants on every run.
+ */
+export function buildExample(ex: ExamplePlan, opts: { stableIds?: boolean } = {}): Area {
   const area = makeArea(ex.area());
-  const p = planter();
+  let n = 0;
+  const p = planter(opts.stableIds ? () => `${ex.key}-${++n}` : undefined);
   ex.plant(p);
   const items = p.items.filter((it) => it.kind !== 'drift' || it.count > 0);
   return { ...area, variants: [{ ...area.variants[0], items, notes: t(...ex.notes) }] };

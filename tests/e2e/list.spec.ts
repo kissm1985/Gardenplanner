@@ -2,6 +2,8 @@ import { expect, test } from '@playwright/test';
 
 test('plant list: counts, reserve, copy as table, CSV and XLSX download', async ({ page, context }) => {
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  // Prices are hidden by default (spec v0.2 F3); this test checks the price columns, so it shows them.
+  await page.addInitScript(() => localStorage.setItem('kerttervezo.showPrices', '1'));
   await page.goto('/');
   await page.getByRole('button', { name: /Kezdés/ }).click();
   // 11 lavender in a straight row on the strip.

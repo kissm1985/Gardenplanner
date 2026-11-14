@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react';
 import { band, track } from '../engine/analytics';
 import { FeatureButton } from './Locked';
+import { useShowPrices } from '../model/prices';
 import { bomTable, buildBom, fmtFt, fmtInt, STATUSES, toCsv, toHtmlTable, toText, toTsv } from '../engine/bom';
 import { buildXlsx } from '../engine/xlsx';
 import { JUGLONE_LABEL, plantName, WATER_LABEL, plantPrice, priceKind } from '../model/plants';
@@ -32,7 +33,8 @@ export function ListView() {
 
   const areaIds = scope === 'all' ? project.areas.map((a) => a.id) : [scope];
   const bom = useMemo(() => buildBom(project, scope === 'all' ? project.areas.map((a) => a.id) : [scope], status), [project, scope, status]);
-  const table = useMemo(() => bomTable(bom), [bom]);
+  const prices = useShowPrices();
+  const table = useMemo(() => bomTable(bom, prices), [bom, prices]);
   const title = scope === 'all' ? localName(project.name) : localName(project.areas.find((a) => a.id === scope)?.name);
   const fileBase = `${t('novenylista', 'plant-list')}-${title
     .normalize('NFD')
@@ -57,13 +59,14 @@ export function ListView() {
   const xlsx = () => {
     track('export', { format: 'xlsx' });
     const sheets = [{ name: scope === 'all' ? t('Összesen', 'Total') : title, rows: table }];
-    if (scope === 'all' && project.areas.length > 1) for (const a of project.areas) sheets.push({ name: localName(a.name), rows: bomTable(buildBom(project, [a.id], status)) });
+    if (scope === 'all' && project.areas.length > 1)
+      for (const a of project.areas) sheets.push({ name: localName(a.name), rows: bomTable(buildBom(project, [a.id], status), prices) });
     downloadBlob(`${fileBase}.xlsx`, buildXlsx(sheets), 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
   };
 
   const canShare = typeof navigator !== 'undefined' && !!navigator.share;
   const share = async () => {
-    const text = toText(bom, title);
+    const text = toText(bom, title, prices);
     try {
       const file = new File(['﻿' + toCsv(table)], `${fileBase}.csv`, { type: 'text/csv' });
       if (navigator.canShare?.({ files: [file] })) await navigator.share({ title: t(`${title} – növénylista`, `${title} – plant list`), text, files: [file] });
@@ -133,21 +136,30 @@ export function ListView() {
             %
           </label>
         </div>
-        <div>
-          <span className="k">{t('Becsült költség', 'Estimated cost')}</span>
-          <span className="v">{fmtFt(bom.total)}</span>
-          <small className="mono muted price-note">
-            {t('Irányárak', 'Guide prices')}
-            {bom.priceDate ? ` (${bom.priceDate.replace('-', '. ')}.)` : ''}
-            {t(': a tényleges ár boltonként és kertészetenként eltér.', ': actual prices differ between shops and nurseries.')}
-          </small>
-          {bom.estimated > 0 && <small className="mono muted">{t(`${bom.estimated} tétel ára becslés`, `${bom.estimated} prices are estimates`)}</small>}
-          {bom.unpriced > 0 && <small className="mono warn-text">{t(`${bom.unpriced} tételnek nincs ára`, `${bom.unpriced} items have no price`)}</small>}
-        </div>
+        {prices && (
+          <div>
+            <span className="k">{t('Becsült költség', 'Estimated cost')}</span>
+            <span className="v">{fmtFt(bom.total)}</span>
+            <small className="mono muted price-note">
+              {t('Irányárak', 'Guide prices')}
+              {bom.priceDate ? ` (${bom.priceDate.replace('-', '. ')}.)` : ''}
+              {t(': a tényleges ár boltonként és kertészetenként eltér.', ': actual prices differ between shops and nurseries.')}
+            </small>
+            {bom.estimated > 0 && <small className="mono muted">{t(`${bom.estimated} tétel ára becslés`, `${bom.estimated} prices are estimates`)}</small>}
+            {bom.unpriced > 0 && <small className="mono warn-text">{t(`${bom.unpriced} tételnek nincs ára`, `${bom.unpriced} items have no price`)}</small>}
+          </div>
+        )}
+        {!prices && (
+          <div>
+            <small className="mono muted prices-off">
+              {t('Az árak rejtve vannak; bekapcsolás: Menü → Nézet és rétegek → Árak megjelenítése.', 'Prices are hidden; to show them: Menu → View and layers → Show prices.')}
+            </small>
+          </div>
+        )}
       </div>
 
       <div className="lv-tools">
-        <button type="button" className="btn btn-primary btn-small" onClick={() => doCopy(toText(bom, title), t('A lista', 'The list'))}>
+        <button type="button" className="btn btn-primary btn-small" onClick={() => doCopy(toText(bom, title, prices), t('A lista', 'The list'))}>
           {t('Másolás szövegként', 'Copy as text')}
         </button>
         <button type="button" className="btn btn-small" onClick={() => doCopy(toTsv(table), t('A táblázat', 'The table'), toHtmlTable(table))}>
@@ -200,8 +212,8 @@ export function ListView() {
                 <th className="m">{t('Tőtáv', 'Spacing')}</th>
                 <th>{t('Víz', 'Water')}</th>
                 <th>Juglone</th>
-                <th className="m">{t('Egységár', 'Unit price')}</th>
-                <th className="m">{t('Részösszeg', 'Subtotal')}</th>
+                {prices && <th className="m">{t('Egységár', 'Unit price')}</th>}
+                {prices && <th className="m">{t('Részösszeg', 'Subtotal')}</th>}
                 <th>{t('Státusz', 'Status')}</th>
               </tr>
             </thead>
@@ -233,13 +245,15 @@ export function ListView() {
                   <td className="m">{r.plant.spacingCm} cm</td>
                   <td>{WATER_LABEL[r.plant.water]}</td>
                   <td>{JUGLONE_LABEL[r.plant.juglone]}</td>
-                  <td className="m">
-                    {plantPrice(r.plant) ? fmtInt(plantPrice(r.plant)) : '–'}
-                    <span className={`tag${priceKind(r.plant) !== 'estimate' ? ' s' : ''}`}>
-                      {{ nursery: t('kertészet', 'nursery'), shop: t('irányár', 'guide'), estimate: t('becsl.', 'est.') }[priceKind(r.plant)]}
-                    </span>
-                  </td>
-                  <td className="m">{fmtInt(r.subtotal)}</td>
+                  {prices && (
+                    <td className="m">
+                      {plantPrice(r.plant) ? fmtInt(plantPrice(r.plant)) : '–'}
+                      <span className={`tag${priceKind(r.plant) !== 'estimate' ? ' s' : ''}`}>
+                        {{ nursery: t('kertészet', 'nursery'), shop: t('irányár', 'guide'), estimate: t('becsl.', 'est.') }[priceKind(r.plant)]}
+                      </span>
+                    </td>
+                  )}
+                  {prices && <td className="m">{fmtInt(r.subtotal)}</td>}
                   <td>
                     <StatusCell counts={r.byStatus} onSet={(s) => useProject.getState().setSpeciesStatus(r.plant.code, s, areaIds, status)} label={plantName(r.plant)} />
                   </td>
@@ -256,8 +270,8 @@ export function ListView() {
                 <td className="m">{bom.planted}</td>
                 <td className="m">{bom.order}</td>
                 <td colSpan={5} />
-                <td />
-                <td className="m">{fmtInt(bom.total)}</td>
+                {prices && <td />}
+                {prices && <td className="m">{fmtInt(bom.total)}</td>}
                 <td />
               </tr>
             </tbody>
@@ -269,7 +283,7 @@ export function ListView() {
         <span>
           {t('Tartalék szövegmező: ha a másolás gomb nem működik, jelöld ki és másold innen', 'Fallback text box: if the copy button does not work, select and copy from here')}
         </span>
-        <textarea ref={taRef} readOnly rows={6} value={fallback || toText(bom, title)} onFocus={(e) => e.currentTarget.select()} spellCheck={false} />
+        <textarea ref={taRef} readOnly rows={6} value={fallback || toText(bom, title, prices)} onFocus={(e) => e.currentTarget.select()} spellCheck={false} />
       </label>
       <p className="mono muted lv-note">
         {t(
