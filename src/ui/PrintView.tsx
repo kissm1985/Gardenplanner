@@ -10,7 +10,8 @@ import { areaSunLevel } from '../engine/rules';
 import type { Orientation } from './ProjectPanel';
 import { locale, t } from '../i18n';
 import { localName } from '../i18n/names';
-import { plantName } from '../model/plants';
+import { plantName, plantPrice } from '../model/plants';
+import { useShowPrices } from '../model/prices';
 
 /**
  * Print-only document (SPEC §4.9): one section per area with plan, four seasons, plant list and
@@ -23,6 +24,7 @@ export function PrintView({ project, orientation }: { project: Project; orientat
     day: 'numeric',
   });
   const total = buildBom(project);
+  const prices = useShowPrices();
   // Pro tier: the nursery's own header and the quote validity.
   const header = getPdfHeader();
   const brand = hasFeature('pdfHeader') && hasPdfHeader(header);
@@ -67,8 +69,8 @@ export function PrintView({ project, orientation }: { project: Project; orientat
                 <dd>{fmtInt(bom.planted)}</dd>
                 <dt>{t('Rendelés', 'Order')}</dt>
                 <dd>{t(`${fmtInt(bom.order)} db`, `${fmtInt(bom.order)}`)}</dd>
-                <dt>{t('Költség', 'Cost')}</dt>
-                <dd>{fmtFt(bom.total)}</dd>
+                {prices && <dt>{t('Költség', 'Cost')}</dt>}
+                {prices && <dd>{fmtFt(bom.total)}</dd>}
               </dl>
             </header>
 
@@ -103,8 +105,8 @@ export function PrintView({ project, orientation }: { project: Project; orientat
                       <th className="n">{t('Tőtáv', 'Spacing')}</th>
                       <th>{t('Víz', 'Water')}</th>
                       <th>Juglone</th>
-                      <th className="n">{t('Egységár', 'Unit price')}</th>
-                      <th className="n">{t('Részösszeg', 'Subtotal')}</th>
+                      {prices && <th className="n">{t('Egységár', 'Unit price')}</th>}
+                      {prices && <th className="n">{t('Részösszeg', 'Subtotal')}</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -127,8 +129,8 @@ export function PrintView({ project, orientation }: { project: Project; orientat
                         <td className="n">{r.plant.spacingCm}</td>
                         <td>{WATER_LABEL[r.plant.water]}</td>
                         <td>{JUGLONE_LABEL[r.plant.juglone]}</td>
-                        <td className="n">{r.plant.unitPriceHuf ? fmtInt(r.plant.unitPriceHuf) : '–'}</td>
-                        <td className="n">{fmtInt(r.subtotal)}</td>
+                        {prices && <td className="n">{plantPrice(r.plant) ? fmtInt(plantPrice(r.plant)) : '–'}</td>}
+                        {prices && <td className="n">{fmtInt(r.subtotal)}</td>}
                       </tr>
                     ))}
                     <tr className="tot">
@@ -138,8 +140,8 @@ export function PrintView({ project, orientation }: { project: Project; orientat
                       </td>
                       <td className="n">{bom.planted}</td>
                       <td className="n">{bom.order}</td>
-                      <td colSpan={6} />
-                      <td className="n">{fmtInt(bom.total)}</td>
+                      <td colSpan={prices ? 6 : 5} />
+                      {prices && <td className="n">{fmtInt(bom.total)}</td>}
                     </tr>
                   </tbody>
                 </table>
@@ -169,8 +171,9 @@ export function PrintView({ project, orientation }: { project: Project; orientat
         <section className="print-page print-summary">
           <h1>{t('Összesítés', 'Summary')}</h1>
           <p className="mono">
-            {t(`${fmtInt(total.planted)} tő · rendelés ${fmtInt(total.order)} db`, `${fmtInt(total.planted)} plants · order ${fmtInt(total.order)}`)} · {fmtFt(total.total)}
-            {total.estimated ? t(` · ${total.estimated} tétel ára becslés`, ` · ${total.estimated} prices estimated`) : ''}
+            {t(`${fmtInt(total.planted)} tő · rendelés ${fmtInt(total.order)} db`, `${fmtInt(total.planted)} plants · order ${fmtInt(total.order)}`)}
+            {prices ? ` · ${fmtFt(total.total)}` : ''}
+            {prices && total.estimated ? t(` · ${total.estimated} tétel ára becslés`, ` · ${total.estimated} prices estimated`) : ''}
           </p>
           <table className="print-table">
             <thead>
@@ -183,7 +186,7 @@ export function PrintView({ project, orientation }: { project: Project; orientat
                 ))}
                 <th className="n">{t('Ültet.', 'Plant')}</th>
                 <th className="n">{t('Rend.', 'Order')}</th>
-                <th className="n">{t('Részösszeg', 'Subtotal')}</th>
+                {prices && <th className="n">{t('Részösszeg', 'Subtotal')}</th>}
               </tr>
             </thead>
             <tbody>
@@ -201,7 +204,7 @@ export function PrintView({ project, orientation }: { project: Project; orientat
                   <td className="n">
                     <b>{r.order}</b>
                   </td>
-                  <td className="n">{fmtInt(r.subtotal)}</td>
+                  {prices && <td className="n">{fmtInt(r.subtotal)}</td>}
                 </tr>
               ))}
             </tbody>

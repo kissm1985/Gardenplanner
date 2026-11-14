@@ -416,7 +416,7 @@ The **List** tool totals **the plan on screen** (which is also the chosen varian
 
 - **Planting**: how many plants go in the ground.
 - **Order**: how many to order, with a **spare**. The spare % can be set; trees get none.
-- **Estimated cost**: prices marked “est.” are estimates, those marked “shop” come from real offers. Prices are in HUF.
+- **Estimated cost**: hidden by default. Switch prices on in *Menu → View and layers → Show prices*; then the list, the totals, the exports and the print show them. Prices marked “est.” are estimates, “shop” ones come from real offers. The browser remembers the setting.
 - **Filter**: *Combined* or per area; by status (*needed, ordered, have it, planted*).
 - **Status**: can be set for a whole species at once in the table.
 - **Copy as text**: for messages and e-mail.

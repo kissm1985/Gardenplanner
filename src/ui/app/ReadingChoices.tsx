@@ -3,11 +3,13 @@ import { ConsentToggle } from '../ConsentBanner';
 import { useProject } from '../../store/projectStore';
 import { setSimpleMode, useSimpleMode } from '../simpleMode';
 import { setLargeText, useLargeText } from '../textSize';
+import { setShowPrices, useShowPrices } from '../../model/prices';
 
 /** Simple mode and larger text (device settings, in the View window). */
 export function ReadingChoices() {
   const simple = useSimpleMode();
   const large = useLargeText();
+  const prices = useShowPrices();
   return (
     <>
       <label className="check">
@@ -20,6 +22,13 @@ export function ReadingChoices() {
       <label className="check">
         <input type="checkbox" checked={large} onChange={(e) => setLargeText(e.target.checked)} />
         <span>{t('Nagyobb betűk', 'Larger text')}</span>
+      </label>
+      <label className="check">
+        <input type="checkbox" checked={prices} onChange={(e) => setShowPrices(e.target.checked)} />
+        <span>
+          {t('Árak megjelenítése', 'Show prices')}
+          <small className="mono muted"> – {t('irányárak a listában, az exportban és a nyomtatásban', 'guide prices in the list, exports and print')}</small>
+        </span>
       </label>
       <ConsentToggle />
     </>

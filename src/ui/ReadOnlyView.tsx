@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { StaticPlan } from '../canvas/StaticPlan';
 import { buildBom, chosenItems, fmtFt, fmtInt } from '../engine/bom';
+import { useShowPrices } from '../model/prices';
 import { decodeShare } from '../engine/share';
 import { SEASON_LABEL, SEASON_MONTH, type Season } from '../engine/season';
 import { ORIENTATION_LABEL, type Project } from '../model/types';
@@ -13,6 +14,7 @@ import { plantName } from '../model/plants';
 
 /** Read-only page opened from a share link (#view=…); never touches the local plan unless asked. */
 export function ReadOnlyView({ code }: { code: string }) {
+  const prices = useShowPrices();
   const parsed = useMemo((): { p: Project | null; err: string } => {
     try {
       return { p: migrate(decodeShare(code)), err: '' };
@@ -86,7 +88,8 @@ export function ReadOnlyView({ code }: { code: string }) {
           </div>
           <div className="ro-list">
             <p className="ro-kpi">
-              <b>{t(`${fmtInt(bom.planted)} tő`, `${fmtInt(bom.planted)} plants`)}</b> · {t(`rendelés ${fmtInt(bom.order)} db`, `order ${fmtInt(bom.order)}`)} · {fmtFt(bom.total)}
+              <b>{t(`${fmtInt(bom.planted)} tő`, `${fmtInt(bom.planted)} plants`)}</b> · {t(`rendelés ${fmtInt(bom.order)} db`, `order ${fmtInt(bom.order)}`)}
+              {prices ? ` · ${fmtFt(bom.total)}` : ''}
             </p>
             <ul className="ro-rows">
               {bom.rows.map((r) => (

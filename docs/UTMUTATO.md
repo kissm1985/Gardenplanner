@@ -416,7 +416,7 @@ A **Lista** eszköz azt a tervet összesíti, **amelyik a rajzon látszik** (ez 
 
 - **Ültetés**: hány tő kerül a földbe.
 - **Rendelés**: hány darabot rendelj, **tartalékkal**. A tartalék %-a állítható; a fák nem kapnak tartalékot.
-- **Becsült költség**: a „becsl.” jelölésű árak becslések, a „bolt” jelölésűek valós ajánlatból származnak.
+- **Becsült költség**: alapból rejtve. Az árakat a *Menü → Nézet és rétegek → Árak megjelenítése* kapcsolja be; ekkor a lista, az összesítés, az exportok és a nyomtatás is mutatja őket. A „becsl.” jelölésű árak becslések, a „bolt” jelölésűek valós ajánlatból származnak. A beállítást a böngésző megjegyzi.
 - **Szűrés**: *Összesítve* vagy területenként; állapot szerint (*kell, megrendelve, megvan, beültetve*).
 - **Állapot**: a táblázatban fajonként egyszerre állítható.
 - **Másolás szövegként**: üzenetbe, e-mailbe.
