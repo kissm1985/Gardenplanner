@@ -2,7 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test('example plans on the start page open as a planted area', async ({ page }) => {
   await page.goto('/');
-  await expect(page.locator('.example-card')).toHaveCount(10);
+  await expect(page.locator('.example-card')).toHaveCount(11);
   await expect(page.locator('.example-card .static-plan').first()).toBeVisible();
   await page.locator('[data-example="english"]').click();
   // Fitted to my own size: the plan stretches, the count is recounted.

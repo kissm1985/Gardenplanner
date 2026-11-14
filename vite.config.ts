@@ -67,7 +67,7 @@ export default defineConfig({
   build: {
     target: ['es2020', 'safari15'],
     // The nursery catalogue admin (Pro) is its own page.
-    rollupOptions: { input: { main: 'index.html', admin: 'admin.html' } },
+    rollupOptions: { input: { main: 'index.html', admin: 'admin.html', render: 'render.html' } },
     assetsInlineLimit: (file: string) => (file.includes('/pictograms/') ? false : undefined),
   },
   plugins: [
