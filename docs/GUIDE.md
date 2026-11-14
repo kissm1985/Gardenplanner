@@ -26,7 +26,7 @@ All data stays on your own device, there is no sign-up, and after the first visi
 13. [Plant list, ordering, cost](#13-plant-list-ordering-cost)
 14. [Planting schedule and care](#14-planting-schedule-and-care)
 15. [Saving, sharing, printing, images](#15-saving-sharing-printing-images)
-16. [Visualisation with ChatGPT](#16-visualisation-with-chatgpt)
+16. [Visualisation (3D and ChatGPT)](#16-visualisation-3d-and-chatgpt)
 17. [Installing on the phone, offline use](#17-installing-on-the-phone-offline-use)
 18. [Tips and FAQ](#18-tips-and-faq)
 19. [Projects, tiers, simple mode](#19-projects-tiers-simple-mode)
@@ -455,20 +455,24 @@ The **⋯** (Menu) button in the top bar → **Project: save, share, print**:
 - **About**: version, author, **Legal information and privacy** (terms of use, privacy notice, data sources) and the **open-source licences**.
 - **Read-only link**: the plan travels encoded at the end of the link, no server. Whoever opens it sees the plan and the list but can’t change them. Tick **Without notes** to leave the notes out; background images, visualisations and own plant photos are never included.
 - **Image of the plan**: **PNG** or **SVG**, optionally **with a legend** (code → plant name, Latin name, count).
-- **Visualisation with ChatGPT**: see the next chapter.
+- **Visualisation**: 3D and ChatGPT, see the next chapter.
 - **Print / save as PDF**: A4, portrait or landscape. One page per area: plan view, four seasons, plant list, warnings, with a summary at the end. Save as PDF from the browser’s print dialog (“Save as PDF”).
 - **Show the intro again**
 
 <br clear="right">
 
-## 16. Visualisation with ChatGPT
+## 16. Visualisation (3D and ChatGPT)
 
-<img src="img/en/17-chatgpt.png" width="280" align="right" alt="Visualisation with ChatGPT">
+<img src="img/en/18-latvanyterv-3d.png" width="280" align="right" alt="3D visualisation from the plan">
 
 The **Visualisation** window makes two kinds of visualisation:
 
 - **3D visualisation from the plan**: **Make the visualisation** draws the variant on the plan as an aerial view computed from the plan data (not a photo, not an AI image): every plant in its place, each species with its own form (tree, conifer, grass, flower spike, cushion, shrub) and colour, a fence along the edge, dimension lines and a title block. It works for free-shape areas too. Download it as **PNG** (2400 px wide), **PDF** (A4 landscape: the image, the species summary and the full plant list with id, species and coordinates) and **manifest.json** (per plant: id, species, required and actually created position). It works on phones and offline.
 - **Visualisation with ChatGPT**: the app writes a detailed description and a plan from which an image AI can draw a realistic picture (see below).
+
+<br clear="right">
+
+<img src="img/en/17-chatgpt.png" width="280" align="right" alt="Visualisation with ChatGPT">
 
 **Opening it**: the **🖼 Visualisation** button in the **Variants** window, or **⋯ Project → Open visualisation**. It is made for the variant being edited on the plan.
 

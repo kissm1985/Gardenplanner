@@ -17,6 +17,7 @@ npm run build      # statikus build a dist/ mappába
 npm run lint       # ESLint; npm run format: Prettier
 npm run server     # Profi csomag: katalógus-szerver (lásd docs/SZERVER.md)
 npm run verify:render  # 3D látványterv ellenőrzése minden mintaprojekten (out/)
+npm run guide:shots    # az útmutató képernyőképei (docs/img, docs/img/en); előtte: npm run build && npx vite preview --port 4173
 ```
 
 **Telefonról (iPhone, Android):** a gép és a telefon legyen ugyanazon a wifin. `npm run dev` után a terminál kiír egy `Network: http://192.168.x.x:5173/` címet – ezt nyisd meg a telefon böngészőjében. Windowson az első indításkor a tűzfal rákérdez: engedélyezd a *magánhálózat* elérését. Telepíthető, offline is működő változathoz HTTPS kell: töltsd fel a `dist/` mappát pl. a Netlify Drop-ra (app.netlify.com/drop), és a kapott https-címet nyisd meg Safariban → Megosztás → *Főképernyőhöz adás*.
