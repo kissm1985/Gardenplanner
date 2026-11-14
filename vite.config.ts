@@ -96,7 +96,9 @@ export default defineConfig({
         ],
       },
       workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
+        globPatterns: ['**/*.{js,css,html,svg,png,woff2,ttf}'],
+        // The PDF font (DejaVu Sans, ~1.4 MB for both weights) is cached too, so the PDF works offline.
+        maximumFileSizeToCacheInBytes: 4 * 1024 * 1024,
         navigateFallback: 'index.html',
         navigateFallbackDenylist: [/admin\.html/, /\/api\//],
       },

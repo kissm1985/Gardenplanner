@@ -3333,3 +3333,14 @@ html[data-text='large'] :is(small, .mono, .muted, .tool-label, .area-meta, .lbl,
   margin: 4px 0;
   padding-left: 18px;
 }
+
+/* 3D visualisation (spec v0.2 F1) */
+.render3d-preview {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 8px 0 4px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: #fff;
+}

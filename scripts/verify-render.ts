@@ -4,7 +4,7 @@
 // Exit code 0 only if every example PASSes and every negative run FAILs.
 //   options: --threshold=0.005 (visibility, % of the image) --tol=20 (cm) --only=key1,key2 --width=2400 --height=1700
 import { execSync } from 'node:child_process';
-import { createReadStream, existsSync, mkdirSync, statSync, writeFileSync } from 'node:fs';
+import { createReadStream, existsSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createServer } from 'node:http';
 import type { AddressInfo } from 'node:net';
 import { extname, join, resolve } from 'node:path';
@@ -66,8 +66,22 @@ const dataUrlToBuf = (u: string) => Buffer.from(u.slice(u.indexOf(',') + 1), 'ba
 const version = (await import('../package.json', { with: { type: 'json' } })).default.version;
 const threeVersion = (await import('three')).REVISION;
 
-async function renderOne(key: string, fault?: Fault): Promise<RenderResult> {
-  return page.evaluate(({ key, fault, w, h }) => window.planterra3d.renderExample(key, { width: w, height: h, fault }), { key, fault, w: WIDTH, h: HEIGHT });
+async function renderOne(key: string, fault?: Fault, pdf = false): Promise<RenderResult & { pdf?: string }> {
+  return page.evaluate(({ key, fault, w, h, pdf }) => window.planterra3d.renderExample(key, { width: w, height: h, fault, pdf }), { key, fault, w: WIDTH, h: HEIGHT, pdf });
+}
+
+/** Opens the PDF with pdf.js and checks it: pages, the title, and every plant id of the plan in its text. */
+async function checkPdf(file: string, ids: string[], title: string): Promise<{ ok: boolean; pages: number; missing: string[] }> {
+  const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
+  const doc = await pdfjs.getDocument({ data: new Uint8Array(readFileSync(file)), useSystemFonts: false }).promise;
+  let text = '';
+  for (let i = 1; i <= doc.numPages; i++) {
+    const c = await (await doc.getPage(i)).getTextContent();
+    text += c.items.map((it) => ('str' in it ? it.str : '')).join('\n') + '\n';
+  }
+  const lines = new Set(text.split('\n').map((l) => l.trim()));
+  const missing = ids.filter((id) => !lines.has(id));
+  return { ok: doc.numPages >= 2 && text.includes(title) && missing.length === 0, pages: doc.numPages, missing };
 }
 
 function writeRun(dir: string, key: string, area: string, r: RenderResult, log: string[], t0: number): CheckResult {
@@ -93,6 +107,7 @@ function writeRun(dir: string, key: string, area: string, r: RenderResult, log: 
   return res;
 }
 
+const pdfResults: { key: string; ok: boolean; pages: number; missing: number }[] = [];
 const header = [
   `Planterra verify:render · ${new Date().toISOString()}`,
   `commit: ${commit} · app ${version} · three r${threeVersion} · node ${process.version} · WebGL: ${webgl}`,
@@ -103,8 +118,24 @@ const summary: { key: string; area: string; shape: string; n: number; verdict: s
 
 for (const ex of examples) {
   const t0 = Date.now();
-  const r = await renderOne(ex.key);
-  const res = writeRun(join(OUT, ex.key), ex.key, ex.name, r, [...header, `example: ${ex.key} (${ex.name}, shape ${ex.shape})`], t0);
+  const r = await renderOne(ex.key, undefined, true);
+  const log = [...header, `example: ${ex.key} (${ex.name}, shape ${ex.shape})`];
+  // Export check: the PNG and the PDF exist, the PDF opens and lists every plant.
+  const pdfFile = join(OUT, ex.key, 'render.pdf');
+  mkdirSync(join(OUT, ex.key), { recursive: true });
+  writeFileSync(pdfFile, Buffer.from(r.pdf ?? '', 'base64'));
+  const pdf = r.pdf
+    ? await checkPdf(
+        pdfFile,
+        r.instances.map((p) => p.plant_id),
+        ex.name,
+      )
+    : { ok: false, pages: 0, missing: ['(no PDF)'] };
+  log.push(
+    `export: render.png ${Math.round((r.png.length * 3) / 4 / 1024)} KB · render.pdf ${pdf.pages} pages, opens with pdf.js, plant list ${pdf.missing.length ? `MISSING ${pdf.missing.length} ids` : 'complete'} → ${pdf.ok ? 'PASS' : 'FAIL'}`,
+  );
+  pdfResults.push({ key: ex.key, ok: pdf.ok, pages: pdf.pages, missing: pdf.missing.length });
+  const res = writeRun(join(OUT, ex.key), ex.key, ex.name, r, log, t0);
   summary.push({
     key: ex.key,
     area: ex.name,
@@ -118,7 +149,7 @@ for (const ex of examples) {
     tooSmall: res.tooSmall,
   });
   console.log(
-    `${res.verdict}  ${ex.key.padEnd(14)} N=${String(res.expected).padStart(3)}  max ${summary.at(-1)!.maxDev} cm  látható ${res.visible}, takarás ${res.notProvable}, kis méret ${res.tooSmall}`,
+    `${res.verdict}  ${ex.key.padEnd(14)} PDF ${pdf.ok ? 'ok' : 'HIBA'} (${pdf.pages} o.)  N=${String(res.expected).padStart(3)}  max ${summary.at(-1)!.maxDev} cm  látható ${res.visible}, takarás ${res.notProvable}, kis méret ${res.tooSmall}`,
   );
 }
 
@@ -142,7 +173,7 @@ for (const n of negatives) {
 await browser.close();
 server.close();
 
-const allPass = summary.length > 0 && summary.every((s) => s.verdict === 'PASS');
+const allPass = summary.length > 0 && summary.every((s) => s.verdict === 'PASS') && pdfResults.every((p) => p.ok);
 const negOk = negResults.every((n) => n.verdict === 'FAIL');
 const md = [
   '# verify:render – összesítő',
@@ -153,6 +184,12 @@ const md = [
   '| Mintaprojekt | Alak | N | Eredmény | Max. eltérés (cm) | Látható | NEM IGAZOLHATÓ – takarás | NEM IGAZOLHATÓ – kis méret |',
   '|---|---|---:|---|---:|---:|---:|---:|',
   ...summary.map((s) => `| ${s.key} (${s.area}) | ${s.shape} | ${s.n} | ${s.verdict} | ${s.maxDev} | ${s.visible} | ${s.notProvable} | ${s.tooSmall} |`),
+  '',
+  '## Export (PNG, PDF)',
+  '',
+  '| Mintaprojekt | PDF oldalak | Hiányzó növény a PDF-ben | Eredmény |',
+  '|---|---:|---:|---|',
+  ...pdfResults.map((p) => `| ${p.key} | ${p.pages} | ${p.missing} | ${p.ok ? 'PASS' : 'FAIL'} |`),
   '',
   '## Negatív tesztek (elvárt: FAIL)',
   '',
