@@ -1,0 +1,2500 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`structured prompt on every example plan > alpine: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 142 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Alpesi sziklakert: 6,0 × 8,0 m, kavicsos / kőkert, déli fekvés, napos (közvetlen nap egész nap), tápanyagszegény talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (6,0; 0), (6,0; 8,0), (0; 8,0).
+- Szikla: x 2,2–3,4 m, y 1,2–1,9 m.
+- Szikla: x 0,6–1,5 m, y 3,8–4,4 m.
+- Szikla: x 4,0–5,1 m, y 4,3–5,0 m.
+- Szikla: x 2,3–3,1 m, y 6,4–6,9 m.
+- Kerti ösvény (lépőkő vagy kavics) („Lépőkövek”): x 2,7–3,3 m, y 2,2–8,0 m.
+
+## 3. Növénytábla (142 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| alpine-1 | PM | Törpefenyő | 1,10 | 1,20 | 150 | 200 |
+| alpine-2 | FL | Fészekluc | 4,90 | 1,10 | 100 | 200 |
+| alpine-3 | JR | Terülő közönséges boróka | 4,70 | 6,90 | 40 | 200 |
+| alpine-4 | PM | Törpefenyő | 1,00 | 6,80 | 150 | 200 |
+| alpine-5#1 | SE | Kövirózsa | 2,92 | 0,37 | 15 | 15 |
+| alpine-5#2 | SE | Kövirózsa | 3,08 | 0,37 | 15 | 15 |
+| alpine-5#3 | SE | Kövirózsa | 3,23 | 0,37 | 15 | 15 |
+| alpine-5#4 | SE | Kövirózsa | 3,38 | 0,37 | 15 | 15 |
+| alpine-5#5 | SE | Kövirózsa | 3,52 | 0,37 | 15 | 15 |
+| alpine-5#6 | SE | Kövirózsa | 3,67 | 0,37 | 15 | 15 |
+| alpine-5#7 | SE | Kövirózsa | 2,77 | 0,52 | 15 | 15 |
+| alpine-5#8 | SE | Kövirózsa | 2,92 | 0,52 | 15 | 15 |
+| alpine-5#9 | SE | Kövirózsa | 3,08 | 0,52 | 15 | 15 |
+| alpine-5#10 | SE | Kövirózsa | 3,23 | 0,52 | 15 | 15 |
+| alpine-5#11 | SE | Kövirózsa | 3,38 | 0,52 | 15 | 15 |
+| alpine-5#12 | SE | Kövirózsa | 3,52 | 0,52 | 15 | 15 |
+| alpine-5#13 | SE | Kövirózsa | 3,67 | 0,52 | 15 | 15 |
+| alpine-5#14 | SE | Kövirózsa | 3,83 | 0,52 | 15 | 15 |
+| alpine-5#15 | SE | Kövirózsa | 2,92 | 0,67 | 15 | 15 |
+| alpine-5#16 | SE | Kövirózsa | 3,08 | 0,67 | 15 | 15 |
+| alpine-5#17 | SE | Kövirózsa | 3,23 | 0,67 | 15 | 15 |
+| alpine-5#18 | SE | Kövirózsa | 3,38 | 0,67 | 15 | 15 |
+| alpine-5#19 | SE | Kövirózsa | 3,52 | 0,67 | 15 | 15 |
+| alpine-5#20 | SE | Kövirózsa | 3,67 | 0,67 | 15 | 15 |
+| alpine-6#1 | AR | Pázsitszegfű | 0,43 | 2,42 | 25 | 25 |
+| alpine-6#2 | AR | Pázsitszegfű | 0,68 | 2,42 | 25 | 25 |
+| alpine-6#3 | AR | Pázsitszegfű | 0,93 | 2,42 | 25 | 25 |
+| alpine-6#4 | AR | Pázsitszegfű | 1,18 | 2,42 | 25 | 25 |
+| alpine-6#5 | AR | Pázsitszegfű | 0,30 | 2,64 | 25 | 25 |
+| alpine-6#6 | AR | Pázsitszegfű | 0,55 | 2,64 | 25 | 25 |
+| alpine-6#7 | AR | Pázsitszegfű | 0,80 | 2,64 | 25 | 25 |
+| alpine-6#8 | AR | Pázsitszegfű | 1,05 | 2,64 | 25 | 25 |
+| alpine-6#9 | AR | Pázsitszegfű | 1,30 | 2,64 | 25 | 25 |
+| alpine-6#10 | AR | Pázsitszegfű | 0,43 | 2,86 | 25 | 25 |
+| alpine-6#11 | AR | Pázsitszegfű | 0,68 | 2,86 | 25 | 25 |
+| alpine-6#12 | AR | Pázsitszegfű | 0,93 | 2,86 | 25 | 25 |
+| alpine-6#13 | AR | Pázsitszegfű | 1,18 | 2,86 | 25 | 25 |
+| alpine-6#14 | AR | Pázsitszegfű | 0,55 | 3,07 | 25 | 25 |
+| alpine-6#15 | AR | Pázsitszegfű | 0,80 | 3,07 | 25 | 25 |
+| alpine-6#16 | AR | Pázsitszegfű | 1,05 | 3,07 | 25 | 25 |
+| alpine-7#1 | TH | Mezei kakukkfű | 1,52 | 2,52 | 8 | 25 |
+| alpine-7#2 | TH | Mezei kakukkfű | 1,77 | 2,52 | 8 | 25 |
+| alpine-7#3 | TH | Mezei kakukkfű | 2,02 | 2,52 | 8 | 25 |
+| alpine-7#4 | TH | Mezei kakukkfű | 2,27 | 2,52 | 8 | 25 |
+| alpine-7#5 | TH | Mezei kakukkfű | 1,65 | 2,74 | 8 | 25 |
+| alpine-7#6 | TH | Mezei kakukkfű | 1,90 | 2,74 | 8 | 25 |
+| alpine-7#7 | TH | Mezei kakukkfű | 2,15 | 2,74 | 8 | 25 |
+| alpine-7#8 | TH | Mezei kakukkfű | 1,52 | 2,95 | 8 | 25 |
+| alpine-7#9 | TH | Mezei kakukkfű | 1,77 | 2,95 | 8 | 25 |
+| alpine-7#10 | TH | Mezei kakukkfű | 2,02 | 2,95 | 8 | 25 |
+| alpine-7#11 | TH | Mezei kakukkfű | 2,27 | 2,95 | 8 | 25 |
+| alpine-7#12 | TH | Mezei kakukkfű | 1,40 | 3,17 | 8 | 25 |
+| alpine-7#13 | TH | Mezei kakukkfű | 1,65 | 3,17 | 8 | 25 |
+| alpine-7#14 | TH | Mezei kakukkfű | 1,90 | 3,17 | 8 | 25 |
+| alpine-7#15 | TH | Mezei kakukkfű | 2,15 | 3,17 | 8 | 25 |
+| alpine-7#16 | TH | Mezei kakukkfű | 2,40 | 3,17 | 8 | 25 |
+| alpine-7#17 | TH | Mezei kakukkfű | 1,77 | 3,39 | 8 | 25 |
+| alpine-7#18 | TH | Mezei kakukkfű | 2,02 | 3,39 | 8 | 25 |
+| alpine-8#1 | PS | Árlevelű lángvirág | 3,90 | 2,31 | 12 | 40 |
+| alpine-8#2 | PS | Árlevelű lángvirág | 4,30 | 2,31 | 12 | 40 |
+| alpine-8#3 | PS | Árlevelű lángvirág | 4,70 | 2,31 | 12 | 40 |
+| alpine-8#4 | PS | Árlevelű lángvirág | 5,10 | 2,31 | 12 | 40 |
+| alpine-8#5 | PS | Árlevelű lángvirág | 3,70 | 2,65 | 12 | 40 |
+| alpine-8#6 | PS | Árlevelű lángvirág | 4,10 | 2,65 | 12 | 40 |
+| alpine-8#7 | PS | Árlevelű lángvirág | 4,50 | 2,65 | 12 | 40 |
+| alpine-8#8 | PS | Árlevelű lángvirág | 4,90 | 2,65 | 12 | 40 |
+| alpine-8#9 | PS | Árlevelű lángvirág | 5,30 | 2,65 | 12 | 40 |
+| alpine-8#10 | PS | Árlevelű lángvirág | 4,30 | 3,00 | 12 | 40 |
+| alpine-8#11 | PS | Árlevelű lángvirág | 4,70 | 3,00 | 12 | 40 |
+| alpine-9#1 | AU | Pázsitviola | 5,10 | 3,31 | 10 | 40 |
+| alpine-9#2 | AU | Pázsitviola | 5,50 | 3,31 | 10 | 40 |
+| alpine-9#3 | AU | Pázsitviola | 4,90 | 3,66 | 10 | 40 |
+| alpine-9#4 | AU | Pázsitviola | 5,30 | 3,66 | 10 | 40 |
+| alpine-9#5 | AU | Pázsitviola | 5,70 | 3,66 | 10 | 40 |
+| alpine-9#6 | AU | Pázsitviola | 5,10 | 4,00 | 10 | 40 |
+| alpine-9#7 | AU | Pázsitviola | 5,50 | 4,00 | 10 | 40 |
+| alpine-10#1 | CT | Molyhos madárhúr | 0,60 | 4,87 | 15 | 40 |
+| alpine-10#2 | CT | Molyhos madárhúr | 1,00 | 4,87 | 15 | 40 |
+| alpine-10#3 | CT | Molyhos madárhúr | 1,40 | 4,87 | 15 | 40 |
+| alpine-10#4 | CT | Molyhos madárhúr | 1,80 | 4,87 | 15 | 40 |
+| alpine-10#5 | CT | Molyhos madárhúr | 2,20 | 4,87 | 15 | 40 |
+| alpine-10#6 | CT | Molyhos madárhúr | 0,80 | 5,22 | 15 | 40 |
+| alpine-10#7 | CT | Molyhos madárhúr | 1,20 | 5,22 | 15 | 40 |
+| alpine-10#8 | CT | Molyhos madárhúr | 1,60 | 5,22 | 15 | 40 |
+| alpine-10#9 | CT | Molyhos madárhúr | 2,00 | 5,22 | 15 | 40 |
+| alpine-11#1 | SD | Kaukázusi varjúháj | 3,48 | 5,42 | 12 | 25 |
+| alpine-11#2 | SD | Kaukázusi varjúháj | 3,73 | 5,42 | 12 | 25 |
+| alpine-11#3 | SD | Kaukázusi varjúháj | 3,98 | 5,42 | 12 | 25 |
+| alpine-11#4 | SD | Kaukázusi varjúháj | 4,22 | 5,42 | 12 | 25 |
+| alpine-11#5 | SD | Kaukázusi varjúháj | 4,47 | 5,42 | 12 | 25 |
+| alpine-11#6 | SD | Kaukázusi varjúháj | 4,72 | 5,42 | 12 | 25 |
+| alpine-11#7 | SD | Kaukázusi varjúháj | 3,35 | 5,64 | 12 | 25 |
+| alpine-11#8 | SD | Kaukázusi varjúháj | 3,60 | 5,64 | 12 | 25 |
+| alpine-11#9 | SD | Kaukázusi varjúháj | 3,85 | 5,64 | 12 | 25 |
+| alpine-11#10 | SD | Kaukázusi varjúháj | 4,10 | 5,64 | 12 | 25 |
+| alpine-11#11 | SD | Kaukázusi varjúháj | 4,35 | 5,64 | 12 | 25 |
+| alpine-11#12 | SD | Kaukázusi varjúháj | 4,60 | 5,64 | 12 | 25 |
+| alpine-11#13 | SD | Kaukázusi varjúháj | 4,85 | 5,64 | 12 | 25 |
+| alpine-11#14 | SD | Kaukázusi varjúháj | 3,48 | 5,86 | 12 | 25 |
+| alpine-11#15 | SD | Kaukázusi varjúháj | 3,73 | 5,86 | 12 | 25 |
+| alpine-11#16 | SD | Kaukázusi varjúháj | 3,98 | 5,86 | 12 | 25 |
+| alpine-11#17 | SD | Kaukázusi varjúháj | 4,22 | 5,86 | 12 | 25 |
+| alpine-11#18 | SD | Kaukázusi varjúháj | 4,47 | 5,86 | 12 | 25 |
+| alpine-11#19 | SD | Kaukázusi varjúháj | 4,72 | 5,86 | 12 | 25 |
+| alpine-12#1 | FE | Kék csenkesz | 1,63 | 7,12 | 30 | 25 |
+| alpine-12#2 | FE | Kék csenkesz | 1,88 | 7,12 | 30 | 25 |
+| alpine-12#3 | FE | Kék csenkesz | 2,13 | 7,12 | 30 | 25 |
+| alpine-12#4 | FE | Kék csenkesz | 2,38 | 7,12 | 30 | 25 |
+| alpine-12#5 | FE | Kék csenkesz | 1,75 | 7,33 | 30 | 25 |
+| alpine-12#6 | FE | Kék csenkesz | 2,00 | 7,33 | 30 | 25 |
+| alpine-12#7 | FE | Kék csenkesz | 2,25 | 7,33 | 30 | 25 |
+| alpine-12#8 | FE | Kék csenkesz | 1,63 | 7,55 | 30 | 25 |
+| alpine-12#9 | FE | Kék csenkesz | 1,88 | 7,55 | 30 | 25 |
+| alpine-12#10 | FE | Kék csenkesz | 2,13 | 7,55 | 30 | 25 |
+| alpine-12#11 | FE | Kék csenkesz | 2,38 | 7,55 | 30 | 25 |
+| alpine-12#12 | FE | Kék csenkesz | 1,75 | 7,77 | 30 | 25 |
+| alpine-12#13 | FE | Kék csenkesz | 2,00 | 7,77 | 30 | 25 |
+| alpine-12#14 | FE | Kék csenkesz | 2,25 | 7,77 | 30 | 25 |
+| alpine-13#1 | SE | Kövirózsa | 3,42 | 7,47 | 15 | 15 |
+| alpine-13#2 | SE | Kövirózsa | 3,58 | 7,47 | 15 | 15 |
+| alpine-13#3 | SE | Kövirózsa | 3,73 | 7,47 | 15 | 15 |
+| alpine-13#4 | SE | Kövirózsa | 3,88 | 7,47 | 15 | 15 |
+| alpine-13#5 | SE | Kövirózsa | 4,03 | 7,47 | 15 | 15 |
+| alpine-13#6 | SE | Kövirózsa | 4,17 | 7,47 | 15 | 15 |
+| alpine-13#7 | SE | Kövirózsa | 3,42 | 7,62 | 15 | 15 |
+| alpine-13#8 | SE | Kövirózsa | 3,58 | 7,62 | 15 | 15 |
+| alpine-13#9 | SE | Kövirózsa | 3,73 | 7,62 | 15 | 15 |
+| alpine-13#10 | SE | Kövirózsa | 3,88 | 7,62 | 15 | 15 |
+| alpine-13#11 | SE | Kövirózsa | 4,03 | 7,62 | 15 | 15 |
+| alpine-13#12 | SE | Kövirózsa | 4,17 | 7,62 | 15 | 15 |
+| alpine-13#13 | SE | Kövirózsa | 3,58 | 7,77 | 15 | 15 |
+| alpine-13#14 | SE | Kövirózsa | 3,73 | 7,77 | 15 | 15 |
+| alpine-13#15 | SE | Kövirózsa | 3,88 | 7,77 | 15 | 15 |
+| alpine-13#16 | SE | Kövirózsa | 4,03 | 7,77 | 15 | 15 |
+| alpine-14#1 | OR | Szurokfű | 5,35 | 5,17 | 20 | 30 |
+| alpine-14#2 | OR | Szurokfű | 5,65 | 5,17 | 20 | 30 |
+| alpine-14#3 | OR | Szurokfű | 5,20 | 5,43 | 20 | 30 |
+| alpine-14#4 | OR | Szurokfű | 5,50 | 5,43 | 20 | 30 |
+| alpine-14#5 | OR | Szurokfű | 5,80 | 5,43 | 20 | 30 |
+| alpine-14#6 | OR | Szurokfű | 5,35 | 5,69 | 20 | 30 |
+| alpine-14#7 | OR | Szurokfű | 5,65 | 5,69 | 20 | 30 |
+| alpine-14#8 | OR | Szurokfű | 5,50 | 5,95 | 20 | 30 |
+
+## 4. Fajok és elhelyezésük
+- **PM – Törpefenyő** (*Pinus mugo 'Mughus'*), 2 tő. Cserje (télen is lombos / örökzöld), kb. 150 cm magas és 200 cm széles; most nem virágzik; lomb: sötétzöld tűlevél.
+  - x 1,1 m, y 1,2 m
+  - x 1,0 m, y 6,8 m
+- **FL – Fészekluc** (*Picea abies 'Nidiformis'*), 1 tő. Bokros évelő, kb. 100 cm magas és 200 cm széles; most nem virágzik; lomb: sötétzöld, közepén fészekszerű mélyedés.
+  - x 4,9 m, y 1,1 m
+- **JR – Terülő közönséges boróka** (*Juniperus communis 'Repanda'*), 1 tő. Alacsony talajtakaró / párna, kb. 40 cm magas és 200 cm széles; most nem virágzik; lomb: zöld, télen bronzos.
+  - x 4,7 m, y 6,9 m
+- **SE – Kövirózsa** (*Sempervivum tectorum*), 36 tő. Alacsony talajtakaró / párna, kb. 15 cm magas és 15 cm széles; most virágzik: rózsaszín.
+  - folt: x 2,7–3,9 m, y 0,3–0,8 m, négyzetes kiosztás, 15 cm tőtáv (20 tő)
+  - folt: x 3,3–4,3 m, y 7,4–7,9 m, négyzetes kiosztás, 15 cm tőtáv (16 tő)
+- **AR – Pázsitszegfű** (*Armeria maritima 'Splendens'*), 16 tő. Bokros évelő, kb. 25 cm magas és 25 cm széles; most nem virágzik; lomb: zöld.
+  - folt: x 0,2–1,4 m, y 2,3–3,2 m, eltolt kiosztás, 25 cm tőtáv (16 tő)
+- **TH – Mezei kakukkfű** (*Thymus serpyllum 'Coccineus'*), 18 tő. Alacsony talajtakaró / párna, kb. 8 cm magas és 25 cm széles; most virágzik: bíborpiros.
+  - folt: x 1,3–2,5 m, y 2,4–3,5 m, eltolt kiosztás, 25 cm tőtáv (18 tő)
+- **PS – Árlevelű lángvirág** (*Phlox subulata 'Emerald Blue'*), 11 tő. Alacsony talajtakaró / párna, kb. 12 cm magas és 40 cm széles; most nem virágzik; lomb: zöld.
+  - folt: x 3,6–5,4 m, y 2,1–3,2 m, eltolt kiosztás, 40 cm tőtáv (11 tő)
+- **AU – Pázsitviola** (*Aubrieta × cultorum*), 7 tő. Alacsony talajtakaró / párna, kb. 10 cm magas és 40 cm széles; most nem virágzik; lomb: szürkészöld.
+  - folt: x 4,8–5,8 m, y 3,1–4,2 m, eltolt kiosztás, 40 cm tőtáv (7 tő)
+- **CT – Molyhos madárhúr** (*Cerastium tomentosum*), 9 tő. Alacsony talajtakaró / párna, kb. 15 cm magas és 40 cm széles; most nem virágzik; lomb: ezüst.
+  - folt: x 0,4–2,4 m, y 4,6–5,5 m, eltolt kiosztás, 40 cm tőtáv (9 tő)
+- **SD – Kaukázusi varjúháj** (*Sedum spurium 'Green Mantle'*), 19 tő. Alacsony talajtakaró / párna, kb. 12 cm magas és 25 cm széles; most virágzik: sárga.
+  - folt: x 3,3–4,9 m, y 5,2–6,0 m, eltolt kiosztás, 25 cm tőtáv (19 tő)
+- **FE – Kék csenkesz** (*Festuca glauca 'Elijah Blue'*), 14 tő. Díszfű / felálló levélcsomó, kb. 30 cm magas és 25 cm széles; most nem virágzik; lomb: ezüstkék.
+  - folt: x 1,5–2,5 m, y 7,0–7,9 m, eltolt kiosztás, 25 cm tőtáv (14 tő)
+- **OR – Szurokfű** (*Origanum vulgare 'Compactum'*), 8 tő. Alacsony talajtakaró / párna, kb. 20 cm magas és 30 cm széles; most virágzik: rózsaszín.
+  - folt: x 5,1–5,9 m, y 5,0–6,1 m, eltolt kiosztás, 30 cm tőtáv (8 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Az ágyás felszíne világos, 4–8 mm-es mosott kavics.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (3,2; 4,3) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 142 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 142 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > chateau: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 296 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Kastélykert: 12,0 × 16,0 m, évelőágyás, déli fekvés, napos (közvetlen nap egész nap), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (12,0; 0), (12,0; 16,0), (0; 16,0).
+- Kerti ösvény (lépőkő vagy kavics) („Főtengely”): x 5,6–6,4 m, y 0,0–16,0 m.
+- Kerti ösvény (lépőkő vagy kavics) („Keresztút”): x 0,0–12,0 m, y 7,6–8,4 m.
+- Kerti tó (víztükör, természetes kőszegély) („Szökőkút”): x 4,9–7,1 m, y 6,9–9,1 m.
+- Kerti pad (fa): x 1,6–3,1 m, y 6,8–7,3 m.
+- Kerti pad (fa): x 8,9–10,4 m, y 8,7–9,2 m.
+
+## 3. Növénytábla (296 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| chateau-1 | CF | Oszlopos gyertyán | 0,90 | 2,60 | 1200 | 500 |
+| chateau-2 | CF | Oszlopos gyertyán | 0,90 | 13,40 | 1200 | 500 |
+| chateau-3 | CF | Oszlopos gyertyán | 11,10 | 2,60 | 1200 | 500 |
+| chateau-4 | CF | Oszlopos gyertyán | 11,10 | 13,40 | 1200 | 500 |
+| chateau-5#1 | BX | Puszpáng | 3,00 | 1,60 | 60 | 50 |
+| chateau-5#2 | BX | Puszpáng | 3,35 | 1,60 | 60 | 50 |
+| chateau-5#3 | BX | Puszpáng | 3,70 | 1,60 | 60 | 50 |
+| chateau-5#4 | BX | Puszpáng | 4,06 | 1,60 | 60 | 50 |
+| chateau-5#5 | BX | Puszpáng | 4,41 | 1,60 | 60 | 50 |
+| chateau-5#6 | BX | Puszpáng | 4,76 | 1,60 | 60 | 50 |
+| chateau-5#7 | BX | Puszpáng | 5,11 | 1,60 | 60 | 50 |
+| chateau-5#8 | BX | Puszpáng | 5,40 | 1,67 | 60 | 50 |
+| chateau-5#9 | BX | Puszpáng | 5,40 | 2,02 | 60 | 50 |
+| chateau-5#10 | BX | Puszpáng | 5,40 | 2,37 | 60 | 50 |
+| chateau-5#11 | BX | Puszpáng | 5,40 | 2,72 | 60 | 50 |
+| chateau-5#12 | BX | Puszpáng | 5,40 | 3,08 | 60 | 50 |
+| chateau-5#13 | BX | Puszpáng | 5,40 | 3,43 | 60 | 50 |
+| chateau-5#14 | BX | Puszpáng | 5,40 | 3,78 | 60 | 50 |
+| chateau-5#15 | BX | Puszpáng | 5,40 | 4,13 | 60 | 50 |
+| chateau-5#16 | BX | Puszpáng | 5,40 | 4,49 | 60 | 50 |
+| chateau-5#17 | BX | Puszpáng | 5,40 | 4,84 | 60 | 50 |
+| chateau-5#18 | BX | Puszpáng | 5,40 | 5,19 | 60 | 50 |
+| chateau-5#19 | BX | Puszpáng | 5,40 | 5,54 | 60 | 50 |
+| chateau-5#20 | BX | Puszpáng | 5,40 | 5,90 | 60 | 50 |
+| chateau-5#21 | BX | Puszpáng | 5,40 | 6,25 | 60 | 50 |
+| chateau-5#22 | BX | Puszpáng | 5,40 | 6,60 | 60 | 50 |
+| chateau-5#23 | BX | Puszpáng | 5,05 | 6,60 | 60 | 50 |
+| chateau-5#24 | BX | Puszpáng | 4,70 | 6,60 | 60 | 50 |
+| chateau-5#25 | BX | Puszpáng | 4,34 | 6,60 | 60 | 50 |
+| chateau-5#26 | BX | Puszpáng | 3,99 | 6,60 | 60 | 50 |
+| chateau-5#27 | BX | Puszpáng | 3,64 | 6,60 | 60 | 50 |
+| chateau-5#28 | BX | Puszpáng | 3,29 | 6,60 | 60 | 50 |
+| chateau-5#29 | BX | Puszpáng | 3,00 | 6,53 | 60 | 50 |
+| chateau-5#30 | BX | Puszpáng | 3,00 | 6,18 | 60 | 50 |
+| chateau-5#31 | BX | Puszpáng | 3,00 | 5,83 | 60 | 50 |
+| chateau-5#32 | BX | Puszpáng | 3,00 | 5,48 | 60 | 50 |
+| chateau-5#33 | BX | Puszpáng | 3,00 | 5,12 | 60 | 50 |
+| chateau-5#34 | BX | Puszpáng | 3,00 | 4,77 | 60 | 50 |
+| chateau-5#35 | BX | Puszpáng | 3,00 | 4,42 | 60 | 50 |
+| chateau-5#36 | BX | Puszpáng | 3,00 | 4,07 | 60 | 50 |
+| chateau-5#37 | BX | Puszpáng | 3,00 | 3,71 | 60 | 50 |
+| chateau-5#38 | BX | Puszpáng | 3,00 | 3,36 | 60 | 50 |
+| chateau-5#39 | BX | Puszpáng | 3,00 | 3,01 | 60 | 50 |
+| chateau-5#40 | BX | Puszpáng | 3,00 | 2,66 | 60 | 50 |
+| chateau-5#41 | BX | Puszpáng | 3,00 | 2,30 | 60 | 50 |
+| chateau-5#42 | BX | Puszpáng | 3,00 | 1,95 | 60 | 50 |
+| chateau-5#43 | BX | Puszpáng | 3,00 | 1,60 | 60 | 50 |
+| chateau-6#1 | LA | Levendula | 3,60 | 2,15 | 45 | 40 |
+| chateau-6#2 | LA | Levendula | 4,00 | 2,15 | 45 | 40 |
+| chateau-6#3 | LA | Levendula | 4,40 | 2,15 | 45 | 40 |
+| chateau-6#4 | LA | Levendula | 4,80 | 2,15 | 45 | 40 |
+| chateau-6#5 | LA | Levendula | 3,40 | 2,50 | 45 | 40 |
+| chateau-6#6 | LA | Levendula | 3,80 | 2,50 | 45 | 40 |
+| chateau-6#7 | LA | Levendula | 4,20 | 2,50 | 45 | 40 |
+| chateau-6#8 | LA | Levendula | 4,60 | 2,50 | 45 | 40 |
+| chateau-6#9 | LA | Levendula | 5,00 | 2,50 | 45 | 40 |
+| chateau-6#10 | LA | Levendula | 3,60 | 2,85 | 45 | 40 |
+| chateau-6#11 | LA | Levendula | 4,00 | 2,85 | 45 | 40 |
+| chateau-6#12 | LA | Levendula | 4,40 | 2,85 | 45 | 40 |
+| chateau-6#13 | LA | Levendula | 4,80 | 2,85 | 45 | 40 |
+| chateau-7#1 | LA | Levendula | 3,60 | 5,35 | 45 | 40 |
+| chateau-7#2 | LA | Levendula | 4,00 | 5,35 | 45 | 40 |
+| chateau-7#3 | LA | Levendula | 4,40 | 5,35 | 45 | 40 |
+| chateau-7#4 | LA | Levendula | 4,80 | 5,35 | 45 | 40 |
+| chateau-7#5 | LA | Levendula | 3,40 | 5,70 | 45 | 40 |
+| chateau-7#6 | LA | Levendula | 3,80 | 5,70 | 45 | 40 |
+| chateau-7#7 | LA | Levendula | 4,20 | 5,70 | 45 | 40 |
+| chateau-7#8 | LA | Levendula | 4,60 | 5,70 | 45 | 40 |
+| chateau-7#9 | LA | Levendula | 5,00 | 5,70 | 45 | 40 |
+| chateau-7#10 | LA | Levendula | 3,60 | 6,05 | 45 | 40 |
+| chateau-7#11 | LA | Levendula | 4,00 | 6,05 | 45 | 40 |
+| chateau-7#12 | LA | Levendula | 4,40 | 6,05 | 45 | 40 |
+| chateau-7#13 | LA | Levendula | 4,80 | 6,05 | 45 | 40 |
+| chateau-8 | TB | Közönséges tiszafa | 4,20 | 4,10 | 300 | 200 |
+| chateau-9#1 | BX | Puszpáng | 6,60 | 1,60 | 60 | 50 |
+| chateau-9#2 | BX | Puszpáng | 6,95 | 1,60 | 60 | 50 |
+| chateau-9#3 | BX | Puszpáng | 7,30 | 1,60 | 60 | 50 |
+| chateau-9#4 | BX | Puszpáng | 7,66 | 1,60 | 60 | 50 |
+| chateau-9#5 | BX | Puszpáng | 8,01 | 1,60 | 60 | 50 |
+| chateau-9#6 | BX | Puszpáng | 8,36 | 1,60 | 60 | 50 |
+| chateau-9#7 | BX | Puszpáng | 8,71 | 1,60 | 60 | 50 |
+| chateau-9#8 | BX | Puszpáng | 9,00 | 1,67 | 60 | 50 |
+| chateau-9#9 | BX | Puszpáng | 9,00 | 2,02 | 60 | 50 |
+| chateau-9#10 | BX | Puszpáng | 9,00 | 2,37 | 60 | 50 |
+| chateau-9#11 | BX | Puszpáng | 9,00 | 2,72 | 60 | 50 |
+| chateau-9#12 | BX | Puszpáng | 9,00 | 3,08 | 60 | 50 |
+| chateau-9#13 | BX | Puszpáng | 9,00 | 3,43 | 60 | 50 |
+| chateau-9#14 | BX | Puszpáng | 9,00 | 3,78 | 60 | 50 |
+| chateau-9#15 | BX | Puszpáng | 9,00 | 4,13 | 60 | 50 |
+| chateau-9#16 | BX | Puszpáng | 9,00 | 4,49 | 60 | 50 |
+| chateau-9#17 | BX | Puszpáng | 9,00 | 4,84 | 60 | 50 |
+| chateau-9#18 | BX | Puszpáng | 9,00 | 5,19 | 60 | 50 |
+| chateau-9#19 | BX | Puszpáng | 9,00 | 5,54 | 60 | 50 |
+| chateau-9#20 | BX | Puszpáng | 9,00 | 5,90 | 60 | 50 |
+| chateau-9#21 | BX | Puszpáng | 9,00 | 6,25 | 60 | 50 |
+| chateau-9#22 | BX | Puszpáng | 9,00 | 6,60 | 60 | 50 |
+| chateau-9#23 | BX | Puszpáng | 8,65 | 6,60 | 60 | 50 |
+| chateau-9#24 | BX | Puszpáng | 8,30 | 6,60 | 60 | 50 |
+| chateau-9#25 | BX | Puszpáng | 7,94 | 6,60 | 60 | 50 |
+| chateau-9#26 | BX | Puszpáng | 7,59 | 6,60 | 60 | 50 |
+| chateau-9#27 | BX | Puszpáng | 7,24 | 6,60 | 60 | 50 |
+| chateau-9#28 | BX | Puszpáng | 6,89 | 6,60 | 60 | 50 |
+| chateau-9#29 | BX | Puszpáng | 6,60 | 6,53 | 60 | 50 |
+| chateau-9#30 | BX | Puszpáng | 6,60 | 6,18 | 60 | 50 |
+| chateau-9#31 | BX | Puszpáng | 6,60 | 5,83 | 60 | 50 |
+| chateau-9#32 | BX | Puszpáng | 6,60 | 5,48 | 60 | 50 |
+| chateau-9#33 | BX | Puszpáng | 6,60 | 5,12 | 60 | 50 |
+| chateau-9#34 | BX | Puszpáng | 6,60 | 4,77 | 60 | 50 |
+| chateau-9#35 | BX | Puszpáng | 6,60 | 4,42 | 60 | 50 |
+| chateau-9#36 | BX | Puszpáng | 6,60 | 4,07 | 60 | 50 |
+| chateau-9#37 | BX | Puszpáng | 6,60 | 3,71 | 60 | 50 |
+| chateau-9#38 | BX | Puszpáng | 6,60 | 3,36 | 60 | 50 |
+| chateau-9#39 | BX | Puszpáng | 6,60 | 3,01 | 60 | 50 |
+| chateau-9#40 | BX | Puszpáng | 6,60 | 2,66 | 60 | 50 |
+| chateau-9#41 | BX | Puszpáng | 6,60 | 2,30 | 60 | 50 |
+| chateau-9#42 | BX | Puszpáng | 6,60 | 1,95 | 60 | 50 |
+| chateau-9#43 | BX | Puszpáng | 6,60 | 1,60 | 60 | 50 |
+| chateau-10#1 | SA | Ligeti zsálya | 7,10 | 2,20 | 40 | 35 |
+| chateau-10#2 | SA | Ligeti zsálya | 7,45 | 2,20 | 40 | 35 |
+| chateau-10#3 | SA | Ligeti zsálya | 7,80 | 2,20 | 40 | 35 |
+| chateau-10#4 | SA | Ligeti zsálya | 8,15 | 2,20 | 40 | 35 |
+| chateau-10#5 | SA | Ligeti zsálya | 8,50 | 2,20 | 40 | 35 |
+| chateau-10#6 | SA | Ligeti zsálya | 6,92 | 2,50 | 40 | 35 |
+| chateau-10#7 | SA | Ligeti zsálya | 7,28 | 2,50 | 40 | 35 |
+| chateau-10#8 | SA | Ligeti zsálya | 7,63 | 2,50 | 40 | 35 |
+| chateau-10#9 | SA | Ligeti zsálya | 7,97 | 2,50 | 40 | 35 |
+| chateau-10#10 | SA | Ligeti zsálya | 8,32 | 2,50 | 40 | 35 |
+| chateau-10#11 | SA | Ligeti zsálya | 8,68 | 2,50 | 40 | 35 |
+| chateau-10#12 | SA | Ligeti zsálya | 7,10 | 2,80 | 40 | 35 |
+| chateau-10#13 | SA | Ligeti zsálya | 7,45 | 2,80 | 40 | 35 |
+| chateau-10#14 | SA | Ligeti zsálya | 7,80 | 2,80 | 40 | 35 |
+| chateau-10#15 | SA | Ligeti zsálya | 8,15 | 2,80 | 40 | 35 |
+| chateau-10#16 | SA | Ligeti zsálya | 8,50 | 2,80 | 40 | 35 |
+| chateau-11#1 | SA | Ligeti zsálya | 7,10 | 5,40 | 40 | 35 |
+| chateau-11#2 | SA | Ligeti zsálya | 7,45 | 5,40 | 40 | 35 |
+| chateau-11#3 | SA | Ligeti zsálya | 7,80 | 5,40 | 40 | 35 |
+| chateau-11#4 | SA | Ligeti zsálya | 8,15 | 5,40 | 40 | 35 |
+| chateau-11#5 | SA | Ligeti zsálya | 8,50 | 5,40 | 40 | 35 |
+| chateau-11#6 | SA | Ligeti zsálya | 6,92 | 5,70 | 40 | 35 |
+| chateau-11#7 | SA | Ligeti zsálya | 7,28 | 5,70 | 40 | 35 |
+| chateau-11#8 | SA | Ligeti zsálya | 7,63 | 5,70 | 40 | 35 |
+| chateau-11#9 | SA | Ligeti zsálya | 7,97 | 5,70 | 40 | 35 |
+| chateau-11#10 | SA | Ligeti zsálya | 8,32 | 5,70 | 40 | 35 |
+| chateau-11#11 | SA | Ligeti zsálya | 8,68 | 5,70 | 40 | 35 |
+| chateau-11#12 | SA | Ligeti zsálya | 7,10 | 6,00 | 40 | 35 |
+| chateau-11#13 | SA | Ligeti zsálya | 7,45 | 6,00 | 40 | 35 |
+| chateau-11#14 | SA | Ligeti zsálya | 7,80 | 6,00 | 40 | 35 |
+| chateau-11#15 | SA | Ligeti zsálya | 8,15 | 6,00 | 40 | 35 |
+| chateau-11#16 | SA | Ligeti zsálya | 8,50 | 6,00 | 40 | 35 |
+| chateau-12 | TB | Közönséges tiszafa | 7,80 | 4,10 | 300 | 200 |
+| chateau-13#1 | BX | Puszpáng | 3,00 | 9,40 | 60 | 50 |
+| chateau-13#2 | BX | Puszpáng | 3,35 | 9,40 | 60 | 50 |
+| chateau-13#3 | BX | Puszpáng | 3,70 | 9,40 | 60 | 50 |
+| chateau-13#4 | BX | Puszpáng | 4,06 | 9,40 | 60 | 50 |
+| chateau-13#5 | BX | Puszpáng | 4,41 | 9,40 | 60 | 50 |
+| chateau-13#6 | BX | Puszpáng | 4,76 | 9,40 | 60 | 50 |
+| chateau-13#7 | BX | Puszpáng | 5,11 | 9,40 | 60 | 50 |
+| chateau-13#8 | BX | Puszpáng | 5,40 | 9,47 | 60 | 50 |
+| chateau-13#9 | BX | Puszpáng | 5,40 | 9,82 | 60 | 50 |
+| chateau-13#10 | BX | Puszpáng | 5,40 | 10,17 | 60 | 50 |
+| chateau-13#11 | BX | Puszpáng | 5,40 | 10,52 | 60 | 50 |
+| chateau-13#12 | BX | Puszpáng | 5,40 | 10,88 | 60 | 50 |
+| chateau-13#13 | BX | Puszpáng | 5,40 | 11,23 | 60 | 50 |
+| chateau-13#14 | BX | Puszpáng | 5,40 | 11,58 | 60 | 50 |
+| chateau-13#15 | BX | Puszpáng | 5,40 | 11,93 | 60 | 50 |
+| chateau-13#16 | BX | Puszpáng | 5,40 | 12,29 | 60 | 50 |
+| chateau-13#17 | BX | Puszpáng | 5,40 | 12,64 | 60 | 50 |
+| chateau-13#18 | BX | Puszpáng | 5,40 | 12,99 | 60 | 50 |
+| chateau-13#19 | BX | Puszpáng | 5,40 | 13,34 | 60 | 50 |
+| chateau-13#20 | BX | Puszpáng | 5,40 | 13,70 | 60 | 50 |
+| chateau-13#21 | BX | Puszpáng | 5,40 | 14,05 | 60 | 50 |
+| chateau-13#22 | BX | Puszpáng | 5,40 | 14,40 | 60 | 50 |
+| chateau-13#23 | BX | Puszpáng | 5,05 | 14,40 | 60 | 50 |
+| chateau-13#24 | BX | Puszpáng | 4,70 | 14,40 | 60 | 50 |
+| chateau-13#25 | BX | Puszpáng | 4,34 | 14,40 | 60 | 50 |
+| chateau-13#26 | BX | Puszpáng | 3,99 | 14,40 | 60 | 50 |
+| chateau-13#27 | BX | Puszpáng | 3,64 | 14,40 | 60 | 50 |
+| chateau-13#28 | BX | Puszpáng | 3,29 | 14,40 | 60 | 50 |
+| chateau-13#29 | BX | Puszpáng | 3,00 | 14,33 | 60 | 50 |
+| chateau-13#30 | BX | Puszpáng | 3,00 | 13,98 | 60 | 50 |
+| chateau-13#31 | BX | Puszpáng | 3,00 | 13,63 | 60 | 50 |
+| chateau-13#32 | BX | Puszpáng | 3,00 | 13,28 | 60 | 50 |
+| chateau-13#33 | BX | Puszpáng | 3,00 | 12,92 | 60 | 50 |
+| chateau-13#34 | BX | Puszpáng | 3,00 | 12,57 | 60 | 50 |
+| chateau-13#35 | BX | Puszpáng | 3,00 | 12,22 | 60 | 50 |
+| chateau-13#36 | BX | Puszpáng | 3,00 | 11,87 | 60 | 50 |
+| chateau-13#37 | BX | Puszpáng | 3,00 | 11,51 | 60 | 50 |
+| chateau-13#38 | BX | Puszpáng | 3,00 | 11,16 | 60 | 50 |
+| chateau-13#39 | BX | Puszpáng | 3,00 | 10,81 | 60 | 50 |
+| chateau-13#40 | BX | Puszpáng | 3,00 | 10,46 | 60 | 50 |
+| chateau-13#41 | BX | Puszpáng | 3,00 | 10,10 | 60 | 50 |
+| chateau-13#42 | BX | Puszpáng | 3,00 | 9,75 | 60 | 50 |
+| chateau-13#43 | BX | Puszpáng | 3,00 | 9,40 | 60 | 50 |
+| chateau-14#1 | SA | Ligeti zsálya | 3,50 | 10,00 | 40 | 35 |
+| chateau-14#2 | SA | Ligeti zsálya | 3,85 | 10,00 | 40 | 35 |
+| chateau-14#3 | SA | Ligeti zsálya | 4,20 | 10,00 | 40 | 35 |
+| chateau-14#4 | SA | Ligeti zsálya | 4,55 | 10,00 | 40 | 35 |
+| chateau-14#5 | SA | Ligeti zsálya | 4,90 | 10,00 | 40 | 35 |
+| chateau-14#6 | SA | Ligeti zsálya | 3,33 | 10,30 | 40 | 35 |
+| chateau-14#7 | SA | Ligeti zsálya | 3,67 | 10,30 | 40 | 35 |
+| chateau-14#8 | SA | Ligeti zsálya | 4,03 | 10,30 | 40 | 35 |
+| chateau-14#9 | SA | Ligeti zsálya | 4,38 | 10,30 | 40 | 35 |
+| chateau-14#10 | SA | Ligeti zsálya | 4,72 | 10,30 | 40 | 35 |
+| chateau-14#11 | SA | Ligeti zsálya | 5,08 | 10,30 | 40 | 35 |
+| chateau-14#12 | SA | Ligeti zsálya | 3,50 | 10,60 | 40 | 35 |
+| chateau-14#13 | SA | Ligeti zsálya | 3,85 | 10,60 | 40 | 35 |
+| chateau-14#14 | SA | Ligeti zsálya | 4,20 | 10,60 | 40 | 35 |
+| chateau-14#15 | SA | Ligeti zsálya | 4,55 | 10,60 | 40 | 35 |
+| chateau-14#16 | SA | Ligeti zsálya | 4,90 | 10,60 | 40 | 35 |
+| chateau-15#1 | SA | Ligeti zsálya | 3,50 | 13,20 | 40 | 35 |
+| chateau-15#2 | SA | Ligeti zsálya | 3,85 | 13,20 | 40 | 35 |
+| chateau-15#3 | SA | Ligeti zsálya | 4,20 | 13,20 | 40 | 35 |
+| chateau-15#4 | SA | Ligeti zsálya | 4,55 | 13,20 | 40 | 35 |
+| chateau-15#5 | SA | Ligeti zsálya | 4,90 | 13,20 | 40 | 35 |
+| chateau-15#6 | SA | Ligeti zsálya | 3,33 | 13,50 | 40 | 35 |
+| chateau-15#7 | SA | Ligeti zsálya | 3,67 | 13,50 | 40 | 35 |
+| chateau-15#8 | SA | Ligeti zsálya | 4,03 | 13,50 | 40 | 35 |
+| chateau-15#9 | SA | Ligeti zsálya | 4,38 | 13,50 | 40 | 35 |
+| chateau-15#10 | SA | Ligeti zsálya | 4,72 | 13,50 | 40 | 35 |
+| chateau-15#11 | SA | Ligeti zsálya | 5,08 | 13,50 | 40 | 35 |
+| chateau-15#12 | SA | Ligeti zsálya | 3,50 | 13,80 | 40 | 35 |
+| chateau-15#13 | SA | Ligeti zsálya | 3,85 | 13,80 | 40 | 35 |
+| chateau-15#14 | SA | Ligeti zsálya | 4,20 | 13,80 | 40 | 35 |
+| chateau-15#15 | SA | Ligeti zsálya | 4,55 | 13,80 | 40 | 35 |
+| chateau-15#16 | SA | Ligeti zsálya | 4,90 | 13,80 | 40 | 35 |
+| chateau-16 | TB | Közönséges tiszafa | 4,20 | 11,90 | 300 | 200 |
+| chateau-17#1 | BX | Puszpáng | 6,60 | 9,40 | 60 | 50 |
+| chateau-17#2 | BX | Puszpáng | 6,95 | 9,40 | 60 | 50 |
+| chateau-17#3 | BX | Puszpáng | 7,30 | 9,40 | 60 | 50 |
+| chateau-17#4 | BX | Puszpáng | 7,66 | 9,40 | 60 | 50 |
+| chateau-17#5 | BX | Puszpáng | 8,01 | 9,40 | 60 | 50 |
+| chateau-17#6 | BX | Puszpáng | 8,36 | 9,40 | 60 | 50 |
+| chateau-17#7 | BX | Puszpáng | 8,71 | 9,40 | 60 | 50 |
+| chateau-17#8 | BX | Puszpáng | 9,00 | 9,47 | 60 | 50 |
+| chateau-17#9 | BX | Puszpáng | 9,00 | 9,82 | 60 | 50 |
+| chateau-17#10 | BX | Puszpáng | 9,00 | 10,17 | 60 | 50 |
+| chateau-17#11 | BX | Puszpáng | 9,00 | 10,52 | 60 | 50 |
+| chateau-17#12 | BX | Puszpáng | 9,00 | 10,88 | 60 | 50 |
+| chateau-17#13 | BX | Puszpáng | 9,00 | 11,23 | 60 | 50 |
+| chateau-17#14 | BX | Puszpáng | 9,00 | 11,58 | 60 | 50 |
+| chateau-17#15 | BX | Puszpáng | 9,00 | 11,93 | 60 | 50 |
+| chateau-17#16 | BX | Puszpáng | 9,00 | 12,29 | 60 | 50 |
+| chateau-17#17 | BX | Puszpáng | 9,00 | 12,64 | 60 | 50 |
+| chateau-17#18 | BX | Puszpáng | 9,00 | 12,99 | 60 | 50 |
+| chateau-17#19 | BX | Puszpáng | 9,00 | 13,34 | 60 | 50 |
+| chateau-17#20 | BX | Puszpáng | 9,00 | 13,70 | 60 | 50 |
+| chateau-17#21 | BX | Puszpáng | 9,00 | 14,05 | 60 | 50 |
+| chateau-17#22 | BX | Puszpáng | 9,00 | 14,40 | 60 | 50 |
+| chateau-17#23 | BX | Puszpáng | 8,65 | 14,40 | 60 | 50 |
+| chateau-17#24 | BX | Puszpáng | 8,30 | 14,40 | 60 | 50 |
+| chateau-17#25 | BX | Puszpáng | 7,94 | 14,40 | 60 | 50 |
+| chateau-17#26 | BX | Puszpáng | 7,59 | 14,40 | 60 | 50 |
+| chateau-17#27 | BX | Puszpáng | 7,24 | 14,40 | 60 | 50 |
+| chateau-17#28 | BX | Puszpáng | 6,89 | 14,40 | 60 | 50 |
+| chateau-17#29 | BX | Puszpáng | 6,60 | 14,33 | 60 | 50 |
+| chateau-17#30 | BX | Puszpáng | 6,60 | 13,98 | 60 | 50 |
+| chateau-17#31 | BX | Puszpáng | 6,60 | 13,63 | 60 | 50 |
+| chateau-17#32 | BX | Puszpáng | 6,60 | 13,28 | 60 | 50 |
+| chateau-17#33 | BX | Puszpáng | 6,60 | 12,92 | 60 | 50 |
+| chateau-17#34 | BX | Puszpáng | 6,60 | 12,57 | 60 | 50 |
+| chateau-17#35 | BX | Puszpáng | 6,60 | 12,22 | 60 | 50 |
+| chateau-17#36 | BX | Puszpáng | 6,60 | 11,87 | 60 | 50 |
+| chateau-17#37 | BX | Puszpáng | 6,60 | 11,51 | 60 | 50 |
+| chateau-17#38 | BX | Puszpáng | 6,60 | 11,16 | 60 | 50 |
+| chateau-17#39 | BX | Puszpáng | 6,60 | 10,81 | 60 | 50 |
+| chateau-17#40 | BX | Puszpáng | 6,60 | 10,46 | 60 | 50 |
+| chateau-17#41 | BX | Puszpáng | 6,60 | 10,10 | 60 | 50 |
+| chateau-17#42 | BX | Puszpáng | 6,60 | 9,75 | 60 | 50 |
+| chateau-17#43 | BX | Puszpáng | 6,60 | 9,40 | 60 | 50 |
+| chateau-18#1 | LA | Levendula | 7,20 | 9,95 | 45 | 40 |
+| chateau-18#2 | LA | Levendula | 7,60 | 9,95 | 45 | 40 |
+| chateau-18#3 | LA | Levendula | 8,00 | 9,95 | 45 | 40 |
+| chateau-18#4 | LA | Levendula | 8,40 | 9,95 | 45 | 40 |
+| chateau-18#5 | LA | Levendula | 7,00 | 10,30 | 45 | 40 |
+| chateau-18#6 | LA | Levendula | 7,40 | 10,30 | 45 | 40 |
+| chateau-18#7 | LA | Levendula | 7,80 | 10,30 | 45 | 40 |
+| chateau-18#8 | LA | Levendula | 8,20 | 10,30 | 45 | 40 |
+| chateau-18#9 | LA | Levendula | 8,60 | 10,30 | 45 | 40 |
+| chateau-18#10 | LA | Levendula | 7,20 | 10,65 | 45 | 40 |
+| chateau-18#11 | LA | Levendula | 7,60 | 10,65 | 45 | 40 |
+| chateau-18#12 | LA | Levendula | 8,00 | 10,65 | 45 | 40 |
+| chateau-18#13 | LA | Levendula | 8,40 | 10,65 | 45 | 40 |
+| chateau-19#1 | LA | Levendula | 7,20 | 13,15 | 45 | 40 |
+| chateau-19#2 | LA | Levendula | 7,60 | 13,15 | 45 | 40 |
+| chateau-19#3 | LA | Levendula | 8,00 | 13,15 | 45 | 40 |
+| chateau-19#4 | LA | Levendula | 8,40 | 13,15 | 45 | 40 |
+| chateau-19#5 | LA | Levendula | 7,00 | 13,50 | 45 | 40 |
+| chateau-19#6 | LA | Levendula | 7,40 | 13,50 | 45 | 40 |
+| chateau-19#7 | LA | Levendula | 7,80 | 13,50 | 45 | 40 |
+| chateau-19#8 | LA | Levendula | 8,20 | 13,50 | 45 | 40 |
+| chateau-19#9 | LA | Levendula | 8,60 | 13,50 | 45 | 40 |
+| chateau-19#10 | LA | Levendula | 7,20 | 13,85 | 45 | 40 |
+| chateau-19#11 | LA | Levendula | 7,60 | 13,85 | 45 | 40 |
+| chateau-19#12 | LA | Levendula | 8,00 | 13,85 | 45 | 40 |
+| chateau-19#13 | LA | Levendula | 8,40 | 13,85 | 45 | 40 |
+| chateau-20 | TB | Közönséges tiszafa | 7,80 | 11,90 | 300 | 200 |
+
+## 4. Fajok és elhelyezésük
+- **CF – Oszlopos gyertyán** (*Carpinus betulus 'Fastigiata'*), 4 tő. Nagy fa (itt fiatal, telepített állapotú is lehet), kb. 1200 cm magas és 500 cm széles; most nem virágzik; lomb: zöld, ősszel sárga.
+  - x 0,9 m, y 2,6 m
+  - x 0,9 m, y 13,4 m
+  - x 11,1 m, y 2,6 m
+  - x 11,1 m, y 13,4 m
+- **BX – Puszpáng** (*Buxus sempervirens*), 172 tő. Alacsony talajtakaró / párna, kb. 60 cm magas és 50 cm széles; most nem virágzik; lomb: sötétzöld.
+  - íves sor (3,0; 1,6) m-től (3,0; 1,6) m-ig, 35 cm tőtáv (43 tő)
+  - íves sor (6,6; 1,6) m-től (6,6; 1,6) m-ig, 35 cm tőtáv (43 tő)
+  - íves sor (3,0; 9,4) m-től (3,0; 9,4) m-ig, 35 cm tőtáv (43 tő)
+  - íves sor (6,6; 9,4) m-től (6,6; 9,4) m-ig, 35 cm tőtáv (43 tő)
+- **LA – Levendula** (*Lavandula angustifolia 'Munstead'*), 52 tő. Bokros évelő, kb. 45 cm magas és 40 cm széles; most virágzik: lila.
+  - folt: x 3,3–5,1 m, y 1,9–3,1 m, eltolt kiosztás, 40 cm tőtáv (13 tő)
+  - folt: x 3,3–5,1 m, y 5,1–6,3 m, eltolt kiosztás, 40 cm tőtáv (13 tő)
+  - folt: x 6,9–8,7 m, y 9,7–10,9 m, eltolt kiosztás, 40 cm tőtáv (13 tő)
+  - folt: x 6,9–8,7 m, y 12,9–14,1 m, eltolt kiosztás, 40 cm tőtáv (13 tő)
+- **TB – Közönséges tiszafa** (*Taxus baccata*), 4 tő. Cserje (télen is lombos / örökzöld), kb. 300 cm magas és 200 cm széles; most nem virágzik; lomb: sötétzöld tűlevél, piros magköpeny.
+  - x 4,2 m, y 4,1 m
+  - x 7,8 m, y 4,1 m
+  - x 4,2 m, y 11,9 m
+  - x 7,8 m, y 11,9 m
+- **SA – Ligeti zsálya** (*Salvia nemorosa 'Marcus'*), 64 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kékeslila.
+  - folt: x 6,9–8,7 m, y 1,9–3,1 m, eltolt kiosztás, 35 cm tőtáv (16 tő)
+  - folt: x 6,9–8,7 m, y 5,1–6,3 m, eltolt kiosztás, 35 cm tőtáv (16 tő)
+  - folt: x 3,3–5,1 m, y 9,7–10,9 m, eltolt kiosztás, 35 cm tőtáv (16 tő)
+  - folt: x 3,3–5,1 m, y 12,9–14,1 m, eltolt kiosztás, 35 cm tőtáv (16 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (levendula, ligeti zsálya) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (6,0; 7,9) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 296 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 296 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > country-yard: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 103 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Vidéki udvar: 10,0 × 12,0 m, évelőágyás, délkeleti fekvés, napos (közvetlen nap 15:00-ig), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (10,0; 0), (10,0; 12,0), (0; 12,0).
+- Kerítés: x -0,1–0,0 m, y 0,0–12,0 m.
+- Gyep: nyírt gyep, sarokpontjai (m): (1,6; 3,0), (7,2; 3,0), (7,2; 9,4), (1,6; 9,4). Növény nincs rajta.
+- Kerti tároló (fa szerszámoskamra): x 0,0–3,0 m, y 0,0–2,0 m.
+- Komposztáló (fa láda): x 8,6–9,8 m, y 0,2–1,2 m.
+- Kút (kőkáva): x 3,9–4,9 m, y 5,7–6,7 m.
+- Magaságyás (fa keret): x 7,8–9,0 m, y 3,0–5,6 m.
+- Magaságyás (fa keret): x 7,8–9,0 m, y 6,2–8,8 m.
+- Burkolat / járda („Járólapok”): x 4,0–4,8 m, y 9,4–12,0 m.
+- Kerti pad (fa): x 5,2–6,7 m, y 2,5–3,0 m.
+- Esővízgyűjtő hordó: x 3,1–3,7 m, y 1,4–2,0 m.
+
+## 3. Növénytábla (103 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| country-yard-1 | DA | Díszalma | 6,00 | 1,20 | 500 | 400 |
+| country-yard-2 | PH | Illatos jezsámen | 0,80 | 3,40 | 300 | 250 |
+| country-yard-3 | SB | Fekete bodza (bordó levelű) | 0,80 | 5,60 | 250 | 200 |
+| country-yard-4 | HP | Bugás hortenzia | 0,80 | 7,80 | 200 | 200 |
+| country-yard-5#1 | AL | Puha palástfű | 0,55 | 8,95 | 40 | 50 |
+| country-yard-5#2 | AL | Puha palástfű | 1,05 | 8,95 | 40 | 50 |
+| country-yard-6#1 | LE | Margitvirág | 0,60 | 10,02 | 70 | 45 |
+| country-yard-6#2 | LE | Margitvirág | 1,05 | 10,02 | 70 | 45 |
+| country-yard-6#3 | LE | Margitvirág | 1,50 | 10,02 | 70 | 45 |
+| country-yard-6#4 | LE | Margitvirág | 0,38 | 10,41 | 70 | 45 |
+| country-yard-6#5 | LE | Margitvirág | 0,82 | 10,41 | 70 | 45 |
+| country-yard-6#6 | LE | Margitvirág | 1,27 | 10,41 | 70 | 45 |
+| country-yard-6#7 | LE | Margitvirág | 1,73 | 10,41 | 70 | 45 |
+| country-yard-6#8 | LE | Margitvirág | 0,60 | 10,80 | 70 | 45 |
+| country-yard-6#9 | LE | Margitvirág | 1,05 | 10,80 | 70 | 45 |
+| country-yard-6#10 | LE | Margitvirág | 1,50 | 10,80 | 70 | 45 |
+| country-yard-6#11 | LE | Margitvirág | 0,38 | 11,19 | 70 | 45 |
+| country-yard-6#12 | LE | Margitvirág | 0,82 | 11,19 | 70 | 45 |
+| country-yard-6#13 | LE | Margitvirág | 1,27 | 11,19 | 70 | 45 |
+| country-yard-6#14 | LE | Margitvirág | 1,73 | 11,19 | 70 | 45 |
+| country-yard-6#15 | LE | Margitvirág | 0,60 | 11,58 | 70 | 45 |
+| country-yard-6#16 | LE | Margitvirág | 1,05 | 11,58 | 70 | 45 |
+| country-yard-6#17 | LE | Margitvirág | 1,50 | 11,58 | 70 | 45 |
+| country-yard-7#1 | EC | Bíbor kúpvirág | 2,23 | 10,02 | 90 | 45 |
+| country-yard-7#2 | EC | Bíbor kúpvirág | 2,67 | 10,02 | 90 | 45 |
+| country-yard-7#3 | EC | Bíbor kúpvirág | 3,13 | 10,02 | 90 | 45 |
+| country-yard-7#4 | EC | Bíbor kúpvirág | 3,58 | 10,02 | 90 | 45 |
+| country-yard-7#5 | EC | Bíbor kúpvirág | 2,00 | 10,41 | 90 | 45 |
+| country-yard-7#6 | EC | Bíbor kúpvirág | 2,45 | 10,41 | 90 | 45 |
+| country-yard-7#7 | EC | Bíbor kúpvirág | 2,90 | 10,41 | 90 | 45 |
+| country-yard-7#8 | EC | Bíbor kúpvirág | 3,35 | 10,41 | 90 | 45 |
+| country-yard-7#9 | EC | Bíbor kúpvirág | 2,23 | 10,80 | 90 | 45 |
+| country-yard-7#10 | EC | Bíbor kúpvirág | 2,67 | 10,80 | 90 | 45 |
+| country-yard-7#11 | EC | Bíbor kúpvirág | 3,13 | 10,80 | 90 | 45 |
+| country-yard-7#12 | EC | Bíbor kúpvirág | 3,58 | 10,80 | 90 | 45 |
+| country-yard-7#13 | EC | Bíbor kúpvirág | 2,00 | 11,19 | 90 | 45 |
+| country-yard-7#14 | EC | Bíbor kúpvirág | 2,45 | 11,19 | 90 | 45 |
+| country-yard-7#15 | EC | Bíbor kúpvirág | 2,90 | 11,19 | 90 | 45 |
+| country-yard-7#16 | EC | Bíbor kúpvirág | 3,35 | 11,19 | 90 | 45 |
+| country-yard-7#17 | EC | Bíbor kúpvirág | 2,23 | 11,58 | 90 | 45 |
+| country-yard-7#18 | EC | Bíbor kúpvirág | 2,67 | 11,58 | 90 | 45 |
+| country-yard-7#19 | EC | Bíbor kúpvirág | 3,13 | 11,58 | 90 | 45 |
+| country-yard-7#20 | EC | Bíbor kúpvirág | 3,58 | 11,58 | 90 | 45 |
+| country-yard-8#1 | RU | Sárga kúpvirág | 5,35 | 10,02 | 60 | 45 |
+| country-yard-8#2 | RU | Sárga kúpvirág | 5,80 | 10,02 | 60 | 45 |
+| country-yard-8#3 | RU | Sárga kúpvirág | 6,25 | 10,02 | 60 | 45 |
+| country-yard-8#4 | RU | Sárga kúpvirág | 5,13 | 10,41 | 60 | 45 |
+| country-yard-8#5 | RU | Sárga kúpvirág | 5,58 | 10,41 | 60 | 45 |
+| country-yard-8#6 | RU | Sárga kúpvirág | 6,03 | 10,41 | 60 | 45 |
+| country-yard-8#7 | RU | Sárga kúpvirág | 6,47 | 10,41 | 60 | 45 |
+| country-yard-8#8 | RU | Sárga kúpvirág | 5,35 | 10,80 | 60 | 45 |
+| country-yard-8#9 | RU | Sárga kúpvirág | 5,80 | 10,80 | 60 | 45 |
+| country-yard-8#10 | RU | Sárga kúpvirág | 6,25 | 10,80 | 60 | 45 |
+| country-yard-8#11 | RU | Sárga kúpvirág | 5,13 | 11,19 | 60 | 45 |
+| country-yard-8#12 | RU | Sárga kúpvirág | 5,58 | 11,19 | 60 | 45 |
+| country-yard-8#13 | RU | Sárga kúpvirág | 6,03 | 11,19 | 60 | 45 |
+| country-yard-8#14 | RU | Sárga kúpvirág | 6,47 | 11,19 | 60 | 45 |
+| country-yard-8#15 | RU | Sárga kúpvirág | 5,35 | 11,58 | 60 | 45 |
+| country-yard-8#16 | RU | Sárga kúpvirág | 5,80 | 11,58 | 60 | 45 |
+| country-yard-8#17 | RU | Sárga kúpvirág | 6,25 | 11,58 | 60 | 45 |
+| country-yard-9#1 | HM | Sásliliom | 7,20 | 10,28 | 70 | 60 |
+| country-yard-9#2 | HM | Sásliliom | 7,80 | 10,28 | 70 | 60 |
+| country-yard-9#3 | HM | Sásliliom | 6,90 | 10,80 | 70 | 60 |
+| country-yard-9#4 | HM | Sásliliom | 7,50 | 10,80 | 70 | 60 |
+| country-yard-9#5 | HM | Sásliliom | 8,10 | 10,80 | 70 | 60 |
+| country-yard-9#6 | HM | Sásliliom | 7,20 | 11,32 | 70 | 60 |
+| country-yard-9#7 | HM | Sásliliom | 7,80 | 11,32 | 70 | 60 |
+| country-yard-10#1 | AM | Közönséges cickafark | 8,65 | 10,02 | 60 | 45 |
+| country-yard-10#2 | AM | Közönséges cickafark | 9,10 | 10,02 | 60 | 45 |
+| country-yard-10#3 | AM | Közönséges cickafark | 9,55 | 10,02 | 60 | 45 |
+| country-yard-10#4 | AM | Közönséges cickafark | 8,43 | 10,41 | 60 | 45 |
+| country-yard-10#5 | AM | Közönséges cickafark | 8,88 | 10,41 | 60 | 45 |
+| country-yard-10#6 | AM | Közönséges cickafark | 9,32 | 10,41 | 60 | 45 |
+| country-yard-10#7 | AM | Közönséges cickafark | 9,78 | 10,41 | 60 | 45 |
+| country-yard-10#8 | AM | Közönséges cickafark | 8,65 | 10,80 | 60 | 45 |
+| country-yard-10#9 | AM | Közönséges cickafark | 9,10 | 10,80 | 60 | 45 |
+| country-yard-10#10 | AM | Közönséges cickafark | 9,55 | 10,80 | 60 | 45 |
+| country-yard-10#11 | AM | Közönséges cickafark | 8,43 | 11,19 | 60 | 45 |
+| country-yard-10#12 | AM | Közönséges cickafark | 8,88 | 11,19 | 60 | 45 |
+| country-yard-10#13 | AM | Közönséges cickafark | 9,32 | 11,19 | 60 | 45 |
+| country-yard-10#14 | AM | Közönséges cickafark | 9,78 | 11,19 | 60 | 45 |
+| country-yard-10#15 | AM | Közönséges cickafark | 8,65 | 11,58 | 60 | 45 |
+| country-yard-10#16 | AM | Közönséges cickafark | 9,10 | 11,58 | 60 | 45 |
+| country-yard-10#17 | AM | Közönséges cickafark | 9,55 | 11,58 | 60 | 45 |
+| country-yard-11#1 | NE | Macskamenta | 7,78 | 1,91 | 60 | 55 |
+| country-yard-11#2 | NE | Macskamenta | 8,32 | 1,91 | 60 | 55 |
+| country-yard-11#3 | NE | Macskamenta | 8,88 | 1,91 | 60 | 55 |
+| country-yard-11#4 | NE | Macskamenta | 9,43 | 1,91 | 60 | 55 |
+| country-yard-11#5 | NE | Macskamenta | 7,50 | 2,39 | 60 | 55 |
+| country-yard-11#6 | NE | Macskamenta | 8,05 | 2,39 | 60 | 55 |
+| country-yard-11#7 | NE | Macskamenta | 8,60 | 2,39 | 60 | 55 |
+| country-yard-11#8 | NE | Macskamenta | 9,15 | 2,39 | 60 | 55 |
+| country-yard-11#9 | NE | Macskamenta | 9,70 | 2,39 | 60 | 55 |
+| country-yard-12#1 | GR | Kék gólyaorr | 9,55 | 3,42 | 50 | 55 |
+| country-yard-12#2 | GR | Kék gólyaorr | 9,55 | 3,98 | 50 | 55 |
+| country-yard-12#3 | GR | Kék gólyaorr | 9,55 | 4,53 | 50 | 55 |
+| country-yard-12#4 | GR | Kék gólyaorr | 9,55 | 5,08 | 50 | 55 |
+| country-yard-12#5 | GR | Kék gólyaorr | 9,55 | 5,63 | 50 | 55 |
+| country-yard-12#6 | GR | Kék gólyaorr | 9,55 | 6,17 | 50 | 55 |
+| country-yard-12#7 | GR | Kék gólyaorr | 9,55 | 6,72 | 50 | 55 |
+| country-yard-12#8 | GR | Kék gólyaorr | 9,55 | 7,28 | 50 | 55 |
+| country-yard-12#9 | GR | Kék gólyaorr | 9,55 | 7,83 | 50 | 55 |
+| country-yard-12#10 | GR | Kék gólyaorr | 9,55 | 8,38 | 50 | 55 |
+
+## 4. Fajok és elhelyezésük
+- **DA – Díszalma** (*Malus 'Evereste'*), 1 tő. Kis fa / nagycserje, kb. 500 cm magas és 400 cm széles; most nem virágzik; lomb: zöld; narancspiros kis almák télig.
+  - x 6,0 m, y 1,2 m
+- **PH – Illatos jezsámen** (*Philadelphus coronarius*), 1 tő. Lombhullató cserje, kb. 300 cm magas és 250 cm széles; most nem virágzik; lomb: zöld.
+  - x 0,8 m, y 3,4 m
+- **SB – Fekete bodza (bordó levelű)** (*Sambucus nigra 'Black Lace'*), 1 tő. Lombhullató cserje, kb. 250 cm magas és 200 cm széles; most nem virágzik; lomb: csipkés, sötétbordó.
+  - x 0,8 m, y 5,6 m
+- **HP – Bugás hortenzia** (*Hydrangea paniculata 'Limelight'*), 1 tő. Cserje (télen is lombos / örökzöld), kb. 200 cm magas és 200 cm széles; most virágzik: limezöld → krém → rózsás.
+  - x 0,8 m, y 7,8 m
+- **AL – Puha palástfű** (*Alchemilla mollis*), 2 tő. Bokros évelő, kb. 40 cm magas és 50 cm széles; most virágzik: sárgászöld.
+  - folt: x 0,2–1,4 m, y 8,6–9,3 m, eltolt kiosztás, 50 cm tőtáv (2 tő)
+- **LE – Margitvirág** (*Leucanthemum × superbum 'Becky'*), 17 tő. Bokros évelő, kb. 70 cm magas és 45 cm széles; most virágzik: fehér.
+  - folt: x 0,2–1,9 m, y 9,8–11,8 m, eltolt kiosztás, 45 cm tőtáv (17 tő)
+- **EC – Bíbor kúpvirág** (*Echinacea purpurea 'Magnus'*), 20 tő. Bokros évelő, kb. 90 cm magas és 45 cm széles; most virágzik: bíborrózsaszín.
+  - folt: x 2,0–3,8 m, y 9,8–11,8 m, eltolt kiosztás, 45 cm tőtáv (20 tő)
+- **RU – Sárga kúpvirág** (*Rudbeckia fulgida 'Goldsturm'*), 17 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: aranysárga.
+  - folt: x 5,0–6,6 m, y 9,8–11,8 m, eltolt kiosztás, 45 cm tőtáv (17 tő)
+- **HM – Sásliliom** (*Hemerocallis sp.*), 7 tő. Bokros évelő, kb. 70 cm magas és 60 cm széles; most virágzik: narancs / sárga.
+  - folt: x 6,7–8,3 m, y 9,8–11,8 m, eltolt kiosztás, 60 cm tőtáv (7 tő)
+- **AM – Közönséges cickafark** (*Achillea millefolium*), 17 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: fehér / rózsaszín / sárga.
+  - folt: x 8,4–9,8 m, y 9,8–11,8 m, eltolt kiosztás, 45 cm tőtáv (17 tő)
+- **NE – Macskamenta** (*Nepeta × faassenii 'Walker's Low'*), 9 tő. Bokros évelő, kb. 60 cm magas és 55 cm széles; most virágzik: levendulakék.
+  - folt: x 7,4–9,8 m, y 1,6–2,7 m, eltolt kiosztás, 55 cm tőtáv (9 tő)
+- **GR – Kék gólyaorr** (*Geranium 'Rozanne'*), 10 tő. Bokros évelő, kb. 50 cm magas és 55 cm széles; most virágzik: ibolyakék.
+  - folt: x 9,2–9,9 m, y 3,0–8,8 m, négyzetes kiosztás, 55 cm tőtáv (10 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (közönséges cickafark, macskamenta) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes délelőtti napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (4,5; 7,4) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 103 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 103 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > curving: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 82 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Kanyargó előkerti ágyás: 9,0 × 7,0 m, szegély, alacsony sövény, déli fekvés, napos (közvetlen nap egész nap), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás alakja (sarokpontok, m): (0,0; 0,0), (9,0; 0,0), (9,0; 3,0), (8,7; 3,2), (8,4; 3,5), (8,1; 3,7), (7,8; 3,8), (7,5; 4,0), (7,2; 4,1), (6,9; 4,1), (6,6; 4,2), (6,3; 4,2), (6,0; 4,2), (5,7; 4,2), (5,4; 4,2), (5,1; 4,2), (4,8; 4,3), (4,5; 4,4), (4,2; 4,5), (3,9; 4,7), (3,6; 4,9), (3,3; 5,1), (3,0; 5,3), (2,7; 5,6), (2,4; 5,8), (2,1; 6,0), (1,8; 6,2), (1,5; 6,3), (1,2; 6,4), (0,9; 6,5), (0,6; 6,5), (0,3; 6,5), (0,0; 6,5).
+- Kerítés: x 0,0–9,0 m, y -0,1–0,0 m.
+
+## 3. Növénytábla (82 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| curving-1 | BX | Puszpáng | 0,60 | 0,60 | 60 | 50 |
+| curving-2 | BX | Puszpáng | 8,40 | 0,60 | 60 | 50 |
+| curving-3#1 | MI | Kínai virágosnád | 1,50 | 1,19 | 100 | 70 |
+| curving-3#2 | MI | Kínai virágosnád | 2,20 | 1,19 | 100 | 70 |
+| curving-3#3 | MI | Kínai virágosnád | 2,90 | 1,19 | 100 | 70 |
+| curving-3#4 | MI | Kínai virágosnád | 3,60 | 1,19 | 100 | 70 |
+| curving-4#1 | PN | Tollborzfű | 5,12 | 0,85 | 60 | 60 |
+| curving-4#2 | PN | Tollborzfű | 5,72 | 0,85 | 60 | 60 |
+| curving-4#3 | PN | Tollborzfű | 6,32 | 0,85 | 60 | 60 |
+| curving-4#4 | PN | Tollborzfű | 6,92 | 0,85 | 60 | 60 |
+| curving-4#5 | PN | Tollborzfű | 7,52 | 0,85 | 60 | 60 |
+| curving-4#6 | PN | Tollborzfű | 4,82 | 1,37 | 60 | 60 |
+| curving-4#7 | PN | Tollborzfű | 5,42 | 1,37 | 60 | 60 |
+| curving-4#8 | PN | Tollborzfű | 6,02 | 1,37 | 60 | 60 |
+| curving-4#9 | PN | Tollborzfű | 6,62 | 1,37 | 60 | 60 |
+| curving-4#10 | PN | Tollborzfű | 7,22 | 1,37 | 60 | 60 |
+| curving-5#1 | EC | Bíbor kúpvirág | 1,09 | 2,86 | 90 | 45 |
+| curving-5#2 | EC | Bíbor kúpvirág | 1,54 | 2,86 | 90 | 45 |
+| curving-5#3 | EC | Bíbor kúpvirág | 1,99 | 2,86 | 90 | 45 |
+| curving-5#4 | EC | Bíbor kúpvirág | 2,44 | 2,86 | 90 | 45 |
+| curving-5#5 | EC | Bíbor kúpvirág | 0,86 | 3,25 | 90 | 45 |
+| curving-5#6 | EC | Bíbor kúpvirág | 1,31 | 3,25 | 90 | 45 |
+| curving-5#7 | EC | Bíbor kúpvirág | 1,76 | 3,25 | 90 | 45 |
+| curving-5#8 | EC | Bíbor kúpvirág | 2,21 | 3,25 | 90 | 45 |
+| curving-5#9 | EC | Bíbor kúpvirág | 2,66 | 3,25 | 90 | 45 |
+| curving-5#10 | EC | Bíbor kúpvirág | 1,09 | 3,64 | 90 | 45 |
+| curving-5#11 | EC | Bíbor kúpvirág | 1,54 | 3,64 | 90 | 45 |
+| curving-5#12 | EC | Bíbor kúpvirág | 1,99 | 3,64 | 90 | 45 |
+| curving-5#13 | EC | Bíbor kúpvirág | 2,44 | 3,64 | 90 | 45 |
+| curving-6#1 | RU | Sárga kúpvirág | 3,58 | 2,39 | 60 | 45 |
+| curving-6#2 | RU | Sárga kúpvirág | 4,03 | 2,39 | 60 | 45 |
+| curving-6#3 | RU | Sárga kúpvirág | 4,48 | 2,39 | 60 | 45 |
+| curving-6#4 | RU | Sárga kúpvirág | 4,93 | 2,39 | 60 | 45 |
+| curving-6#5 | RU | Sárga kúpvirág | 3,35 | 2,78 | 60 | 45 |
+| curving-6#6 | RU | Sárga kúpvirág | 3,80 | 2,78 | 60 | 45 |
+| curving-6#7 | RU | Sárga kúpvirág | 4,25 | 2,78 | 60 | 45 |
+| curving-6#8 | RU | Sárga kúpvirág | 4,70 | 2,78 | 60 | 45 |
+| curving-6#9 | RU | Sárga kúpvirág | 5,15 | 2,78 | 60 | 45 |
+| curving-6#10 | RU | Sárga kúpvirág | 3,58 | 3,17 | 60 | 45 |
+| curving-6#11 | RU | Sárga kúpvirág | 4,03 | 3,17 | 60 | 45 |
+| curving-6#12 | RU | Sárga kúpvirág | 4,48 | 3,17 | 60 | 45 |
+| curving-6#13 | RU | Sárga kúpvirág | 4,93 | 3,17 | 60 | 45 |
+| curving-7#1 | SA | Ligeti zsálya | 6,27 | 1,94 | 40 | 35 |
+| curving-7#2 | SA | Ligeti zsálya | 6,62 | 1,94 | 40 | 35 |
+| curving-7#3 | SA | Ligeti zsálya | 6,97 | 1,94 | 40 | 35 |
+| curving-7#4 | SA | Ligeti zsálya | 7,32 | 1,94 | 40 | 35 |
+| curving-7#5 | SA | Ligeti zsálya | 6,10 | 2,24 | 40 | 35 |
+| curving-7#6 | SA | Ligeti zsálya | 6,45 | 2,24 | 40 | 35 |
+| curving-7#7 | SA | Ligeti zsálya | 6,80 | 2,24 | 40 | 35 |
+| curving-7#8 | SA | Ligeti zsálya | 7,15 | 2,24 | 40 | 35 |
+| curving-7#9 | SA | Ligeti zsálya | 7,50 | 2,24 | 40 | 35 |
+| curving-7#10 | SA | Ligeti zsálya | 7,85 | 2,24 | 40 | 35 |
+| curving-7#11 | SA | Ligeti zsálya | 6,27 | 2,55 | 40 | 35 |
+| curving-7#12 | SA | Ligeti zsálya | 6,62 | 2,55 | 40 | 35 |
+| curving-7#13 | SA | Ligeti zsálya | 6,97 | 2,55 | 40 | 35 |
+| curving-7#14 | SA | Ligeti zsálya | 7,32 | 2,55 | 40 | 35 |
+| curving-8#1 | NE | Macskamenta | 1,04 | 4,80 | 60 | 55 |
+| curving-8#2 | NE | Macskamenta | 1,59 | 4,80 | 60 | 55 |
+| curving-8#3 | NE | Macskamenta | 0,77 | 5,28 | 60 | 55 |
+| curving-8#4 | NE | Macskamenta | 1,32 | 5,28 | 60 | 55 |
+| curving-8#5 | NE | Macskamenta | 1,87 | 5,28 | 60 | 55 |
+| curving-9#1 | LA | Levendula | 0,70 | 5,95 | 45 | 40 |
+| curving-9#2 | LA | Levendula | 1,09 | 5,89 | 45 | 40 |
+| curving-9#3 | LA | Levendula | 1,47 | 5,77 | 45 | 40 |
+| curving-9#4 | LA | Levendula | 1,83 | 5,61 | 45 | 40 |
+| curving-9#5 | LA | Levendula | 2,17 | 5,41 | 45 | 40 |
+| curving-9#6 | LA | Levendula | 2,49 | 5,18 | 45 | 40 |
+| curving-9#7 | LA | Levendula | 2,80 | 4,94 | 45 | 40 |
+| curving-9#8 | LA | Levendula | 3,11 | 4,69 | 45 | 40 |
+| curving-9#9 | LA | Levendula | 3,42 | 4,45 | 45 | 40 |
+| curving-9#10 | LA | Levendula | 3,75 | 4,22 | 45 | 40 |
+| curving-9#11 | LA | Levendula | 4,08 | 4,01 | 45 | 40 |
+| curving-9#12 | LA | Levendula | 4,44 | 3,84 | 45 | 40 |
+| curving-9#13 | LA | Levendula | 4,81 | 3,70 | 45 | 40 |
+| curving-9#14 | LA | Levendula | 5,20 | 3,63 | 45 | 40 |
+| curving-9#15 | LA | Levendula | 5,59 | 3,61 | 45 | 40 |
+| curving-9#16 | LA | Levendula | 5,99 | 3,62 | 45 | 40 |
+| curving-9#17 | LA | Levendula | 6,38 | 3,62 | 45 | 40 |
+| curving-9#18 | LA | Levendula | 6,78 | 3,60 | 45 | 40 |
+| curving-9#19 | LA | Levendula | 7,17 | 3,53 | 45 | 40 |
+| curving-9#20 | LA | Levendula | 7,54 | 3,41 | 45 | 40 |
+| curving-9#21 | LA | Levendula | 7,90 | 3,24 | 45 | 40 |
+
+## 4. Fajok és elhelyezésük
+- **BX – Puszpáng** (*Buxus sempervirens*), 2 tő. Alacsony talajtakaró / párna, kb. 60 cm magas és 50 cm széles; most nem virágzik; lomb: sötétzöld.
+  - x 0,6 m, y 0,6 m
+  - x 8,4 m, y 0,6 m
+- **MI – Kínai virágosnád** (*Miscanthus sinensis 'Adagio'*), 4 tő. Díszfű / felálló levélcsomó, kb. 100 cm magas és 70 cm széles; most nem virágzik; lomb: keskeny zöld.
+  - folt: x 1,0–4,1 m, y 0,6–1,8 m, eltolt kiosztás, 70 cm tőtáv (4 tő)
+- **PN – Tollborzfű** (*Pennisetum alopecuroides 'Hameln'*), 10 tő. Díszfű / felálló levélcsomó, kb. 60 cm magas és 60 cm széles; most nem virágzik; lomb: zöld, ősszel arany.
+  - folt: x 4,6–8,0 m, y 0,5–1,7 m, eltolt kiosztás, 60 cm tőtáv (10 tő)
+- **EC – Bíbor kúpvirág** (*Echinacea purpurea 'Magnus'*), 13 tő. Bokros évelő, kb. 90 cm magas és 45 cm széles; most virágzik: bíborrózsaszín.
+  - folt: x 0,6–2,9 m, y 2,5–4,0 m, eltolt kiosztás, 45 cm tőtáv (13 tő)
+- **RU – Sárga kúpvirág** (*Rudbeckia fulgida 'Goldsturm'*), 13 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: aranysárga.
+  - folt: x 3,1–5,4 m, y 2,2–3,4 m, eltolt kiosztás, 45 cm tőtáv (13 tő)
+- **SA – Ligeti zsálya** (*Salvia nemorosa 'Marcus'*), 14 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kékeslila.
+  - folt: x 6,0–8,0 m, y 1,8–2,7 m, eltolt kiosztás, 35 cm tőtáv (14 tő)
+- **NE – Macskamenta** (*Nepeta × faassenii 'Walker's Low'*), 5 tő. Bokros évelő, kb. 60 cm magas és 55 cm széles; most virágzik: levendulakék.
+  - folt: x 0,5–2,1 m, y 4,5–5,5 m, eltolt kiosztás, 55 cm tőtáv (5 tő)
+- **LA – Levendula** (*Lavandula angustifolia 'Munstead'*), 21 tő. Bokros évelő, kb. 45 cm magas és 40 cm széles; most virágzik: lila.
+  - íves sor (0,7; 5,9) m-től (7,9; 3,2) m-ig, 40 cm tőtáv (21 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (ligeti zsálya, macskamenta, levendula) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (4,0; 2,3) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 82 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 82 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > english: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 152 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Angolkert: 10,0 × 14,0 m, szegély, alacsony sövény, délnyugati fekvés, napos (közvetlen nap délutántól napos), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (10,0; 0), (10,0; 14,0), (0; 14,0).
+- Gyep: ívelt, lágy szélű nyírt gyep, kb. x 2,5–7,5 m, y 0,0–14,0 m között (alakja a mellékelt rajzon). Növény nincs rajta.
+- Kerti pad (fa): x 4,3–5,8 m, y 0,3–0,8 m.
+- Kerti tó (víztükör, természetes kőszegély): x 6,4–8,6 m, y 10,8–12,3 m.
+
+## 3. Növénytábla (152 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| english-1 | DC | Japán díszcseresznye | 2,20 | 1,60 | 800 | 600 |
+| english-2 | SV | Kerti gyöngyvessző | 8,60 | 1,80 | 200 | 250 |
+| english-3 | HS | Mályvacserje | 8,60 | 4,70 | 250 | 150 |
+| english-4#1 | CK | Tollas nádtippan | 0,50 | 4,62 | 110 | 50 |
+| english-4#2 | CK | Tollas nádtippan | 0,25 | 5,05 | 110 | 50 |
+| english-4#3 | CK | Tollas nádtippan | 0,75 | 5,05 | 110 | 50 |
+| english-4#4 | CK | Tollas nádtippan | 0,50 | 5,48 | 110 | 50 |
+| english-4#5 | CK | Tollas nádtippan | 0,25 | 5,92 | 110 | 50 |
+| english-4#6 | CK | Tollas nádtippan | 0,75 | 5,92 | 110 | 50 |
+| english-4#7 | CK | Tollas nádtippan | 0,50 | 6,35 | 110 | 50 |
+| english-4#8 | CK | Tollas nádtippan | 0,25 | 6,78 | 110 | 50 |
+| english-4#9 | CK | Tollas nádtippan | 0,75 | 6,78 | 110 | 50 |
+| english-5#1 | AG | Ánizsizsóp | 1,38 | 4,53 | 80 | 45 |
+| english-5#2 | AG | Ánizsizsóp | 1,82 | 4,53 | 80 | 45 |
+| english-5#3 | AG | Ánizsizsóp | 1,15 | 4,92 | 80 | 45 |
+| english-5#4 | AG | Ánizsizsóp | 1,60 | 4,92 | 80 | 45 |
+| english-5#5 | AG | Ánizsizsóp | 2,05 | 4,92 | 80 | 45 |
+| english-5#6 | AG | Ánizsizsóp | 1,38 | 5,31 | 80 | 45 |
+| english-5#7 | AG | Ánizsizsóp | 1,82 | 5,31 | 80 | 45 |
+| english-5#8 | AG | Ánizsizsóp | 1,15 | 5,70 | 80 | 45 |
+| english-5#9 | AG | Ánizsizsóp | 1,60 | 5,70 | 80 | 45 |
+| english-5#10 | AG | Ánizsizsóp | 2,05 | 5,70 | 80 | 45 |
+| english-5#11 | AG | Ánizsizsóp | 1,38 | 6,09 | 80 | 45 |
+| english-5#12 | AG | Ánizsizsóp | 1,82 | 6,09 | 80 | 45 |
+| english-5#13 | AG | Ánizsizsóp | 1,15 | 6,48 | 80 | 45 |
+| english-5#14 | AG | Ánizsizsóp | 1,60 | 6,48 | 80 | 45 |
+| english-5#15 | AG | Ánizsizsóp | 2,05 | 6,48 | 80 | 45 |
+| english-5#16 | AG | Ánizsizsóp | 1,38 | 6,87 | 80 | 45 |
+| english-5#17 | AG | Ánizsizsóp | 1,82 | 6,87 | 80 | 45 |
+| english-6#1 | VS | Macskafarkú veronika | 0,38 | 7,79 | 40 | 35 |
+| english-6#2 | VS | Macskafarkú veronika | 0,72 | 7,79 | 40 | 35 |
+| english-6#3 | VS | Macskafarkú veronika | 0,20 | 8,09 | 40 | 35 |
+| english-6#4 | VS | Macskafarkú veronika | 0,55 | 8,09 | 40 | 35 |
+| english-6#5 | VS | Macskafarkú veronika | 0,90 | 8,09 | 40 | 35 |
+| english-6#6 | VS | Macskafarkú veronika | 0,38 | 8,39 | 40 | 35 |
+| english-6#7 | VS | Macskafarkú veronika | 0,72 | 8,39 | 40 | 35 |
+| english-6#8 | VS | Macskafarkú veronika | 0,20 | 8,70 | 40 | 35 |
+| english-6#9 | VS | Macskafarkú veronika | 0,55 | 8,70 | 40 | 35 |
+| english-6#10 | VS | Macskafarkú veronika | 0,90 | 8,70 | 40 | 35 |
+| english-6#11 | VS | Macskafarkú veronika | 0,38 | 9,00 | 40 | 35 |
+| english-6#12 | VS | Macskafarkú veronika | 0,72 | 9,00 | 40 | 35 |
+| english-6#13 | VS | Macskafarkú veronika | 0,20 | 9,30 | 40 | 35 |
+| english-6#14 | VS | Macskafarkú veronika | 0,55 | 9,30 | 40 | 35 |
+| english-6#15 | VS | Macskafarkú veronika | 0,90 | 9,30 | 40 | 35 |
+| english-6#16 | VS | Macskafarkú veronika | 0,38 | 9,61 | 40 | 35 |
+| english-6#17 | VS | Macskafarkú veronika | 0,72 | 9,61 | 40 | 35 |
+| english-6#18 | VS | Macskafarkú veronika | 0,20 | 9,91 | 40 | 35 |
+| english-6#19 | VS | Macskafarkú veronika | 0,55 | 9,91 | 40 | 35 |
+| english-6#20 | VS | Macskafarkú veronika | 0,90 | 9,91 | 40 | 35 |
+| english-6#21 | VS | Macskafarkú veronika | 0,38 | 10,21 | 40 | 35 |
+| english-6#22 | VS | Macskafarkú veronika | 0,72 | 10,21 | 40 | 35 |
+| english-7#1 | LE | Margitvirág | 1,38 | 7,83 | 70 | 45 |
+| english-7#2 | LE | Margitvirág | 1,82 | 7,83 | 70 | 45 |
+| english-7#3 | LE | Margitvirág | 1,15 | 8,22 | 70 | 45 |
+| english-7#4 | LE | Margitvirág | 1,60 | 8,22 | 70 | 45 |
+| english-7#5 | LE | Margitvirág | 2,05 | 8,22 | 70 | 45 |
+| english-7#6 | LE | Margitvirág | 1,38 | 8,61 | 70 | 45 |
+| english-7#7 | LE | Margitvirág | 1,82 | 8,61 | 70 | 45 |
+| english-7#8 | LE | Margitvirág | 1,15 | 9,00 | 70 | 45 |
+| english-7#9 | LE | Margitvirág | 1,60 | 9,00 | 70 | 45 |
+| english-7#10 | LE | Margitvirág | 2,05 | 9,00 | 70 | 45 |
+| english-7#11 | LE | Margitvirág | 1,38 | 9,39 | 70 | 45 |
+| english-7#12 | LE | Margitvirág | 1,82 | 9,39 | 70 | 45 |
+| english-7#13 | LE | Margitvirág | 1,15 | 9,78 | 70 | 45 |
+| english-7#14 | LE | Margitvirág | 1,60 | 9,78 | 70 | 45 |
+| english-7#15 | LE | Margitvirág | 2,05 | 9,78 | 70 | 45 |
+| english-7#16 | LE | Margitvirág | 1,38 | 10,17 | 70 | 45 |
+| english-7#17 | LE | Margitvirág | 1,82 | 10,17 | 70 | 45 |
+| english-8#1 | EC | Bíbor kúpvirág | 0,47 | 11,13 | 90 | 45 |
+| english-8#2 | EC | Bíbor kúpvirág | 0,93 | 11,13 | 90 | 45 |
+| english-8#3 | EC | Bíbor kúpvirág | 0,25 | 11,52 | 90 | 45 |
+| english-8#4 | EC | Bíbor kúpvirág | 0,70 | 11,52 | 90 | 45 |
+| english-8#5 | EC | Bíbor kúpvirág | 1,15 | 11,52 | 90 | 45 |
+| english-8#6 | EC | Bíbor kúpvirág | 0,47 | 11,91 | 90 | 45 |
+| english-8#7 | EC | Bíbor kúpvirág | 0,93 | 11,91 | 90 | 45 |
+| english-8#8 | EC | Bíbor kúpvirág | 0,25 | 12,30 | 90 | 45 |
+| english-8#9 | EC | Bíbor kúpvirág | 0,70 | 12,30 | 90 | 45 |
+| english-8#10 | EC | Bíbor kúpvirág | 1,15 | 12,30 | 90 | 45 |
+| english-8#11 | EC | Bíbor kúpvirág | 0,47 | 12,69 | 90 | 45 |
+| english-8#12 | EC | Bíbor kúpvirág | 0,93 | 12,69 | 90 | 45 |
+| english-8#13 | EC | Bíbor kúpvirág | 0,25 | 13,08 | 90 | 45 |
+| english-8#14 | EC | Bíbor kúpvirág | 0,70 | 13,08 | 90 | 45 |
+| english-8#15 | EC | Bíbor kúpvirág | 1,15 | 13,08 | 90 | 45 |
+| english-8#16 | EC | Bíbor kúpvirág | 0,47 | 13,47 | 90 | 45 |
+| english-8#17 | EC | Bíbor kúpvirág | 0,93 | 13,47 | 90 | 45 |
+| english-9#1 | NE | Macskamenta | 2,00 | 11,11 | 60 | 55 |
+| english-9#2 | NE | Macskamenta | 1,73 | 11,59 | 60 | 55 |
+| english-9#3 | NE | Macskamenta | 2,27 | 11,59 | 60 | 55 |
+| english-9#4 | NE | Macskamenta | 2,00 | 12,06 | 60 | 55 |
+| english-9#5 | NE | Macskamenta | 1,73 | 12,54 | 60 | 55 |
+| english-9#6 | NE | Macskamenta | 2,27 | 12,54 | 60 | 55 |
+| english-9#7 | NE | Macskamenta | 2,00 | 13,01 | 60 | 55 |
+| english-9#8 | NE | Macskamenta | 1,73 | 13,49 | 60 | 55 |
+| english-9#9 | NE | Macskamenta | 2,27 | 13,49 | 60 | 55 |
+| english-10#1 | GR | Kék gólyaorr | 7,17 | 6,98 | 50 | 55 |
+| english-10#2 | GR | Kék gólyaorr | 7,72 | 6,98 | 50 | 55 |
+| english-10#3 | GR | Kék gólyaorr | 8,28 | 6,98 | 50 | 55 |
+| english-10#4 | GR | Kék gólyaorr | 8,82 | 6,98 | 50 | 55 |
+| english-10#5 | GR | Kék gólyaorr | 6,90 | 7,46 | 50 | 55 |
+| english-10#6 | GR | Kék gólyaorr | 7,45 | 7,46 | 50 | 55 |
+| english-10#7 | GR | Kék gólyaorr | 8,00 | 7,46 | 50 | 55 |
+| english-10#8 | GR | Kék gólyaorr | 8,55 | 7,46 | 50 | 55 |
+| english-10#9 | GR | Kék gólyaorr | 9,10 | 7,46 | 50 | 55 |
+| english-10#10 | GR | Kék gólyaorr | 7,17 | 7,93 | 50 | 55 |
+| english-10#11 | GR | Kék gólyaorr | 7,72 | 7,93 | 50 | 55 |
+| english-10#12 | GR | Kék gólyaorr | 8,28 | 7,93 | 50 | 55 |
+| english-10#13 | GR | Kék gólyaorr | 8,82 | 7,93 | 50 | 55 |
+| english-10#14 | GR | Kék gólyaorr | 7,45 | 8,41 | 50 | 55 |
+| english-10#15 | GR | Kék gólyaorr | 8,00 | 8,41 | 50 | 55 |
+| english-10#16 | GR | Kék gólyaorr | 8,55 | 8,41 | 50 | 55 |
+| english-11#1 | HM | Sásliliom | 8,50 | 9,21 | 70 | 60 |
+| english-11#2 | HM | Sásliliom | 9,10 | 9,21 | 70 | 60 |
+| english-11#3 | HM | Sásliliom | 8,20 | 9,73 | 70 | 60 |
+| english-11#4 | HM | Sásliliom | 8,80 | 9,73 | 70 | 60 |
+| english-11#5 | HM | Sásliliom | 9,40 | 9,73 | 70 | 60 |
+| english-12#1 | AM | Közönséges cickafark | 8,03 | 13,06 | 60 | 45 |
+| english-12#2 | AM | Közönséges cickafark | 8,47 | 13,06 | 60 | 45 |
+| english-12#3 | AM | Közönséges cickafark | 8,93 | 13,06 | 60 | 45 |
+| english-12#4 | AM | Közönséges cickafark | 9,38 | 13,06 | 60 | 45 |
+| english-12#5 | AM | Közönséges cickafark | 7,80 | 13,44 | 60 | 45 |
+| english-12#6 | AM | Közönséges cickafark | 8,25 | 13,44 | 60 | 45 |
+| english-12#7 | AM | Közönséges cickafark | 8,70 | 13,44 | 60 | 45 |
+| english-12#8 | AM | Közönséges cickafark | 9,15 | 13,44 | 60 | 45 |
+| english-12#9 | AM | Közönséges cickafark | 9,60 | 13,44 | 60 | 45 |
+| english-13#1 | AG | Ánizsizsóp | 9,07 | 5,81 | 80 | 45 |
+| english-13#2 | AG | Ánizsizsóp | 9,53 | 5,81 | 80 | 45 |
+| english-13#3 | AG | Ánizsizsóp | 8,85 | 6,20 | 80 | 45 |
+| english-13#4 | AG | Ánizsizsóp | 9,30 | 6,20 | 80 | 45 |
+| english-13#5 | AG | Ánizsizsóp | 9,75 | 6,20 | 80 | 45 |
+| english-13#6 | AG | Ánizsizsóp | 9,07 | 6,59 | 80 | 45 |
+| english-13#7 | AG | Ánizsizsóp | 9,53 | 6,59 | 80 | 45 |
+| english-14#1 | EC | Bíbor kúpvirág | 9,13 | 10,92 | 90 | 45 |
+| english-14#2 | EC | Bíbor kúpvirág | 9,57 | 10,92 | 90 | 45 |
+| english-14#3 | EC | Bíbor kúpvirág | 8,90 | 11,31 | 90 | 45 |
+| english-14#4 | EC | Bíbor kúpvirág | 9,35 | 11,31 | 90 | 45 |
+| english-14#5 | EC | Bíbor kúpvirág | 9,13 | 11,69 | 90 | 45 |
+| english-14#6 | EC | Bíbor kúpvirág | 9,57 | 11,69 | 90 | 45 |
+| english-14#7 | EC | Bíbor kúpvirág | 8,90 | 12,08 | 90 | 45 |
+| english-14#8 | EC | Bíbor kúpvirág | 9,35 | 12,08 | 90 | 45 |
+| english-15#1 | VS | Macskafarkú veronika | 7,72 | 3,25 | 40 | 35 |
+| english-15#2 | VS | Macskafarkú veronika | 8,07 | 3,25 | 40 | 35 |
+| english-15#3 | VS | Macskafarkú veronika | 8,43 | 3,25 | 40 | 35 |
+| english-15#4 | VS | Macskafarkú veronika | 8,78 | 3,25 | 40 | 35 |
+| english-15#5 | VS | Macskafarkú veronika | 9,13 | 3,25 | 40 | 35 |
+| english-15#6 | VS | Macskafarkú veronika | 9,47 | 3,25 | 40 | 35 |
+| english-15#7 | VS | Macskafarkú veronika | 7,55 | 3,55 | 40 | 35 |
+| english-15#8 | VS | Macskafarkú veronika | 7,90 | 3,55 | 40 | 35 |
+| english-15#9 | VS | Macskafarkú veronika | 8,25 | 3,55 | 40 | 35 |
+| english-15#10 | VS | Macskafarkú veronika | 8,60 | 3,55 | 40 | 35 |
+| english-15#11 | VS | Macskafarkú veronika | 8,95 | 3,55 | 40 | 35 |
+| english-15#12 | VS | Macskafarkú veronika | 9,30 | 3,55 | 40 | 35 |
+| english-15#13 | VS | Macskafarkú veronika | 9,65 | 3,55 | 40 | 35 |
+
+## 4. Fajok és elhelyezésük
+- **DC – Japán díszcseresznye** (*Prunus serrulata 'Kanzan'*), 1 tő. Kis fa / nagycserje, kb. 800 cm magas és 600 cm széles; most nem virágzik; lomb: bronzos hajtás, ősszel narancs.
+  - x 2,2 m, y 1,6 m
+- **SV – Kerti gyöngyvessző** (*Spiraea × vanhouttei*), 1 tő. Lombhullató cserje, kb. 200 cm magas és 250 cm széles; most nem virágzik; lomb: kékeszöld.
+  - x 8,6 m, y 1,8 m
+- **HS – Mályvacserje** (*Hibiscus syriacus 'Oiseau Bleu'*), 1 tő. Lombhullató cserje, kb. 250 cm magas és 150 cm széles; most virágzik: kék, bordó szemmel.
+  - x 8,6 m, y 4,7 m
+- **CK – Tollas nádtippan** (*Calamagrostis × acutiflora 'Overdam'*), 9 tő. Díszfű / felálló levélcsomó, kb. 110 cm magas és 50 cm széles; most virágzik: bronz kalász.
+  - folt: x 0,1–0,9 m, y 4,2–7,2 m, eltolt kiosztás, 50 cm tőtáv (9 tő)
+- **AG – Ánizsizsóp** (*Agastache 'Blue Fortune'*), 24 tő. Bokros évelő, kb. 80 cm magas és 45 cm széles; most virágzik: levendulakék.
+  - folt: x 1,1–2,1 m, y 4,2–7,2 m, eltolt kiosztás, 45 cm tőtáv (17 tő)
+  - folt: x 8,8–9,8 m, y 5,6–6,8 m, eltolt kiosztás, 45 cm tőtáv (7 tő)
+- **VS – Macskafarkú veronika** (*Veronica spicata 'Ulster Blue Dwarf'*), 35 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kék.
+  - folt: x 0,1–1,0 m, y 7,6–10,4 m, eltolt kiosztás, 35 cm tőtáv (22 tő)
+  - folt: x 7,4–9,8 m, y 3,0–3,8 m, eltolt kiosztás, 35 cm tőtáv (13 tő)
+- **LE – Margitvirág** (*Leucanthemum × superbum 'Becky'*), 17 tő. Bokros évelő, kb. 70 cm magas és 45 cm széles; most virágzik: fehér.
+  - folt: x 1,1–2,1 m, y 7,6–10,4 m, eltolt kiosztás, 45 cm tőtáv (17 tő)
+- **EC – Bíbor kúpvirág** (*Echinacea purpurea 'Magnus'*), 25 tő. Bokros évelő, kb. 90 cm magas és 45 cm széles; most virágzik: bíborrózsaszín.
+  - folt: x 0,1–1,3 m, y 10,8–13,8 m, eltolt kiosztás, 45 cm tőtáv (17 tő)
+  - folt: x 8,9–9,8 m, y 10,6–12,4 m, eltolt kiosztás, 45 cm tőtáv (8 tő)
+- **NE – Macskamenta** (*Nepeta × faassenii 'Walker's Low'*), 9 tő. Bokros évelő, kb. 60 cm magas és 55 cm széles; most virágzik: levendulakék.
+  - folt: x 1,5–2,5 m, y 10,8–13,8 m, eltolt kiosztás, 55 cm tőtáv (9 tő)
+- **GR – Kék gólyaorr** (*Geranium 'Rozanne'*), 16 tő. Bokros évelő, kb. 50 cm magas és 55 cm széles; most virágzik: ibolyakék.
+  - folt: x 6,8–9,2 m, y 6,7–8,7 m, eltolt kiosztás, 55 cm tőtáv (16 tő)
+- **HM – Sásliliom** (*Hemerocallis sp.*), 5 tő. Bokros évelő, kb. 70 cm magas és 60 cm széles; most virágzik: narancs / sárga.
+  - folt: x 8,0–9,6 m, y 8,8–10,2 m, eltolt kiosztás, 60 cm tőtáv (5 tő)
+- **AM – Közönséges cickafark** (*Achillea millefolium*), 9 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: fehér / rózsaszín / sárga.
+  - folt: x 7,6–9,8 m, y 12,7–13,8 m, eltolt kiosztás, 45 cm tőtáv (9 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (kerti gyöngyvessző, ánizsizsóp, macskafarkú veronika, macskamenta, közönséges cickafark) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes késő délutáni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (5,3; 7,6) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 152 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 152 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > japanese: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 75 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Japánkert: 8,0 × 10,0 m, árnyékágyás, keleti fekvés, félárnyékos (közvetlen nap 11:00-ig), savanyú talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (8,0; 0), (8,0; 10,0), (0; 10,0).
+- Kerti tó (víztükör, természetes kőszegély): x 4,2–7,2 m, y 1,2–3,2 m.
+- Kavicságy (világos zúzottkő, köztük ültetett növények) („Gereblyézett kavics”): x 0,6–4,0 m, y 5,6–8,2 m.
+- Kerti ösvény (lépőkő vagy kavics) („Lépőkövek”): x 4,6–5,2 m, y 3,8–10,0 m.
+- Kőlámpás: x 3,6–4,0 m, y 1,4–1,8 m.
+- Kerti pad (fa): x 6,0–7,5 m, y 8,8–9,3 m.
+
+## 3. Növénytábla (75 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| japanese-1 | BG | Bordó japán juhar | 2,00 | 2,00 | 500 | 400 |
+| japanese-2 | AC | Törpe japán juhar | 6,40 | 4,40 | 180 | 120 |
+| japanese-3 | IC | Japán magyal | 0,50 | 3,30 | 80 | 60 |
+| japanese-4 | IC | Japán magyal | 0,50 | 4,80 | 80 | 60 |
+| japanese-5 | TR | Terülő tiszafa | 7,20 | 6,80 | 60 | 300 |
+| japanese-6 | FL | Fészekluc | 3,00 | 9,00 | 100 | 200 |
+| japanese-7#1 | PA | Japán kövérke | 1,45 | 3,99 | 20 | 30 |
+| japanese-7#2 | PA | Japán kövérke | 1,75 | 3,99 | 20 | 30 |
+| japanese-7#3 | PA | Japán kövérke | 2,05 | 3,99 | 20 | 30 |
+| japanese-7#4 | PA | Japán kövérke | 2,35 | 3,99 | 20 | 30 |
+| japanese-7#5 | PA | Japán kövérke | 2,65 | 3,99 | 20 | 30 |
+| japanese-7#6 | PA | Japán kövérke | 2,95 | 3,99 | 20 | 30 |
+| japanese-7#7 | PA | Japán kövérke | 1,00 | 4,25 | 20 | 30 |
+| japanese-7#8 | PA | Japán kövérke | 1,30 | 4,25 | 20 | 30 |
+| japanese-7#9 | PA | Japán kövérke | 1,60 | 4,25 | 20 | 30 |
+| japanese-7#10 | PA | Japán kövérke | 1,90 | 4,25 | 20 | 30 |
+| japanese-7#11 | PA | Japán kövérke | 2,20 | 4,25 | 20 | 30 |
+| japanese-7#12 | PA | Japán kövérke | 2,50 | 4,25 | 20 | 30 |
+| japanese-7#13 | PA | Japán kövérke | 2,80 | 4,25 | 20 | 30 |
+| japanese-7#14 | PA | Japán kövérke | 3,10 | 4,25 | 20 | 30 |
+| japanese-7#15 | PA | Japán kövérke | 3,40 | 4,25 | 20 | 30 |
+| japanese-7#16 | PA | Japán kövérke | 1,45 | 4,51 | 20 | 30 |
+| japanese-7#17 | PA | Japán kövérke | 1,75 | 4,51 | 20 | 30 |
+| japanese-7#18 | PA | Japán kövérke | 2,05 | 4,51 | 20 | 30 |
+| japanese-7#19 | PA | Japán kövérke | 2,35 | 4,51 | 20 | 30 |
+| japanese-7#20 | PA | Japán kövérke | 2,65 | 4,51 | 20 | 30 |
+| japanese-7#21 | PA | Japán kövérke | 2,95 | 4,51 | 20 | 30 |
+| japanese-8#1 | HK | Japán erdei fű | 2,85 | 0,53 | 35 | 45 |
+| japanese-8#2 | HK | Japán erdei fű | 3,30 | 0,53 | 35 | 45 |
+| japanese-8#3 | HK | Japán erdei fű | 3,75 | 0,53 | 35 | 45 |
+| japanese-9#1 | CA | Japán sás | 7,33 | 3,07 | 30 | 35 |
+| japanese-9#2 | CA | Japán sás | 7,67 | 3,07 | 30 | 35 |
+| japanese-9#3 | CA | Japán sás | 7,15 | 3,37 | 30 | 35 |
+| japanese-9#4 | CA | Japán sás | 7,50 | 3,37 | 30 | 35 |
+| japanese-9#5 | CA | Japán sás | 7,85 | 3,37 | 30 | 35 |
+| japanese-9#6 | CA | Japán sás | 7,33 | 3,68 | 30 | 35 |
+| japanese-9#7 | CA | Japán sás | 7,67 | 3,68 | 30 | 35 |
+| japanese-9#8 | CA | Japán sás | 7,15 | 3,98 | 30 | 35 |
+| japanese-9#9 | CA | Japán sás | 7,50 | 3,98 | 30 | 35 |
+| japanese-9#10 | CA | Japán sás | 7,85 | 3,98 | 30 | 35 |
+| japanese-9#11 | CA | Japán sás | 7,33 | 4,28 | 30 | 35 |
+| japanese-9#12 | CA | Japán sás | 7,67 | 4,28 | 30 | 35 |
+| japanese-10#1 | DR | Erdei pajzsika (páfrány) | 0,70 | 0,70 | 80 | 70 |
+| japanese-11#1 | PA | Japán kövérke | 0,45 | 8,75 | 20 | 30 |
+| japanese-11#2 | PA | Japán kövérke | 0,75 | 8,75 | 20 | 30 |
+| japanese-11#3 | PA | Japán kövérke | 1,05 | 8,75 | 20 | 30 |
+| japanese-11#4 | PA | Japán kövérke | 1,35 | 8,75 | 20 | 30 |
+| japanese-11#5 | PA | Japán kövérke | 1,65 | 8,75 | 20 | 30 |
+| japanese-11#6 | PA | Japán kövérke | 1,95 | 8,75 | 20 | 30 |
+| japanese-11#7 | PA | Japán kövérke | 0,45 | 9,05 | 20 | 30 |
+| japanese-11#8 | PA | Japán kövérke | 0,75 | 9,05 | 20 | 30 |
+| japanese-11#9 | PA | Japán kövérke | 1,05 | 9,05 | 20 | 30 |
+| japanese-11#10 | PA | Japán kövérke | 1,35 | 9,05 | 20 | 30 |
+| japanese-11#11 | PA | Japán kövérke | 1,65 | 9,05 | 20 | 30 |
+| japanese-11#12 | PA | Japán kövérke | 1,95 | 9,05 | 20 | 30 |
+| japanese-11#13 | PA | Japán kövérke | 0,45 | 9,35 | 20 | 30 |
+| japanese-11#14 | PA | Japán kövérke | 0,75 | 9,35 | 20 | 30 |
+| japanese-11#15 | PA | Japán kövérke | 1,05 | 9,35 | 20 | 30 |
+| japanese-11#16 | PA | Japán kövérke | 1,35 | 9,35 | 20 | 30 |
+| japanese-11#17 | PA | Japán kövérke | 1,65 | 9,35 | 20 | 30 |
+| japanese-11#18 | PA | Japán kövérke | 1,95 | 9,35 | 20 | 30 |
+| japanese-11#19 | PA | Japán kövérke | 0,45 | 9,65 | 20 | 30 |
+| japanese-11#20 | PA | Japán kövérke | 0,75 | 9,65 | 20 | 30 |
+| japanese-11#21 | PA | Japán kövérke | 1,05 | 9,65 | 20 | 30 |
+| japanese-11#22 | PA | Japán kövérke | 1,35 | 9,65 | 20 | 30 |
+| japanese-11#23 | PA | Japán kövérke | 1,65 | 9,65 | 20 | 30 |
+| japanese-11#24 | PA | Japán kövérke | 1,95 | 9,65 | 20 | 30 |
+| japanese-12#1 | HK | Japán erdei fű | 5,58 | 5,30 | 35 | 45 |
+| japanese-12#2 | HK | Japán erdei fű | 6,03 | 5,30 | 35 | 45 |
+| japanese-12#3 | HK | Japán erdei fű | 5,35 | 5,69 | 35 | 45 |
+| japanese-12#4 | HK | Japán erdei fű | 5,80 | 5,69 | 35 | 45 |
+| japanese-12#5 | HK | Japán erdei fű | 6,25 | 5,69 | 35 | 45 |
+| japanese-12#6 | HK | Japán erdei fű | 5,58 | 6,08 | 35 | 45 |
+| japanese-12#7 | HK | Japán erdei fű | 6,03 | 6,08 | 35 | 45 |
+| japanese-12#8 | HK | Japán erdei fű | 5,80 | 6,47 | 35 | 45 |
+
+## 4. Fajok és elhelyezésük
+- **BG – Bordó japán juhar** (*Acer palmatum 'Bloodgood'*), 1 tő. Kis fa / nagycserje, kb. 500 cm magas és 400 cm széles; most nem virágzik; lomb: bordó, ősszel karmin.
+  - x 2,0 m, y 2,0 m
+- **AC – Törpe japán juhar** (*Acer palmatum 'Shaina'*), 1 tő. Kis fa / nagycserje, kb. 180 cm magas és 120 cm széles; most nem virágzik; lomb: bordó, ősszel skarlát.
+  - x 6,4 m, y 4,4 m
+- **IC – Japán magyal** (*Ilex crenata 'Dark Green'*), 2 tő. Alacsony talajtakaró / párna, kb. 80 cm magas és 60 cm széles; most nem virágzik; lomb: sötétzöld.
+  - x 0,5 m, y 3,3 m
+  - x 0,5 m, y 4,8 m
+- **TR – Terülő tiszafa** (*Taxus baccata 'Repandens'*), 1 tő. Alacsony talajtakaró / párna, kb. 60 cm magas és 300 cm széles; most nem virágzik; lomb: sötétzöld tű, ívelő ágak.
+  - x 7,2 m, y 6,8 m
+- **FL – Fészekluc** (*Picea abies 'Nidiformis'*), 1 tő. Bokros évelő, kb. 100 cm magas és 200 cm széles; most nem virágzik; lomb: sötétzöld, közepén fészekszerű mélyedés.
+  - x 3,0 m, y 9,0 m
+- **PA – Japán kövérke** (*Pachysandra terminalis*), 45 tő. Alacsony talajtakaró / párna, kb. 20 cm magas és 30 cm széles; most nem virágzik; lomb: sötétzöld.
+  - folt: x 1,0–3,4 m, y 3,8–4,7 m, eltolt kiosztás, 30 cm tőtáv (21 tő)
+  - folt: x 0,2–2,2 m, y 8,6–9,8 m, négyzetes kiosztás, 30 cm tőtáv (24 tő)
+- **HK – Japán erdei fű** (*Hakonechloa macra 'Aureola'*), 11 tő. Díszfű / felálló levélcsomó, kb. 35 cm magas és 45 cm széles; most nem virágzik; lomb: aranysárga csíkos.
+  - folt: x 2,6–4,0 m, y 0,2–0,9 m, eltolt kiosztás, 45 cm tőtáv (3 tő)
+  - folt: x 5,3–6,3 m, y 5,0–6,8 m, eltolt kiosztás, 45 cm tőtáv (8 tő)
+- **CA – Japán sás** (*Carex oshimensis 'Evergold'*), 12 tő. Díszfű / felálló levélcsomó, kb. 30 cm magas és 35 cm széles; most nem virágzik; lomb: sárga–zöld csíkos.
+  - folt: x 7,1–7,9 m, y 2,9–4,5 m, eltolt kiosztás, 35 cm tőtáv (12 tő)
+- **DR – Erdei pajzsika (páfrány)** (*Dryopteris filix-mas*), 1 tő. Díszfű / felálló levélcsomó, kb. 80 cm magas és 70 cm széles; most nem virágzik; lomb: élénkzöld.
+  - folt: x 0,2–1,2 m, y 0,2–1,2 m, eltolt kiosztás, 70 cm tőtáv (1 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Sötét fakéreg mulcs a tövek között.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes délelőtti napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (3,4; 4,5) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 75 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 75 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > mediterranean: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 333 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Mediterrán kert: 8,0 × 10,0 m, kavicsos / kőkert, déli fekvés, napos (közvetlen nap egész nap), homokos talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (8,0; 0), (8,0; 10,0), (0; 10,0).
+- Burkolat / járda („Terasz”): x 0,0–8,0 m, y 8,3–10,0 m.
+- Kerti ösvény (lépőkő vagy kavics) („Kavicsos út”): x 3,6–4,4 m, y 0,0–8,3 m.
+- Kerti pad (fa): x 0,8–2,3 m, y 7,6–8,1 m.
+- Agyagkorsó: x 6,0–6,6 m, y 7,6–8,2 m.
+
+## 3. Növénytábla (333 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| mediterranean-1 | CL | Oszlopos hamisciprus | 3,00 | 0,50 | 800 | 150 |
+| mediterranean-2 | CL | Oszlopos hamisciprus | 5,00 | 0,50 | 800 | 150 |
+| mediterranean-3 | EE | Ezüstös ezüstfa | 1,60 | 1,70 | 300 | 300 |
+| mediterranean-4 | EE | Ezüstös ezüstfa | 6,40 | 1,70 | 300 | 300 |
+| mediterranean-5#1 | LA | Levendula | 3,30 | 1,40 | 45 | 40 |
+| mediterranean-5#2 | LA | Levendula | 3,30 | 1,79 | 45 | 40 |
+| mediterranean-5#3 | LA | Levendula | 3,30 | 2,18 | 45 | 40 |
+| mediterranean-5#4 | LA | Levendula | 3,30 | 2,56 | 45 | 40 |
+| mediterranean-5#5 | LA | Levendula | 3,30 | 2,95 | 45 | 40 |
+| mediterranean-5#6 | LA | Levendula | 3,30 | 3,34 | 45 | 40 |
+| mediterranean-5#7 | LA | Levendula | 3,30 | 3,73 | 45 | 40 |
+| mediterranean-5#8 | LA | Levendula | 3,30 | 4,12 | 45 | 40 |
+| mediterranean-5#9 | LA | Levendula | 3,30 | 4,51 | 45 | 40 |
+| mediterranean-5#10 | LA | Levendula | 3,30 | 4,89 | 45 | 40 |
+| mediterranean-5#11 | LA | Levendula | 3,30 | 5,28 | 45 | 40 |
+| mediterranean-5#12 | LA | Levendula | 3,30 | 5,67 | 45 | 40 |
+| mediterranean-5#13 | LA | Levendula | 3,30 | 6,06 | 45 | 40 |
+| mediterranean-5#14 | LA | Levendula | 3,30 | 6,45 | 45 | 40 |
+| mediterranean-5#15 | LA | Levendula | 3,30 | 6,84 | 45 | 40 |
+| mediterranean-5#16 | LA | Levendula | 3,30 | 7,22 | 45 | 40 |
+| mediterranean-5#17 | LA | Levendula | 3,30 | 7,61 | 45 | 40 |
+| mediterranean-5#18 | LA | Levendula | 3,30 | 8,00 | 45 | 40 |
+| mediterranean-6#1 | LA | Levendula | 4,70 | 1,40 | 45 | 40 |
+| mediterranean-6#2 | LA | Levendula | 4,70 | 1,79 | 45 | 40 |
+| mediterranean-6#3 | LA | Levendula | 4,70 | 2,18 | 45 | 40 |
+| mediterranean-6#4 | LA | Levendula | 4,70 | 2,56 | 45 | 40 |
+| mediterranean-6#5 | LA | Levendula | 4,70 | 2,95 | 45 | 40 |
+| mediterranean-6#6 | LA | Levendula | 4,70 | 3,34 | 45 | 40 |
+| mediterranean-6#7 | LA | Levendula | 4,70 | 3,73 | 45 | 40 |
+| mediterranean-6#8 | LA | Levendula | 4,70 | 4,12 | 45 | 40 |
+| mediterranean-6#9 | LA | Levendula | 4,70 | 4,51 | 45 | 40 |
+| mediterranean-6#10 | LA | Levendula | 4,70 | 4,89 | 45 | 40 |
+| mediterranean-6#11 | LA | Levendula | 4,70 | 5,28 | 45 | 40 |
+| mediterranean-6#12 | LA | Levendula | 4,70 | 5,67 | 45 | 40 |
+| mediterranean-6#13 | LA | Levendula | 4,70 | 6,06 | 45 | 40 |
+| mediterranean-6#14 | LA | Levendula | 4,70 | 6,45 | 45 | 40 |
+| mediterranean-6#15 | LA | Levendula | 4,70 | 6,84 | 45 | 40 |
+| mediterranean-6#16 | LA | Levendula | 4,70 | 7,22 | 45 | 40 |
+| mediterranean-6#17 | LA | Levendula | 4,70 | 7,61 | 45 | 40 |
+| mediterranean-6#18 | LA | Levendula | 4,70 | 8,00 | 45 | 40 |
+| mediterranean-7#1 | HB | Kék zabfű | 0,55 | 0,43 | 60 | 50 |
+| mediterranean-7#2 | HB | Kék zabfű | 1,05 | 0,43 | 60 | 50 |
+| mediterranean-7#3 | HB | Kék zabfű | 1,55 | 0,43 | 60 | 50 |
+| mediterranean-7#4 | HB | Kék zabfű | 2,05 | 0,43 | 60 | 50 |
+| mediterranean-7#5 | HB | Kék zabfű | 0,30 | 0,87 | 60 | 50 |
+| mediterranean-7#6 | HB | Kék zabfű | 0,80 | 0,87 | 60 | 50 |
+| mediterranean-7#7 | HB | Kék zabfű | 1,30 | 0,87 | 60 | 50 |
+| mediterranean-7#8 | HB | Kék zabfű | 1,80 | 0,87 | 60 | 50 |
+| mediterranean-7#9 | HB | Kék zabfű | 2,30 | 0,87 | 60 | 50 |
+| mediterranean-8#1 | HB | Kék zabfű | 5,95 | 0,43 | 60 | 50 |
+| mediterranean-8#2 | HB | Kék zabfű | 6,45 | 0,43 | 60 | 50 |
+| mediterranean-8#3 | HB | Kék zabfű | 6,95 | 0,43 | 60 | 50 |
+| mediterranean-8#4 | HB | Kék zabfű | 7,45 | 0,43 | 60 | 50 |
+| mediterranean-8#5 | HB | Kék zabfű | 5,70 | 0,87 | 60 | 50 |
+| mediterranean-8#6 | HB | Kék zabfű | 6,20 | 0,87 | 60 | 50 |
+| mediterranean-8#7 | HB | Kék zabfű | 6,70 | 0,87 | 60 | 50 |
+| mediterranean-8#8 | HB | Kék zabfű | 7,20 | 0,87 | 60 | 50 |
+| mediterranean-8#9 | HB | Kék zabfű | 7,70 | 0,87 | 60 | 50 |
+| mediterranean-9#1 | ST | Gyapjas tisztesfű | 0,35 | 2,89 | 20 | 30 |
+| mediterranean-9#2 | ST | Gyapjas tisztesfű | 0,65 | 2,89 | 20 | 30 |
+| mediterranean-9#3 | ST | Gyapjas tisztesfű | 0,95 | 2,89 | 20 | 30 |
+| mediterranean-9#4 | ST | Gyapjas tisztesfű | 1,25 | 2,89 | 20 | 30 |
+| mediterranean-9#5 | ST | Gyapjas tisztesfű | 0,20 | 3,15 | 20 | 30 |
+| mediterranean-9#6 | ST | Gyapjas tisztesfű | 0,50 | 3,15 | 20 | 30 |
+| mediterranean-9#7 | ST | Gyapjas tisztesfű | 0,80 | 3,15 | 20 | 30 |
+| mediterranean-9#8 | ST | Gyapjas tisztesfű | 1,10 | 3,15 | 20 | 30 |
+| mediterranean-9#9 | ST | Gyapjas tisztesfű | 0,35 | 3,41 | 20 | 30 |
+| mediterranean-9#10 | ST | Gyapjas tisztesfű | 0,65 | 3,41 | 20 | 30 |
+| mediterranean-9#11 | ST | Gyapjas tisztesfű | 0,95 | 3,41 | 20 | 30 |
+| mediterranean-9#12 | ST | Gyapjas tisztesfű | 1,25 | 3,41 | 20 | 30 |
+| mediterranean-9#13 | ST | Gyapjas tisztesfű | 0,20 | 3,67 | 20 | 30 |
+| mediterranean-9#14 | ST | Gyapjas tisztesfű | 0,50 | 3,67 | 20 | 30 |
+| mediterranean-9#15 | ST | Gyapjas tisztesfű | 0,80 | 3,67 | 20 | 30 |
+| mediterranean-9#16 | ST | Gyapjas tisztesfű | 1,10 | 3,67 | 20 | 30 |
+| mediterranean-9#17 | ST | Gyapjas tisztesfű | 0,35 | 3,93 | 20 | 30 |
+| mediterranean-9#18 | ST | Gyapjas tisztesfű | 0,65 | 3,93 | 20 | 30 |
+| mediterranean-9#19 | ST | Gyapjas tisztesfű | 0,95 | 3,93 | 20 | 30 |
+| mediterranean-9#20 | ST | Gyapjas tisztesfű | 1,25 | 3,93 | 20 | 30 |
+| mediterranean-9#21 | ST | Gyapjas tisztesfű | 0,20 | 4,19 | 20 | 30 |
+| mediterranean-9#22 | ST | Gyapjas tisztesfű | 0,50 | 4,19 | 20 | 30 |
+| mediterranean-9#23 | ST | Gyapjas tisztesfű | 0,80 | 4,19 | 20 | 30 |
+| mediterranean-9#24 | ST | Gyapjas tisztesfű | 1,10 | 4,19 | 20 | 30 |
+| mediterranean-9#25 | ST | Gyapjas tisztesfű | 0,35 | 4,45 | 20 | 30 |
+| mediterranean-9#26 | ST | Gyapjas tisztesfű | 0,65 | 4,45 | 20 | 30 |
+| mediterranean-9#27 | ST | Gyapjas tisztesfű | 0,95 | 4,45 | 20 | 30 |
+| mediterranean-9#28 | ST | Gyapjas tisztesfű | 1,25 | 4,45 | 20 | 30 |
+| mediterranean-9#29 | ST | Gyapjas tisztesfű | 0,20 | 4,71 | 20 | 30 |
+| mediterranean-9#30 | ST | Gyapjas tisztesfű | 0,50 | 4,71 | 20 | 30 |
+| mediterranean-9#31 | ST | Gyapjas tisztesfű | 0,80 | 4,71 | 20 | 30 |
+| mediterranean-9#32 | ST | Gyapjas tisztesfű | 1,10 | 4,71 | 20 | 30 |
+| mediterranean-10#1 | PE | Kékszakállfű / orosz zsálya | 2,25 | 3,10 | 100 | 70 |
+| mediterranean-10#2 | PE | Kékszakállfű / orosz zsálya | 2,25 | 3,80 | 100 | 70 |
+| mediterranean-10#3 | PE | Kékszakállfű / orosz zsálya | 2,25 | 4,50 | 100 | 70 |
+| mediterranean-11#1 | SA | Ligeti zsálya | 5,28 | 2,92 | 40 | 35 |
+| mediterranean-11#2 | SA | Ligeti zsálya | 5,63 | 2,92 | 40 | 35 |
+| mediterranean-11#3 | SA | Ligeti zsálya | 5,97 | 2,92 | 40 | 35 |
+| mediterranean-11#4 | SA | Ligeti zsálya | 6,33 | 2,92 | 40 | 35 |
+| mediterranean-11#5 | SA | Ligeti zsálya | 5,28 | 3,27 | 40 | 35 |
+| mediterranean-11#6 | SA | Ligeti zsálya | 5,63 | 3,27 | 40 | 35 |
+| mediterranean-11#7 | SA | Ligeti zsálya | 5,97 | 3,27 | 40 | 35 |
+| mediterranean-11#8 | SA | Ligeti zsálya | 6,33 | 3,27 | 40 | 35 |
+| mediterranean-11#9 | SA | Ligeti zsálya | 5,28 | 3,63 | 40 | 35 |
+| mediterranean-11#10 | SA | Ligeti zsálya | 5,63 | 3,63 | 40 | 35 |
+| mediterranean-11#11 | SA | Ligeti zsálya | 5,97 | 3,63 | 40 | 35 |
+| mediterranean-11#12 | SA | Ligeti zsálya | 6,33 | 3,63 | 40 | 35 |
+| mediterranean-11#13 | SA | Ligeti zsálya | 5,28 | 3,98 | 40 | 35 |
+| mediterranean-11#14 | SA | Ligeti zsálya | 5,63 | 3,98 | 40 | 35 |
+| mediterranean-11#15 | SA | Ligeti zsálya | 5,97 | 3,98 | 40 | 35 |
+| mediterranean-11#16 | SA | Ligeti zsálya | 6,33 | 3,98 | 40 | 35 |
+| mediterranean-11#17 | SA | Ligeti zsálya | 5,28 | 4,33 | 40 | 35 |
+| mediterranean-11#18 | SA | Ligeti zsálya | 5,63 | 4,33 | 40 | 35 |
+| mediterranean-11#19 | SA | Ligeti zsálya | 5,97 | 4,33 | 40 | 35 |
+| mediterranean-11#20 | SA | Ligeti zsálya | 6,33 | 4,33 | 40 | 35 |
+| mediterranean-11#21 | SA | Ligeti zsálya | 5,28 | 4,67 | 40 | 35 |
+| mediterranean-11#22 | SA | Ligeti zsálya | 5,63 | 4,67 | 40 | 35 |
+| mediterranean-11#23 | SA | Ligeti zsálya | 5,97 | 4,67 | 40 | 35 |
+| mediterranean-11#24 | SA | Ligeti zsálya | 6,33 | 4,67 | 40 | 35 |
+| mediterranean-12#1 | ST | Gyapjas tisztesfű | 6,75 | 2,89 | 20 | 30 |
+| mediterranean-12#2 | ST | Gyapjas tisztesfű | 7,05 | 2,89 | 20 | 30 |
+| mediterranean-12#3 | ST | Gyapjas tisztesfű | 7,35 | 2,89 | 20 | 30 |
+| mediterranean-12#4 | ST | Gyapjas tisztesfű | 7,65 | 2,89 | 20 | 30 |
+| mediterranean-12#5 | ST | Gyapjas tisztesfű | 6,60 | 3,15 | 20 | 30 |
+| mediterranean-12#6 | ST | Gyapjas tisztesfű | 6,90 | 3,15 | 20 | 30 |
+| mediterranean-12#7 | ST | Gyapjas tisztesfű | 7,20 | 3,15 | 20 | 30 |
+| mediterranean-12#8 | ST | Gyapjas tisztesfű | 7,50 | 3,15 | 20 | 30 |
+| mediterranean-12#9 | ST | Gyapjas tisztesfű | 6,75 | 3,41 | 20 | 30 |
+| mediterranean-12#10 | ST | Gyapjas tisztesfű | 7,05 | 3,41 | 20 | 30 |
+| mediterranean-12#11 | ST | Gyapjas tisztesfű | 7,35 | 3,41 | 20 | 30 |
+| mediterranean-12#12 | ST | Gyapjas tisztesfű | 7,65 | 3,41 | 20 | 30 |
+| mediterranean-12#13 | ST | Gyapjas tisztesfű | 6,60 | 3,67 | 20 | 30 |
+| mediterranean-12#14 | ST | Gyapjas tisztesfű | 6,90 | 3,67 | 20 | 30 |
+| mediterranean-12#15 | ST | Gyapjas tisztesfű | 7,20 | 3,67 | 20 | 30 |
+| mediterranean-12#16 | ST | Gyapjas tisztesfű | 7,50 | 3,67 | 20 | 30 |
+| mediterranean-12#17 | ST | Gyapjas tisztesfű | 6,75 | 3,93 | 20 | 30 |
+| mediterranean-12#18 | ST | Gyapjas tisztesfű | 7,05 | 3,93 | 20 | 30 |
+| mediterranean-12#19 | ST | Gyapjas tisztesfű | 7,35 | 3,93 | 20 | 30 |
+| mediterranean-12#20 | ST | Gyapjas tisztesfű | 7,65 | 3,93 | 20 | 30 |
+| mediterranean-12#21 | ST | Gyapjas tisztesfű | 6,60 | 4,19 | 20 | 30 |
+| mediterranean-12#22 | ST | Gyapjas tisztesfű | 6,90 | 4,19 | 20 | 30 |
+| mediterranean-12#23 | ST | Gyapjas tisztesfű | 7,20 | 4,19 | 20 | 30 |
+| mediterranean-12#24 | ST | Gyapjas tisztesfű | 7,50 | 4,19 | 20 | 30 |
+| mediterranean-12#25 | ST | Gyapjas tisztesfű | 6,75 | 4,45 | 20 | 30 |
+| mediterranean-12#26 | ST | Gyapjas tisztesfű | 7,05 | 4,45 | 20 | 30 |
+| mediterranean-12#27 | ST | Gyapjas tisztesfű | 7,35 | 4,45 | 20 | 30 |
+| mediterranean-12#28 | ST | Gyapjas tisztesfű | 7,65 | 4,45 | 20 | 30 |
+| mediterranean-12#29 | ST | Gyapjas tisztesfű | 6,60 | 4,71 | 20 | 30 |
+| mediterranean-12#30 | ST | Gyapjas tisztesfű | 6,90 | 4,71 | 20 | 30 |
+| mediterranean-12#31 | ST | Gyapjas tisztesfű | 7,20 | 4,71 | 20 | 30 |
+| mediterranean-12#32 | ST | Gyapjas tisztesfű | 7,50 | 4,71 | 20 | 30 |
+| mediterranean-13#1 | FE | Kék csenkesz | 0,42 | 5,32 | 30 | 25 |
+| mediterranean-13#2 | FE | Kék csenkesz | 0,68 | 5,32 | 30 | 25 |
+| mediterranean-13#3 | FE | Kék csenkesz | 0,93 | 5,32 | 30 | 25 |
+| mediterranean-13#4 | FE | Kék csenkesz | 1,18 | 5,32 | 30 | 25 |
+| mediterranean-13#5 | FE | Kék csenkesz | 1,43 | 5,32 | 30 | 25 |
+| mediterranean-13#6 | FE | Kék csenkesz | 1,68 | 5,32 | 30 | 25 |
+| mediterranean-13#7 | FE | Kék csenkesz | 1,93 | 5,32 | 30 | 25 |
+| mediterranean-13#8 | FE | Kék csenkesz | 2,17 | 5,32 | 30 | 25 |
+| mediterranean-13#9 | FE | Kék csenkesz | 2,42 | 5,32 | 30 | 25 |
+| mediterranean-13#10 | FE | Kék csenkesz | 2,67 | 5,32 | 30 | 25 |
+| mediterranean-13#11 | FE | Kék csenkesz | 0,30 | 5,53 | 30 | 25 |
+| mediterranean-13#12 | FE | Kék csenkesz | 0,55 | 5,53 | 30 | 25 |
+| mediterranean-13#13 | FE | Kék csenkesz | 0,80 | 5,53 | 30 | 25 |
+| mediterranean-13#14 | FE | Kék csenkesz | 1,05 | 5,53 | 30 | 25 |
+| mediterranean-13#15 | FE | Kék csenkesz | 1,30 | 5,53 | 30 | 25 |
+| mediterranean-13#16 | FE | Kék csenkesz | 1,55 | 5,53 | 30 | 25 |
+| mediterranean-13#17 | FE | Kék csenkesz | 1,80 | 5,53 | 30 | 25 |
+| mediterranean-13#18 | FE | Kék csenkesz | 2,05 | 5,53 | 30 | 25 |
+| mediterranean-13#19 | FE | Kék csenkesz | 2,30 | 5,53 | 30 | 25 |
+| mediterranean-13#20 | FE | Kék csenkesz | 2,55 | 5,53 | 30 | 25 |
+| mediterranean-13#21 | FE | Kék csenkesz | 2,80 | 5,53 | 30 | 25 |
+| mediterranean-13#22 | FE | Kék csenkesz | 0,42 | 5,75 | 30 | 25 |
+| mediterranean-13#23 | FE | Kék csenkesz | 0,68 | 5,75 | 30 | 25 |
+| mediterranean-13#24 | FE | Kék csenkesz | 0,93 | 5,75 | 30 | 25 |
+| mediterranean-13#25 | FE | Kék csenkesz | 1,18 | 5,75 | 30 | 25 |
+| mediterranean-13#26 | FE | Kék csenkesz | 1,43 | 5,75 | 30 | 25 |
+| mediterranean-13#27 | FE | Kék csenkesz | 1,68 | 5,75 | 30 | 25 |
+| mediterranean-13#28 | FE | Kék csenkesz | 1,93 | 5,75 | 30 | 25 |
+| mediterranean-13#29 | FE | Kék csenkesz | 2,17 | 5,75 | 30 | 25 |
+| mediterranean-13#30 | FE | Kék csenkesz | 2,42 | 5,75 | 30 | 25 |
+| mediterranean-13#31 | FE | Kék csenkesz | 2,67 | 5,75 | 30 | 25 |
+| mediterranean-13#32 | FE | Kék csenkesz | 0,30 | 5,97 | 30 | 25 |
+| mediterranean-13#33 | FE | Kék csenkesz | 0,55 | 5,97 | 30 | 25 |
+| mediterranean-13#34 | FE | Kék csenkesz | 0,80 | 5,97 | 30 | 25 |
+| mediterranean-13#35 | FE | Kék csenkesz | 1,05 | 5,97 | 30 | 25 |
+| mediterranean-13#36 | FE | Kék csenkesz | 1,30 | 5,97 | 30 | 25 |
+| mediterranean-13#37 | FE | Kék csenkesz | 1,55 | 5,97 | 30 | 25 |
+| mediterranean-13#38 | FE | Kék csenkesz | 1,80 | 5,97 | 30 | 25 |
+| mediterranean-13#39 | FE | Kék csenkesz | 2,05 | 5,97 | 30 | 25 |
+| mediterranean-13#40 | FE | Kék csenkesz | 2,30 | 5,97 | 30 | 25 |
+| mediterranean-13#41 | FE | Kék csenkesz | 2,55 | 5,97 | 30 | 25 |
+| mediterranean-13#42 | FE | Kék csenkesz | 2,80 | 5,97 | 30 | 25 |
+| mediterranean-13#43 | FE | Kék csenkesz | 0,42 | 6,18 | 30 | 25 |
+| mediterranean-13#44 | FE | Kék csenkesz | 0,68 | 6,18 | 30 | 25 |
+| mediterranean-13#45 | FE | Kék csenkesz | 0,93 | 6,18 | 30 | 25 |
+| mediterranean-13#46 | FE | Kék csenkesz | 1,18 | 6,18 | 30 | 25 |
+| mediterranean-13#47 | FE | Kék csenkesz | 1,43 | 6,18 | 30 | 25 |
+| mediterranean-13#48 | FE | Kék csenkesz | 1,68 | 6,18 | 30 | 25 |
+| mediterranean-13#49 | FE | Kék csenkesz | 1,93 | 6,18 | 30 | 25 |
+| mediterranean-13#50 | FE | Kék csenkesz | 2,17 | 6,18 | 30 | 25 |
+| mediterranean-13#51 | FE | Kék csenkesz | 2,42 | 6,18 | 30 | 25 |
+| mediterranean-13#52 | FE | Kék csenkesz | 2,67 | 6,18 | 30 | 25 |
+| mediterranean-14#1 | FE | Kék csenkesz | 5,33 | 5,32 | 30 | 25 |
+| mediterranean-14#2 | FE | Kék csenkesz | 5,58 | 5,32 | 30 | 25 |
+| mediterranean-14#3 | FE | Kék csenkesz | 5,83 | 5,32 | 30 | 25 |
+| mediterranean-14#4 | FE | Kék csenkesz | 6,08 | 5,32 | 30 | 25 |
+| mediterranean-14#5 | FE | Kék csenkesz | 6,33 | 5,32 | 30 | 25 |
+| mediterranean-14#6 | FE | Kék csenkesz | 6,58 | 5,32 | 30 | 25 |
+| mediterranean-14#7 | FE | Kék csenkesz | 6,83 | 5,32 | 30 | 25 |
+| mediterranean-14#8 | FE | Kék csenkesz | 7,08 | 5,32 | 30 | 25 |
+| mediterranean-14#9 | FE | Kék csenkesz | 7,33 | 5,32 | 30 | 25 |
+| mediterranean-14#10 | FE | Kék csenkesz | 7,58 | 5,32 | 30 | 25 |
+| mediterranean-14#11 | FE | Kék csenkesz | 5,20 | 5,53 | 30 | 25 |
+| mediterranean-14#12 | FE | Kék csenkesz | 5,45 | 5,53 | 30 | 25 |
+| mediterranean-14#13 | FE | Kék csenkesz | 5,70 | 5,53 | 30 | 25 |
+| mediterranean-14#14 | FE | Kék csenkesz | 5,95 | 5,53 | 30 | 25 |
+| mediterranean-14#15 | FE | Kék csenkesz | 6,20 | 5,53 | 30 | 25 |
+| mediterranean-14#16 | FE | Kék csenkesz | 6,45 | 5,53 | 30 | 25 |
+| mediterranean-14#17 | FE | Kék csenkesz | 6,70 | 5,53 | 30 | 25 |
+| mediterranean-14#18 | FE | Kék csenkesz | 6,95 | 5,53 | 30 | 25 |
+| mediterranean-14#19 | FE | Kék csenkesz | 7,20 | 5,53 | 30 | 25 |
+| mediterranean-14#20 | FE | Kék csenkesz | 7,45 | 5,53 | 30 | 25 |
+| mediterranean-14#21 | FE | Kék csenkesz | 7,70 | 5,53 | 30 | 25 |
+| mediterranean-14#22 | FE | Kék csenkesz | 5,33 | 5,75 | 30 | 25 |
+| mediterranean-14#23 | FE | Kék csenkesz | 5,58 | 5,75 | 30 | 25 |
+| mediterranean-14#24 | FE | Kék csenkesz | 5,83 | 5,75 | 30 | 25 |
+| mediterranean-14#25 | FE | Kék csenkesz | 6,08 | 5,75 | 30 | 25 |
+| mediterranean-14#26 | FE | Kék csenkesz | 6,33 | 5,75 | 30 | 25 |
+| mediterranean-14#27 | FE | Kék csenkesz | 6,58 | 5,75 | 30 | 25 |
+| mediterranean-14#28 | FE | Kék csenkesz | 6,83 | 5,75 | 30 | 25 |
+| mediterranean-14#29 | FE | Kék csenkesz | 7,08 | 5,75 | 30 | 25 |
+| mediterranean-14#30 | FE | Kék csenkesz | 7,33 | 5,75 | 30 | 25 |
+| mediterranean-14#31 | FE | Kék csenkesz | 7,58 | 5,75 | 30 | 25 |
+| mediterranean-14#32 | FE | Kék csenkesz | 5,20 | 5,97 | 30 | 25 |
+| mediterranean-14#33 | FE | Kék csenkesz | 5,45 | 5,97 | 30 | 25 |
+| mediterranean-14#34 | FE | Kék csenkesz | 5,70 | 5,97 | 30 | 25 |
+| mediterranean-14#35 | FE | Kék csenkesz | 5,95 | 5,97 | 30 | 25 |
+| mediterranean-14#36 | FE | Kék csenkesz | 6,20 | 5,97 | 30 | 25 |
+| mediterranean-14#37 | FE | Kék csenkesz | 6,45 | 5,97 | 30 | 25 |
+| mediterranean-14#38 | FE | Kék csenkesz | 6,70 | 5,97 | 30 | 25 |
+| mediterranean-14#39 | FE | Kék csenkesz | 6,95 | 5,97 | 30 | 25 |
+| mediterranean-14#40 | FE | Kék csenkesz | 7,20 | 5,97 | 30 | 25 |
+| mediterranean-14#41 | FE | Kék csenkesz | 7,45 | 5,97 | 30 | 25 |
+| mediterranean-14#42 | FE | Kék csenkesz | 7,70 | 5,97 | 30 | 25 |
+| mediterranean-14#43 | FE | Kék csenkesz | 5,33 | 6,18 | 30 | 25 |
+| mediterranean-14#44 | FE | Kék csenkesz | 5,58 | 6,18 | 30 | 25 |
+| mediterranean-14#45 | FE | Kék csenkesz | 5,83 | 6,18 | 30 | 25 |
+| mediterranean-14#46 | FE | Kék csenkesz | 6,08 | 6,18 | 30 | 25 |
+| mediterranean-14#47 | FE | Kék csenkesz | 6,33 | 6,18 | 30 | 25 |
+| mediterranean-14#48 | FE | Kék csenkesz | 6,58 | 6,18 | 30 | 25 |
+| mediterranean-14#49 | FE | Kék csenkesz | 6,83 | 6,18 | 30 | 25 |
+| mediterranean-14#50 | FE | Kék csenkesz | 7,08 | 6,18 | 30 | 25 |
+| mediterranean-14#51 | FE | Kék csenkesz | 7,33 | 6,18 | 30 | 25 |
+| mediterranean-14#52 | FE | Kék csenkesz | 7,58 | 6,18 | 30 | 25 |
+| mediterranean-15#1 | TH | Mezei kakukkfű | 0,33 | 6,52 | 8 | 25 |
+| mediterranean-15#2 | TH | Mezei kakukkfű | 0,57 | 6,52 | 8 | 25 |
+| mediterranean-15#3 | TH | Mezei kakukkfű | 0,20 | 6,73 | 8 | 25 |
+| mediterranean-15#4 | TH | Mezei kakukkfű | 0,45 | 6,73 | 8 | 25 |
+| mediterranean-15#5 | TH | Mezei kakukkfű | 0,33 | 6,95 | 8 | 25 |
+| mediterranean-15#6 | TH | Mezei kakukkfű | 0,57 | 6,95 | 8 | 25 |
+| mediterranean-15#7 | TH | Mezei kakukkfű | 0,20 | 7,17 | 8 | 25 |
+| mediterranean-15#8 | TH | Mezei kakukkfű | 0,45 | 7,17 | 8 | 25 |
+| mediterranean-15#9 | TH | Mezei kakukkfű | 0,33 | 7,38 | 8 | 25 |
+| mediterranean-15#10 | TH | Mezei kakukkfű | 0,57 | 7,38 | 8 | 25 |
+| mediterranean-16#1 | SE | Kövirózsa | 2,60 | 6,63 | 15 | 15 |
+| mediterranean-16#2 | SE | Kövirózsa | 2,75 | 6,63 | 15 | 15 |
+| mediterranean-16#3 | SE | Kövirózsa | 2,90 | 6,63 | 15 | 15 |
+| mediterranean-16#4 | SE | Kövirózsa | 2,60 | 6,78 | 15 | 15 |
+| mediterranean-16#5 | SE | Kövirózsa | 2,75 | 6,78 | 15 | 15 |
+| mediterranean-16#6 | SE | Kövirózsa | 2,90 | 6,78 | 15 | 15 |
+| mediterranean-16#7 | SE | Kövirózsa | 2,60 | 6,92 | 15 | 15 |
+| mediterranean-16#8 | SE | Kövirózsa | 2,75 | 6,92 | 15 | 15 |
+| mediterranean-16#9 | SE | Kövirózsa | 2,90 | 6,92 | 15 | 15 |
+| mediterranean-16#10 | SE | Kövirózsa | 2,60 | 7,08 | 15 | 15 |
+| mediterranean-16#11 | SE | Kövirózsa | 2,75 | 7,08 | 15 | 15 |
+| mediterranean-16#12 | SE | Kövirózsa | 2,90 | 7,08 | 15 | 15 |
+| mediterranean-16#13 | SE | Kövirózsa | 2,60 | 7,22 | 15 | 15 |
+| mediterranean-16#14 | SE | Kövirózsa | 2,75 | 7,22 | 15 | 15 |
+| mediterranean-16#15 | SE | Kövirózsa | 2,90 | 7,22 | 15 | 15 |
+| mediterranean-16#16 | SE | Kövirózsa | 2,60 | 7,38 | 15 | 15 |
+| mediterranean-16#17 | SE | Kövirózsa | 2,75 | 7,38 | 15 | 15 |
+| mediterranean-16#18 | SE | Kövirózsa | 2,90 | 7,38 | 15 | 15 |
+| mediterranean-17#1 | TH | Mezei kakukkfű | 5,25 | 6,52 | 8 | 25 |
+| mediterranean-17#2 | TH | Mezei kakukkfű | 5,50 | 6,52 | 8 | 25 |
+| mediterranean-17#3 | TH | Mezei kakukkfű | 5,75 | 6,52 | 8 | 25 |
+| mediterranean-17#4 | TH | Mezei kakukkfű | 5,13 | 6,73 | 8 | 25 |
+| mediterranean-17#5 | TH | Mezei kakukkfű | 5,38 | 6,73 | 8 | 25 |
+| mediterranean-17#6 | TH | Mezei kakukkfű | 5,63 | 6,73 | 8 | 25 |
+| mediterranean-17#7 | TH | Mezei kakukkfű | 5,88 | 6,73 | 8 | 25 |
+| mediterranean-17#8 | TH | Mezei kakukkfű | 5,25 | 6,95 | 8 | 25 |
+| mediterranean-17#9 | TH | Mezei kakukkfű | 5,50 | 6,95 | 8 | 25 |
+| mediterranean-17#10 | TH | Mezei kakukkfű | 5,75 | 6,95 | 8 | 25 |
+| mediterranean-17#11 | TH | Mezei kakukkfű | 5,13 | 7,17 | 8 | 25 |
+| mediterranean-17#12 | TH | Mezei kakukkfű | 5,38 | 7,17 | 8 | 25 |
+| mediterranean-17#13 | TH | Mezei kakukkfű | 5,63 | 7,17 | 8 | 25 |
+| mediterranean-17#14 | TH | Mezei kakukkfű | 5,88 | 7,17 | 8 | 25 |
+| mediterranean-17#15 | TH | Mezei kakukkfű | 5,25 | 7,38 | 8 | 25 |
+| mediterranean-17#16 | TH | Mezei kakukkfű | 5,50 | 7,38 | 8 | 25 |
+| mediterranean-17#17 | TH | Mezei kakukkfű | 5,75 | 7,38 | 8 | 25 |
+| mediterranean-18#1 | SE | Kövirózsa | 7,10 | 6,50 | 15 | 15 |
+| mediterranean-18#2 | SE | Kövirózsa | 7,25 | 6,50 | 15 | 15 |
+| mediterranean-18#3 | SE | Kövirózsa | 7,40 | 6,50 | 15 | 15 |
+| mediterranean-18#4 | SE | Kövirózsa | 7,55 | 6,50 | 15 | 15 |
+| mediterranean-18#5 | SE | Kövirózsa | 7,70 | 6,50 | 15 | 15 |
+| mediterranean-18#6 | SE | Kövirózsa | 7,10 | 6,65 | 15 | 15 |
+| mediterranean-18#7 | SE | Kövirózsa | 7,25 | 6,65 | 15 | 15 |
+| mediterranean-18#8 | SE | Kövirózsa | 7,40 | 6,65 | 15 | 15 |
+| mediterranean-18#9 | SE | Kövirózsa | 7,55 | 6,65 | 15 | 15 |
+| mediterranean-18#10 | SE | Kövirózsa | 7,70 | 6,65 | 15 | 15 |
+| mediterranean-18#11 | SE | Kövirózsa | 7,10 | 6,80 | 15 | 15 |
+| mediterranean-18#12 | SE | Kövirózsa | 7,25 | 6,80 | 15 | 15 |
+| mediterranean-18#13 | SE | Kövirózsa | 7,40 | 6,80 | 15 | 15 |
+| mediterranean-18#14 | SE | Kövirózsa | 7,55 | 6,80 | 15 | 15 |
+| mediterranean-18#15 | SE | Kövirózsa | 7,70 | 6,80 | 15 | 15 |
+| mediterranean-18#16 | SE | Kövirózsa | 7,10 | 6,95 | 15 | 15 |
+| mediterranean-18#17 | SE | Kövirózsa | 7,25 | 6,95 | 15 | 15 |
+| mediterranean-18#18 | SE | Kövirózsa | 7,40 | 6,95 | 15 | 15 |
+| mediterranean-18#19 | SE | Kövirózsa | 7,55 | 6,95 | 15 | 15 |
+| mediterranean-18#20 | SE | Kövirózsa | 7,70 | 6,95 | 15 | 15 |
+| mediterranean-18#21 | SE | Kövirózsa | 7,10 | 7,10 | 15 | 15 |
+| mediterranean-18#22 | SE | Kövirózsa | 7,25 | 7,10 | 15 | 15 |
+| mediterranean-18#23 | SE | Kövirózsa | 7,40 | 7,10 | 15 | 15 |
+| mediterranean-18#24 | SE | Kövirózsa | 7,55 | 7,10 | 15 | 15 |
+| mediterranean-18#25 | SE | Kövirózsa | 7,70 | 7,10 | 15 | 15 |
+| mediterranean-18#26 | SE | Kövirózsa | 7,10 | 7,25 | 15 | 15 |
+| mediterranean-18#27 | SE | Kövirózsa | 7,25 | 7,25 | 15 | 15 |
+| mediterranean-18#28 | SE | Kövirózsa | 7,40 | 7,25 | 15 | 15 |
+| mediterranean-18#29 | SE | Kövirózsa | 7,55 | 7,25 | 15 | 15 |
+| mediterranean-18#30 | SE | Kövirózsa | 7,70 | 7,25 | 15 | 15 |
+| mediterranean-18#31 | SE | Kövirózsa | 7,10 | 7,40 | 15 | 15 |
+| mediterranean-18#32 | SE | Kövirózsa | 7,25 | 7,40 | 15 | 15 |
+| mediterranean-18#33 | SE | Kövirózsa | 7,40 | 7,40 | 15 | 15 |
+| mediterranean-18#34 | SE | Kövirózsa | 7,55 | 7,40 | 15 | 15 |
+| mediterranean-18#35 | SE | Kövirózsa | 7,70 | 7,40 | 15 | 15 |
+
+## 4. Fajok és elhelyezésük
+- **CL – Oszlopos hamisciprus** (*Chamaecyparis lawsoniana 'Columnaris'*), 2 tő. Cserje (télen is lombos / örökzöld), kb. 800 cm magas és 150 cm széles; most nem virágzik; lomb: kékeszöld pikkelylevél.
+  - x 3,0 m, y 0,5 m
+  - x 5,0 m, y 0,5 m
+- **EE – Ezüstös ezüstfa** (*Elaeagnus × ebbingei*), 2 tő. Cserje (télen is lombos / örökzöld), kb. 300 cm magas és 300 cm széles; most nem virágzik; lomb: örökzöld, ezüstös fonák.
+  - x 1,6 m, y 1,7 m
+  - x 6,4 m, y 1,7 m
+- **LA – Levendula** (*Lavandula angustifolia 'Munstead'*), 36 tő. Bokros évelő, kb. 45 cm magas és 40 cm széles; most virágzik: lila.
+  - egyenes sor (3,3; 1,4) m-től (3,3; 8,0) m-ig, 40 cm tőtáv (18 tő)
+  - egyenes sor (4,7; 1,4) m-től (4,7; 8,0) m-ig, 40 cm tőtáv (18 tő)
+- **HB – Kék zabfű** (*Helictotrichon sempervirens*), 18 tő. Díszfű / felálló levélcsomó, kb. 60 cm magas és 50 cm széles; most virágzik: szalmaszín.
+  - folt: x 0,2–2,4 m, y 0,2–1,1 m, eltolt kiosztás, 50 cm tőtáv (9 tő)
+  - folt: x 5,6–7,8 m, y 0,2–1,1 m, eltolt kiosztás, 50 cm tőtáv (9 tő)
+- **ST – Gyapjas tisztesfű** (*Stachys byzantina 'Silver Carpet'*), 64 tő. Alacsony talajtakaró / párna, kb. 20 cm magas és 30 cm széles; most virágzik: rózsaszín (ritkán nyílik).
+  - folt: x 0,2–1,4 m, y 2,7–4,9 m, eltolt kiosztás, 30 cm tőtáv (32 tő)
+  - folt: x 6,6–7,8 m, y 2,7–4,9 m, eltolt kiosztás, 30 cm tőtáv (32 tő)
+- **PE – Kékszakállfű / orosz zsálya** (*Salvia yangii (Perovskia atriplicifolia)*), 3 tő. Bokros évelő, kb. 100 cm magas és 70 cm széles; most virágzik: levendulakék.
+  - folt: x 1,6–2,9 m, y 2,7–4,9 m, négyzetes kiosztás, 70 cm tőtáv (3 tő)
+- **SA – Ligeti zsálya** (*Salvia nemorosa 'Marcus'*), 24 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kékeslila.
+  - folt: x 5,1–6,5 m, y 2,7–4,9 m, négyzetes kiosztás, 35 cm tőtáv (24 tő)
+- **FE – Kék csenkesz** (*Festuca glauca 'Elijah Blue'*), 104 tő. Díszfű / felálló levélcsomó, kb. 30 cm magas és 25 cm széles; most nem virágzik; lomb: ezüstkék.
+  - folt: x 0,2–2,9 m, y 5,2–6,3 m, eltolt kiosztás, 25 cm tőtáv (52 tő)
+  - folt: x 5,1–7,8 m, y 5,2–6,3 m, eltolt kiosztás, 25 cm tőtáv (52 tő)
+- **TH – Mezei kakukkfű** (*Thymus serpyllum 'Coccineus'*), 27 tő. Alacsony talajtakaró / párna, kb. 8 cm magas és 25 cm széles; most virágzik: bíborpiros.
+  - folt: x 0,2–0,7 m, y 6,4–7,5 m, eltolt kiosztás, 25 cm tőtáv (10 tő)
+  - folt: x 5,1–5,9 m, y 6,4–7,5 m, eltolt kiosztás, 25 cm tőtáv (17 tő)
+- **SE – Kövirózsa** (*Sempervivum tectorum*), 53 tő. Alacsony talajtakaró / párna, kb. 15 cm magas és 15 cm széles; most virágzik: rózsaszín.
+  - folt: x 2,5–3,0 m, y 6,5–7,5 m, négyzetes kiosztás, 15 cm tőtáv (18 tő)
+  - folt: x 7,0–7,8 m, y 6,4–7,5 m, négyzetes kiosztás, 15 cm tőtáv (35 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Az ágyás felszíne világos, 4–8 mm-es mosott kavics.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (4,0; 3,9) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 333 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 333 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > modern: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 57 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Modern városi kert: 6,0 × 9,0 m, évelőágyás, nyugati fekvés, napos (közvetlen nap 13:00-tól), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (6,0; 0), (6,0; 9,0), (0; 9,0).
+- A ház fala (vakolt, világos): x -0,2–0,0 m, y 0,0–9,0 m.
+- A ház fala (vakolt, világos): x 6,0–6,2 m, y 0,0–9,0 m.
+- Burkolat / járda („Terasz”): x 0,0–6,0 m, y 6,4–9,0 m.
+- Burkolat / járda („Járólap”): x 2,6–3,4 m, y 3,0–6,4 m.
+- Kerti pad (fa) („Kültéri pad”): x 0,6–2,6 m, y 7,2–7,7 m.
+
+## 3. Növénytábla (57 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| modern-1 | DO | Oszlopos díszcseresznye | 1,00 | 0,60 | 600 | 150 |
+| modern-2 | DO | Oszlopos díszcseresznye | 3,00 | 0,60 | 600 | 150 |
+| modern-3 | DO | Oszlopos díszcseresznye | 5,00 | 0,60 | 600 | 150 |
+| modern-4#1 | CK | Tollas nádtippan | 0,55 | 1,95 | 110 | 50 |
+| modern-4#2 | CK | Tollas nádtippan | 1,05 | 1,95 | 110 | 50 |
+| modern-4#3 | CK | Tollas nádtippan | 1,55 | 1,95 | 110 | 50 |
+| modern-4#4 | CK | Tollas nádtippan | 2,05 | 1,95 | 110 | 50 |
+| modern-4#5 | CK | Tollas nádtippan | 0,55 | 2,45 | 110 | 50 |
+| modern-4#6 | CK | Tollas nádtippan | 1,05 | 2,45 | 110 | 50 |
+| modern-4#7 | CK | Tollas nádtippan | 1,55 | 2,45 | 110 | 50 |
+| modern-4#8 | CK | Tollas nádtippan | 2,05 | 2,45 | 110 | 50 |
+| modern-5#1 | CK | Tollas nádtippan | 3,95 | 1,95 | 110 | 50 |
+| modern-5#2 | CK | Tollas nádtippan | 4,45 | 1,95 | 110 | 50 |
+| modern-5#3 | CK | Tollas nádtippan | 4,95 | 1,95 | 110 | 50 |
+| modern-5#4 | CK | Tollas nádtippan | 5,45 | 1,95 | 110 | 50 |
+| modern-5#5 | CK | Tollas nádtippan | 3,95 | 2,45 | 110 | 50 |
+| modern-5#6 | CK | Tollas nádtippan | 4,45 | 2,45 | 110 | 50 |
+| modern-5#7 | CK | Tollas nádtippan | 4,95 | 2,45 | 110 | 50 |
+| modern-5#8 | CK | Tollas nádtippan | 5,45 | 2,45 | 110 | 50 |
+| modern-6#1 | LA | Levendula | 0,50 | 3,35 | 45 | 40 |
+| modern-6#2 | LA | Levendula | 0,90 | 3,35 | 45 | 40 |
+| modern-6#3 | LA | Levendula | 1,30 | 3,35 | 45 | 40 |
+| modern-6#4 | LA | Levendula | 1,70 | 3,35 | 45 | 40 |
+| modern-6#5 | LA | Levendula | 2,10 | 3,35 | 45 | 40 |
+| modern-6#6 | LA | Levendula | 0,50 | 3,75 | 45 | 40 |
+| modern-6#7 | LA | Levendula | 0,90 | 3,75 | 45 | 40 |
+| modern-6#8 | LA | Levendula | 1,30 | 3,75 | 45 | 40 |
+| modern-6#9 | LA | Levendula | 1,70 | 3,75 | 45 | 40 |
+| modern-6#10 | LA | Levendula | 2,10 | 3,75 | 45 | 40 |
+| modern-6#11 | LA | Levendula | 0,50 | 4,15 | 45 | 40 |
+| modern-6#12 | LA | Levendula | 0,90 | 4,15 | 45 | 40 |
+| modern-6#13 | LA | Levendula | 1,30 | 4,15 | 45 | 40 |
+| modern-6#14 | LA | Levendula | 1,70 | 4,15 | 45 | 40 |
+| modern-6#15 | LA | Levendula | 2,10 | 4,15 | 45 | 40 |
+| modern-7#1 | LA | Levendula | 3,90 | 3,35 | 45 | 40 |
+| modern-7#2 | LA | Levendula | 4,30 | 3,35 | 45 | 40 |
+| modern-7#3 | LA | Levendula | 4,70 | 3,35 | 45 | 40 |
+| modern-7#4 | LA | Levendula | 5,10 | 3,35 | 45 | 40 |
+| modern-7#5 | LA | Levendula | 5,50 | 3,35 | 45 | 40 |
+| modern-7#6 | LA | Levendula | 3,90 | 3,75 | 45 | 40 |
+| modern-7#7 | LA | Levendula | 4,30 | 3,75 | 45 | 40 |
+| modern-7#8 | LA | Levendula | 4,70 | 3,75 | 45 | 40 |
+| modern-7#9 | LA | Levendula | 5,10 | 3,75 | 45 | 40 |
+| modern-7#10 | LA | Levendula | 5,50 | 3,75 | 45 | 40 |
+| modern-7#11 | LA | Levendula | 3,90 | 4,15 | 45 | 40 |
+| modern-7#12 | LA | Levendula | 4,30 | 4,15 | 45 | 40 |
+| modern-7#13 | LA | Levendula | 4,70 | 4,15 | 45 | 40 |
+| modern-7#14 | LA | Levendula | 5,10 | 4,15 | 45 | 40 |
+| modern-7#15 | LA | Levendula | 5,50 | 4,15 | 45 | 40 |
+| modern-8#1 | BX | Puszpáng | 0,95 | 5,05 | 60 | 50 |
+| modern-8#2 | BX | Puszpáng | 1,65 | 5,05 | 60 | 50 |
+| modern-8#3 | BX | Puszpáng | 0,95 | 5,75 | 60 | 50 |
+| modern-8#4 | BX | Puszpáng | 1,65 | 5,75 | 60 | 50 |
+| modern-9#1 | BX | Puszpáng | 4,35 | 5,05 | 60 | 50 |
+| modern-9#2 | BX | Puszpáng | 5,05 | 5,05 | 60 | 50 |
+| modern-9#3 | BX | Puszpáng | 4,35 | 5,75 | 60 | 50 |
+| modern-9#4 | BX | Puszpáng | 5,05 | 5,75 | 60 | 50 |
+
+## 4. Fajok és elhelyezésük
+- **DO – Oszlopos díszcseresznye** (*Prunus serrulata 'Amanogawa'*), 3 tő. Kis fa / nagycserje, kb. 600 cm magas és 150 cm széles; most nem virágzik; lomb: zöld, ősszel sárga-narancs.
+  - x 1,0 m, y 0,6 m
+  - x 3,0 m, y 0,6 m
+  - x 5,0 m, y 0,6 m
+- **CK – Tollas nádtippan** (*Calamagrostis × acutiflora 'Overdam'*), 16 tő. Díszfű / felálló levélcsomó, kb. 110 cm magas és 50 cm széles; most virágzik: bronz kalász.
+  - folt: x 0,2–2,4 m, y 1,6–2,8 m, négyzetes kiosztás, 50 cm tőtáv (8 tő)
+  - folt: x 3,6–5,8 m, y 1,6–2,8 m, négyzetes kiosztás, 50 cm tőtáv (8 tő)
+- **LA – Levendula** (*Lavandula angustifolia 'Munstead'*), 30 tő. Bokros évelő, kb. 45 cm magas és 40 cm széles; most virágzik: lila.
+  - folt: x 0,2–2,4 m, y 3,1–4,4 m, négyzetes kiosztás, 40 cm tőtáv (15 tő)
+  - folt: x 3,6–5,8 m, y 3,1–4,4 m, négyzetes kiosztás, 40 cm tőtáv (15 tő)
+- **BX – Puszpáng** (*Buxus sempervirens*), 8 tő. Alacsony talajtakaró / párna, kb. 60 cm magas és 50 cm széles; most nem virágzik; lomb: sötétzöld.
+  - folt: x 0,3–2,3 m, y 4,7–6,1 m, négyzetes kiosztás, 70 cm tőtáv (4 tő)
+  - folt: x 3,7–5,7 m, y 4,7–6,1 m, négyzetes kiosztás, 70 cm tőtáv (4 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (levendula) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes késő délutáni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (3,0; 2,7) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 57 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 57 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > pollinator: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 157 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Kerek pillangókert: 7,0 × 7,0 m, évelőágyás, déli fekvés, napos (közvetlen nap egész nap), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás kör alakú, 7,0 m átmérőjű, a (3,5; 3,5) m középponttal.
+- Kút (kőkáva) („Madáritató”): x 3,1–3,9 m, y 3,1–3,9 m.
+
+## 3. Növénytábla (157 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| pollinator-1#1 | NE | Macskamenta | 5,10 | 3,90 | 60 | 55 |
+| pollinator-1#2 | NE | Macskamenta | 5,65 | 3,90 | 60 | 55 |
+| pollinator-1#3 | NE | Macskamenta | 6,20 | 3,90 | 60 | 55 |
+| pollinator-1#4 | NE | Macskamenta | 4,82 | 4,38 | 60 | 55 |
+| pollinator-1#5 | NE | Macskamenta | 5,37 | 4,38 | 60 | 55 |
+| pollinator-1#6 | NE | Macskamenta | 5,92 | 4,38 | 60 | 55 |
+| pollinator-1#7 | NE | Macskamenta | 6,47 | 4,38 | 60 | 55 |
+| pollinator-1#8 | NE | Macskamenta | 5,10 | 4,86 | 60 | 55 |
+| pollinator-1#9 | NE | Macskamenta | 5,65 | 4,86 | 60 | 55 |
+| pollinator-1#10 | NE | Macskamenta | 6,20 | 4,86 | 60 | 55 |
+| pollinator-1#11 | NE | Macskamenta | 5,92 | 5,33 | 60 | 55 |
+| pollinator-2#1 | AG | Ánizsizsóp | 4,39 | 4,87 | 80 | 45 |
+| pollinator-2#2 | AG | Ánizsizsóp | 3,72 | 5,26 | 80 | 45 |
+| pollinator-2#3 | AG | Ánizsizsóp | 4,17 | 5,26 | 80 | 45 |
+| pollinator-2#4 | AG | Ánizsizsóp | 4,62 | 5,26 | 80 | 45 |
+| pollinator-2#5 | AG | Ánizsizsóp | 5,07 | 5,26 | 80 | 45 |
+| pollinator-2#6 | AG | Ánizsizsóp | 3,94 | 5,65 | 80 | 45 |
+| pollinator-2#7 | AG | Ánizsizsóp | 4,39 | 5,65 | 80 | 45 |
+| pollinator-2#8 | AG | Ánizsizsóp | 4,84 | 5,65 | 80 | 45 |
+| pollinator-2#9 | AG | Ánizsizsóp | 5,29 | 5,65 | 80 | 45 |
+| pollinator-2#10 | AG | Ánizsizsóp | 3,72 | 6,04 | 80 | 45 |
+| pollinator-2#11 | AG | Ánizsizsóp | 4,17 | 6,04 | 80 | 45 |
+| pollinator-2#12 | AG | Ánizsizsóp | 4,62 | 6,04 | 80 | 45 |
+| pollinator-2#13 | AG | Ánizsizsóp | 5,07 | 6,04 | 80 | 45 |
+| pollinator-2#14 | AG | Ánizsizsóp | 3,94 | 6,43 | 80 | 45 |
+| pollinator-2#15 | AG | Ánizsizsóp | 4,39 | 6,43 | 80 | 45 |
+| pollinator-3#1 | EC | Bíbor kúpvirág | 2,61 | 4,87 | 90 | 45 |
+| pollinator-3#2 | EC | Bíbor kúpvirág | 1,93 | 5,26 | 90 | 45 |
+| pollinator-3#3 | EC | Bíbor kúpvirág | 2,38 | 5,26 | 90 | 45 |
+| pollinator-3#4 | EC | Bíbor kúpvirág | 2,83 | 5,26 | 90 | 45 |
+| pollinator-3#5 | EC | Bíbor kúpvirág | 3,28 | 5,26 | 90 | 45 |
+| pollinator-3#6 | EC | Bíbor kúpvirág | 1,71 | 5,65 | 90 | 45 |
+| pollinator-3#7 | EC | Bíbor kúpvirág | 2,16 | 5,65 | 90 | 45 |
+| pollinator-3#8 | EC | Bíbor kúpvirág | 2,61 | 5,65 | 90 | 45 |
+| pollinator-3#9 | EC | Bíbor kúpvirág | 3,06 | 5,65 | 90 | 45 |
+| pollinator-3#10 | EC | Bíbor kúpvirág | 1,93 | 6,04 | 90 | 45 |
+| pollinator-3#11 | EC | Bíbor kúpvirág | 2,38 | 6,04 | 90 | 45 |
+| pollinator-3#12 | EC | Bíbor kúpvirág | 2,83 | 6,04 | 90 | 45 |
+| pollinator-3#13 | EC | Bíbor kúpvirág | 3,28 | 6,04 | 90 | 45 |
+| pollinator-3#14 | EC | Bíbor kúpvirág | 2,61 | 6,43 | 90 | 45 |
+| pollinator-3#15 | EC | Bíbor kúpvirág | 3,06 | 6,43 | 90 | 45 |
+| pollinator-4#1 | SA | Ligeti zsálya | 0,48 | 3,71 | 40 | 35 |
+| pollinator-4#2 | SA | Ligeti zsálya | 0,83 | 3,71 | 40 | 35 |
+| pollinator-4#3 | SA | Ligeti zsálya | 1,18 | 3,71 | 40 | 35 |
+| pollinator-4#4 | SA | Ligeti zsálya | 1,53 | 3,71 | 40 | 35 |
+| pollinator-4#5 | SA | Ligeti zsálya | 1,88 | 3,71 | 40 | 35 |
+| pollinator-4#6 | SA | Ligeti zsálya | 0,65 | 4,01 | 40 | 35 |
+| pollinator-4#7 | SA | Ligeti zsálya | 1,00 | 4,01 | 40 | 35 |
+| pollinator-4#8 | SA | Ligeti zsálya | 1,35 | 4,01 | 40 | 35 |
+| pollinator-4#9 | SA | Ligeti zsálya | 1,70 | 4,01 | 40 | 35 |
+| pollinator-4#10 | SA | Ligeti zsálya | 2,05 | 4,01 | 40 | 35 |
+| pollinator-4#11 | SA | Ligeti zsálya | 0,48 | 4,31 | 40 | 35 |
+| pollinator-4#12 | SA | Ligeti zsálya | 0,83 | 4,31 | 40 | 35 |
+| pollinator-4#13 | SA | Ligeti zsálya | 1,18 | 4,31 | 40 | 35 |
+| pollinator-4#14 | SA | Ligeti zsálya | 1,53 | 4,31 | 40 | 35 |
+| pollinator-4#15 | SA | Ligeti zsálya | 1,88 | 4,31 | 40 | 35 |
+| pollinator-4#16 | SA | Ligeti zsálya | 2,23 | 4,31 | 40 | 35 |
+| pollinator-4#17 | SA | Ligeti zsálya | 0,65 | 4,62 | 40 | 35 |
+| pollinator-4#18 | SA | Ligeti zsálya | 1,00 | 4,62 | 40 | 35 |
+| pollinator-4#19 | SA | Ligeti zsálya | 1,35 | 4,62 | 40 | 35 |
+| pollinator-4#20 | SA | Ligeti zsálya | 1,70 | 4,62 | 40 | 35 |
+| pollinator-4#21 | SA | Ligeti zsálya | 2,05 | 4,62 | 40 | 35 |
+| pollinator-4#22 | SA | Ligeti zsálya | 0,83 | 4,92 | 40 | 35 |
+| pollinator-4#23 | SA | Ligeti zsálya | 1,18 | 4,92 | 40 | 35 |
+| pollinator-4#24 | SA | Ligeti zsálya | 1,53 | 4,92 | 40 | 35 |
+| pollinator-4#25 | SA | Ligeti zsálya | 1,88 | 4,92 | 40 | 35 |
+| pollinator-4#26 | SA | Ligeti zsálya | 1,00 | 5,22 | 40 | 35 |
+| pollinator-4#27 | SA | Ligeti zsálya | 1,35 | 5,22 | 40 | 35 |
+| pollinator-4#28 | SA | Ligeti zsálya | 1,18 | 5,53 | 40 | 35 |
+| pollinator-5#1 | VS | Macskafarkú veronika | 1,18 | 1,47 | 40 | 35 |
+| pollinator-5#2 | VS | Macskafarkú veronika | 1,00 | 1,78 | 40 | 35 |
+| pollinator-5#3 | VS | Macskafarkú veronika | 1,35 | 1,78 | 40 | 35 |
+| pollinator-5#4 | VS | Macskafarkú veronika | 0,83 | 2,08 | 40 | 35 |
+| pollinator-5#5 | VS | Macskafarkú veronika | 1,18 | 2,08 | 40 | 35 |
+| pollinator-5#6 | VS | Macskafarkú veronika | 1,53 | 2,08 | 40 | 35 |
+| pollinator-5#7 | VS | Macskafarkú veronika | 1,88 | 2,08 | 40 | 35 |
+| pollinator-5#8 | VS | Macskafarkú veronika | 0,65 | 2,38 | 40 | 35 |
+| pollinator-5#9 | VS | Macskafarkú veronika | 1,00 | 2,38 | 40 | 35 |
+| pollinator-5#10 | VS | Macskafarkú veronika | 1,35 | 2,38 | 40 | 35 |
+| pollinator-5#11 | VS | Macskafarkú veronika | 1,70 | 2,38 | 40 | 35 |
+| pollinator-5#12 | VS | Macskafarkú veronika | 2,05 | 2,38 | 40 | 35 |
+| pollinator-5#13 | VS | Macskafarkú veronika | 0,48 | 2,69 | 40 | 35 |
+| pollinator-5#14 | VS | Macskafarkú veronika | 0,83 | 2,69 | 40 | 35 |
+| pollinator-5#15 | VS | Macskafarkú veronika | 1,18 | 2,69 | 40 | 35 |
+| pollinator-5#16 | VS | Macskafarkú veronika | 1,53 | 2,69 | 40 | 35 |
+| pollinator-5#17 | VS | Macskafarkú veronika | 1,88 | 2,69 | 40 | 35 |
+| pollinator-5#18 | VS | Macskafarkú veronika | 2,23 | 2,69 | 40 | 35 |
+| pollinator-5#19 | VS | Macskafarkú veronika | 0,65 | 2,99 | 40 | 35 |
+| pollinator-5#20 | VS | Macskafarkú veronika | 1,00 | 2,99 | 40 | 35 |
+| pollinator-5#21 | VS | Macskafarkú veronika | 1,35 | 2,99 | 40 | 35 |
+| pollinator-5#22 | VS | Macskafarkú veronika | 1,70 | 2,99 | 40 | 35 |
+| pollinator-5#23 | VS | Macskafarkú veronika | 2,05 | 2,99 | 40 | 35 |
+| pollinator-5#24 | VS | Macskafarkú veronika | 0,48 | 3,29 | 40 | 35 |
+| pollinator-5#25 | VS | Macskafarkú veronika | 0,83 | 3,29 | 40 | 35 |
+| pollinator-5#26 | VS | Macskafarkú veronika | 1,18 | 3,29 | 40 | 35 |
+| pollinator-5#27 | VS | Macskafarkú veronika | 1,53 | 3,29 | 40 | 35 |
+| pollinator-5#28 | VS | Macskafarkú veronika | 1,88 | 3,29 | 40 | 35 |
+| pollinator-6#1 | AM | Közönséges cickafark | 2,61 | 0,57 | 60 | 45 |
+| pollinator-6#2 | AM | Közönséges cickafark | 3,06 | 0,57 | 60 | 45 |
+| pollinator-6#3 | AM | Közönséges cickafark | 1,93 | 0,96 | 60 | 45 |
+| pollinator-6#4 | AM | Közönséges cickafark | 2,38 | 0,96 | 60 | 45 |
+| pollinator-6#5 | AM | Közönséges cickafark | 2,83 | 0,96 | 60 | 45 |
+| pollinator-6#6 | AM | Közönséges cickafark | 3,28 | 0,96 | 60 | 45 |
+| pollinator-6#7 | AM | Közönséges cickafark | 1,71 | 1,35 | 60 | 45 |
+| pollinator-6#8 | AM | Közönséges cickafark | 2,16 | 1,35 | 60 | 45 |
+| pollinator-6#9 | AM | Közönséges cickafark | 2,61 | 1,35 | 60 | 45 |
+| pollinator-6#10 | AM | Közönséges cickafark | 3,06 | 1,35 | 60 | 45 |
+| pollinator-6#11 | AM | Közönséges cickafark | 1,93 | 1,74 | 60 | 45 |
+| pollinator-6#12 | AM | Közönséges cickafark | 2,38 | 1,74 | 60 | 45 |
+| pollinator-6#13 | AM | Közönséges cickafark | 2,83 | 1,74 | 60 | 45 |
+| pollinator-6#14 | AM | Közönséges cickafark | 3,28 | 1,74 | 60 | 45 |
+| pollinator-6#15 | AM | Közönséges cickafark | 2,61 | 2,13 | 60 | 45 |
+| pollinator-7#1 | PE | Kékszakállfű / orosz zsálya | 3,92 | 0,75 | 100 | 70 |
+| pollinator-7#2 | PE | Kékszakállfű / orosz zsálya | 4,62 | 0,75 | 100 | 70 |
+| pollinator-7#3 | PE | Kékszakállfű / orosz zsálya | 4,27 | 1,35 | 100 | 70 |
+| pollinator-7#4 | PE | Kékszakállfű / orosz zsálya | 4,97 | 1,35 | 100 | 70 |
+| pollinator-7#5 | PE | Kékszakállfű / orosz zsálya | 3,92 | 1,96 | 100 | 70 |
+| pollinator-7#6 | PE | Kékszakállfű / orosz zsálya | 4,62 | 1,96 | 100 | 70 |
+| pollinator-8#1 | HH | Magas varjúháj | 5,40 | 1,73 | 60 | 50 |
+| pollinator-8#2 | HH | Magas varjúháj | 5,90 | 1,73 | 60 | 50 |
+| pollinator-8#3 | HH | Magas varjúháj | 5,15 | 2,17 | 60 | 50 |
+| pollinator-8#4 | HH | Magas varjúháj | 5,65 | 2,17 | 60 | 50 |
+| pollinator-8#5 | HH | Magas varjúháj | 6,15 | 2,17 | 60 | 50 |
+| pollinator-8#6 | HH | Magas varjúháj | 4,90 | 2,60 | 60 | 50 |
+| pollinator-8#7 | HH | Magas varjúháj | 5,40 | 2,60 | 60 | 50 |
+| pollinator-8#8 | HH | Magas varjúháj | 5,90 | 2,60 | 60 | 50 |
+| pollinator-8#9 | HH | Magas varjúháj | 6,40 | 2,60 | 60 | 50 |
+| pollinator-8#10 | HH | Magas varjúháj | 5,15 | 3,03 | 60 | 50 |
+| pollinator-8#11 | HH | Magas varjúháj | 5,65 | 3,03 | 60 | 50 |
+| pollinator-8#12 | HH | Magas varjúháj | 6,15 | 3,03 | 60 | 50 |
+| pollinator-8#13 | HH | Magas varjúháj | 6,65 | 3,03 | 60 | 50 |
+| pollinator-9#1 | TH | Mezei kakukkfű | 3,50 | 2,50 | 8 | 25 |
+| pollinator-9#2 | TH | Mezei kakukkfű | 3,75 | 2,53 | 8 | 25 |
+| pollinator-9#3 | TH | Mezei kakukkfű | 3,98 | 2,63 | 8 | 25 |
+| pollinator-9#4 | TH | Mezei kakukkfű | 4,18 | 2,77 | 8 | 25 |
+| pollinator-9#5 | TH | Mezei kakukkfű | 4,34 | 2,97 | 8 | 25 |
+| pollinator-9#6 | TH | Mezei kakukkfű | 4,45 | 3,19 | 8 | 25 |
+| pollinator-9#7 | TH | Mezei kakukkfű | 4,49 | 3,44 | 8 | 25 |
+| pollinator-9#8 | TH | Mezei kakukkfű | 4,48 | 3,69 | 8 | 25 |
+| pollinator-9#9 | TH | Mezei kakukkfű | 4,40 | 3,92 | 8 | 25 |
+| pollinator-9#10 | TH | Mezei kakukkfű | 4,26 | 4,13 | 8 | 25 |
+| pollinator-9#11 | TH | Mezei kakukkfű | 4,08 | 4,30 | 8 | 25 |
+| pollinator-9#12 | TH | Mezei kakukkfű | 3,86 | 4,42 | 8 | 25 |
+| pollinator-9#13 | TH | Mezei kakukkfű | 3,62 | 4,48 | 8 | 25 |
+| pollinator-9#14 | TH | Mezei kakukkfű | 3,38 | 4,48 | 8 | 25 |
+| pollinator-9#15 | TH | Mezei kakukkfű | 3,14 | 4,42 | 8 | 25 |
+| pollinator-9#16 | TH | Mezei kakukkfű | 2,92 | 4,30 | 8 | 25 |
+| pollinator-9#17 | TH | Mezei kakukkfű | 2,74 | 4,13 | 8 | 25 |
+| pollinator-9#18 | TH | Mezei kakukkfű | 2,60 | 3,92 | 8 | 25 |
+| pollinator-9#19 | TH | Mezei kakukkfű | 2,52 | 3,69 | 8 | 25 |
+| pollinator-9#20 | TH | Mezei kakukkfű | 2,51 | 3,44 | 8 | 25 |
+| pollinator-9#21 | TH | Mezei kakukkfű | 2,55 | 3,19 | 8 | 25 |
+| pollinator-9#22 | TH | Mezei kakukkfű | 2,66 | 2,97 | 8 | 25 |
+| pollinator-9#23 | TH | Mezei kakukkfű | 2,82 | 2,77 | 8 | 25 |
+| pollinator-9#24 | TH | Mezei kakukkfű | 3,02 | 2,63 | 8 | 25 |
+| pollinator-9#25 | TH | Mezei kakukkfű | 3,25 | 2,53 | 8 | 25 |
+| pollinator-9#26 | TH | Mezei kakukkfű | 3,50 | 2,50 | 8 | 25 |
+
+## 4. Fajok és elhelyezésük
+- **NE – Macskamenta** (*Nepeta × faassenii 'Walker's Low'*), 11 tő. Bokros évelő, kb. 60 cm magas és 55 cm széles; most virágzik: levendulakék.
+  - folt: x 4,6–6,7 m, y 3,6–5,7 m, eltolt kiosztás, 55 cm tőtáv (11 tő)
+- **AG – Ánizsizsóp** (*Agastache 'Blue Fortune'*), 15 tő. Bokros évelő, kb. 80 cm magas és 45 cm széles; most virágzik: levendulakék.
+  - folt: x 3,6–5,7 m, y 4,6–6,7 m, eltolt kiosztás, 45 cm tőtáv (15 tő)
+- **EC – Bíbor kúpvirág** (*Echinacea purpurea 'Magnus'*), 15 tő. Bokros évelő, kb. 90 cm magas és 45 cm széles; most virágzik: bíborrózsaszín.
+  - folt: x 1,3–3,4 m, y 4,6–6,7 m, eltolt kiosztás, 45 cm tőtáv (15 tő)
+- **SA – Ligeti zsálya** (*Salvia nemorosa 'Marcus'*), 28 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kékeslila.
+  - folt: x 0,3–2,4 m, y 3,6–5,7 m, eltolt kiosztás, 35 cm tőtáv (28 tő)
+- **VS – Macskafarkú veronika** (*Veronica spicata 'Ulster Blue Dwarf'*), 28 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kék.
+  - folt: x 0,3–2,4 m, y 1,3–3,4 m, eltolt kiosztás, 35 cm tőtáv (28 tő)
+- **AM – Közönséges cickafark** (*Achillea millefolium*), 15 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: fehér / rózsaszín / sárga.
+  - folt: x 1,3–3,4 m, y 0,3–2,4 m, eltolt kiosztás, 45 cm tőtáv (15 tő)
+- **PE – Kékszakállfű / orosz zsálya** (*Salvia yangii (Perovskia atriplicifolia)*), 6 tő. Bokros évelő, kb. 100 cm magas és 70 cm széles; most virágzik: levendulakék.
+  - folt: x 3,6–5,7 m, y 0,3–2,4 m, eltolt kiosztás, 70 cm tőtáv (6 tő)
+- **HH – Magas varjúháj** (*Hylotelephium 'Herbstfreude'*), 13 tő. Bokros évelő, kb. 60 cm magas és 50 cm széles; most nem virágzik; lomb: szürkészöld.
+  - folt: x 4,6–6,7 m, y 1,3–3,4 m, eltolt kiosztás, 50 cm tőtáv (13 tő)
+- **TH – Mezei kakukkfű** (*Thymus serpyllum 'Coccineus'*), 26 tő. Alacsony talajtakaró / párna, kb. 8 cm magas és 25 cm széles; most virágzik: bíborpiros.
+  - íves sor (3,5; 2,5) m-től (3,5; 2,5) m-ig, 25 cm tőtáv (26 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (macskamenta, ánizsizsóp, ligeti zsálya, macskafarkú veronika, közönséges cickafark, kékszakállfű / orosz zsálya, magas varjúháj, mezei kakukkfű) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (3,5; 3,5) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 157 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 157 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > prairie: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 226 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Prérikert: 8,0 × 10,0 m, évelőágyás, déli fekvés, napos (közvetlen nap egész nap), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (8,0; 0), (8,0; 10,0), (0; 10,0).
+- Kerti ösvény (lépőkő vagy kavics) („Nyírt ösvény”): x 3,6–4,4 m, y 0,0–10,0 m.
+
+## 3. Növénytábla (226 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| prairie-1#1 | CK | Tollas nádtippan | 0,36 | 0,49 | 110 | 50 |
+| prairie-1#2 | CK | Tollas nádtippan | 0,86 | 0,49 | 110 | 50 |
+| prairie-1#3 | CK | Tollas nádtippan | 1,36 | 0,49 | 110 | 50 |
+| prairie-1#4 | CK | Tollas nádtippan | 1,86 | 0,49 | 110 | 50 |
+| prairie-1#5 | CK | Tollas nádtippan | 2,36 | 0,49 | 110 | 50 |
+| prairie-1#6 | CK | Tollas nádtippan | 0,61 | 0,92 | 110 | 50 |
+| prairie-1#7 | CK | Tollas nádtippan | 1,11 | 0,92 | 110 | 50 |
+| prairie-1#8 | CK | Tollas nádtippan | 1,61 | 0,92 | 110 | 50 |
+| prairie-1#9 | CK | Tollas nádtippan | 2,11 | 0,92 | 110 | 50 |
+| prairie-1#10 | CK | Tollas nádtippan | 2,61 | 0,92 | 110 | 50 |
+| prairie-1#11 | CK | Tollas nádtippan | 0,36 | 1,35 | 110 | 50 |
+| prairie-1#12 | CK | Tollas nádtippan | 0,86 | 1,35 | 110 | 50 |
+| prairie-1#13 | CK | Tollas nádtippan | 1,36 | 1,35 | 110 | 50 |
+| prairie-1#14 | CK | Tollas nádtippan | 1,86 | 1,35 | 110 | 50 |
+| prairie-1#15 | CK | Tollas nádtippan | 2,36 | 1,35 | 110 | 50 |
+| prairie-1#16 | CK | Tollas nádtippan | 2,86 | 1,35 | 110 | 50 |
+| prairie-1#17 | CK | Tollas nádtippan | 0,61 | 1,79 | 110 | 50 |
+| prairie-1#18 | CK | Tollas nádtippan | 1,11 | 1,79 | 110 | 50 |
+| prairie-1#19 | CK | Tollas nádtippan | 1,61 | 1,79 | 110 | 50 |
+| prairie-1#20 | CK | Tollas nádtippan | 2,11 | 1,79 | 110 | 50 |
+| prairie-2#1 | EC | Bíbor kúpvirág | 2,33 | 2,28 | 90 | 45 |
+| prairie-2#2 | EC | Bíbor kúpvirág | 2,78 | 2,28 | 90 | 45 |
+| prairie-2#3 | EC | Bíbor kúpvirág | 1,65 | 2,67 | 90 | 45 |
+| prairie-2#4 | EC | Bíbor kúpvirág | 2,10 | 2,67 | 90 | 45 |
+| prairie-2#5 | EC | Bíbor kúpvirág | 2,55 | 2,67 | 90 | 45 |
+| prairie-2#6 | EC | Bíbor kúpvirág | 3,00 | 2,67 | 90 | 45 |
+| prairie-2#7 | EC | Bíbor kúpvirág | 1,88 | 3,06 | 90 | 45 |
+| prairie-2#8 | EC | Bíbor kúpvirág | 2,33 | 3,06 | 90 | 45 |
+| prairie-2#9 | EC | Bíbor kúpvirág | 2,78 | 3,06 | 90 | 45 |
+| prairie-2#10 | EC | Bíbor kúpvirág | 3,23 | 3,06 | 90 | 45 |
+| prairie-2#11 | EC | Bíbor kúpvirág | 1,65 | 3,45 | 90 | 45 |
+| prairie-2#12 | EC | Bíbor kúpvirág | 2,10 | 3,45 | 90 | 45 |
+| prairie-2#13 | EC | Bíbor kúpvirág | 2,55 | 3,45 | 90 | 45 |
+| prairie-2#14 | EC | Bíbor kúpvirág | 3,00 | 3,45 | 90 | 45 |
+| prairie-2#15 | EC | Bíbor kúpvirág | 3,45 | 3,45 | 90 | 45 |
+| prairie-2#16 | EC | Bíbor kúpvirág | 1,88 | 3,84 | 90 | 45 |
+| prairie-2#17 | EC | Bíbor kúpvirág | 2,33 | 3,84 | 90 | 45 |
+| prairie-2#18 | EC | Bíbor kúpvirág | 2,78 | 3,84 | 90 | 45 |
+| prairie-2#19 | EC | Bíbor kúpvirág | 3,23 | 3,84 | 90 | 45 |
+| prairie-2#20 | EC | Bíbor kúpvirág | 2,10 | 4,23 | 90 | 45 |
+| prairie-2#21 | EC | Bíbor kúpvirág | 2,55 | 4,23 | 90 | 45 |
+| prairie-2#22 | EC | Bíbor kúpvirág | 3,00 | 4,23 | 90 | 45 |
+| prairie-3#1 | SI | Hajszálas árvalányhaj | 0,80 | 2,37 | 50 | 40 |
+| prairie-3#2 | SI | Hajszálas árvalányhaj | 0,20 | 2,72 | 50 | 40 |
+| prairie-3#3 | SI | Hajszálas árvalányhaj | 0,60 | 2,72 | 50 | 40 |
+| prairie-3#4 | SI | Hajszálas árvalányhaj | 1,00 | 2,72 | 50 | 40 |
+| prairie-3#5 | SI | Hajszálas árvalányhaj | 0,40 | 3,07 | 50 | 40 |
+| prairie-3#6 | SI | Hajszálas árvalányhaj | 0,80 | 3,07 | 50 | 40 |
+| prairie-3#7 | SI | Hajszálas árvalányhaj | 1,20 | 3,07 | 50 | 40 |
+| prairie-3#8 | SI | Hajszálas árvalányhaj | 0,20 | 3,41 | 50 | 40 |
+| prairie-3#9 | SI | Hajszálas árvalányhaj | 0,60 | 3,41 | 50 | 40 |
+| prairie-3#10 | SI | Hajszálas árvalányhaj | 1,00 | 3,41 | 50 | 40 |
+| prairie-3#11 | SI | Hajszálas árvalányhaj | 1,40 | 3,41 | 50 | 40 |
+| prairie-3#12 | SI | Hajszálas árvalányhaj | 0,40 | 3,76 | 50 | 40 |
+| prairie-3#13 | SI | Hajszálas árvalányhaj | 0,80 | 3,76 | 50 | 40 |
+| prairie-3#14 | SI | Hajszálas árvalányhaj | 1,20 | 3,76 | 50 | 40 |
+| prairie-3#15 | SI | Hajszálas árvalányhaj | 0,20 | 4,11 | 50 | 40 |
+| prairie-3#16 | SI | Hajszálas árvalányhaj | 0,60 | 4,11 | 50 | 40 |
+| prairie-3#17 | SI | Hajszálas árvalányhaj | 1,00 | 4,11 | 50 | 40 |
+| prairie-3#18 | SI | Hajszálas árvalányhaj | 0,40 | 4,45 | 50 | 40 |
+| prairie-3#19 | SI | Hajszálas árvalányhaj | 0,80 | 4,45 | 50 | 40 |
+| prairie-3#20 | SI | Hajszálas árvalányhaj | 1,20 | 4,45 | 50 | 40 |
+| prairie-3#21 | SI | Hajszálas árvalányhaj | 0,60 | 4,80 | 50 | 40 |
+| prairie-3#22 | SI | Hajszálas árvalányhaj | 1,00 | 4,80 | 50 | 40 |
+| prairie-4#1 | AG | Ánizsizsóp | 1,76 | 5,26 | 80 | 45 |
+| prairie-4#2 | AG | Ánizsizsóp | 2,21 | 5,26 | 80 | 45 |
+| prairie-4#3 | AG | Ánizsizsóp | 2,66 | 5,26 | 80 | 45 |
+| prairie-4#4 | AG | Ánizsizsóp | 1,54 | 5,65 | 80 | 45 |
+| prairie-4#5 | AG | Ánizsizsóp | 1,99 | 5,65 | 80 | 45 |
+| prairie-4#6 | AG | Ánizsizsóp | 2,44 | 5,65 | 80 | 45 |
+| prairie-4#7 | AG | Ánizsizsóp | 2,89 | 5,65 | 80 | 45 |
+| prairie-4#8 | AG | Ánizsizsóp | 3,34 | 5,65 | 80 | 45 |
+| prairie-4#9 | AG | Ánizsizsóp | 1,76 | 6,04 | 80 | 45 |
+| prairie-4#10 | AG | Ánizsizsóp | 2,21 | 6,04 | 80 | 45 |
+| prairie-4#11 | AG | Ánizsizsóp | 2,66 | 6,04 | 80 | 45 |
+| prairie-4#12 | AG | Ánizsizsóp | 3,11 | 6,04 | 80 | 45 |
+| prairie-4#13 | AG | Ánizsizsóp | 1,54 | 6,43 | 80 | 45 |
+| prairie-4#14 | AG | Ánizsizsóp | 1,99 | 6,43 | 80 | 45 |
+| prairie-4#15 | AG | Ánizsizsóp | 2,44 | 6,43 | 80 | 45 |
+| prairie-4#16 | AG | Ánizsizsóp | 2,89 | 6,43 | 80 | 45 |
+| prairie-4#17 | AG | Ánizsizsóp | 3,34 | 6,43 | 80 | 45 |
+| prairie-4#18 | AG | Ánizsizsóp | 1,76 | 6,82 | 80 | 45 |
+| prairie-4#19 | AG | Ánizsizsóp | 2,21 | 6,82 | 80 | 45 |
+| prairie-4#20 | AG | Ánizsizsóp | 2,66 | 6,82 | 80 | 45 |
+| prairie-4#21 | AG | Ánizsizsóp | 3,11 | 6,82 | 80 | 45 |
+| prairie-5#1 | PN | Tollborzfű | 0,56 | 5,61 | 60 | 60 |
+| prairie-5#2 | PN | Tollborzfű | 1,16 | 5,61 | 60 | 60 |
+| prairie-5#3 | PN | Tollborzfű | 0,26 | 6,13 | 60 | 60 |
+| prairie-5#4 | PN | Tollborzfű | 0,86 | 6,13 | 60 | 60 |
+| prairie-5#5 | PN | Tollborzfű | 1,46 | 6,13 | 60 | 60 |
+| prairie-5#6 | PN | Tollborzfű | 0,56 | 6,65 | 60 | 60 |
+| prairie-5#7 | PN | Tollborzfű | 1,16 | 6,65 | 60 | 60 |
+| prairie-5#8 | PN | Tollborzfű | 0,26 | 7,17 | 60 | 60 |
+| prairie-5#9 | PN | Tollborzfű | 0,86 | 7,17 | 60 | 60 |
+| prairie-6#1 | HH | Magas varjúháj | 0,97 | 8,07 | 60 | 50 |
+| prairie-6#2 | HH | Magas varjúháj | 0,22 | 8,50 | 60 | 50 |
+| prairie-6#3 | HH | Magas varjúháj | 0,72 | 8,50 | 60 | 50 |
+| prairie-6#4 | HH | Magas varjúháj | 1,22 | 8,50 | 60 | 50 |
+| prairie-6#5 | HH | Magas varjúháj | 1,72 | 8,50 | 60 | 50 |
+| prairie-6#6 | HH | Magas varjúháj | 0,47 | 8,94 | 60 | 50 |
+| prairie-6#7 | HH | Magas varjúháj | 0,97 | 8,94 | 60 | 50 |
+| prairie-6#8 | HH | Magas varjúháj | 1,47 | 8,94 | 60 | 50 |
+| prairie-6#9 | HH | Magas varjúháj | 0,72 | 9,37 | 60 | 50 |
+| prairie-6#10 | HH | Magas varjúháj | 1,22 | 9,37 | 60 | 50 |
+| prairie-7#1 | SA | Ligeti zsálya | 2,65 | 7,78 | 40 | 35 |
+| prairie-7#2 | SA | Ligeti zsálya | 3,00 | 7,78 | 40 | 35 |
+| prairie-7#3 | SA | Ligeti zsálya | 2,47 | 8,09 | 40 | 35 |
+| prairie-7#4 | SA | Ligeti zsálya | 2,82 | 8,09 | 40 | 35 |
+| prairie-7#5 | SA | Ligeti zsálya | 3,17 | 8,09 | 40 | 35 |
+| prairie-7#6 | SA | Ligeti zsálya | 2,30 | 8,39 | 40 | 35 |
+| prairie-7#7 | SA | Ligeti zsálya | 2,65 | 8,39 | 40 | 35 |
+| prairie-7#8 | SA | Ligeti zsálya | 3,00 | 8,39 | 40 | 35 |
+| prairie-7#9 | SA | Ligeti zsálya | 3,35 | 8,39 | 40 | 35 |
+| prairie-7#10 | SA | Ligeti zsálya | 2,47 | 8,69 | 40 | 35 |
+| prairie-7#11 | SA | Ligeti zsálya | 2,82 | 8,69 | 40 | 35 |
+| prairie-7#12 | SA | Ligeti zsálya | 3,17 | 8,69 | 40 | 35 |
+| prairie-7#13 | SA | Ligeti zsálya | 3,52 | 8,69 | 40 | 35 |
+| prairie-7#14 | SA | Ligeti zsálya | 2,30 | 9,00 | 40 | 35 |
+| prairie-7#15 | SA | Ligeti zsálya | 2,65 | 9,00 | 40 | 35 |
+| prairie-7#16 | SA | Ligeti zsálya | 3,00 | 9,00 | 40 | 35 |
+| prairie-7#17 | SA | Ligeti zsálya | 3,35 | 9,00 | 40 | 35 |
+| prairie-7#18 | SA | Ligeti zsálya | 2,47 | 9,30 | 40 | 35 |
+| prairie-7#19 | SA | Ligeti zsálya | 2,82 | 9,30 | 40 | 35 |
+| prairie-7#20 | SA | Ligeti zsálya | 3,17 | 9,30 | 40 | 35 |
+| prairie-7#21 | SA | Ligeti zsálya | 2,65 | 9,60 | 40 | 35 |
+| prairie-7#22 | SA | Ligeti zsálya | 3,00 | 9,60 | 40 | 35 |
+| prairie-8#1 | MO | Kékperje | 5,66 | 0,39 | 90 | 50 |
+| prairie-8#2 | MO | Kékperje | 6,16 | 0,39 | 90 | 50 |
+| prairie-8#3 | MO | Kékperje | 6,66 | 0,39 | 90 | 50 |
+| prairie-8#4 | MO | Kékperje | 7,16 | 0,39 | 90 | 50 |
+| prairie-8#5 | MO | Kékperje | 5,41 | 0,82 | 90 | 50 |
+| prairie-8#6 | MO | Kékperje | 5,91 | 0,82 | 90 | 50 |
+| prairie-8#7 | MO | Kékperje | 6,41 | 0,82 | 90 | 50 |
+| prairie-8#8 | MO | Kékperje | 6,91 | 0,82 | 90 | 50 |
+| prairie-8#9 | MO | Kékperje | 7,41 | 0,82 | 90 | 50 |
+| prairie-8#10 | MO | Kékperje | 7,91 | 0,82 | 90 | 50 |
+| prairie-8#11 | MO | Kékperje | 5,16 | 1,25 | 90 | 50 |
+| prairie-8#12 | MO | Kékperje | 5,66 | 1,25 | 90 | 50 |
+| prairie-8#13 | MO | Kékperje | 6,16 | 1,25 | 90 | 50 |
+| prairie-8#14 | MO | Kékperje | 6,66 | 1,25 | 90 | 50 |
+| prairie-8#15 | MO | Kékperje | 7,16 | 1,25 | 90 | 50 |
+| prairie-8#16 | MO | Kékperje | 7,66 | 1,25 | 90 | 50 |
+| prairie-8#17 | MO | Kékperje | 5,41 | 1,69 | 90 | 50 |
+| prairie-8#18 | MO | Kékperje | 5,91 | 1,69 | 90 | 50 |
+| prairie-8#19 | MO | Kékperje | 6,41 | 1,69 | 90 | 50 |
+| prairie-8#20 | MO | Kékperje | 6,91 | 1,69 | 90 | 50 |
+| prairie-8#21 | MO | Kékperje | 7,41 | 1,69 | 90 | 50 |
+| prairie-9#1 | RU | Sárga kúpvirág | 5,21 | 2,65 | 60 | 45 |
+| prairie-9#2 | RU | Sárga kúpvirág | 5,66 | 2,65 | 60 | 45 |
+| prairie-9#3 | RU | Sárga kúpvirág | 6,11 | 2,65 | 60 | 45 |
+| prairie-9#4 | RU | Sárga kúpvirág | 4,53 | 3,04 | 60 | 45 |
+| prairie-9#5 | RU | Sárga kúpvirág | 4,98 | 3,04 | 60 | 45 |
+| prairie-9#6 | RU | Sárga kúpvirág | 5,43 | 3,04 | 60 | 45 |
+| prairie-9#7 | RU | Sárga kúpvirág | 5,88 | 3,04 | 60 | 45 |
+| prairie-9#8 | RU | Sárga kúpvirág | 6,33 | 3,04 | 60 | 45 |
+| prairie-9#9 | RU | Sárga kúpvirág | 4,76 | 3,43 | 60 | 45 |
+| prairie-9#10 | RU | Sárga kúpvirág | 5,21 | 3,43 | 60 | 45 |
+| prairie-9#11 | RU | Sárga kúpvirág | 5,66 | 3,43 | 60 | 45 |
+| prairie-9#12 | RU | Sárga kúpvirág | 6,11 | 3,43 | 60 | 45 |
+| prairie-9#13 | RU | Sárga kúpvirág | 4,98 | 3,82 | 60 | 45 |
+| prairie-9#14 | RU | Sárga kúpvirág | 5,43 | 3,82 | 60 | 45 |
+| prairie-9#15 | RU | Sárga kúpvirág | 5,88 | 3,82 | 60 | 45 |
+| prairie-9#16 | RU | Sárga kúpvirág | 6,33 | 3,82 | 60 | 45 |
+| prairie-9#17 | RU | Sárga kúpvirág | 5,21 | 4,21 | 60 | 45 |
+| prairie-9#18 | RU | Sárga kúpvirág | 5,66 | 4,21 | 60 | 45 |
+| prairie-9#19 | RU | Sárga kúpvirág | 6,11 | 4,21 | 60 | 45 |
+| prairie-10#1 | HB | Kék zabfű | 6,94 | 2,75 | 60 | 50 |
+| prairie-10#2 | HB | Kék zabfű | 7,44 | 2,75 | 60 | 50 |
+| prairie-10#3 | HB | Kék zabfű | 6,69 | 3,19 | 60 | 50 |
+| prairie-10#4 | HB | Kék zabfű | 7,19 | 3,19 | 60 | 50 |
+| prairie-10#5 | HB | Kék zabfű | 7,69 | 3,19 | 60 | 50 |
+| prairie-10#6 | HB | Kék zabfű | 6,94 | 3,62 | 60 | 50 |
+| prairie-10#7 | HB | Kék zabfű | 7,44 | 3,62 | 60 | 50 |
+| prairie-10#8 | HB | Kék zabfű | 6,69 | 4,05 | 60 | 50 |
+| prairie-10#9 | HB | Kék zabfű | 7,19 | 4,05 | 60 | 50 |
+| prairie-10#10 | HB | Kék zabfű | 7,69 | 4,05 | 60 | 50 |
+| prairie-10#11 | HB | Kék zabfű | 6,94 | 4,48 | 60 | 50 |
+| prairie-10#12 | HB | Kék zabfű | 7,44 | 4,48 | 60 | 50 |
+| prairie-10#13 | HB | Kék zabfű | 7,19 | 4,92 | 60 | 50 |
+| prairie-11#1 | PE | Kékszakállfű / orosz zsálya | 4,88 | 5,56 | 100 | 70 |
+| prairie-11#2 | PE | Kékszakállfű / orosz zsálya | 5,58 | 5,56 | 100 | 70 |
+| prairie-11#3 | PE | Kékszakállfű / orosz zsálya | 6,28 | 5,56 | 100 | 70 |
+| prairie-11#4 | PE | Kékszakállfű / orosz zsálya | 4,53 | 6,16 | 100 | 70 |
+| prairie-11#5 | PE | Kékszakállfű / orosz zsálya | 5,23 | 6,16 | 100 | 70 |
+| prairie-11#6 | PE | Kékszakállfű / orosz zsálya | 5,93 | 6,16 | 100 | 70 |
+| prairie-11#7 | PE | Kékszakállfű / orosz zsálya | 6,63 | 6,16 | 100 | 70 |
+| prairie-11#8 | PE | Kékszakállfű / orosz zsálya | 4,88 | 6,77 | 100 | 70 |
+| prairie-11#9 | PE | Kékszakállfű / orosz zsálya | 5,58 | 6,77 | 100 | 70 |
+| prairie-11#10 | PE | Kékszakállfű / orosz zsálya | 6,28 | 6,77 | 100 | 70 |
+| prairie-12#1 | AM | Közönséges cickafark | 7,19 | 5,81 | 60 | 45 |
+| prairie-12#2 | AM | Közönséges cickafark | 7,64 | 5,81 | 60 | 45 |
+| prairie-12#3 | AM | Közönséges cickafark | 7,41 | 6,20 | 60 | 45 |
+| prairie-12#4 | AM | Közönséges cickafark | 7,86 | 6,20 | 60 | 45 |
+| prairie-12#5 | AM | Közönséges cickafark | 7,19 | 6,59 | 60 | 45 |
+| prairie-12#6 | AM | Közönséges cickafark | 7,64 | 6,59 | 60 | 45 |
+| prairie-12#7 | AM | Közönséges cickafark | 6,96 | 6,98 | 60 | 45 |
+| prairie-12#8 | AM | Közönséges cickafark | 7,41 | 6,98 | 60 | 45 |
+| prairie-12#9 | AM | Közönséges cickafark | 7,86 | 6,98 | 60 | 45 |
+| prairie-12#10 | AM | Közönséges cickafark | 7,19 | 7,37 | 60 | 45 |
+| prairie-12#11 | AM | Közönséges cickafark | 7,64 | 7,37 | 60 | 45 |
+| prairie-12#12 | AM | Közönséges cickafark | 7,41 | 7,76 | 60 | 45 |
+| prairie-13#1 | EU | Színváltó kutyatej | 4,76 | 8,22 | 40 | 50 |
+| prairie-13#2 | EU | Színváltó kutyatej | 5,26 | 8,22 | 40 | 50 |
+| prairie-13#3 | EU | Színváltó kutyatej | 5,76 | 8,22 | 40 | 50 |
+| prairie-13#4 | EU | Színváltó kutyatej | 4,51 | 8,65 | 40 | 50 |
+| prairie-13#5 | EU | Színváltó kutyatej | 5,01 | 8,65 | 40 | 50 |
+| prairie-13#6 | EU | Színváltó kutyatej | 5,51 | 8,65 | 40 | 50 |
+| prairie-13#7 | EU | Színváltó kutyatej | 4,76 | 9,08 | 40 | 50 |
+| prairie-13#8 | EU | Színváltó kutyatej | 5,26 | 9,08 | 40 | 50 |
+| prairie-13#9 | EU | Színváltó kutyatej | 5,76 | 9,08 | 40 | 50 |
+| prairie-13#10 | EU | Színváltó kutyatej | 5,01 | 9,52 | 40 | 50 |
+| prairie-13#11 | EU | Színváltó kutyatej | 5,51 | 9,52 | 40 | 50 |
+| prairie-14#1 | SI | Hajszálas árvalányhaj | 6,96 | 8,20 | 50 | 40 |
+| prairie-14#2 | SI | Hajszálas árvalányhaj | 7,36 | 8,20 | 50 | 40 |
+| prairie-14#3 | SI | Hajszálas árvalányhaj | 6,76 | 8,55 | 50 | 40 |
+| prairie-14#4 | SI | Hajszálas árvalányhaj | 7,16 | 8,55 | 50 | 40 |
+| prairie-14#5 | SI | Hajszálas árvalányhaj | 7,56 | 8,55 | 50 | 40 |
+| prairie-14#6 | SI | Hajszálas árvalányhaj | 6,56 | 8,90 | 50 | 40 |
+| prairie-14#7 | SI | Hajszálas árvalányhaj | 6,96 | 8,90 | 50 | 40 |
+| prairie-14#8 | SI | Hajszálas árvalányhaj | 7,36 | 8,90 | 50 | 40 |
+| prairie-14#9 | SI | Hajszálas árvalányhaj | 7,76 | 8,90 | 50 | 40 |
+| prairie-14#10 | SI | Hajszálas árvalányhaj | 6,76 | 9,24 | 50 | 40 |
+| prairie-14#11 | SI | Hajszálas árvalányhaj | 7,16 | 9,24 | 50 | 40 |
+| prairie-14#12 | SI | Hajszálas árvalányhaj | 7,56 | 9,24 | 50 | 40 |
+| prairie-14#13 | SI | Hajszálas árvalányhaj | 6,96 | 9,59 | 50 | 40 |
+| prairie-14#14 | SI | Hajszálas árvalányhaj | 7,36 | 9,59 | 50 | 40 |
+
+## 4. Fajok és elhelyezésük
+- **CK – Tollas nádtippan** (*Calamagrostis × acutiflora 'Overdam'*), 20 tő. Díszfű / felálló levélcsomó, kb. 110 cm magas és 50 cm széles; most virágzik: bronz kalász.
+  - folt: x 0,1–3,1 m, y 0,1–2,2 m, eltolt kiosztás, 50 cm tőtáv (20 tő)
+- **EC – Bíbor kúpvirág** (*Echinacea purpurea 'Magnus'*), 22 tő. Bokros évelő, kb. 90 cm magas és 45 cm széles; most virágzik: bíborrózsaszín.
+  - folt: x 1,5–3,6 m, y 2,0–4,5 m, eltolt kiosztás, 45 cm tőtáv (22 tő)
+- **SI – Hajszálas árvalányhaj** (*Stipa tenuissima 'Pony Tails'*), 36 tő. Díszfű / felálló levélcsomó, kb. 50 cm magas és 40 cm széles; most virágzik: szőke.
+  - folt: x 0,1–1,5 m, y 2,2–5,0 m, eltolt kiosztás, 40 cm tőtáv (22 tő)
+  - folt: x 6,4–8,0 m, y 8,0–9,8 m, eltolt kiosztás, 40 cm tőtáv (14 tő)
+- **AG – Ánizsizsóp** (*Agastache 'Blue Fortune'*), 21 tő. Bokros évelő, kb. 80 cm magas és 45 cm széles; most virágzik: levendulakék.
+  - folt: x 1,3–3,5 m, y 4,9–7,2 m, eltolt kiosztás, 45 cm tőtáv (21 tő)
+- **PN – Tollborzfű** (*Pennisetum alopecuroides 'Hameln'*), 9 tő. Díszfű / felálló levélcsomó, kb. 60 cm magas és 60 cm széles; most nem virágzik; lomb: zöld, ősszel arany.
+  - folt: x 0,1–1,6 m, y 5,2–7,6 m, eltolt kiosztás, 60 cm tőtáv (9 tő)
+- **HH – Magas varjúháj** (*Hylotelephium 'Herbstfreude'*), 10 tő. Bokros évelő, kb. 60 cm magas és 50 cm széles; most nem virágzik; lomb: szürkészöld.
+  - folt: x 0,2–1,8 m, y 7,8–9,6 m, eltolt kiosztás, 50 cm tőtáv (10 tő)
+- **SA – Ligeti zsálya** (*Salvia nemorosa 'Marcus'*), 22 tő. Bokros évelő, kb. 40 cm magas és 35 cm széles; most virágzik: kékeslila.
+  - folt: x 2,1–3,5 m, y 7,6–9,8 m, eltolt kiosztás, 35 cm tőtáv (22 tő)
+- **MO – Kékperje** (*Molinia caerulea 'Moorhexe'*), 21 tő. Díszfű / felálló levélcsomó, kb. 90 cm magas és 50 cm széles; most nem virágzik; lomb: zöld, ősszel arany.
+  - folt: x 4,9–7,9 m, y 0,0–2,0 m, eltolt kiosztás, 50 cm tőtáv (21 tő)
+- **RU – Sárga kúpvirág** (*Rudbeckia fulgida 'Goldsturm'*), 19 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: aranysárga.
+  - folt: x 4,4–6,4 m, y 2,3–4,6 m, eltolt kiosztás, 45 cm tőtáv (19 tő)
+- **HB – Kék zabfű** (*Helictotrichon sempervirens*), 13 tő. Díszfű / felálló levélcsomó, kb. 60 cm magas és 50 cm széles; most virágzik: szalmaszín.
+  - folt: x 6,5–7,9 m, y 2,5–5,2 m, eltolt kiosztás, 50 cm tőtáv (13 tő)
+- **PE – Kékszakállfű / orosz zsálya** (*Salvia yangii (Perovskia atriplicifolia)*), 10 tő. Bokros évelő, kb. 100 cm magas és 70 cm széles; most virágzik: levendulakék.
+  - folt: x 4,5–6,7 m, y 5,0–7,3 m, eltolt kiosztás, 70 cm tőtáv (10 tő)
+- **AM – Közönséges cickafark** (*Achillea millefolium*), 12 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: fehér / rózsaszín / sárga.
+  - folt: x 6,9–7,9 m, y 5,6–8,0 m, eltolt kiosztás, 45 cm tőtáv (12 tő)
+- **EU – Színváltó kutyatej** (*Euphorbia epithymoides (E. polychroma)*), 11 tő. Bokros évelő, kb. 40 cm magas és 50 cm széles; most nem virágzik; lomb: zöld, ősszel vörös.
+  - folt: x 4,5–6,1 m, y 8,0–9,8 m, eltolt kiosztás, 50 cm tőtáv (11 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Világos apró kavicsmulcs a szárazságtűrők (hajszálas árvalányhaj, ánizsizsóp, magas varjúháj, ligeti zsálya, kék zabfű, kékszakállfű / orosz zsálya, közönséges cickafark, színváltó kutyatej) körül, máshol sötét fakéreg mulcs.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (4,0; 5,5) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 226 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 226 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;
+
+exports[`structured prompt on every example plan > shade: snapshot 1`] = `
+"## 1. Szerep és cél
+Kerttervező látványtervezőként dolgozol. Készíts fotórealisztikus kerti látványtervet a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan 154 növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.
+Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.
+
+## 2. Telek
+Árnyékkert: 7,0 × 9,0 m, árnyékágyás, északi fekvés, árnyékos (közvetlen nap alig napos), vályog talaj. Hely: Győr környéki kertes ház (Magyarország).
+Koordináták: a mellékelt alaprajz bal felső sarka a (0; 0) pont, x a szélesség (balról jobbra), y a hossz (felülről lefelé), méterben.
+Az ágyás téglalap, sarokpontjai (m): (0; 0), (7,0; 0), (7,0; 9,0), (0; 9,0).
+- Meglévő fa: nagy lombkoronájú fa a (3,5; 3,8) m pontnál, korona sugara kb. 3,2 m.
+- Kerti ösvény (lépőkő vagy kavics) („Kéregmulcsos ösvény”): x 0,0–7,0 m, y 6,2–6,9 m.
+- Kerti pad (fa): x 2,8–4,3 m, y 5,4–5,9 m.
+
+## 3. Növénytábla (154 növény)
+Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.
+| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |
+|---|---|---|---:|---:|---:|---:|
+| shade-1#1 | DR | Erdei pajzsika (páfrány) | 0,85 | 0,87 | 80 | 70 |
+| shade-1#2 | DR | Erdei pajzsika (páfrány) | 1,55 | 0,87 | 80 | 70 |
+| shade-1#3 | DR | Erdei pajzsika (páfrány) | 0,50 | 1,48 | 80 | 70 |
+| shade-1#4 | DR | Erdei pajzsika (páfrány) | 1,20 | 1,48 | 80 | 70 |
+| shade-1#5 | DR | Erdei pajzsika (páfrány) | 1,90 | 1,48 | 80 | 70 |
+| shade-2#1 | HO | Árnyékliliom | 2,70 | 0,81 | 50 | 60 |
+| shade-2#2 | HO | Árnyékliliom | 3,30 | 0,81 | 50 | 60 |
+| shade-2#3 | HO | Árnyékliliom | 3,90 | 0,81 | 50 | 60 |
+| shade-2#4 | HO | Árnyékliliom | 2,40 | 1,33 | 50 | 60 |
+| shade-2#5 | HO | Árnyékliliom | 3,00 | 1,33 | 50 | 60 |
+| shade-2#6 | HO | Árnyékliliom | 3,60 | 1,33 | 50 | 60 |
+| shade-2#7 | HO | Árnyékliliom | 4,20 | 1,33 | 50 | 60 |
+| shade-3#1 | PU | Tüdőfű | 5,03 | 0,70 | 30 | 45 |
+| shade-3#2 | PU | Tüdőfű | 5,47 | 0,70 | 30 | 45 |
+| shade-3#3 | PU | Tüdőfű | 5,92 | 0,70 | 30 | 45 |
+| shade-3#4 | PU | Tüdőfű | 6,38 | 0,70 | 30 | 45 |
+| shade-3#5 | PU | Tüdőfű | 4,80 | 1,09 | 30 | 45 |
+| shade-3#6 | PU | Tüdőfű | 5,25 | 1,09 | 30 | 45 |
+| shade-3#7 | PU | Tüdőfű | 5,70 | 1,09 | 30 | 45 |
+| shade-3#8 | PU | Tüdőfű | 6,15 | 1,09 | 30 | 45 |
+| shade-3#9 | PU | Tüdőfű | 6,60 | 1,09 | 30 | 45 |
+| shade-3#10 | PU | Tüdőfű | 5,03 | 1,48 | 30 | 45 |
+| shade-3#11 | PU | Tüdőfű | 5,47 | 1,48 | 30 | 45 |
+| shade-3#12 | PU | Tüdőfű | 5,92 | 1,48 | 30 | 45 |
+| shade-3#13 | PU | Tüdőfű | 6,38 | 1,48 | 30 | 45 |
+| shade-3#14 | PU | Tüdőfű | 5,25 | 1,87 | 30 | 45 |
+| shade-3#15 | PU | Tüdőfű | 5,70 | 1,87 | 30 | 45 |
+| shade-3#16 | PU | Tüdőfű | 6,15 | 1,87 | 30 | 45 |
+| shade-4#1 | HE | Tűzeső | 0,80 | 2,69 | 35 | 40 |
+| shade-4#2 | HE | Tűzeső | 1,20 | 2,69 | 35 | 40 |
+| shade-4#3 | HE | Tűzeső | 0,60 | 3,04 | 35 | 40 |
+| shade-4#4 | HE | Tűzeső | 1,00 | 3,04 | 35 | 40 |
+| shade-4#5 | HE | Tűzeső | 1,40 | 3,04 | 35 | 40 |
+| shade-4#6 | HE | Tűzeső | 0,40 | 3,39 | 35 | 40 |
+| shade-4#7 | HE | Tűzeső | 0,80 | 3,39 | 35 | 40 |
+| shade-4#8 | HE | Tűzeső | 1,20 | 3,39 | 35 | 40 |
+| shade-4#9 | HE | Tűzeső | 1,60 | 3,39 | 35 | 40 |
+| shade-4#10 | HE | Tűzeső | 0,60 | 3,73 | 35 | 40 |
+| shade-4#11 | HE | Tűzeső | 1,00 | 3,73 | 35 | 40 |
+| shade-4#12 | HE | Tűzeső | 1,40 | 3,73 | 35 | 40 |
+| shade-4#13 | HE | Tűzeső | 0,80 | 4,08 | 35 | 40 |
+| shade-4#14 | HE | Tűzeső | 1,20 | 4,08 | 35 | 40 |
+| shade-5#1 | EP | Püspöksüveg | 2,30 | 3,02 | 30 | 40 |
+| shade-5#2 | EP | Püspöksüveg | 2,70 | 3,02 | 30 | 40 |
+| shade-5#3 | EP | Püspöksüveg | 3,10 | 3,02 | 30 | 40 |
+| shade-5#4 | EP | Püspöksüveg | 2,10 | 3,37 | 30 | 40 |
+| shade-5#5 | EP | Püspöksüveg | 2,50 | 3,37 | 30 | 40 |
+| shade-5#6 | EP | Püspöksüveg | 2,90 | 3,37 | 30 | 40 |
+| shade-5#7 | EP | Püspöksüveg | 3,30 | 3,37 | 30 | 40 |
+| shade-5#8 | EP | Püspöksüveg | 2,30 | 3,71 | 30 | 40 |
+| shade-5#9 | EP | Püspöksüveg | 2,70 | 3,71 | 30 | 40 |
+| shade-5#10 | EP | Püspöksüveg | 3,10 | 3,71 | 30 | 40 |
+| shade-6#1 | BR | Kaukázusi nefelejcs | 4,20 | 2,94 | 40 | 50 |
+| shade-6#2 | BR | Kaukázusi nefelejcs | 4,70 | 2,94 | 40 | 50 |
+| shade-6#3 | BR | Kaukázusi nefelejcs | 5,20 | 2,94 | 40 | 50 |
+| shade-6#4 | BR | Kaukázusi nefelejcs | 3,95 | 3,38 | 40 | 50 |
+| shade-6#5 | BR | Kaukázusi nefelejcs | 4,45 | 3,38 | 40 | 50 |
+| shade-6#6 | BR | Kaukázusi nefelejcs | 4,95 | 3,38 | 40 | 50 |
+| shade-6#7 | BR | Kaukázusi nefelejcs | 5,45 | 3,38 | 40 | 50 |
+| shade-6#8 | BR | Kaukázusi nefelejcs | 4,20 | 3,81 | 40 | 50 |
+| shade-6#9 | BR | Kaukázusi nefelejcs | 4,70 | 3,81 | 40 | 50 |
+| shade-6#10 | BR | Kaukázusi nefelejcs | 5,20 | 3,81 | 40 | 50 |
+| shade-7#1 | HL | Keleti hunyor | 5,97 | 3,10 | 40 | 45 |
+| shade-7#2 | HL | Keleti hunyor | 6,42 | 3,10 | 40 | 45 |
+| shade-7#3 | HL | Keleti hunyor | 5,75 | 3,49 | 40 | 45 |
+| shade-7#4 | HL | Keleti hunyor | 6,20 | 3,49 | 40 | 45 |
+| shade-7#5 | HL | Keleti hunyor | 6,65 | 3,49 | 40 | 45 |
+| shade-7#6 | HL | Keleti hunyor | 5,97 | 3,88 | 40 | 45 |
+| shade-7#7 | HL | Keleti hunyor | 6,42 | 3,88 | 40 | 45 |
+| shade-7#8 | HL | Keleti hunyor | 6,20 | 4,27 | 40 | 45 |
+| shade-8#1 | VI | Kis meténg | 0,40 | 4,90 | 15 | 40 |
+| shade-8#2 | VI | Kis meténg | 0,80 | 4,90 | 15 | 40 |
+| shade-8#3 | VI | Kis meténg | 1,20 | 4,90 | 15 | 40 |
+| shade-8#4 | VI | Kis meténg | 1,60 | 4,90 | 15 | 40 |
+| shade-8#5 | VI | Kis meténg | 2,00 | 4,90 | 15 | 40 |
+| shade-8#6 | VI | Kis meténg | 2,40 | 4,90 | 15 | 40 |
+| shade-8#7 | VI | Kis meténg | 0,40 | 5,30 | 15 | 40 |
+| shade-8#8 | VI | Kis meténg | 0,80 | 5,30 | 15 | 40 |
+| shade-8#9 | VI | Kis meténg | 1,20 | 5,30 | 15 | 40 |
+| shade-8#10 | VI | Kis meténg | 1,60 | 5,30 | 15 | 40 |
+| shade-8#11 | VI | Kis meténg | 2,00 | 5,30 | 15 | 40 |
+| shade-8#12 | VI | Kis meténg | 2,40 | 5,30 | 15 | 40 |
+| shade-8#13 | VI | Kis meténg | 0,40 | 5,70 | 15 | 40 |
+| shade-8#14 | VI | Kis meténg | 0,80 | 5,70 | 15 | 40 |
+| shade-8#15 | VI | Kis meténg | 1,20 | 5,70 | 15 | 40 |
+| shade-8#16 | VI | Kis meténg | 1,60 | 5,70 | 15 | 40 |
+| shade-8#17 | VI | Kis meténg | 2,00 | 5,70 | 15 | 40 |
+| shade-8#18 | VI | Kis meténg | 2,40 | 5,70 | 15 | 40 |
+| shade-9#1 | LU | Foltos árvacsalán | 5,03 | 4,91 | 20 | 45 |
+| shade-9#2 | LU | Foltos árvacsalán | 5,47 | 4,91 | 20 | 45 |
+| shade-9#3 | LU | Foltos árvacsalán | 5,92 | 4,91 | 20 | 45 |
+| shade-9#4 | LU | Foltos árvacsalán | 6,38 | 4,91 | 20 | 45 |
+| shade-9#5 | LU | Foltos árvacsalán | 4,80 | 5,30 | 20 | 45 |
+| shade-9#6 | LU | Foltos árvacsalán | 5,25 | 5,30 | 20 | 45 |
+| shade-9#7 | LU | Foltos árvacsalán | 5,70 | 5,30 | 20 | 45 |
+| shade-9#8 | LU | Foltos árvacsalán | 6,15 | 5,30 | 20 | 45 |
+| shade-9#9 | LU | Foltos árvacsalán | 6,60 | 5,30 | 20 | 45 |
+| shade-9#10 | LU | Foltos árvacsalán | 5,03 | 5,69 | 20 | 45 |
+| shade-9#11 | LU | Foltos árvacsalán | 5,47 | 5,69 | 20 | 45 |
+| shade-9#12 | LU | Foltos árvacsalán | 5,92 | 5,69 | 20 | 45 |
+| shade-9#13 | LU | Foltos árvacsalán | 6,38 | 5,69 | 20 | 45 |
+| shade-10#1 | AS | Tollbuga | 0,62 | 7,39 | 60 | 45 |
+| shade-10#2 | AS | Tollbuga | 1,07 | 7,39 | 60 | 45 |
+| shade-10#3 | AS | Tollbuga | 1,52 | 7,39 | 60 | 45 |
+| shade-10#4 | AS | Tollbuga | 1,98 | 7,39 | 60 | 45 |
+| shade-10#5 | AS | Tollbuga | 0,40 | 7,78 | 60 | 45 |
+| shade-10#6 | AS | Tollbuga | 0,85 | 7,78 | 60 | 45 |
+| shade-10#7 | AS | Tollbuga | 1,30 | 7,78 | 60 | 45 |
+| shade-10#8 | AS | Tollbuga | 1,75 | 7,78 | 60 | 45 |
+| shade-10#9 | AS | Tollbuga | 2,20 | 7,78 | 60 | 45 |
+| shade-10#10 | AS | Tollbuga | 0,62 | 8,17 | 60 | 45 |
+| shade-10#11 | AS | Tollbuga | 1,07 | 8,17 | 60 | 45 |
+| shade-10#12 | AS | Tollbuga | 1,52 | 8,17 | 60 | 45 |
+| shade-10#13 | AS | Tollbuga | 1,98 | 8,17 | 60 | 45 |
+| shade-10#14 | AS | Tollbuga | 0,85 | 8,56 | 60 | 45 |
+| shade-10#15 | AS | Tollbuga | 1,30 | 8,56 | 60 | 45 |
+| shade-10#16 | AS | Tollbuga | 1,75 | 8,56 | 60 | 45 |
+| shade-11#1 | HK | Japán erdei fű | 2,83 | 7,68 | 35 | 45 |
+| shade-11#2 | HK | Japán erdei fű | 3,27 | 7,68 | 35 | 45 |
+| shade-11#3 | HK | Japán erdei fű | 3,73 | 7,68 | 35 | 45 |
+| shade-11#4 | HK | Japán erdei fű | 4,17 | 7,68 | 35 | 45 |
+| shade-11#5 | HK | Japán erdei fű | 2,60 | 8,07 | 35 | 45 |
+| shade-11#6 | HK | Japán erdei fű | 3,05 | 8,07 | 35 | 45 |
+| shade-11#7 | HK | Japán erdei fű | 3,50 | 8,07 | 35 | 45 |
+| shade-11#8 | HK | Japán erdei fű | 3,95 | 8,07 | 35 | 45 |
+| shade-11#9 | HK | Japán erdei fű | 4,40 | 8,07 | 35 | 45 |
+| shade-11#10 | HK | Japán erdei fű | 2,83 | 8,46 | 35 | 45 |
+| shade-11#11 | HK | Japán erdei fű | 3,27 | 8,46 | 35 | 45 |
+| shade-11#12 | HK | Japán erdei fű | 3,73 | 8,46 | 35 | 45 |
+| shade-11#13 | HK | Japán erdei fű | 4,17 | 8,46 | 35 | 45 |
+| shade-12#1 | CA | Japán sás | 5,17 | 7,37 | 30 | 35 |
+| shade-12#2 | CA | Japán sás | 5,53 | 7,37 | 30 | 35 |
+| shade-12#3 | CA | Japán sás | 5,88 | 7,37 | 30 | 35 |
+| shade-12#4 | CA | Japán sás | 6,22 | 7,37 | 30 | 35 |
+| shade-12#5 | CA | Japán sás | 5,00 | 7,67 | 30 | 35 |
+| shade-12#6 | CA | Japán sás | 5,35 | 7,67 | 30 | 35 |
+| shade-12#7 | CA | Japán sás | 5,70 | 7,67 | 30 | 35 |
+| shade-12#8 | CA | Japán sás | 6,05 | 7,67 | 30 | 35 |
+| shade-12#9 | CA | Japán sás | 6,40 | 7,67 | 30 | 35 |
+| shade-12#10 | CA | Japán sás | 4,83 | 7,98 | 30 | 35 |
+| shade-12#11 | CA | Japán sás | 5,17 | 7,98 | 30 | 35 |
+| shade-12#12 | CA | Japán sás | 5,53 | 7,98 | 30 | 35 |
+| shade-12#13 | CA | Japán sás | 5,88 | 7,98 | 30 | 35 |
+| shade-12#14 | CA | Japán sás | 6,22 | 7,98 | 30 | 35 |
+| shade-12#15 | CA | Japán sás | 6,58 | 7,98 | 30 | 35 |
+| shade-12#16 | CA | Japán sás | 5,00 | 8,28 | 30 | 35 |
+| shade-12#17 | CA | Japán sás | 5,35 | 8,28 | 30 | 35 |
+| shade-12#18 | CA | Japán sás | 5,70 | 8,28 | 30 | 35 |
+| shade-12#19 | CA | Japán sás | 6,05 | 8,28 | 30 | 35 |
+| shade-12#20 | CA | Japán sás | 6,40 | 8,28 | 30 | 35 |
+| shade-12#21 | CA | Japán sás | 5,17 | 8,58 | 30 | 35 |
+| shade-12#22 | CA | Japán sás | 5,53 | 8,58 | 30 | 35 |
+| shade-12#23 | CA | Japán sás | 5,88 | 8,58 | 30 | 35 |
+| shade-12#24 | CA | Japán sás | 6,22 | 8,58 | 30 | 35 |
+
+## 4. Fajok és elhelyezésük
+- **DR – Erdei pajzsika (páfrány)** (*Dryopteris filix-mas*), 5 tő. Díszfű / felálló levélcsomó, kb. 80 cm magas és 70 cm széles; most nem virágzik; lomb: élénkzöld.
+  - folt: x 0,3–2,1 m, y 0,4–2,0 m, eltolt kiosztás, 70 cm tőtáv (5 tő)
+- **HO – Árnyékliliom** (*Hosta sp.*), 7 tő. Bokros évelő, kb. 50 cm magas és 60 cm széles; most virágzik: halványlila.
+  - folt: x 2,2–4,4 m, y 0,4–1,8 m, eltolt kiosztás, 60 cm tőtáv (7 tő)
+- **PU – Tüdőfű** (*Pulmonaria officinalis 'Sissinghurst White'*), 16 tő. Bokros évelő, kb. 30 cm magas és 45 cm széles; most nem virágzik; lomb: ezüstfoltos zöld.
+  - folt: x 4,7–6,7 m, y 0,4–2,2 m, eltolt kiosztás, 45 cm tőtáv (16 tő)
+- **HE – Tűzeső** (*Heuchera sp.*), 14 tő. Bokros évelő, kb. 35 cm magas és 40 cm széles; most virágzik: rózsaszín / fehér.
+  - folt: x 0,2–1,8 m, y 2,5–4,3 m, eltolt kiosztás, 40 cm tőtáv (14 tő)
+- **EP – Püspöksüveg** (*Epimedium × versicolor*), 10 tő. Alacsony talajtakaró / párna, kb. 30 cm magas és 40 cm széles; most nem virágzik; lomb: bronz–zöld.
+  - folt: x 2,0–3,4 m, y 2,7–4,1 m, eltolt kiosztás, 40 cm tőtáv (10 tő)
+- **BR – Kaukázusi nefelejcs** (*Brunnera macrophylla 'Jack Frost'*), 10 tő. Bokros évelő, kb. 40 cm magas és 50 cm széles; most nem virágzik; lomb: ezüst erezett.
+  - folt: x 3,9–5,5 m, y 2,6–4,2 m, eltolt kiosztás, 50 cm tőtáv (10 tő)
+- **HL – Keleti hunyor** (*Helleborus × hybridus*), 8 tő. Bokros évelő, kb. 40 cm magas és 45 cm széles; most nem virágzik; lomb: sötétzöld.
+  - folt: x 5,6–6,8 m, y 2,8–4,6 m, eltolt kiosztás, 45 cm tőtáv (8 tő)
+- **VI – Kis meténg** (*Vinca minor*), 18 tő. Alacsony talajtakaró / párna, kb. 15 cm magas és 40 cm széles; most nem virágzik; lomb: fényes sötétzöld.
+  - folt: x 0,2–2,6 m, y 4,7–5,9 m, négyzetes kiosztás, 40 cm tőtáv (18 tő)
+- **LU – Foltos árvacsalán** (*Lamium maculatum 'White Nancy'*), 13 tő. Alacsony talajtakaró / párna, kb. 20 cm magas és 45 cm széles; most virágzik: fehér.
+  - folt: x 4,6–6,8 m, y 4,7–5,9 m, eltolt kiosztás, 45 cm tőtáv (13 tő)
+- **AS – Tollbuga** (*Astilbe × arendsii*), 16 tő. Bokros évelő, kb. 60 cm magas és 45 cm széles; most virágzik: rózsaszín.
+  - folt: x 0,2–2,4 m, y 7,2–8,8 m, eltolt kiosztás, 45 cm tőtáv (16 tő)
+- **HK – Japán erdei fű** (*Hakonechloa macra 'Aureola'*), 13 tő. Díszfű / felálló levélcsomó, kb. 35 cm magas és 45 cm széles; most nem virágzik; lomb: aranysárga csíkos.
+  - folt: x 2,5–4,5 m, y 7,4–8,8 m, eltolt kiosztás, 45 cm tőtáv (13 tő)
+- **CA – Japán sás** (*Carex oshimensis 'Evergold'*), 24 tő. Díszfű / felálló levélcsomó, kb. 30 cm magas és 35 cm széles; most nem virágzik; lomb: sárga–zöld csíkos.
+  - folt: x 4,6–6,8 m, y 7,2–8,8 m, eltolt kiosztás, 35 cm tőtáv (24 tő)
+
+## 5. Stíluselőírás: talajtakarás, évszak
+Sötét fakéreg mulcs a tövek között.
+Évszak: nyár (július, teljes virágzás). A növények kifejlett, 2–3 éves állapotban.
+Fény: természetes napközbeni napfény, valósághű árnyékokkal.
+
+## 6. Kamera, fény és stílus
+Madártávlatból, kb. 45°-os szögből, hogy az elrendezés jól látsszon.
+Stílus: fotórealisztikus, természetes színek; emberek, feliratok és vízjel nélkül. A kódokat (pl. LA) ne írd rá a képre.
+(A beültetés súlypontja kb. (3,5; 4,3) m.)
+
+## 7. Tiltások
+- Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan 154 növény legyen a képen.
+- Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.
+- Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.
+- Ne írj feliratot, kódot, vízjelet vagy árat a képre.
+
+## 8. Ellenőrzés
+A látványterv elkészítésekor minden növényhez rögzítsd az egyedi azonosítót, a fajt, az előírt koordinátát és a ténylegesen létrehozott geometriai pozíciót. A fejlesztést csak akkor tekintsd sikeresnek, ha mind a 154 növény szerepel a kimenetben, minden fajazonosság helyes, és egyik növény középpontjának eltérése sem haladja meg a 20 cm-t. Futtass reprodukálható ellenőrzést a strukturált kimeneti adatokon, és készíts növényenkénti tesztjegyzőkönyvet (mért eltérés, PASS/FAIL, tesztazonosító, futtatási napló hivatkozása). A végső renderen külön ellenőrizd a növények látható darabszámát és azonosíthatóságát; jelezd, ha a perspektíva vagy takarás miatt valamely követelmény nem igazolható. Ha nincs ténylegesen végrehajtott teszt vagy elegendő bizonyíték, az eredményt „NEM IGAZOLT” státusszal jelöld, és ne jelents sikeres teljesítést.
+
+Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi."
+`;

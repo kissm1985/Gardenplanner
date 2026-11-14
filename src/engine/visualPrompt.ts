@@ -11,6 +11,8 @@ import { areaSunLevel } from './rules';
 import { mulchAdvice } from './schedule';
 import { localName } from '../i18n/names';
 import { plantLook, SEASON_MONTH, type Season } from './season';
+import { plantInstances } from '../render3d/instances';
+import { checkBlock } from './checkBlock';
 
 /** camera = the viewpoint placed on the plan; eye = from the bottom edge; aerial = bird's-eye; both = eye (or camera) + aerial. */
 export type Viewpoint = 'camera' | 'eye' | 'aerial' | 'both';
@@ -273,15 +275,23 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
   const style = opt.style ?? 'photo';
   const L: string[] = [];
 
-  // Task
+  const instances = plantInstances(items, project.plantDb);
+  const N = instances.length;
+  // 1. Role and goal
+  L.push(hu ? '## 1. Szerep és cél' : '## 1. Role and goal');
   L.push(
     hu
-      ? `Készíts ${STYLE_TASK[style].hu} a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A növények helye, darabszáma, mérete és színe pontosan egyezzen a tervvel; ne adj hozzá más növényt vagy tárgyat.`
-      : `Create ${STYLE_TASK[style].en} from the exact description below and the attached plan (PNG with legend). Plant positions, counts, sizes and colours must match the plan exactly; do not add any other plants or objects.`,
+      ? `Kerttervező látványtervezőként dolgozol. Készíts ${STYLE_TASK[style].hu} a lenti pontos leírás és a mellékelt alaprajz (PNG, jelmagyarázattal) alapján. A tervben pontosan ${N} növény van; mindegyik helye, faja, mérete és színe pontosan egyezzen a növénytáblával; ne adj hozzá más növényt vagy tárgyat.`
+      : `You are a garden visualisation designer. Create ${STYLE_TASK[style].en} from the exact description below and the attached plan (PNG with legend). The plan has exactly ${N} plants; each one's position, species, size and colour must match the plant table exactly; do not add any other plants or objects.`,
+  );
+  L.push(
+    hu
+      ? 'Ha mellékelve van a manifest.json (a Planterra 3D látványtervéből), annak koordinátái azonosak a növénytábla koordinátáival.'
+      : 'If manifest.json (from the Planterra 3D visualisation) is attached, its coordinates are the same as those in the plant table.',
   );
   L.push('');
-  // Site
-  L.push(hu ? '## Terület' : '## Site');
+  // 2. Site
+  L.push(hu ? '## 2. Telek' : '## 2. Site');
   L.push(
     hu
       ? `${localName(area.name, 'hu')}: ${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m, ${area.kind ? AREA_KIND_LABEL[area.kind] : 'évelőágyás'}, ${ORIENTATION_LABEL[area.orientation]}i fekvés, ${sun === 'sun' ? 'napos' : sun === 'part' ? 'félárnyékos' : 'árnyékos'}${area.sunUntil ? ` (közvetlen nap ${area.sunUntil})` : ''}${area.soil ? `, ${SOIL_LABEL[area.soil]} talaj` : ''}. Hely: ${gardenLocation(project.settings).name} környéki kertes ház (Magyarország).`
@@ -302,6 +312,12 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
           ? `Az ágyás ellipszis alakú (${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m), a (${fmt(area.widthCm / 2)}; ${fmt(area.lengthCm / 2)}) m középponttal.`
           : `The bed is oval (${fmt(area.widthCm)} × ${fmt(area.lengthCm)} m), centred at (${fmt(area.widthCm / 2)}, ${fmt(area.lengthCm / 2)}) m.`,
     );
+  if (area.shape.kind === 'rect')
+    L.push(
+      hu
+        ? `Az ágyás téglalap, sarokpontjai (m): (0; 0), (${fmt(area.widthCm)}; 0), (${fmt(area.widthCm)}; ${fmt(area.lengthCm)}), (0; ${fmt(area.lengthCm)}).`
+        : `The bed is a rectangle, corners (m): (0, 0), (${fmt(area.widthCm)}, 0), (${fmt(area.widthCm)}, ${fmt(area.lengthCm)}), (0, ${fmt(area.lengthCm)}).`,
+    );
   if (area.shape.kind === 'polygon')
     L.push(
       hu
@@ -311,8 +327,26 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
   for (const f of fixtureLines(area, opt.lang)) L.push(`- ${f}`);
   L.push('');
 
-  // Plants
-  L.push(hu ? '## Növények és elhelyezésük' : '## Plants and placement');
+  // 3. Plant table: every plant with its id, species, position and size (the same ids as the 3D manifest).
+  L.push(hu ? `## 3. Növénytábla (${N} növény)` : `## 3. Plant table (${N} plants)`);
+  L.push(
+    hu
+      ? 'Minden sor egy növény. Az x és y a tő középpontja méterben (bal felső sarok = 0; 0). Méret: kifejlett magasság és szélesség cm-ben.'
+      : 'One row per plant. x and y are the centre of the plant in metres (top-left corner = 0, 0). Size: mature height and spread in cm.',
+  );
+  L.push(hu ? '| ID | Faj | Név | x (m) | y (m) | Magasság (cm) | Szélesség (cm) |' : '| ID | Species | Name | x (m) | y (m) | Height (cm) | Spread (cm) |');
+  L.push('|---|---|---|---:|---:|---:|---:|');
+  const xy = (cm: number) => (hu ? (cm / 100).toFixed(2).replace('.', ',') : (cm / 100).toFixed(2));
+  const nameOf = (code: string) => {
+    const p = plants.get(code)!;
+    return hu ? p.nameHu : p.nameEn || p.nameHu;
+  };
+  for (const pi of instances) L.push(`| ${pi.plant_id} | ${pi.species_id} | ${nameOf(pi.species_id)} | ${xy(pi.xCm)} | ${xy(pi.yCm)} | ${pi.heightCm} | ${pi.spreadCm} |`);
+  if (!N) L.push(hu ? '| – | – | (még nincs növény) | – | – | – | – |' : '| – | – | (no plants yet) | – | – | – | – |');
+  L.push('');
+
+  // Species: look and grouping
+  L.push(hu ? '## 4. Fajok és elhelyezésük' : '## 4. Species and placement');
   const byPlant = new Map<string, PlacedItem[]>();
   for (const it of items) byPlant.set(it.plantId, [...(byPlant.get(it.plantId) ?? []), it]);
   for (const p of used) {
@@ -360,7 +394,7 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
 
   // Ground and season
   const mul = mulchAdvice(used);
-  L.push(hu ? '## Talajtakarás, évszak, fény' : '## Ground cover, season, light');
+  L.push(hu ? '## 5. Stíluselőírás: talajtakarás, évszak' : '## 5. Style: ground cover, season');
   L.push(
     area.kind === 'gravel'
       ? hu
@@ -393,7 +427,7 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
   L.push('');
 
   // Camera
-  L.push(hu ? '## Nézőpont és stílus' : '## Viewpoint and style');
+  L.push(hu ? '## 6. Kamera, fény és stílus' : '## 6. Camera, light and style');
   const eye = hu
     ? `Szemmagasságból (kb. 1,6 m), az alaprajz alsó széle (y = ${fmt(area.lengthCm)} m) felől a terület hossza mentén nézve, 35 mm-es objektívvel.`
     : `Eye level (about 1.6 m) from the bottom edge of the plan (y = ${fmt(area.lengthCm)} m), looking along the length, 35 mm lens.`;
@@ -414,5 +448,34 @@ export function buildVisualPrompt(project: Project, area: Area, items: PlacedIte
   );
   const centre = items.length ? centroid(items.map((i) => (i.kind === 'plant' ? [i.x, i.y] : centroid(i.kind === 'drift' ? i.polygon : i.path)) as Pt)) : null;
   if (centre) L.push(hu ? `(A beültetés súlypontja kb. (${fmt(centre[0])}; ${fmt(centre[1])}) m.)` : `(The planting is centred around (${fmt(centre[0])}, ${fmt(centre[1])}) m.)`);
+  L.push('');
+
+  // 7. Prohibitions
+  L.push(hu ? '## 7. Tiltások' : '## 7. Do not');
+  for (const line of hu
+    ? [
+        `Ne adj hozzá növényt, és ne hagyj el egyet sem: pontosan ${N} növény legyen a képen.`,
+        'Ne cseréld a fajokat, és ne mozdítsd el a növényeket a táblában megadott helyükről.',
+        'Ne adj hozzá épületet, bútort, embert, állatot vagy tárgyat, ami nincs a leírásban.',
+        'Ne írj feliratot, kódot, vízjelet vagy árat a képre.',
+      ]
+    : [
+        `Do not add or leave out any plant: the image must show exactly ${N} plants.`,
+        'Do not swap species and do not move plants from the positions in the table.',
+        'Do not add buildings, furniture, people, animals or objects that are not in the description.',
+        'Do not put labels, codes, watermarks or prices on the image.',
+      ])
+    L.push(`- ${line}`);
+  L.push('');
+
+  // 8. Verification block (word for word, N = the plan's plant count)
+  L.push(hu ? '## 8. Ellenőrzés' : '## 8. Verification');
+  L.push(checkBlock(N, opt.lang));
+  L.push('');
+  L.push(
+    hu
+      ? 'Megjegyzés: képgenerálás közben koordináta nem mérhető, ezért kódfuttatás nélkül az eredmény „NEM IGAZOLT”. A Planterra 3D látványterve (verify:render) ezt ténylegesen ellenőrzi.'
+      : 'Note: an image generator cannot measure coordinates, so without running code the result is “NOT VERIFIED”. The Planterra 3D visualisation (verify:render) does check this.',
+  );
   return L.join('\n');
 }

@@ -465,7 +465,10 @@ A felső sáv **⋯** (Menü) gombja → **Projekt: mentés, megosztás, nyomtat
 
 <img src="img/17-chatgpt.png" width="280" align="right" alt="Látványterv ChatGPT-nek">
 
-A program elkészít egy részletes leírást és egy rajzot, amiből egy képgeneráló mesterséges intelligencia (pl. ChatGPT) valósághű látványtervet tud rajzolni.
+A **Látványterv** ablakban kétféle látványterv készülhet:
+
+- **3D látványterv a tervből**: a **Látványterv készítése** gomb a rajzon látható változatot légi nézetben, a terv adataiból számolva rajzolja meg (nem fotó, nem MI-kép): minden növény a helyén, fajonként saját formával (lombos fa, tűlevelű, díszfű, virágfüzér, párna, bokor) és színnel, kerítéssel a terület szélén, méretvonalakkal és címblokkal. Szabad alakú területen is működik. Letölthető **PNG**-ben (2400 px széles), **PDF**-ben (A4 fekvő: a kép, a fajok összesítése és a teljes növénylista azonosítóval, fajjal és koordinátával), és **manifest.json**-ként (növényenként azonosító, faj, előírt és ténylegesen létrehozott pozíció). Telefonon is működik, internet nélkül is.
+- **Látványterv ChatGPT-vel**: a program részletes leírást és rajzot készít, amiből egy képgeneráló mesterséges intelligencia valósághű képet tud rajzolni (lásd lent).
 
 **Megnyitás**: a **Változatok** ablak **🖼 Látványterv** gombjával, vagy a **⋯ Projekt → Látványterv megnyitása** gombbal. A rajzon éppen szerkesztett változatról készül.
 
@@ -476,6 +479,8 @@ A program elkészít egy részletes leírást és egy rajzot, amiből egy képge
    - **telefonon** megnyílik a megosztó menü: válaszd a ChatGPT-t, és a leírás a rajzzal együtt érkezik (a leírás a vágólapra is kerül, ha az app csak a képet venné át);
    - **számítógépen** a leírás a vágólapra kerül, a rajz letöltődik, és új lapon megnyílik a chatgpt.com: illeszd be a szöveget, és húzd mellé a képet.
 5. A **Leírás másolása** és a **Rajz PNG-ben** gomb külön is elvégzi a két lépést.
+
+A leírás szerkezete: **1. szerep és cél**, **2. telek** (körvonal-koordináták, méretek, tájolás, kerítés, burkolatok), **3. növénytábla** (minden növény egy sor: azonosító, faj, x és y méterben, magasság, szélesség – ugyanazok az azonosítók, mint a 3D látványterv manifestjében), **4. fajok** (kinézet az évszakban, foltok és sorok), **5. stílus**, **6. kamera és fény**, **7. tiltások** (ne adjon hozzá és ne hagyjon el növényt), **8. ellenőrzés** (a jóváhagyott ellenőrző blokk, a terv tényleges növényszámával). A képgenerálás koordinátát nem mér, ezért ott az ellenőrzés eredménye kódfuttatás nélkül „NEM IGAZOLT”; a valódi ellenőrzést a 3D látványterv végzi.
 
 A leírásban benne vannak a méretek, az elemek, minden folt helye méterben, minden faj színe, formája, magassága az adott évszakban, és a kamerából látható növények és elemek előtér, középtér és háttér szerint (balra, középen, jobbra). A PNG-n a kamera és a látómező is látszik.
 
