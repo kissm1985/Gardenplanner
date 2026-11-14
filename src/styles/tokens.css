@@ -1,0 +1,95 @@
+/* Planterra identity: forest, olive, sandstone, ivory and dark earth. Fraunces and JetBrains Mono for the interface, Outfit for the wordmark. */
+:root {
+  --bg: #f7f4ec;
+  --panel: #fcfaf5;
+  --fg: #2b322b;
+  --mute: #686e64;
+  --line: #e2dccb;
+  --accent: #244b3c;
+  --accent-fg: #ffffff;
+  --lav: #6b4fa0;
+  --soil: #d5c5a7;
+  --warn: #9a5b12;
+  --danger: #a3362b;
+  --lawn: #a3bf84;
+  --edge: #7b8577;
+  --wall: #4a524d;
+  --drip: #2f7ea6;
+  --ring: rgba(23, 58, 40, 0.35);
+  --chip: #ecebdf;
+  --grid-minor: rgba(23, 58, 40, 0.09);
+  --grid-major: rgba(23, 58, 40, 0.22);
+  --juglone: #8a5a2b;
+  --brand-stem: #244b3c;
+  --brand-leaf: #8a9462;
+  --forest: #244b3c;
+  --olive: #8a9462;
+  --sandstone: #d5c5a7;
+  --ivory: #f7f4ec;
+  --earth: #343a32;
+  --sage: #b9bf9c;
+  --sand: #d5c5a7;
+  --sans: 'Outfit Variable', 'Outfit', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --serif: 'Fraunces Variable', 'Fraunces', Georgia, 'Times New Roman', serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, Consolas, monospace;
+  --tile: 35%;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --tap: 44px;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --bg: #1d231e;
+    --panel: #252d26;
+    --fg: #f1eee4;
+    --mute: #a7ab9c;
+    --line: #36403a;
+    --accent: #a9b37e;
+    --accent-fg: #1d231e;
+    --lav: #b9a2e6;
+    --soil: #2f2920;
+    --warn: #e0a458;
+    --danger: #f08a7e;
+    --lawn: #3f5a37;
+    --edge: #5e6a5e;
+    --wall: #8d998f;
+    --drip: #6fb4d6;
+    --ring: rgba(255, 255, 255, 0.3);
+    --chip: #2c352d;
+    --grid-minor: rgba(227, 233, 223, 0.08);
+    --grid-major: rgba(227, 233, 223, 0.2);
+    --juglone: #d6a46a;
+    --brand-stem: #f7f4ec;
+    --brand-leaf: #8a9462;
+    --tile: 14%;
+    color-scheme: dark;
+  }
+}
+:root[data-theme='dark'] {
+  --bg: #1d231e;
+  --panel: #252d26;
+  --fg: #f1eee4;
+  --mute: #a7ab9c;
+  --line: #36403a;
+  --accent: #a9b37e;
+  --accent-fg: #1d231e;
+  --lav: #b9a2e6;
+  --soil: #2f2920;
+  --warn: #e0a458;
+  --danger: #f08a7e;
+  --lawn: #3f5a37;
+  --edge: #5e6a5e;
+  --wall: #8d998f;
+  --drip: #6fb4d6;
+  --ring: rgba(255, 255, 255, 0.3);
+  --chip: #2c352d;
+  --grid-minor: rgba(227, 233, 223, 0.08);
+  --grid-major: rgba(227, 233, 223, 0.2);
+  --juglone: #d6a46a;
+  --brand-stem: #f7f4ec;
+  --brand-leaf: #8a9462;
+  --tile: 14%;
+  color-scheme: dark;
+}

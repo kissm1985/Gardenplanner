@@ -1,0 +1,97 @@
+/* Catalogue admin page */
+body {
+  overflow: auto;
+}
+.admin,
+.admin-login {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 16px;
+}
+.admin-login {
+  max-width: 420px;
+}
+.admin-login h1 {
+  font-size: 1.4rem;
+}
+.admin-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+.admin-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.admin-table th,
+.admin-table td {
+  text-align: left;
+  vertical-align: top;
+  padding: 6px;
+  border-bottom: 1px solid var(--line);
+}
+.admin-table input {
+  width: 100%;
+  min-width: 70px;
+}
+.admin-table tr.is-disabled {
+  opacity: 0.55;
+}
+.admin-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 8px;
+}
+.admin-search {
+  flex: 1;
+  min-width: 180px;
+}
+.admin-tag {
+  margin-left: 4px;
+  padding: 0 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--accent-soft, #e3ecdf);
+}
+.admin-scroll {
+  overflow-x: auto;
+  max-height: 60vh;
+}
+.admin-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.admin-status {
+  font-size: 12px;
+  padding: 1px 6px;
+  border-radius: 8px;
+  background: var(--line);
+}
+.admin-status.is-new {
+  background: #d8ecd2;
+  color: #1f4d1a;
+}
+.admin-status.is-update {
+  background: #f3e6c4;
+  color: #5c4500;
+}
+.admin-status.is-error {
+  background: #f4d4d0;
+  color: #7a1b10;
+}
+.admin-secret {
+  word-break: break-all;
+}
+.admin-file {
+  display: inline-block;
+  cursor: pointer;
+}

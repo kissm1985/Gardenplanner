@@ -1,0 +1,9 @@
+dist
+dev-dist
+node_modules
+test-results
+playwright-report
+package-lock.json
+docs
+public/third-party-licenses.txt
+*.md
